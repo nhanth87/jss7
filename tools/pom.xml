@@ -14,7 +14,6 @@
 	<modules>
 		<module>simulator</module>
 		<module>trace-parser</module>
-		<module>simple-alarm-listener</module>
 	</modules>
 
 	<build>

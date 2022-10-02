@@ -41,7 +41,7 @@ public class TCAPProviderImplWrapper extends TCAPProviderImpl {
     }
 
     public ScheduledExecutorService getExecuter() {
-        return this._EXECUTOR;
+        return (ScheduledExecutorService) this._EXECUTOR;
     }
 
 }

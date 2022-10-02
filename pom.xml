@@ -64,7 +64,6 @@
 		<module>oam</module>
 
 		<module>service</module>
-		<module>sgw</module>
 
 		<module>tools</module>
 	</modules>
@@ -72,6 +71,12 @@
 	<!-- declare our babies -->
 	<dependencyManagement>
 		<dependencies>
+			<!-- Hazelcat -->
+			<dependency>
+				<groupId>com.hazelcast</groupId>
+				<artifactId>hazelcast</artifactId>
+				<version>4.0.2</version>
+			</dependency>
 			<!-- ASN -->
 			<dependency>
 				<groupId>org.mobicents.protocols.asn</groupId>

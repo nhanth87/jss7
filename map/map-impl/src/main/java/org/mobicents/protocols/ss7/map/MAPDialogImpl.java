@@ -53,6 +53,7 @@ import org.mobicents.protocols.ss7.tcap.asn.comp.Reject;
 import org.mobicents.protocols.ss7.tcap.asn.comp.ReturnError;
 import org.mobicents.protocols.ss7.tcap.asn.comp.ReturnResult;
 import org.mobicents.protocols.ss7.tcap.asn.comp.ReturnResultLast;
+import org.mobicents.protocols.ss7.tcap.api.tc.dialog.TRPseudoState;
 
 /**
  *
@@ -64,6 +65,8 @@ import org.mobicents.protocols.ss7.tcap.asn.comp.ReturnResultLast;
  * @author sergey vetyutnev
  */
 public abstract class MAPDialogImpl implements MAPDialog {
+    private static final long serialVersionUID = 1L;
+
     private static final Logger logger = Logger.getLogger(MAPDialogImpl.class);
 
     protected Dialog tcapDialog = null;
@@ -406,6 +409,10 @@ public abstract class MAPDialogImpl implements MAPDialog {
 
     public MAPDialogState getState() {
         return state;
+    }
+
+    public void setState(TRPseudoState state) {
+        this.tcapDialog.setState(state);
     }
 
     protected synchronized void setState(MAPDialogState newState) {

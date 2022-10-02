@@ -23,10 +23,10 @@
 package org.mobicents.protocols.ss7.tcap;
 
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.hazelcast.scheduledexecutor.IScheduledExecutorService;
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.ss7.tcap.api.TCAPStack;
 import org.mobicents.protocols.ss7.tcap.asn.ApplicationContextName;
@@ -52,7 +52,7 @@ public class PrevewDialogData {
 
     private ReentrantLock dialogLock = new ReentrantLock();
     private Future idleTimerFuture;
-    private ScheduledExecutorService executor;
+    private transient IScheduledExecutorService executor;
     private TCAPProviderImpl provider;
     private long idleTaskTimeout;
     private Long dialogId;

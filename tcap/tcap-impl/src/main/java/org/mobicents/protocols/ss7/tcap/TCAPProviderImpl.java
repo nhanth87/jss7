@@ -24,14 +24,16 @@ package org.mobicents.protocols.ss7.tcap;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
+//import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
+//import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 
-import javolution.util.FastMap;
-
+import com.hazelcast.scheduledexecutor.IScheduledExecutorService;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -82,6 +84,7 @@ import org.mobicents.protocols.ss7.tcap.tc.dialog.events.TCEndIndicationImpl;
 import org.mobicents.protocols.ss7.tcap.tc.dialog.events.TCPAbortIndicationImpl;
 import org.mobicents.protocols.ss7.tcap.tc.dialog.events.TCUniIndicationImpl;
 import org.mobicents.protocols.ss7.tcap.tc.dialog.events.TCUserAbortIndicationImpl;
+import java.io.Serializable;
 
 /**
  * @author amit bhayani
@@ -89,12 +92,13 @@ import org.mobicents.protocols.ss7.tcap.tc.dialog.events.TCUserAbortIndicationIm
  * @author sergey vetyutnev
  *
  */
-public class TCAPProviderImpl implements TCAPProvider, SccpListener {
+public class TCAPProviderImpl implements TCAPProvider, SccpListener, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger logger = Logger.getLogger(TCAPProviderImpl.class); // listenres
 
     private transient List<TCListener> tcListeners = new CopyOnWriteArrayList<TCListener>();
-    protected transient ScheduledExecutorService _EXECUTOR;
+    public transient IScheduledExecutorService _EXECUTOR;
     // boundry for Uni directional dialogs :), tx id is always encoded
     // on 4 octets, so this is its max value
     // private static final long _4_OCTETS_LONG_FILL = 4294967295l;
@@ -108,13 +112,14 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     private transient TCAPStackImpl stack; // originating TX id ~=Dialog, its direct
     // mapping, but not described
     // explicitly...
-    private transient FastMap<Long, DialogImpl> dialogs = new FastMap<Long, DialogImpl>();
-    protected transient FastMap<PrevewDialogDataKey, PrevewDialogData> dialogPreviewList = new FastMap<PrevewDialogDataKey, PrevewDialogData>();
+    private transient Map<Long, DialogImpl> dialogs;
+    protected transient Map<PrevewDialogDataKey, PrevewDialogData> dialogPreviewList;
 
     private int seqControl = 0;
     private int ssn;
     private long curDialogId = 0;
 
+    HazelcastInstance hzInstance;
     protected TCAPProviderImpl(SccpProvider sccpProvider, TCAPStackImpl stack, int ssn) {
         super();
         this.sccpProvider = sccpProvider;
@@ -519,7 +524,6 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     void start() {
         logger.info("Starting TCAP Provider");
 
-        this._EXECUTOR = Executors.newScheduledThreadPool(4);
 
         this.sccpProvider.registerSccpListener(ssn, this);
         logger.info("Registered SCCP listener with ssn " + ssn);
@@ -534,6 +538,14 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                 }
             }
         }
+
+        //hazelcat action
+        hzInstance = Hazelcast.newHazelcastInstance();
+        dialogs = hzInstance.getReplicatedMap("TCAPProviderImpl");
+        dialogPreviewList = hzInstance.getReplicatedMap("DialogPreviewList");
+
+        this._EXECUTOR = hzInstance.getScheduledExecutorService("TCAPDialogTimer");
+
     }
 
     void stop() {
@@ -552,6 +564,8 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 
         this.dialogs.clear();
         this.dialogPreviewList.clear();
+
+        this.hzInstance.shutdown();
     }
 
     protected void sendProviderAbort(PAbortCauseType pAbortCause, byte[] remoteTransactionId, SccpAddress remoteAddress,

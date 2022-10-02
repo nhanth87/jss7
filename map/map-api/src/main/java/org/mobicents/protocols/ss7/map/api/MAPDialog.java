@@ -36,6 +36,7 @@ import org.mobicents.protocols.ss7.tcap.asn.comp.Invoke;
 import org.mobicents.protocols.ss7.tcap.asn.comp.Problem;
 import org.mobicents.protocols.ss7.tcap.asn.comp.ReturnResult;
 import org.mobicents.protocols.ss7.tcap.asn.comp.ReturnResultLast;
+import org.mobicents.protocols.ss7.tcap.api.tc.dialog.TRPseudoState;
 
 /**
  *
@@ -57,6 +58,8 @@ public interface MAPDialog extends Serializable {
      * @return
      */
     MAPDialogState getState();
+
+    void setState(TRPseudoState newstate);
 
     /**
      *

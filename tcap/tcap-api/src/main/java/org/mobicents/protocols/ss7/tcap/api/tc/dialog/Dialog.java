@@ -122,6 +122,14 @@ public interface Dialog extends Serializable {
      */
     UserInformation getUserInformation();
 
+
+    /**
+     * set state
+     *@param newState
+     *
+     */
+    void setState(TRPseudoState newState);
+
     /**
      * returns new, unique for this dialog, invocation id to be used in TC_INVOKE. If there is no free invoke id, it returns
      * null. Invoke ID is freed once operation using it is canceled, timeouts or simply returns final value.

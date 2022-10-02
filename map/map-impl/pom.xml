@@ -19,6 +19,11 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+			<version>4.0.2</version>
+		</dependency>
 
 		<dependency>
 			<groupId>concurrent</groupId>

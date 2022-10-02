@@ -31,13 +31,15 @@ import org.mobicents.protocols.ss7.map.api.primitives.AddressString;
 import org.mobicents.protocols.ss7.map.api.primitives.MAPExtensionContainer;
 import org.mobicents.protocols.ss7.tcap.asn.ApplicationContextName;
 
+import java.io.Serializable;
+
 /**
  *
  * @author amit bhayani
  * @author sergey vetyutnev
  *
  */
-public interface MAPDialogListener {
+public interface MAPDialogListener extends Serializable {
     /**
      * Called when all components has been processed. It is equals the MAP-DELIMITER indication primitive
      */

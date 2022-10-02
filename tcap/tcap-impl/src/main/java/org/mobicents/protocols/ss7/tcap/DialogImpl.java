@@ -27,10 +27,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.hazelcast.scheduledexecutor.IScheduledExecutorService;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -111,6 +111,7 @@ import org.mobicents.protocols.ss7.tcap.tc.dialog.events.TCUserAbortIndicationIm
  *
  */
 public class DialogImpl implements Dialog {
+    private static final long serialVersionUID = 1L;
 
     // timeout of remove task after TC_END
     private static final int _REMOVE_TIMEOUT = 30000;
@@ -158,7 +159,8 @@ public class DialogImpl implements Dialog {
     protected InvokeImpl[] operationsSent = new InvokeImpl[invokeIDTable.length];
     protected InvokeImpl[] operationsSentA = new InvokeImpl[invokeIDTable.length];
     private Set<Long> incomingInvokeList = new HashSet<Long>();
-    private ScheduledExecutorService executor;
+
+    private transient IScheduledExecutorService executor;
 
     // scheduled components list
     private List<Component> scheduledComponentList = new ArrayList<Component>();
@@ -198,7 +200,7 @@ public class DialogImpl implements Dialog {
      * @param previewMode
      */
     protected DialogImpl(SccpAddress localAddress, SccpAddress remoteAddress, Long origTransactionId, boolean structured,
-            ScheduledExecutorService executor, TCAPProviderImpl provider, int seqControl, boolean previewMode) {
+            IScheduledExecutorService executor, TCAPProviderImpl provider, int seqControl, boolean previewMode) {
         super();
         this.localAddress = localAddress;
         this.remoteAddress = remoteAddress;
@@ -235,7 +237,7 @@ public class DialogImpl implements Dialog {
      * @param sideB
      */
     protected DialogImpl(SccpAddress localAddress, SccpAddress remoteAddress, int seqControl,
-            ScheduledExecutorService executor, TCAPProviderImpl provider, PrevewDialogData pdd, boolean sideB) {
+            IScheduledExecutorService executor, TCAPProviderImpl provider, PrevewDialogData pdd, boolean sideB) {
         this.localAddress = localAddress;
         this.remoteAddress = remoteAddress;
         this.localTransactionIdObject = pdd.getDialogId();
@@ -2030,7 +2032,7 @@ public class DialogImpl implements Dialog {
         }
     }
 
-    protected void setState(TRPseudoState newState) {
+    public void setState(TRPseudoState newState) {
         try {
             this.dialogLock.lock();
             // add checks?

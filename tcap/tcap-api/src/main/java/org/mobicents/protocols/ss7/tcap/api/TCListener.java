@@ -31,6 +31,7 @@ import org.mobicents.protocols.ss7.tcap.api.tc.dialog.events.TCPAbortIndication;
 import org.mobicents.protocols.ss7.tcap.api.tc.dialog.events.TCUniIndication;
 import org.mobicents.protocols.ss7.tcap.api.tc.dialog.events.TCUserAbortIndication;
 import org.mobicents.protocols.ss7.tcap.asn.comp.Invoke;
+import java.io.Serializable;
 
 /**
  * @author baranowb
@@ -38,7 +39,7 @@ import org.mobicents.protocols.ss7.tcap.asn.comp.Invoke;
  * @author sergey vetyutnev
  *
  */
-public interface TCListener {
+public interface TCListener extends Serializable {
 
     // dialog handlers
     /**

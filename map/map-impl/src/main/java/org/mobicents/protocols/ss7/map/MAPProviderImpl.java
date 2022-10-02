@@ -25,9 +25,12 @@ package org.mobicents.protocols.ss7.map;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-
 import javolution.util.FastList;
+
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import javolution.util.FastMap;
 
 import org.apache.log4j.Logger;
@@ -125,6 +128,7 @@ import org.mobicents.protocols.ss7.tcap.asn.comp.ReturnErrorProblemType;
 import org.mobicents.protocols.ss7.tcap.asn.comp.ReturnResult;
 import org.mobicents.protocols.ss7.tcap.asn.comp.ReturnResultLast;
 import org.mobicents.protocols.ss7.tcap.asn.comp.ReturnResultProblemType;
+import java.io.Serializable;
 
 /**
  *
@@ -132,14 +136,15 @@ import org.mobicents.protocols.ss7.tcap.asn.comp.ReturnResultProblemType;
  * @author sergey vetyutnev
  *
  */
-public class MAPProviderImpl implements MAPProvider, TCListener {
+public class MAPProviderImpl implements MAPProvider, TCListener, Serializable {
+    private static final long serialVersionUID = 1L;
 
     protected final transient Logger loger;
 
 
     private transient Collection<MAPDialogListener> dialogListeners = new FastList<MAPDialogListener>().shared();
 
-    protected transient FastMap<Long, MAPDialogImpl> dialogs = new FastMap<Long, MAPDialogImpl>().shared();
+    protected transient Map<Long, MAPDialogImpl> dialogs;
 
     /**
      * Congestion sources name list. Congestion is where this collection is not empty
@@ -162,6 +167,7 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
     private final transient MAPServiceSms mapServiceSms = new MAPServiceSmsImpl(this);
     private final transient MAPServiceLsm mapServiceLsm = new MAPServiceLsmImpl(this);
 
+    HazelcastInstance hzInstance;
     /**
      * public common methods
      */
@@ -239,11 +245,19 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
     }
 
     public void start() {
+
         this.tcapProvider.addTCListener(this);
+
+        hzInstance = Hazelcast.newHazelcastInstance();
+
+
+        dialogs = hzInstance.getReplicatedMap("MAPProvider");
     }
 
     public void stop() {
         this.tcapProvider.removeTCListener(this);
+
+        this.hzInstance.shutdown();
 
         this.dialogs.clear();
     }

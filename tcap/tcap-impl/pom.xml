@@ -12,6 +12,11 @@
 	<name>Restcomm jSS7 :: TCAP :: Impl :: ${project.artifactId}</name>
 	<dependencies>
 		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+			<version>4.0.2</version>
+		</dependency>
+		<dependency>
 			<groupId>concurrent</groupId>
 			<artifactId>concurrent</artifactId>
 			<scope>provided</scope>
@@ -71,7 +76,15 @@
 					</suiteXmlFiles>
 				</configuration>
 			</plugin>
-		</plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>6</source>
+                    <target>6</target>
+                </configuration>
+            </plugin>
+        </plugins>
 	</build>
 
 	<profiles>
