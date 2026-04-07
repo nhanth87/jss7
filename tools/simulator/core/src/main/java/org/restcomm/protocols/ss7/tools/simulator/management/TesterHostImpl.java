@@ -10,10 +10,8 @@ import java.util.Properties;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 
-import javolution.text.TextBuilder;
-import javolution.xml.XMLBinding;
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
+import java.io.StringWriter;
+import java.io.StringReader;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -81,8 +79,7 @@ public class TesterHostImpl extends NotificationBroadcasterSupport implements Te
 
     private final String appName;
     private String persistDir = null;
-    private final TextBuilder persistFile = TextBuilder.newInstance();
-    private static final XMLBinding binding = new XMLBinding();
+    private final StringBuilder persistFile = new StringBuilder();
 
     // SETTINGS
     private boolean isStarted = false;
@@ -196,10 +193,8 @@ public class TesterHostImpl extends NotificationBroadcasterSupport implements Te
 
         this.setupLog4j(appName);
 
-        binding.setClassAttribute(CLASS_ATTRIBUTE);
-
-        this.persistFile.clear();
-        TextBuilder persistFileOld = new TextBuilder();
+        this.persistFile.setLength(0);
+        StringBuilder persistFileOld = new StringBuilder();
 
         if (persistDir != null) {
             persistFileOld.append(persistDir).append(File.separator).append(this.appName).append("_")
@@ -851,24 +846,19 @@ public class TesterHostImpl extends NotificationBroadcasterSupport implements Te
     }
 
     public synchronized void store() {
-
         try {
-            XMLObjectWriter writer = XMLObjectWriter.newInstance(new FileOutputStream(persistFile.toString()));
-            writer.setBinding(binding);
-            // writer.setReferenceResolver(new XMLReferenceResolver());
-            writer.setIndentation(TAB_INDENT);
-
-            writer.write(this.configurationData, CONFIGURATION_DATA, ConfigurationData.class);
-
-            writer.close();
+            StringWriter writer = new StringWriter();
+            ToolsXStreamHelper.toXML(this.configurationData, writer);
+            
+            FileOutputStream fos = new FileOutputStream(persistFile.toString());
+            fos.write(writer.toString().getBytes());
+            fos.close();
         } catch (Exception e) {
             this.sendNotif(SOURCE_NAME, "Error while persisting the Host state in file", e, Level.ERROR);
         }
     }
 
     private boolean load(File fn) {
-
-        XMLObjectReader reader = null;
         try {
             if (!fn.exists()) {
                 this.sendNotif(SOURCE_NAME, "Error while reading the Host state from file: file not found: " + persistFile, "",
@@ -876,13 +866,13 @@ public class TesterHostImpl extends NotificationBroadcasterSupport implements Te
                 return false;
             }
 
-            reader = XMLObjectReader.newInstance(new FileInputStream(fn));
-
-            reader.setBinding(binding);
-
-            this.configurationData = reader.read(CONFIGURATION_DATA, ConfigurationData.class);
-
-            reader.close();
+            FileInputStream fis = new FileInputStream(fn);
+            byte[] buffer = new byte[(int) fn.length()];
+            fis.read(buffer);
+            fis.close();
+            
+            String xml = new String(buffer);
+            this.configurationData = (ConfigurationData) ToolsXStreamHelper.fromXML(xml);
 
             return true;
 

@@ -9,9 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.XMLSerializable;
-import javolution.xml.stream.XMLStreamException;
+
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.As;
@@ -40,7 +38,7 @@ import org.restcomm.protocols.ss7.mtp.RoutingLabelFormat;
  * @author amit bhayani
  *
  */
-public class AsImpl implements XMLSerializable, As {
+public class AsImpl implements As {
 
     private static final Logger logger = Logger.getLogger(AsImpl.class);
 
@@ -697,47 +695,6 @@ public class AsImpl implements XMLSerializable, As {
             aspImpl.getAspFactory().write(payload);
         }
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<AsImpl> AS_XML = new XMLFormat<AsImpl>(AsImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, AsImpl asImpl) throws XMLStreamException {
-            asImpl.name = xml.getAttribute(NAME, "");
-            asImpl.minAspActiveForLb = xml.getAttribute(MIN_ASP_ACT_LB).toInt();
-
-            asImpl.functionality = Functionality.getFunctionality(xml.getAttribute("functionality", ""));
-            asImpl.exchangeType = ExchangeType.getExchangeType(xml.getAttribute("exchangeType", ""));
-            asImpl.ipspType = IPSPType.getIPSPType(xml.getAttribute("ipspType", ""));
-
-            asImpl.routingContext = xml.get(ROUTING_CONTEXT, RoutingContextImpl.class);
-            asImpl.networkAppearance = xml.get(NETWORK_APPEARANCE, NetworkAppearanceImpl.class);
-            asImpl.trafficModeType = xml.get(TRAFFIC_MODE, TrafficModeTypeImpl.class);
-            asImpl.defaultTrafficModeType = xml.get(DEFAULT_TRAFFIC_MODE, TrafficModeTypeImpl.class);
-            asImpl.appServerProcs.addAll(xml.get(ASP_LIST, CopyOnWriteArrayList.class));
-            asImpl.init();
-        }
-
-        @Override
-        public void write(AsImpl asImpl, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(NAME, asImpl.name);
-            xml.setAttribute(MIN_ASP_ACT_LB, asImpl.minAspActiveForLb);
-            xml.setAttribute("functionality", asImpl.functionality.getType());
-            xml.setAttribute("exchangeType", asImpl.exchangeType.getType());
-            if (asImpl.ipspType != null) {
-                xml.setAttribute("ipspType", asImpl.ipspType.getType());
-            }
-
-            xml.add((RoutingContextImpl) asImpl.routingContext, ROUTING_CONTEXT, RoutingContextImpl.class);
-            xml.add((NetworkAppearanceImpl) asImpl.networkAppearance, NETWORK_APPEARANCE, NetworkAppearanceImpl.class);
-            xml.add((TrafficModeTypeImpl) asImpl.trafficModeType, TRAFFIC_MODE, TrafficModeTypeImpl.class);
-            xml.add((TrafficModeTypeImpl) asImpl.defaultTrafficModeType, DEFAULT_TRAFFIC_MODE, TrafficModeTypeImpl.class);
-            xml.add(asImpl.appServerProcs, ASP_LIST, CopyOnWriteArrayList.class);
-
-        }
-    };
 
     public void show(StringBuffer sb) {
         sb.append(M3UAOAMMessages.SHOW_AS_NAME).append(this.name).append(M3UAOAMMessages.SHOW_FUNCTIONALITY)

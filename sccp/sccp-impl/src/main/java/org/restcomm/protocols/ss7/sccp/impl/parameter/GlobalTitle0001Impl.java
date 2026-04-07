@@ -5,8 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
+
 
 import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
@@ -122,25 +121,5 @@ public class GlobalTitle0001Impl extends AbstractGlobalTitle implements GlobalTi
         return "GlobalTitle0001Impl [digits=" + digits + ", natureOfAddress=" + natureOfAddress + ", encodingScheme="
                 + encodingScheme + "]";
     }
-
- // default XML representation.
-    protected static final XMLFormat<GlobalTitle0001Impl> XML = new XMLFormat<GlobalTitle0001Impl>(GlobalTitle0001Impl.class) {
-
-        public void write(GlobalTitle0001Impl ai, OutputElement xml) throws XMLStreamException {
-            // xml.setAttribute(GLOBALTITLE_INDICATOR, ai.gti.getValue());
-            xml.setAttribute(NATURE_OF_ADDRESS_INDICATOR, ai.natureOfAddress.getValue());
-            xml.setAttribute(DIGITS, ai.digits);
-        }
-
-        public void read(InputElement xml, GlobalTitle0001Impl ai) throws XMLStreamException {
-            // ai.gti = GlobalTitleIndicator.valueOf(xml.getAttribute(GLOBALTITLE_INDICATOR).toInt());
-            try {
-                ai.natureOfAddress = NatureOfAddress.valueOf(xml.getAttribute(NATURE_OF_ADDRESS_INDICATOR).toInt());
-            } catch (IllegalArgumentException e) {
-                throw new XMLStreamException(e);
-            }
-            ai.digits = xml.getAttribute(DIGITS).toString();
-        }
-    };
 
 }

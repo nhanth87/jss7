@@ -5,8 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
+
 
 import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
@@ -150,30 +149,5 @@ public class GlobalTitle0100Impl extends AbstractGlobalTitle implements GlobalTi
                 + ", translationType=" + translationType + ", encodingScheme=" + encodingScheme + "]";
     }
 
-    // default XML representation.
-    protected static final XMLFormat<GlobalTitle0100Impl> XML = new XMLFormat<GlobalTitle0100Impl>(GlobalTitle0100Impl.class) {
-        private final ParameterFactoryImpl factory = new ParameterFactoryImpl();
-        public void write(GlobalTitle0100Impl ai, OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(TRANSLATION_TYPE, ai.translationType);
-            xml.setAttribute(ENCODING_SCHEME, ai.encodingScheme.getSchemeCode());
-            xml.setAttribute(NUMBERING_PLAN, ai.numberingPlan.getValue());
-            xml.setAttribute(NATURE_OF_ADDRESS_INDICATOR, ai.natureOfAddress.getValue());
-            xml.setAttribute(DIGITS, ai.digits);
-        }
 
-        public void read(InputElement xml, GlobalTitle0100Impl ai) throws XMLStreamException {
-
-            try {
-                ai.translationType = xml.getAttribute(TRANSLATION_TYPE).toInt();
-              //wrong...
-                final byte esCode = (byte) xml.getAttribute(ENCODING_SCHEME).toInt();
-                ai.encodingScheme = factory.createEncodingScheme(esCode);
-                ai.numberingPlan = NumberingPlan.valueOf(xml.getAttribute(NUMBERING_PLAN).toInt());
-                ai.natureOfAddress = NatureOfAddress.valueOf(xml.getAttribute(NATURE_OF_ADDRESS_INDICATOR).toInt());
-                ai.digits = xml.getAttribute(DIGITS).toString();
-            } catch (Exception e) {
-                throw new XMLStreamException(e);
-            }
-        }
-    };
 }

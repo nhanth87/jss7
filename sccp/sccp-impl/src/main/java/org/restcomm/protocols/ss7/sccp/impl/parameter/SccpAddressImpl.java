@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.XMLSerializable;
-import javolution.xml.stream.XMLStreamException;
+
 
 import org.restcomm.protocols.ss7.indicator.AddressIndicator;
 import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
@@ -24,7 +22,7 @@ import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
  * @author baranowb
  *
  */
-public class SccpAddressImpl extends AbstractParameter implements XMLSerializable, SccpAddress {
+public class SccpAddressImpl extends AbstractParameter implements SccpAddress {
 
     private static final byte ROUTE_ON_PC_FLAG = 0x40;
     private static final short REMOVE_PC_FLAG = 0xFE;
@@ -137,27 +135,6 @@ public class SccpAddressImpl extends AbstractParameter implements XMLSerializabl
         return "pc=" + pc + ",ssn=" + ssn + ",AI=" + ai.getValue(SccpProtocolVersion.ITU) +
                 ",gt=" + gt + ",networkId=" + networkId;
     }
-
-    protected static final XMLFormat<SccpAddress> XML = new XMLFormat<>(SccpAddress.class) {
-
-        public void write(SccpAddress ai, OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(POINT_CODE, ai.getSignalingPointCode());
-            xml.setAttribute(SUBSYSTEM_NUMBER, ai.getSubsystemNumber());
-            xml.setAttribute(NETWORK_ID, ai.getNetworkId());
-            xml.add(ai.getAddressIndicator(), AI, AddressIndicator.class);
-            xml.add(ai.getGlobalTitle(), GLOBAL_TITLE);
-
-        }
-
-        public void read(InputElement xml, SccpAddress ai) throws XMLStreamException {
-            SccpAddressImpl impl = (SccpAddressImpl) ai;
-            impl.pc = xml.getAttribute(POINT_CODE).toInt();
-            impl.ssn = xml.getAttribute(SUBSYSTEM_NUMBER).toInt();
-            impl.networkId = xml.getAttribute(NETWORK_ID).toInt();
-            impl.ai = xml.get(AI, AddressIndicator.class);
-            impl.gt = xml.get(GLOBAL_TITLE);
-        }
-    };
 
     @Override
     public void decode(final InputStream bin, ParameterFactory factory, SccpProtocolVersion sccpProtocolVersion) throws ParseException {

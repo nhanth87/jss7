@@ -2,7 +2,7 @@
 package org.restcomm.protocols.ss7.sccp.impl;
 
 import io.netty.util.concurrent.DefaultThreadFactory;
-import javolution.text.TextBuilder;
+
 import org.jctools.maps.NonBlockingHashMap;
 
 import org.apache.log4j.Level;
@@ -224,7 +224,7 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
 
     protected final String name;
 
-    protected final TextBuilder persistFile = TextBuilder.newInstance();
+    protected final StringBuilder persistFile = new StringBuilder();
     protected String persistDir = null;
 
     protected boolean rspProhibitedByDefault;
@@ -849,7 +849,7 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
 
         ss7ExtSccpDetailedInterface.startExtBefore(persistDir, this.name);
 
-        this.persistFile.clear();
+        this.persistFile.setLength(0);
 
         if (persistDir != null) {
             this.persistFile.append(persistDir).append(File.separator).append(this.name).append("_").append(PERSIST_FILE_NAME);

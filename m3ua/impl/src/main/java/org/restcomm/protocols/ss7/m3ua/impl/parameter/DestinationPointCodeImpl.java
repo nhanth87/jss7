@@ -1,8 +1,6 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.XMLSerializable;
-import javolution.xml.stream.XMLStreamException;
+
 
 import org.restcomm.protocols.ss7.m3ua.parameter.DestinationPointCode;
 import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
@@ -12,7 +10,7 @@ import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
  * @author amit bhayani
  *
  */
-public class DestinationPointCodeImpl extends ParameterImpl implements DestinationPointCode, XMLSerializable {
+public class DestinationPointCodeImpl extends ParameterImpl implements DestinationPointCode {
 
     private static final String DPC = "dpc";
     private static final String MASK = "mask";
@@ -74,25 +72,5 @@ public class DestinationPointCodeImpl extends ParameterImpl implements Destinati
     public String toString() {
         return String.format("DestinationPointCode dpc=%d mask=%d", destPC, mask);
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<DestinationPointCodeImpl> RC_XML = new XMLFormat<DestinationPointCodeImpl>(
-            DestinationPointCodeImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, DestinationPointCodeImpl dpc) throws XMLStreamException {
-            dpc.destPC = xml.getAttribute(DPC).toInt();
-            dpc.mask = (short) xml.getAttribute(MASK).toInt();
-            dpc.encode();
-        }
-
-        @Override
-        public void write(DestinationPointCodeImpl dpc, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(DPC, dpc.destPC);
-            xml.setAttribute(MASK, dpc.mask);
-        }
-    };
 
 }

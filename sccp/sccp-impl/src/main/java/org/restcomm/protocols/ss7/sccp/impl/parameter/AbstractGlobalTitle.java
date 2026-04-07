@@ -4,7 +4,7 @@ package org.restcomm.protocols.ss7.sccp.impl.parameter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import javolution.xml.XMLSerializable;
+
 
 import org.restcomm.protocols.ss7.sccp.SccpProtocolVersion;
 import org.restcomm.protocols.ss7.sccp.message.ParseException;
@@ -15,7 +15,7 @@ import org.restcomm.protocols.ss7.sccp.parameter.ParameterFactory;
 /**
  * @author baranowb
  */
-public abstract class AbstractGlobalTitle extends AbstractParameter implements GlobalTitle, XMLSerializable {
+public abstract class AbstractGlobalTitle extends AbstractParameter implements GlobalTitle {
 
     protected String digits;
 

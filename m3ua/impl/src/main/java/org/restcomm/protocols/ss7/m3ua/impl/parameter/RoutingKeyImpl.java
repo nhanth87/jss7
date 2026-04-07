@@ -5,9 +5,7 @@ import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
 import java.util.List;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.XMLSerializable;
-import javolution.xml.stream.XMLStreamException;
+
 
 import org.restcomm.protocols.ss7.m3ua.parameter.DestinationPointCode;
 import org.restcomm.protocols.ss7.m3ua.parameter.LocalRKIdentifier;
@@ -24,7 +22,7 @@ import org.restcomm.protocols.ss7.m3ua.parameter.TrafficModeType;
  * @author amit bhayani
  *
  */
-public class RoutingKeyImpl extends ParameterImpl implements RoutingKey, XMLSerializable {
+public class RoutingKeyImpl extends ParameterImpl implements RoutingKey {
 
     private static final String LOCAL_RK_ID = "localRkId";
     private static final String ROUTING_CONTEXT = "rc";
@@ -241,88 +239,4 @@ public class RoutingKeyImpl extends ParameterImpl implements RoutingKey, XMLSeri
         return tb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<RoutingKeyImpl> RC_XML = new XMLFormat<RoutingKeyImpl>(RoutingKeyImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, RoutingKeyImpl routingKey) throws XMLStreamException {
-            int dpcArraySize = xml.getAttribute(DPC_ARRAY_SIZE).toInt();
-            int opcArraySize = xml.getAttribute(OPC_ARRAY_SIZE).toInt();
-            int siArraySize = xml.getAttribute(SI_ARRAY_SIZE).toInt();
-
-            routingKey.localRkId = xml.get(LOCAL_RK_ID);
-            routingKey.rc = xml.get(ROUTING_CONTEXT);
-            routingKey.trafficModeType = xml.get(TRAFFIC_MODE);
-            routingKey.networkAppearance = xml.get(NETWORK_APPEARANCE);
-
-            if (dpcArraySize != -1) {
-                routingKey.dpc = new DestinationPointCodeImpl[dpcArraySize];
-                for (int i = 0; i < dpcArraySize; i++) {
-                    routingKey.dpc[i] = xml.get(DPCS);
-                }
-            }
-
-            if (opcArraySize != -1) {
-                routingKey.opcList = new OPCList[opcArraySize];
-                for (int i = 0; i < opcArraySize; i++) {
-                    routingKey.opcList[i] = xml.get(OPC_LIST);
-                }
-            }
-
-            if (siArraySize != -1) {
-                routingKey.serviceIndicators = new ServiceIndicators[siArraySize];
-                for (int i = 0; i < siArraySize; i++) {
-                    routingKey.serviceIndicators[i] = xml.get(SIS);
-                }
-            }
-
-            routingKey.encode();
-        }
-
-        @Override
-        public void write(RoutingKeyImpl routingKey, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (routingKey.dpc != null) {
-                xml.setAttribute(DPC_ARRAY_SIZE, routingKey.dpc.length);
-            } else {
-                xml.setAttribute(DPC_ARRAY_SIZE, -1);
-            }
-
-            if (routingKey.opcList != null) {
-                xml.setAttribute(OPC_ARRAY_SIZE, routingKey.opcList.length);
-            } else {
-                xml.setAttribute(OPC_ARRAY_SIZE, -1);
-            }
-
-            if (routingKey.serviceIndicators != null) {
-                xml.setAttribute(SI_ARRAY_SIZE, routingKey.serviceIndicators.length);
-            } else {
-                xml.setAttribute(SI_ARRAY_SIZE, -1);
-            }
-
-            xml.add(routingKey.localRkId, LOCAL_RK_ID);
-            xml.add(routingKey.rc, ROUTING_CONTEXT);
-            xml.add(routingKey.trafficModeType, TRAFFIC_MODE);
-            xml.add(routingKey.networkAppearance, NETWORK_APPEARANCE);
-
-            if (routingKey.dpc != null) {
-                for (int i = 0; i < routingKey.dpc.length; i++) {
-                    xml.add(routingKey.dpc[i], DPCS);
-                }
-            }
-
-            if (routingKey.opcList != null) {
-                for (int i = 0; i < routingKey.opcList.length; i++) {
-                    xml.add(routingKey.opcList[i], OPC_LIST);
-                }
-            }
-
-            if (routingKey.serviceIndicators != null) {
-                for (int i = 0; i < routingKey.serviceIndicators.length; i++) {
-                    xml.add(routingKey.serviceIndicators[i], SIS);
-                }
-            }
-        }
-    };
 }
