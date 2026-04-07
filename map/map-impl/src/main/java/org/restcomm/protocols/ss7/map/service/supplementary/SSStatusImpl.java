@@ -80,29 +80,4 @@ public class SSStatusImpl extends OctetStringLength1Base implements SSStatus {
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<SSStatusImpl> SS_STATUS_XML = new XMLFormat<SSStatusImpl>(SSStatusImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, SSStatusImpl ssCode) throws XMLStreamException {
-            ssCode.data = xml.get(DATA, Integer.class);
-            xml.get(Q_BIT, Boolean.class);
-            xml.get(P_BIT, Boolean.class);
-            xml.get(R_BIT, Boolean.class);
-            xml.get(A_BIT, Boolean.class);
-
-        }
-
-        @Override
-        public void write(SSStatusImpl ssCode, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.add(ssCode.getData(), DATA, Integer.class);
-            xml.add(ssCode.getQBit(), Q_BIT, Boolean.class);
-            xml.add(ssCode.getPBit(), P_BIT, Boolean.class);
-            xml.add(ssCode.getRBit(), R_BIT, Boolean.class);
-            xml.add(ssCode.getABit(), A_BIT, Boolean.class);
-        }
-    };
-
 }

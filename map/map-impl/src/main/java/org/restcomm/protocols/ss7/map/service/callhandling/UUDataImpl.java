@@ -134,34 +134,6 @@ public class UUDataImpl extends SequenceBase implements UUData {
         }
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<UUDataImpl> UU_DATA_XML = new XMLFormat<UUDataImpl>(UUDataImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, UUDataImpl uuData) throws XMLStreamException {
-            uuData.uuIndicator = xml.get(UU_INDICATOR, UUIndicatorImpl.class);
-            uuData.uuI = xml.get(UU_I, UUIImpl.class);
-            Boolean bval = xml.get(UUS_CF_INTERACTION, Boolean.class);
-            if (bval != null)
-                uuData.uusCFInteraction = bval;
-            uuData.extensionContainer = xml.get(EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-
-        @Override
-        public void write(UUDataImpl uuData, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (uuData.uuIndicator != null)
-                xml.add((UUIndicatorImpl) uuData.uuIndicator, UU_INDICATOR, UUIndicatorImpl.class);
-            if (uuData.uuI != null)
-                xml.add((UUIImpl) uuData.uuI, UU_I, UUIImpl.class);
-            if (uuData.uusCFInteraction)
-                xml.add(uuData.uusCFInteraction, UUS_CF_INTERACTION, Boolean.class);
-            if (uuData.extensionContainer != null)
-                xml.add((MAPExtensionContainerImpl) uuData.extensionContainer, EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-    };
-
     @Override
     public String toString() {
 

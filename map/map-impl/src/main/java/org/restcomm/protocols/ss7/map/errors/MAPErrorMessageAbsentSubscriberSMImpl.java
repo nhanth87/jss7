@@ -223,43 +223,4 @@ public class MAPErrorMessageAbsentSubscriberSMImpl extends MAPErrorMessageImpl i
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessageAbsentSubscriberSMImpl> MAP_ERROR_MESSAGE_ABSENT_SUBSCRIBER_XML = new XMLFormat<MAPErrorMessageAbsentSubscriberSMImpl>(
-            MAPErrorMessageAbsentSubscriberSMImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessageAbsentSubscriberSMImpl ussdMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, ussdMessage);
-
-            String str = xml.get(ABSENT_SUBSCRIBER_DIAGNOSTIC_SM, String.class);
-            if (str != null)
-                ussdMessage.absentSubscriberDiagnosticSM = Enum.valueOf(AbsentSubscriberDiagnosticSM.class, str);
-
-            str = xml.get(ADDITIONAL_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM, String.class);
-            if (str != null)
-                ussdMessage.additionalAbsentSubscriberDiagnosticSM = Enum.valueOf(AbsentSubscriberDiagnosticSM.class, str);
-
-            ussdMessage.extensionContainer = xml.get(MAP_EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-
-        @Override
-        public void write(MAPErrorMessageAbsentSubscriberSMImpl ussdMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(ussdMessage, xml);
-
-            if (ussdMessage.getAbsentSubscriberDiagnosticSM() != null)
-                xml.add((String) ussdMessage.getAbsentSubscriberDiagnosticSM().toString(), ABSENT_SUBSCRIBER_DIAGNOSTIC_SM,
-                        String.class);
-
-            if (ussdMessage.getAdditionalAbsentSubscriberDiagnosticSM() != null)
-                xml.add((String) ussdMessage.getAdditionalAbsentSubscriberDiagnosticSM().toString(),
-                        ADDITIONAL_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM, String.class);
-
-            xml.add((MAPExtensionContainerImpl) ussdMessage.extensionContainer, MAP_EXTENSION_CONTAINER,
-                    MAPExtensionContainerImpl.class);
-        }
-    };
 }

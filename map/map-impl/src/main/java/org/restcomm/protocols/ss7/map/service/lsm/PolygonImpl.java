@@ -81,24 +81,4 @@ public class PolygonImpl extends OctetStringBase implements Polygon {
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<PolygonImpl> POLYGON_XML = new XMLFormat<PolygonImpl>(PolygonImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, PolygonImpl polygon) throws XMLStreamException {
-            String s = xml.getAttribute(DATA, DEFAULT_VALUE);
-            if (s != null) {
-                polygon.data = DatatypeConverter.parseHexBinary(s);
-            }
-        }
-
-        @Override
-        public void write(PolygonImpl polygon, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (polygon.data != null) {
-                xml.setAttribute(DATA, DatatypeConverter.printHexBinary(polygon.data));
-            }
-        }
-    };
 }

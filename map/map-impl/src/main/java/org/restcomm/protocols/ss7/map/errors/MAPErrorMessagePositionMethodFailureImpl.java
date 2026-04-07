@@ -196,34 +196,4 @@ public class MAPErrorMessagePositionMethodFailureImpl extends MAPErrorMessageImp
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessagePositionMethodFailureImpl> MAP_ERROR_MESSAGE_POSITION_METHOD_FAILURE_XML = new XMLFormat<MAPErrorMessagePositionMethodFailureImpl>(
-            MAPErrorMessagePositionMethodFailureImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessagePositionMethodFailureImpl errorMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, errorMessage);
-            String str = xml.get(POSITION_METHOD_FAILURE_DIAG, String.class);
-            if (str != null)
-                errorMessage.positionMethodFailureDiagnostic = Enum.valueOf(PositionMethodFailureDiagnostic.class, str);
-
-            errorMessage.extensionContainer = xml.get(MAP_EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-
-        @Override
-        public void write(MAPErrorMessagePositionMethodFailureImpl errorMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(errorMessage, xml);
-            if (errorMessage.getPositionMethodFailureDiagnostic() != null)
-                xml.add((String) errorMessage.getPositionMethodFailureDiagnostic().toString(), POSITION_METHOD_FAILURE_DIAG,
-                        String.class);
-
-            xml.add((MAPExtensionContainerImpl) errorMessage.extensionContainer, MAP_EXTENSION_CONTAINER,
-                    MAPExtensionContainerImpl.class);
-        }
-    };
-
 }

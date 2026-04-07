@@ -165,25 +165,4 @@ public class MAPErrorMessageExtensionContainerImpl extends MAPErrorMessageImpl i
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessageExtensionContainerImpl> MAP_ERROR_MESSAGE_CALL_BARRED_XML = new XMLFormat<MAPErrorMessageExtensionContainerImpl>(
-            MAPErrorMessageExtensionContainerImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessageExtensionContainerImpl errorMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, errorMessage);
-            errorMessage.extensionContainer = xml.get(MAP_EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-
-        @Override
-        public void write(MAPErrorMessageExtensionContainerImpl errorMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(errorMessage, xml);
-            xml.add((MAPExtensionContainerImpl) errorMessage.extensionContainer, MAP_EXTENSION_CONTAINER,
-                    MAPExtensionContainerImpl.class);
-        }
-    };
 }

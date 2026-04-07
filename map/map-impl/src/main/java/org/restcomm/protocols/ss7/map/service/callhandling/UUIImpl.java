@@ -27,25 +27,4 @@ public class UUIImpl extends OctetStringBase implements UUI {
         return data;
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<UUIImpl> UUI_XML = new XMLFormat<UUIImpl>(UUIImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, UUIImpl uui) throws XMLStreamException {
-            String s = xml.getAttribute(DATA, DEFAULT_VALUE);
-            if (s != null) {
-                uui.data = DatatypeConverter.parseHexBinary(s);
-            }
-        }
-
-        @Override
-        public void write(UUIImpl uui, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (uui.data != null) {
-                xml.setAttribute(DATA, DatatypeConverter.printHexBinary(uui.data));
-            }
-        }
-    };
-
 }

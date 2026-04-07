@@ -156,24 +156,4 @@ public class ProcessUnstructuredSSResponseImpl extends SupplementaryMessageImpl 
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ProcessUnstructuredSSResponseImpl> PROCESS_UNSTRUCTURED_SS_RESPONSE_XML = new XMLFormat<ProcessUnstructuredSSResponseImpl>(
-            ProcessUnstructuredSSResponseImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ProcessUnstructuredSSResponseImpl ussdMessage)
-                throws XMLStreamException {
-            USSD_MESSAGE_XML.read(xml, ussdMessage);
-
-        }
-
-        @Override
-        public void write(ProcessUnstructuredSSResponseImpl ussdMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            USSD_MESSAGE_XML.write(ussdMessage, xml);
-        }
-    };
-
 }

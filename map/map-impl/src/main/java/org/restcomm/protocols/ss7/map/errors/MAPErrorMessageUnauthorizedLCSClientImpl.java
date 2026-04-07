@@ -197,33 +197,4 @@ public class MAPErrorMessageUnauthorizedLCSClientImpl extends MAPErrorMessageImp
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessageUnauthorizedLCSClientImpl> MAP_ERROR_MESSAGE_UNAUTHORIZED_LCS_CLIENT_XML = new XMLFormat<MAPErrorMessageUnauthorizedLCSClientImpl>(
-            MAPErrorMessageUnauthorizedLCSClientImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessageUnauthorizedLCSClientImpl errorMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, errorMessage);
-            String str = xml.get(UNAUTHORIZED_LCS_CLIENT_DIAGNOSTIC, String.class);
-            if (str != null)
-                errorMessage.unauthorizedLCSClientDiagnostic = Enum.valueOf(UnauthorizedLCSClientDiagnostic.class, str);
-
-            errorMessage.extensionContainer = xml.get(MAP_EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-
-        @Override
-        public void write(MAPErrorMessageUnauthorizedLCSClientImpl errorMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(errorMessage, xml);
-            if (errorMessage.getUnauthorizedLCSClientDiagnostic() != null)
-                xml.add((String) errorMessage.getUnauthorizedLCSClientDiagnostic().toString(),
-                        UNAUTHORIZED_LCS_CLIENT_DIAGNOSTIC, String.class);
-
-            xml.add((MAPExtensionContainerImpl) errorMessage.extensionContainer, MAP_EXTENSION_CONTAINER,
-                    MAPExtensionContainerImpl.class);
-        }
-    };
 }

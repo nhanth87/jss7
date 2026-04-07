@@ -229,33 +229,4 @@ public class MAPErrorMessageSsErrorStatusImpl extends MAPErrorMessageImpl implem
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessageSsErrorStatusImpl> MAP_ERROR_MESSAGE_SS_ERROR_STATUS_XML = new XMLFormat<MAPErrorMessageSsErrorStatusImpl>(
-            MAPErrorMessageSsErrorStatusImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessageSsErrorStatusImpl errorMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, errorMessage);
-            errorMessage.data = xml.get(DATA, Integer.class);
-            xml.get(Q_BIT, Boolean.class);
-            xml.get(P_BIT, Boolean.class);
-            xml.get(R_BIT, Boolean.class);
-            xml.get(A_BIT, Boolean.class);
-        }
-
-        @Override
-        public void write(MAPErrorMessageSsErrorStatusImpl errorMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(errorMessage, xml);
-            xml.add(errorMessage.data, DATA, Integer.class);
-            xml.add(errorMessage.getQBit(), Q_BIT, Boolean.class);
-            xml.add(errorMessage.getPBit(), P_BIT, Boolean.class);
-            xml.add(errorMessage.getRBit(), R_BIT, Boolean.class);
-            xml.add(errorMessage.getABit(), A_BIT, Boolean.class);
-        }
-    };
-
 }

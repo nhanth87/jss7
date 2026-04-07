@@ -247,32 +247,4 @@ public class CellGlobalIdOrServiceAreaIdOrLAIImpl implements CellGlobalIdOrServi
         return true;
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<CellGlobalIdOrServiceAreaIdOrLAIImpl> CELL_GLOBAL_ID_OR_SERVICE_AREA_ID_OR_LAI_XML = new XMLFormat<CellGlobalIdOrServiceAreaIdOrLAIImpl>(
-            CellGlobalIdOrServiceAreaIdOrLAIImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml,
-                CellGlobalIdOrServiceAreaIdOrLAIImpl cellGlobalIdOrServiceAreaIdOrLAI) throws XMLStreamException {
-            cellGlobalIdOrServiceAreaIdOrLAI.cellGlobalIdOrServiceAreaIdFixedLength = xml.get(
-                    CELL_GLOBAL_ID_OR_SERVICE_AREA_ID_FIXED_LENGTH, CellGlobalIdOrServiceAreaIdFixedLengthImpl.class);
-            cellGlobalIdOrServiceAreaIdOrLAI.laiFixedLength = xml.get(LAI_FIXED_LENGTH, LAIFixedLengthImpl.class);
-        }
-
-        @Override
-        public void write(CellGlobalIdOrServiceAreaIdOrLAIImpl cellGlobalIdOrServiceAreaIdOrLAI,
-                javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (cellGlobalIdOrServiceAreaIdOrLAI.getCellGlobalIdOrServiceAreaIdFixedLength() != null) {
-                xml.add((CellGlobalIdOrServiceAreaIdFixedLengthImpl) cellGlobalIdOrServiceAreaIdOrLAI
-                        .getCellGlobalIdOrServiceAreaIdFixedLength(), CELL_GLOBAL_ID_OR_SERVICE_AREA_ID_FIXED_LENGTH,
-                        CellGlobalIdOrServiceAreaIdFixedLengthImpl.class);
-            }
-            if (cellGlobalIdOrServiceAreaIdOrLAI.getLAIFixedLength() != null) {
-                xml.add((LAIFixedLengthImpl) cellGlobalIdOrServiceAreaIdOrLAI.getLAIFixedLength(), LAI_FIXED_LENGTH,
-                        LAIFixedLengthImpl.class);
-            }
-        }
-    };
 }

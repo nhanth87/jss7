@@ -232,29 +232,4 @@ public class MAPErrorMessageSsIncompatibilityImpl extends MAPErrorMessageImpl im
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessageSsIncompatibilityImpl> MAP_ERROR_MESSAGE_SS_INCOMPATIBILITY_XML = new XMLFormat<MAPErrorMessageSsIncompatibilityImpl>(
-            MAPErrorMessageSsIncompatibilityImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessageSsIncompatibilityImpl errorMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, errorMessage);
-            errorMessage.ssCode = xml.get(SS_CODE, SSCodeImpl.class);
-            errorMessage.basicService = xml.get(BASIC_SERVICE, BasicServiceCodeImpl.class);
-            errorMessage.ssStatus = xml.get(SS_STATUS, SSStatusImpl.class);
-        }
-
-        @Override
-        public void write(MAPErrorMessageSsIncompatibilityImpl errorMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(errorMessage, xml);
-            xml.add((SSCodeImpl) errorMessage.ssCode, SS_CODE, SSCodeImpl.class);
-            xml.add((BasicServiceCodeImpl) errorMessage.getBasicService(), BASIC_SERVICE, BasicServiceCodeImpl.class);
-            xml.add((SSStatusImpl) errorMessage.getSSStatus(), SS_STATUS, SSStatusImpl.class);
-        }
-    };
-
 }

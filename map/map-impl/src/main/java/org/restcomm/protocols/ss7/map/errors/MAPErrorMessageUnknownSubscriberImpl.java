@@ -189,33 +189,4 @@ public class MAPErrorMessageUnknownSubscriberImpl extends MAPErrorMessageImpl im
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessageUnknownSubscriberImpl> MAP_ERROR_MESSAGE_UNKNOWN_SUBSCRIBER_XML = new XMLFormat<MAPErrorMessageUnknownSubscriberImpl>(
-            MAPErrorMessageUnknownSubscriberImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessageUnknownSubscriberImpl errorMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, errorMessage);
-            String str = xml.get(UNKNOWN_SUBSCRIBER_DIAGNOSTIC, String.class);
-            if (str != null)
-                errorMessage.unknownSubscriberDiagnostic = Enum.valueOf(UnknownSubscriberDiagnostic.class, str);
-
-            errorMessage.extensionContainer = xml.get(MAP_EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-
-        @Override
-        public void write(MAPErrorMessageUnknownSubscriberImpl errorMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(errorMessage, xml);
-            if (errorMessage.getUnknownSubscriberDiagnostic() != null)
-                xml.add((String) errorMessage.getUnknownSubscriberDiagnostic().toString(), UNKNOWN_SUBSCRIBER_DIAGNOSTIC,
-                        String.class);
-
-            xml.add((MAPExtensionContainerImpl) errorMessage.extensionContainer, MAP_EXTENSION_CONTAINER,
-                    MAPExtensionContainerImpl.class);
-        }
-    };
 }

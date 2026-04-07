@@ -296,49 +296,4 @@ public class MAPErrorMessageSMDeliveryFailureImpl extends MAPErrorMessageImpl im
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessageSMDeliveryFailureImpl> MAP_ERROR_MESSAGE_SM_DEL_FAILURE_XML = new XMLFormat<MAPErrorMessageSMDeliveryFailureImpl>(
-            MAPErrorMessageSMDeliveryFailureImpl.class) {
-
-        // TODO: we need to think of parsing of SignallingInfo into XML components (now we just write a byte array)
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessageSMDeliveryFailureImpl errorMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, errorMessage);
-            errorMessage.mapProtocolVersion = xml.get(MAP_PROTOCOL_VERSION, Long.class);
-
-            String str = xml.get(SM_ENUMERATE_DEL_FAIL_CAUSE, String.class);
-            if (str != null)
-                errorMessage.smEnumeratedDeliveryFailureCause = Enum.valueOf(SMEnumeratedDeliveryFailureCause.class, str);
-
-            ByteArrayContainer bc = xml.get(SIGNAL_INFO, ByteArrayContainer.class);
-            if (bc != null) {
-                errorMessage.signalInfo = bc.getData();
-            }
-
-            errorMessage.extensionContainer = xml.get(MAP_EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-
-        @Override
-        public void write(MAPErrorMessageSMDeliveryFailureImpl errorMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(errorMessage, xml);
-            xml.add(errorMessage.getMapProtocolVersion(), MAP_PROTOCOL_VERSION, Long.class);
-
-            if (errorMessage.getSMEnumeratedDeliveryFailureCause() != null)
-                xml.add((String) errorMessage.getSMEnumeratedDeliveryFailureCause().toString(), SM_ENUMERATE_DEL_FAIL_CAUSE,
-                        String.class);
-
-            if (errorMessage.signalInfo != null) {
-                ByteArrayContainer bac = new ByteArrayContainer(errorMessage.signalInfo);
-                xml.add(bac, SIGNAL_INFO, ByteArrayContainer.class);
-            }
-
-            xml.add((MAPExtensionContainerImpl) errorMessage.extensionContainer, MAP_EXTENSION_CONTAINER,
-                    MAPExtensionContainerImpl.class);
-        }
-    };
 }

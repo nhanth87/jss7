@@ -191,27 +191,4 @@ public class MAPErrorMessageSubscriberBusyForMtSmsImpl extends MAPErrorMessageIm
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessageSubscriberBusyForMtSmsImpl> MAP_ERROR_MESSAGE_SUBSCRIBER_BUSY_FOR_MT_SMS_XML = new XMLFormat<MAPErrorMessageSubscriberBusyForMtSmsImpl>(
-            MAPErrorMessageSubscriberBusyForMtSmsImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessageSubscriberBusyForMtSmsImpl errorMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, errorMessage);
-            errorMessage.gprsConnectionSuspended = xml.get(GPRS_CONNECTION_SUSPENDED, Boolean.class);
-            errorMessage.extensionContainer = xml.get(MAP_EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-
-        @Override
-        public void write(MAPErrorMessageSubscriberBusyForMtSmsImpl errorMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(errorMessage, xml);
-            xml.add(errorMessage.getGprsConnectionSuspended(), GPRS_CONNECTION_SUSPENDED, Boolean.class);
-            xml.add((MAPExtensionContainerImpl) errorMessage.extensionContainer, MAP_EXTENSION_CONTAINER,
-                    MAPExtensionContainerImpl.class);
-        }
-    };
 }

@@ -155,28 +155,4 @@ public class MAPErrorMessagePwRegistrationFailureImpl extends MAPErrorMessageImp
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessagePwRegistrationFailureImpl> MAP_ERROR_MESSAGE_PW_REGIS_FAILURE_XML = new XMLFormat<MAPErrorMessagePwRegistrationFailureImpl>(
-            MAPErrorMessagePwRegistrationFailureImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessagePwRegistrationFailureImpl errorMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, errorMessage);
-            String str = xml.get(PW_REGIS_FAILURE_CAUSE, String.class);
-            if (str != null)
-                errorMessage.pwRegistrationFailureCause = Enum.valueOf(PWRegistrationFailureCause.class, str);
-        }
-
-        @Override
-        public void write(MAPErrorMessagePwRegistrationFailureImpl errorMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(errorMessage, xml);
-            if (errorMessage.getPWRegistrationFailureCause() != null)
-                xml.add((String) errorMessage.getPWRegistrationFailureCause().toString(), PW_REGIS_FAILURE_CAUSE, String.class);
-        }
-    };
-
 }

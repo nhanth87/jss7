@@ -64,22 +64,4 @@ public class MAPErrorMessageParameterlessImpl extends MAPErrorMessageImpl implem
         return "MAPErrorMessageParameterless [errorCode=" + this.errorCode + "]";
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessageParameterlessImpl> MAP_ERROR_MESSAGE_PARAMETERLESS_XML = new XMLFormat<MAPErrorMessageParameterlessImpl>(
-            MAPErrorMessageParameterlessImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessageParameterlessImpl errorMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, errorMessage);
-        }
-
-        @Override
-        public void write(MAPErrorMessageParameterlessImpl errorMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(errorMessage, xml);
-        }
-    };
 }
