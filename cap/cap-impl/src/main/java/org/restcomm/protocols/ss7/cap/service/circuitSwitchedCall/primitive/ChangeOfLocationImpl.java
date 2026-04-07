@@ -341,54 +341,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
         return sb.toString();
     }
 
-    protected static final XMLFormat<ChangeOfLocationImpl> CHANGE_OF_LOCATION_XML = new XMLFormat<ChangeOfLocationImpl>(ChangeOfLocationImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ChangeOfLocationImpl changeOfLocation) throws XMLStreamException {
-            changeOfLocation.cellGlobalId = xml.get(CELL_GLOBAL_ID, CellGlobalIdOrServiceAreaIdFixedLengthImpl.class);
-            changeOfLocation.serviceAreaId = xml.get(SERVICE_AREA_ID, CellGlobalIdOrServiceAreaIdFixedLengthImpl.class);
-
-            changeOfLocation.locationAreaId = xml.get(LOCATION_AREA_ID, LAIFixedLengthImpl.class);
-
-            Boolean bval = xml.get(INTER_SYSTEM_HAND_OVER, Boolean.class);
-            if (bval != null)
-                changeOfLocation.interSystemHandOver = bval;
-            bval = xml.get(INTER_PLMN_HAND_OVER, Boolean.class);
-            if (bval != null)
-                changeOfLocation.interPLMNHandOver = bval;
-            bval = xml.get(INTER_MSC_HAND_OVER, Boolean.class);
-            if (bval != null)
-                changeOfLocation.interMSCHandOver = bval;
-
-            changeOfLocation.changeOfLocationAlt = xml.get(CHANGE_OF_LOCATION_ALT, ChangeOfLocationAltImpl.class);
-        }
-
-        @Override
-        public void write(ChangeOfLocationImpl changeOfLocation, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (changeOfLocation.cellGlobalId != null) {
-                xml.add((CellGlobalIdOrServiceAreaIdFixedLengthImpl) changeOfLocation.cellGlobalId, CELL_GLOBAL_ID, CellGlobalIdOrServiceAreaIdFixedLengthImpl.class);
-            }
-            if (changeOfLocation.serviceAreaId != null) {
-                xml.add((CellGlobalIdOrServiceAreaIdFixedLengthImpl) changeOfLocation.serviceAreaId, SERVICE_AREA_ID, CellGlobalIdOrServiceAreaIdFixedLengthImpl.class);
-            }
-
-            if (changeOfLocation.locationAreaId != null) {
-                xml.add((LAIFixedLengthImpl) changeOfLocation.locationAreaId, LOCATION_AREA_ID, LAIFixedLengthImpl.class);
-            }
-
-            if (changeOfLocation.interSystemHandOver)
-                xml.add(changeOfLocation.interSystemHandOver, INTER_SYSTEM_HAND_OVER, Boolean.class);
-            if (changeOfLocation.interPLMNHandOver)
-                xml.add(changeOfLocation.interPLMNHandOver, INTER_PLMN_HAND_OVER, Boolean.class);
-            if (changeOfLocation.interMSCHandOver)
-                xml.add(changeOfLocation.interMSCHandOver, INTER_MSC_HAND_OVER, Boolean.class);
-
-            if (changeOfLocation.changeOfLocationAlt != null) {
-                xml.add((ChangeOfLocationAltImpl) changeOfLocation.changeOfLocationAlt, CHANGE_OF_LOCATION_ALT, ChangeOfLocationAltImpl.class);
-            }
-        }
-    };
-
     public enum CellGlobalIdOrServiceAreaIdFixedLength_Option {
         cellGlobalId, serviceAreaId;
     }

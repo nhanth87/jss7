@@ -28,9 +28,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("aChChargingAddress")
 public class AChChargingAddressImpl implements AChChargingAddress, CAPAsnPrimitive {
 
-    private static final String LEG_ID = "legID";
-    private static final String SRF_CONNECTION = "srfConnection";
-
     public static final int _ID_legID = 2;
     public static final int _ID_srfConnection = 50;
 
@@ -222,26 +219,4 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
         return sb.toString();
     }
-
-    protected static final XMLFormat<AChChargingAddressImpl> A_CH_CHARGING_ADDRESS_XML = new XMLFormat<AChChargingAddressImpl>(AChChargingAddressImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, AChChargingAddressImpl aChChargingAddress) throws XMLStreamException {
-            aChChargingAddress.legID = xml.get(LEG_ID, LegIDImpl.class);
-            Integer i1 = xml.get(SRF_CONNECTION, Integer.class);
-            if (i1 != null)
-                aChChargingAddress.srfConnection = i1;
-        }
-
-        @Override
-        public void write(AChChargingAddressImpl aChChargingAddress, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (aChChargingAddress.legID != null) {
-                xml.add((LegIDImpl) aChChargingAddress.legID, LEG_ID, LegIDImpl.class);
-            }
-            if (aChChargingAddress.srfConnection != 0) {
-                xml.add((Integer) aChChargingAddress.srfConnection, SRF_CONNECTION, Integer.class);
-            }
-        }
-    };
-
 }

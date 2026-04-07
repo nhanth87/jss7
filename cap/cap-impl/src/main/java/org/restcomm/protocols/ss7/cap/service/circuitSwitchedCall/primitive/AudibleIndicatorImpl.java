@@ -27,9 +27,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("audibleIndicator")
  implements AudibleIndicator, CAPAsnPrimitive {
 
-    private static final String TONE = "tone";
-    private static final String BURST_LIST = "burstList";
-
     public static final int _ID_burstList = 1;
 
     public static final String _PrimitiveName = "AudibleIndicator";
@@ -218,24 +215,4 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
         return sb.toString();
     }
-
-    protected static final XMLFormat<AudibleIndicatorImpl> AUDIBLE_INDICATOR_XML = new XMLFormat<AudibleIndicatorImpl>(AudibleIndicatorImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, AudibleIndicatorImpl audibleIndicator) throws XMLStreamException {
-            audibleIndicator.tone = xml.get(TONE, Boolean.class);
-            audibleIndicator.burstList = xml.get(BURST_LIST, BurstListImpl.class);
-        }
-
-        @Override
-        public void write(AudibleIndicatorImpl audibleIndicator, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (audibleIndicator.tone != null) {
-                xml.add(audibleIndicator.tone, TONE, Boolean.class);
-            }
-            if (audibleIndicator.burstList != null) {
-                xml.add((BurstListImpl) audibleIndicator.burstList, BURST_LIST, BurstListImpl.class);
-            }
-        }
-    };
-
 }
