@@ -91,24 +91,4 @@ public class PDPTypeImpl extends OctetStringBase implements PDPType {
         }
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<PDPTypeImpl> PDP_TYPE_XML = new XMLFormat<PDPTypeImpl>(PDPTypeImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, PDPTypeImpl pdpType) throws XMLStreamException {
-            String s = xml.getAttribute(PDP_TYPE_VALUE, DEFAULT_VALUE);
-            if (s != null) {
-                pdpType.setPDPTypeValue(Enum.valueOf(PDPTypeValue.class, s));
-            }
-        }
-
-        @Override
-        public void write(PDPTypeImpl pdpType, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (pdpType.getPDPTypeValue() != null) {
-                xml.setAttribute(PDP_TYPE_VALUE, pdpType.getPDPTypeValue().toString());
-            }
-        }
-    };
 }

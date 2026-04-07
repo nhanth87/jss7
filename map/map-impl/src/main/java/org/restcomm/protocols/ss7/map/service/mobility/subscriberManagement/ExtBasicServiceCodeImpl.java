@@ -164,33 +164,4 @@ public class ExtBasicServiceCodeImpl implements ExtBasicServiceCode, MAPAsnPrimi
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ExtBasicServiceCodeImpl> EXT_BASIC_SERVICE_CODE_XML = new XMLFormat<ExtBasicServiceCodeImpl>(
-            ExtBasicServiceCodeImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ExtBasicServiceCodeImpl extBasicServiceCode)
-                throws XMLStreamException {
-            extBasicServiceCode.extBearerService = xml.get(EXT_BEARER_SERVICE, ExtBearerServiceCodeImpl.class);
-            extBasicServiceCode.extTeleservice = xml.get(EXT_TELE_SERVICE, ExtTeleserviceCodeImpl.class);
-
-        }
-
-        @Override
-        public void write(ExtBasicServiceCodeImpl extBasicServiceCode, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-
-            if (extBasicServiceCode.extBearerService != null) {
-                xml.add(((ExtBearerServiceCodeImpl) extBasicServiceCode.extBearerService), EXT_BEARER_SERVICE,
-                        ExtBearerServiceCodeImpl.class);
-            }
-
-            if (extBasicServiceCode.extTeleservice != null) {
-                xml.add(((ExtTeleserviceCodeImpl) extBasicServiceCode.extTeleservice), EXT_TELE_SERVICE,
-                        ExtTeleserviceCodeImpl.class);
-            }
-        }
-    };
 }

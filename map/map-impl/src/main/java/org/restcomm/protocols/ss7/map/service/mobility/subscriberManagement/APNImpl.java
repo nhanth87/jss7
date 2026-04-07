@@ -114,31 +114,4 @@ public class APNImpl extends OctetStringBase implements APN {
             return super.toString();
         }
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<APNImpl> APN_XML = new XMLFormat<APNImpl>(APNImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, APNImpl apn) throws XMLStreamException {
-            String s = xml.getAttribute(DATA, DEFAULT_VALUE);
-            if (s != null && s.length() > 0) {
-                try {
-                    apn.setApnString(s);
-                } catch (MAPException e) {
-                }
-            }
-        }
-
-        @Override
-        public void write(APNImpl apn, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (apn.data != null) {
-                try {
-                    xml.setAttribute(DATA, apn.getApn());
-                } catch (Exception e) {
-                }
-            }
-        }
-    };
 }

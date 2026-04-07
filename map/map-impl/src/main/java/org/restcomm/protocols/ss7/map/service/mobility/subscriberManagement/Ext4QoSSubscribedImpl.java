@@ -25,23 +25,4 @@ public class Ext4QoSSubscribedImpl extends OctetStringLength1Base implements Ext
         return data;
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<Ext4QoSSubscribedImpl> EXT4_QOS_SUBSCRIBED_XML = new XMLFormat<Ext4QoSSubscribedImpl>(Ext4QoSSubscribedImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, Ext4QoSSubscribedImpl qos4Subscribed) throws XMLStreamException {
-
-            qos4Subscribed.data = xml.getAttribute(PRIORITY_LEVEL, DEFAULT_INT_VALUE);
-
-        }
-
-        @Override
-        public void write(Ext4QoSSubscribedImpl qos4Subscribed, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-
-            xml.setAttribute(PRIORITY_LEVEL, qos4Subscribed.data);
-
-        }
-    };
 }

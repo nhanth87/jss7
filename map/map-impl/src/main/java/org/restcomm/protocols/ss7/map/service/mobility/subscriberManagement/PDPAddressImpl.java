@@ -1,8 +1,6 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-import jakarta.xml.bind.DatatypeConverter;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.PDPAddress;
@@ -26,26 +24,5 @@ public class PDPAddressImpl extends OctetStringBase implements PDPAddress {
     public byte[] getData() {
         return data;
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<PDPAddressImpl> PDP_ADDRESS_XML = new XMLFormat<PDPAddressImpl>(PDPAddressImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, PDPAddressImpl pdpAddress) throws XMLStreamException {
-            String s = xml.getAttribute(DATA, DEFAULT_VALUE);
-            if (s != null) {
-                pdpAddress.data = DatatypeConverter.parseHexBinary(s);
-            }
-        }
-
-        @Override
-        public void write(PDPAddressImpl pdpAddress, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (pdpAddress.data != null) {
-                xml.setAttribute(DATA, DatatypeConverter.printHexBinary(pdpAddress.data));
-            }
-        }
-    };
 
 }

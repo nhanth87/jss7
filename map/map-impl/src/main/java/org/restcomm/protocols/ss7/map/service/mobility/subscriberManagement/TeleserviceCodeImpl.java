@@ -53,26 +53,4 @@ public class TeleserviceCodeImpl extends OctetStringLength1Base implements Teles
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<TeleserviceCodeImpl> TELE_SERVICE_CODE_XML = new XMLFormat<TeleserviceCodeImpl>(
-            TeleserviceCodeImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, TeleserviceCodeImpl ssCode) throws XMLStreamException {
-            ssCode.data = xml.get(DATA, Integer.class);
-
-            String str = xml.get(TELE_SERVICE_CODE_VALUE, String.class);
-        }
-
-        @Override
-        public void write(TeleserviceCodeImpl ssCode, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.add(ssCode.getData(), DATA, Integer.class);
-
-            if (ssCode.getTeleserviceCodeValue() != null)
-                xml.add((String) ssCode.getTeleserviceCodeValue().toString(), TELE_SERVICE_CODE_VALUE, String.class);
-        }
-    };
-
 }
