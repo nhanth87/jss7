@@ -142,7 +142,7 @@ public class GenericNumberImpl extends AbstractNAINumber implements GenericNumbe
     }
 
     public void setNumberingPlanIndicator(int numberingPlanIndicator) {
-        this.numberingPlanIndicator = numberPlanIndicator & 0x07;
+        this.numberingPlanIndicator = numberingPlanIndicator & 0x07;
     }
 
     public int getAddressRepresentationRestrictedIndicator() {
