@@ -5,7 +5,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.mobicents.protocols.api.Management;
 import org.mobicents.protocols.api.Server;

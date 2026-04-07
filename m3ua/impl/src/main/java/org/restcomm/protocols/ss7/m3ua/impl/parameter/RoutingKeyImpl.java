@@ -2,8 +2,9 @@ package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import javolution.text.TextBuilder;
-import javolution.util.FastList;
+import java.util.ArrayList;
+import java.util.List;
+
 import javolution.xml.XMLFormat;
 import javolution.xml.XMLSerializable;
 import javolution.xml.stream.XMLStreamException;
@@ -78,9 +79,9 @@ public class RoutingKeyImpl extends ParameterImpl implements RoutingKey, XMLSeri
 
     private void decode(byte[] data) {
         int pos = 0;
-        FastList<DestinationPointCode> dpcList = new FastList<DestinationPointCode>();
-        FastList<ServiceIndicators> serIndList = new FastList<ServiceIndicators>();
-        FastList<OPCList> opcListList = new FastList<OPCList>();
+        List<DestinationPointCode> dpcList = new ArrayList<DestinationPointCode>();
+        List<ServiceIndicators> serIndList = new ArrayList<ServiceIndicators>();
+        List<OPCList> opcListList = new ArrayList<OPCList>();
 
         while (pos < data.length) {
             short tag = (short) ((data[pos] & 0xff) << 8 | (data[pos + 1] & 0xff));
@@ -207,7 +208,7 @@ public class RoutingKeyImpl extends ParameterImpl implements RoutingKey, XMLSeri
 
     @Override
     public String toString() {
-        TextBuilder tb = TextBuilder.newInstance();
+        StringBuilder tb = new StringBuilder();
         tb.append("RoutingKey(");
         if (localRkId != null) {
             tb.append(localRkId.toString());

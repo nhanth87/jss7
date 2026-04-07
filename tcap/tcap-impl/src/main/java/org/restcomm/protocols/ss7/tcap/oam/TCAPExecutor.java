@@ -4,7 +4,7 @@ package org.restcomm.protocols.ss7.tcap.oam;
 import java.util.Arrays;
 import java.util.Map;
 
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.tcap.TCAPStackImpl;
@@ -18,7 +18,7 @@ public class TCAPExecutor implements ShellExecutor {
 
     private static final Logger logger = Logger.getLogger(TCAPExecutor.class);
 
-    private FastMap<String, TCAPStackImpl> tcapStacks = new FastMap<String, TCAPStackImpl>();
+    private NonBlockingHashMap<String, TCAPStackImpl> tcapStacks = new NonBlockingHashMap<String, TCAPStackImpl>();
 
     private TCAPStackImpl tcapStack = null;
 
@@ -36,7 +36,7 @@ public class TCAPExecutor implements ShellExecutor {
     public void setTcapStacks(Map<String, TCAPStackImpl> mtp3UserPartsTemp) {
         if (mtp3UserPartsTemp != null) {
             synchronized (this) {
-                FastMap<String, TCAPStackImpl> newMtp3UserPart = new FastMap<String, TCAPStackImpl>();
+                NonBlockingHashMap<String, TCAPStackImpl> newMtp3UserPart = new NonBlockingHashMap<String, TCAPStackImpl>();
                 newMtp3UserPart.putAll(mtp3UserPartsTemp);
                 this.tcapStacks = newMtp3UserPart;
             }
@@ -312,8 +312,7 @@ public class TCAPExecutor implements ShellExecutor {
 
             StringBuilder sb = new StringBuilder();
 
-            for (FastMap.Entry<String, TCAPStackImpl> e = this.tcapStacks.head(), end = this.tcapStacks.tail(); (e = e
-                    .getNext()) != end;) {
+            for (Map.Entry<String, TCAPStackImpl> e : this.tcapStacks.entrySet()) {
                 TCAPStackImpl tcapStackImpl = e.getValue();
                 String tcapStackname = e.getKey();
 

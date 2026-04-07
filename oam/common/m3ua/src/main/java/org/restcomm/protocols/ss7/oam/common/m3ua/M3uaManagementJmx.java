@@ -4,9 +4,9 @@ package org.restcomm.protocols.ss7.oam.common.m3ua;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.As;
 import org.restcomm.protocols.ss7.m3ua.Asp;
@@ -63,13 +63,13 @@ public class M3uaManagementJmx implements M3uaManagementJmxMBean, M3UAManagement
     private final MBeanHost ss7Management;
     private final M3UAManagement wrappedM3UAManagement;
 
-    protected FastList<As> appServers = new FastList<As>();
-    protected FastList<AspFactory> aspFactories = new FastList<AspFactory>();
+    protected CopyOnWriteArrayList<As> appServers = new CopyOnWriteArrayList<As>();
+    protected CopyOnWriteArrayList<AspFactory> aspFactories = new CopyOnWriteArrayList<AspFactory>();
     private AlarmListenerCollection alc = new AlarmListenerCollection();
 
     private static final ParameterFactory parameterFactory = new ParameterFactoryImpl();
 
-    private FastMap<String, CounterDefSet> lstCounters = new FastMap<String, CounterDefSet>();
+    private NonBlockingHashMap<String, CounterDefSet> lstCounters = new NonBlockingHashMap<String, CounterDefSet>();
 
 
     public M3uaManagementJmx(MBeanHost ss7Management, M3UAManagement wrappedM3UAManagement) {
@@ -573,8 +573,7 @@ public class M3uaManagementJmx implements M3uaManagementJmxMBean, M3UAManagement
         AspFactoryJmx aspFactoryJmx = null;
 
         synchronized (this.appServers) {
-            for (FastList.Node<As> n = this.appServers.head(), end = this.appServers.tail(); (n = n.getNext()) != end;) {
-                As asTemp = n.getValue();
+            for (As asTemp : this.appServers) {
                 if (asTemp.getName().equals(as.getName())) {
                     asJmx = (AsJmx) asTemp;
                     break;
@@ -583,8 +582,7 @@ public class M3uaManagementJmx implements M3uaManagementJmxMBean, M3UAManagement
         }
 
         synchronized (this.aspFactories) {
-            for (FastList.Node<AspFactory> n = this.aspFactories.head(), end = this.aspFactories.tail(); (n = n.getNext()) != end;) {
-                AspFactory aspFactoryJmxTmp = n.getValue();
+            for (AspFactory aspFactoryJmxTmp : this.aspFactories) {
                 if (aspFactoryJmxTmp.getName().equals(asp.getName())) {
                     aspFactoryJmx = (AspFactoryJmx) aspFactoryJmxTmp;
                     break;
@@ -601,8 +599,7 @@ public class M3uaManagementJmx implements M3uaManagementJmxMBean, M3UAManagement
         AspFactoryJmx aspFactoryJmx = null;
 
         synchronized (this.appServers) {
-            for (FastList.Node<As> n = this.appServers.head(), end = this.appServers.tail(); (n = n.getNext()) != end;) {
-                As asTemp = n.getValue();
+            for (As asTemp : this.appServers) {
                 if (asTemp.getName().equals(as.getName())) {
                     asJmx = (AsJmx) asTemp;
                     break;
@@ -611,8 +608,7 @@ public class M3uaManagementJmx implements M3uaManagementJmxMBean, M3UAManagement
         }
 
         synchronized (this.aspFactories) {
-            for (FastList.Node<AspFactory> n = this.aspFactories.head(), end = this.aspFactories.tail(); (n = n.getNext()) != end;) {
-                AspFactory aspFactoryJmxTmp = n.getValue();
+            for (AspFactory aspFactoryJmxTmp : this.aspFactories) {
                 if (aspFactoryJmxTmp.getName().equals(asp.getName())) {
                     aspFactoryJmx = (AspFactoryJmx) aspFactoryJmxTmp;
                     break;
@@ -642,8 +638,7 @@ public class M3uaManagementJmx implements M3uaManagementJmxMBean, M3UAManagement
     private void removeAsFromManagement(As as) {
         synchronized (this.appServers) {
             As asJmx = null;
-            for (FastList.Node<As> n = this.appServers.head(), end = this.appServers.tail(); (n = n.getNext()) != end;) {
-                As asTemp = n.getValue();
+            for (As asTemp : this.appServers) {
                 if (asTemp.getName().equals(as.getName())) {
                     asJmx = asTemp;
                     break;
@@ -667,8 +662,7 @@ public class M3uaManagementJmx implements M3uaManagementJmxMBean, M3UAManagement
     private void removeAspFactoryFromManagement(AspFactory aspFactory) {
         synchronized (this.aspFactories) {
             AspFactory aspFactoryJmx = null;
-            for (FastList.Node<AspFactory> n = this.aspFactories.head(), end = this.aspFactories.tail(); (n = n.getNext()) != end;) {
-                AspFactory aspFactoryJmxTmp = n.getValue();
+            for (AspFactory aspFactoryJmxTmp : this.aspFactories) {
                 if (aspFactoryJmxTmp.getName().equals(aspFactory.getName())) {
                     aspFactoryJmx = aspFactoryJmxTmp;
                     break;
@@ -1086,7 +1080,7 @@ public class M3uaManagementJmx implements M3uaManagementJmxMBean, M3UAManagement
     }
 
     private void setupCounterList() {
-        FastMap<String, CounterDefSet> lst = new FastMap<String, CounterDefSet>();
+        NonBlockingHashMap<String, CounterDefSet> lst = new NonBlockingHashMap<String, CounterDefSet>();
 
         CounterDefSetImpl cds = new CounterDefSetImpl(this.getCounterMediatorName() + "-Main");
         lst.put(cds.getName(), cds);

@@ -2,7 +2,6 @@
 package org.restcomm.protocols.ss7.map.load.sms.mo;
 
 import com.google.common.util.concurrent.RateLimiter;
-import javolution.util.FastList;
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.api.IpChannelType;
 import org.mobicents.protocols.sctp.netty.NettySctpManagementImpl;
@@ -271,7 +270,7 @@ public class Client extends TestHarnessSmsMo {
     }
 
     private void initTCAP() throws Exception {
-        List<Integer> extraSsns = new FastList<Integer>();
+        List<Integer> extraSsns = new ArrayList<Integer>();
         extraSsns.add(6);
 
         this.tcapStack = new TCAPStackImpl("Test", this.sccpStack.getSccpProvider(), SSN);

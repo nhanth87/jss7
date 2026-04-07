@@ -1,6 +1,6 @@
 package org.restcomm.protocols.ss7.m3ua.impl.router;
 
-import javolution.util.FastList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.restcomm.protocols.ss7.m3ua.impl.AsImpl;
 import org.restcomm.protocols.ss7.m3ua.parameter.OPCList;
@@ -23,7 +23,7 @@ import org.restcomm.protocols.ss7.m3ua.parameter.ServiceIndicators;
  */
 public class ServerM3UARouter {
 
-    private FastList<DPCNode> dpcList = new FastList<DPCNode>();
+    private final CopyOnWriteArrayList<DPCNode> dpcList = new CopyOnWriteArrayList<DPCNode>();
 
     public ServerM3UARouter() {
     }
@@ -63,8 +63,7 @@ public class ServerM3UARouter {
             siShortArr = siArray[0].getIndicators();
         }
 
-        for (FastList.Node<DPCNode> n = dpcList.head(), end = dpcList.tail(); (n = n.getNext()) != end;) {
-            DPCNode dpcNode = n.getValue();
+        for (DPCNode dpcNode : dpcList) {
             if (dpcNode.dpc == dpc) {
                 this.addSi(dpcNode, opcIntArr, siShortArr, asImpl);
                 return;
@@ -93,8 +92,7 @@ public class ServerM3UARouter {
      * @return
      */
     public AsImpl getAs(int dpc, int opc, short si) {
-        for (FastList.Node<DPCNode> n = dpcList.head(), end = dpcList.tail(); (n = n.getNext()) != end;) {
-            DPCNode dpcNode = n.getValue();
+        for (DPCNode dpcNode : dpcList) {
             if (dpcNode.dpc == dpc) {
                 return dpcNode.getAs(opc, si);
             }

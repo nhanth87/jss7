@@ -2,8 +2,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.message;
 
 import io.netty.buffer.ByteBuf;
-import javolution.text.TextBuilder;
-import javolution.util.FastMap;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.restcomm.protocols.ss7.m3ua.impl.parameter.ParameterFactoryImpl;
 import org.restcomm.protocols.ss7.m3ua.message.M3UAMessage;
@@ -21,7 +21,7 @@ public abstract class M3UAMessageImpl implements M3UAMessage {
     private int messageType;
 
     private String message;
-    protected FastMap<Short, Parameter> parameters = new FastMap<Short, Parameter>();
+    protected final ConcurrentHashMap<Short, Parameter> parameters = new ConcurrentHashMap<Short, Parameter>();
 
     private ParameterFactoryImpl factory = new ParameterFactoryImpl();
 
@@ -92,14 +92,13 @@ public abstract class M3UAMessageImpl implements M3UAMessage {
 
     @Override
     public String toString() {
-        TextBuilder tb = new TextBuilder();
-        tb.append(this.message).append(" Params(");
-        for (FastMap.Entry<Short, Parameter> e = parameters.head(), end = parameters.tail(); (e = e.getNext()) != end;) {
-            Parameter value = e.getValue();
-            tb.append(value.toString());
-            tb.append(", ");
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.message).append(" Params(");
+        for (Parameter param : parameters.values()) {
+            sb.append(param.toString());
+            sb.append(", ");
         }
-        tb.append(")");
-        return tb.toString();
+        sb.append(")");
+        return sb.toString();
     }
 }

@@ -7,9 +7,10 @@ import java.util.List;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
 import java.util.Comparator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jboss.as.controller.services.path.PathManager;
 import org.jboss.dmr.ModelNode;
@@ -96,34 +97,34 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
 
     private ModelNode fullModel;
 
-    private FastMap<String, Management> beanSctpManagements = new FastMap<String, Management>();
+    private ConcurrentHashMap<String, Management> beanSctpManagements = new ConcurrentHashMap<String, Management>();
     private SCTPShellExecutor beanSctpShellExecutor;
-    private FastMap<String, SctpManagementJmx> beanSctpManagementJmxs = new FastMap<String, SctpManagementJmx>();
-    private FastMap<String, RoutingLabelFormat> routingLabelFormats = new FastMap<String, RoutingLabelFormat>();
-    private FastMap<String, Mtp3UserPart> beanMtp3UserParts = new FastMap<String, Mtp3UserPart>();
-    private FastMap<String, M3UAManagementImpl> beanM3uaManagementImpls = new FastMap<String, M3UAManagementImpl>();
-    private FastMap<String, M3uaManagementJmx> beanM3uaManagementJmxs = new FastMap<String, M3uaManagementJmx>();
+    private ConcurrentHashMap<String, SctpManagementJmx> beanSctpManagementJmxs = new ConcurrentHashMap<String, SctpManagementJmx>();
+    private ConcurrentHashMap<String, RoutingLabelFormat> routingLabelFormats = new ConcurrentHashMap<String, RoutingLabelFormat>();
+    private ConcurrentHashMap<String, Mtp3UserPart> beanMtp3UserParts = new ConcurrentHashMap<String, Mtp3UserPart>();
+    private ConcurrentHashMap<String, M3UAManagementImpl> beanM3uaManagementImpls = new ConcurrentHashMap<String, M3UAManagementImpl>();
+    private ConcurrentHashMap<String, M3uaManagementJmx> beanM3uaManagementJmxs = new ConcurrentHashMap<String, M3uaManagementJmx>();
     private M3UAShellExecutor beanM3uaShellExecutor;
     private Ss7ExtInterfaceImpl ss7ExtInterfaceImpl;
     private SccpExtModule sccpExtModule;
 
     private Scheduler schedulerMBean = null;
 
-    private FastMap<String, Comparator<RuleImpl>> beanRuleComparators = new FastMap<String, Comparator<RuleImpl>>();
+    private ConcurrentHashMap<String, Comparator<RuleImpl>> beanRuleComparators = new ConcurrentHashMap<String, Comparator<RuleImpl>>();
     private RuleComparatorFactory ruleComparatorMbean;
 
-    private FastMap<String, ISUPStack> beanISUPStacks = new FastMap<String, ISUPStack>();
-    private FastMap<String, SccpStackImpl> beanSccpStacks = new FastMap<String, SccpStackImpl>();
+    private ConcurrentHashMap<String, ISUPStack> beanISUPStacks = new ConcurrentHashMap<String, ISUPStack>();
+    private ConcurrentHashMap<String, SccpStackImpl> beanSccpStacks = new ConcurrentHashMap<String, SccpStackImpl>();
     private SccpExecutorExt beanSccpExecutor;
-    private FastMap<String, SccpManagementJmx> beanSccpManagementJmxs = new FastMap<String, SccpManagementJmx>();
-    private FastMap<String, TCAPStackImpl> beanTcapStacks = new FastMap<String, TCAPStackImpl>();
+    private ConcurrentHashMap<String, SccpManagementJmx> beanSccpManagementJmxs = new ConcurrentHashMap<String, SccpManagementJmx>();
+    private ConcurrentHashMap<String, TCAPStackImpl> beanTcapStacks = new ConcurrentHashMap<String, TCAPStackImpl>();
     private TCAPExecutor beanTcapExecutor;
-    private FastMap<String, TcapManagementJmx> beanTcapManagementJmxs = new FastMap<String, TcapManagementJmx>();
-    private FastMap<String, MAPStackImpl> beanMapStacks = new FastMap<String, MAPStackImpl>();
-    private FastMap<String, CAPStackImpl> beanCapStacks = new FastMap<String, CAPStackImpl>();
-    private FastMap<String, SnifferImpl> beanSnifferImpls = new FastMap<String, SnifferImpl>();
+    private ConcurrentHashMap<String, TcapManagementJmx> beanTcapManagementJmxs = new ConcurrentHashMap<String, TcapManagementJmx>();
+    private ConcurrentHashMap<String, MAPStackImpl> beanMapStacks = new ConcurrentHashMap<String, MAPStackImpl>();
+    private ConcurrentHashMap<String, CAPStackImpl> beanCapStacks = new ConcurrentHashMap<String, CAPStackImpl>();
+    private ConcurrentHashMap<String, SnifferImpl> beanSnifferImpls = new ConcurrentHashMap<String, SnifferImpl>();
 
-    private FastMap<String, SS7Service> beanSS7Services = new FastMap<String, SS7Service>();
+    private ConcurrentHashMap<String, SS7Service> beanSS7Services = new ConcurrentHashMap<String, SS7Service>();
 
     private ShellServer shellExecutorMBean = null;
     private Ss7Management ss7ManagementMBean = null;
@@ -214,7 +215,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         if(shellExecutorExists()) {
             shellExecutorMBean = null;
             try {
-                FastList<ShellExecutor> shellExecutors = new FastList<ShellExecutor>();
+                CopyOnWriteArrayList<ShellExecutor> shellExecutors = new CopyOnWriteArrayList<ShellExecutor>();
                 shellExecutors.add(beanSccpExecutor);
                 shellExecutors.add(beanM3uaShellExecutor);
                 shellExecutors.add(beanSctpShellExecutor);
@@ -258,8 +259,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // SctpManagementJmx
-        for (FastMap.Entry<String, Management> n = beanSctpManagements.head(), end = beanSctpManagements.tail(); (n = n
-                .getNext()) != end;) {
+        for (Map.Entry<String, Management> n : beanSctpManagements.entrySet()) {
             String beanName = n.getKey();
             Management sctpManagement = n.getValue();
 
@@ -273,8 +273,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // M3uaManagementJmx
-        for (FastMap.Entry<String, M3UAManagementImpl> n = beanM3uaManagementImpls.head(), end = beanM3uaManagementImpls.tail(); (n = n
-                .getNext()) != end;) {
+        for (Map.Entry<String, M3UAManagementImpl> n : beanM3uaManagementImpls.entrySet()) {
             String beanName = n.getKey();
             M3UAManagementImpl m3uaManagement = n.getValue();
 
@@ -288,7 +287,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // SccpManagementJmx
-        for (FastMap.Entry<String, SccpStackImpl> n = beanSccpStacks.head(), end = beanSccpStacks.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, SccpStackImpl> n : beanSccpStacks.entrySet()) {
             String beanName = n.getKey();
             SccpStackImpl sccpStack = n.getValue();
 
@@ -302,7 +301,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // TcapManagementJmx
-        for (FastMap.Entry<String, TCAPStackImpl> n = beanTcapStacks.head(), end = beanTcapStacks.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, TCAPStackImpl> n : beanTcapStacks.entrySet()) {
             String beanName = n.getKey();
             TCAPStackImpl tcapStack = n.getValue();
 
@@ -317,8 +316,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
 
 
         // SCTPManagement - start
-        for (FastMap.Entry<String, Management> n = beanSctpManagements.head(), end = beanSctpManagements.tail(); (n = n
-                .getNext()) != end;) {
+        for (Map.Entry<String, Management> n : beanSctpManagements.entrySet()) {
             String beanName = n.getKey();
             Management sctpManagement = n.getValue();
             try {
@@ -329,7 +327,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // mtp3UserParts - start
-        for (FastMap.Entry<String, Mtp3UserPart> n = beanMtp3UserParts.head(), end = beanMtp3UserParts.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, Mtp3UserPart> n : beanMtp3UserParts.entrySet()) {
             String beanName = n.getKey();
             Mtp3UserPart mtp3UserPart = n.getValue();
             try {
@@ -347,7 +345,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // ISUP - start
-        for (FastMap.Entry<String, ISUPStack> n = beanISUPStacks.head(), end = beanISUPStacks.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, ISUPStack> n : beanISUPStacks.entrySet()) {
             String beanName = n.getKey();
             ISUPStack isupStack = n.getValue();
             try {
@@ -358,7 +356,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // SCCP - start
-        for (FastMap.Entry<String, SccpStackImpl> n = beanSccpStacks.head(), end = beanSccpStacks.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, SccpStackImpl> n : beanSccpStacks.entrySet()) {
             String beanName = n.getKey();
             SccpStackImpl sccpStack = n.getValue();
             try {
@@ -369,7 +367,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // TCAP - start
-        for (FastMap.Entry<String, TCAPStackImpl> n = beanTcapStacks.head(), end = beanTcapStacks.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, TCAPStackImpl> n : beanTcapStacks.entrySet()) {
             String beanName = n.getKey();
             TCAPStackImpl tcapStack = n.getValue();
             try {
@@ -380,7 +378,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // MAP - start
-        for (FastMap.Entry<String, MAPStackImpl> n = beanMapStacks.head(), end = beanMapStacks.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, MAPStackImpl> n : beanMapStacks.entrySet()) {
             String beanName = n.getKey();
             MAPStackImpl mapStack = n.getValue();
             try {
@@ -391,7 +389,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // CAP - start
-        for (FastMap.Entry<String, CAPStackImpl> n = beanCapStacks.head(), end = beanCapStacks.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, CAPStackImpl> n : beanCapStacks.entrySet()) {
             String beanName = n.getKey();
             CAPStackImpl capStack = n.getValue();
             try {
@@ -402,7 +400,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // Snnifer - start
-        for (FastMap.Entry<String, SnifferImpl> n = beanSnifferImpls.head(), end = beanSnifferImpls.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, SnifferImpl> n : beanSnifferImpls.entrySet()) {
             String beanName = n.getKey();
             SnifferImpl snifferImpl = n.getValue();
             try {
@@ -426,7 +424,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // Services - start
-        for (FastMap.Entry<String, SS7Service> n = beanSS7Services.head(), end = beanSS7Services.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, SS7Service> n : beanSS7Services.entrySet()) {
             String beanName = n.getKey();
             SS7Service ss7Service = n.getValue();
             try {
@@ -438,8 +436,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
          // SctpManagementMBean - start
-        for (FastMap.Entry<String, SctpManagementJmx> n = beanSctpManagementJmxs.head(), end = beanSctpManagementJmxs.tail(); (n = n
-                .getNext()) != end;) {
+        for (Map.Entry<String, SctpManagementJmx> n : beanSctpManagementJmxs.entrySet()) {
             String beanName = n.getKey();
             SctpManagementJmx sctpManagementJmx = n.getValue();
             try {
@@ -450,8 +447,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // M3uaManagementMBean - start
-        for (FastMap.Entry<String, M3uaManagementJmx> n = beanM3uaManagementJmxs.head(), end = beanM3uaManagementJmxs.tail(); (n = n
-                .getNext()) != end;) {
+        for (Map.Entry<String, M3uaManagementJmx> n : beanM3uaManagementJmxs.entrySet()) {
             String beanName = n.getKey();
             M3uaManagementJmx m3uaManagementJmx = n.getValue();
             try {
@@ -462,8 +458,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // SccpManagementMBean - start
-        for (FastMap.Entry<String, SccpManagementJmx> n = beanSccpManagementJmxs.head(), end = beanSccpManagementJmxs.tail(); (n = n
-                .getNext()) != end;) {
+        for (Map.Entry<String, SccpManagementJmx> n : beanSccpManagementJmxs.entrySet()) {
             String beanName = n.getKey();
             SccpManagementJmx sccpManagementJmx = n.getValue();
             try {
@@ -474,8 +469,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // TcapManagementMBean - start
-        for (FastMap.Entry<String, TcapManagementJmx> n = beanTcapManagementJmxs.head(), end = beanTcapManagementJmxs.tail(); (n = n
-                .getNext()) != end;) {
+        for (Map.Entry<String, TcapManagementJmx> n : beanTcapManagementJmxs.entrySet()) {
             String beanName = n.getKey();
             TcapManagementJmx tcapManagementJmx = n.getValue();
             try {
@@ -496,8 +490,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         log.info("Stopping SS7ExtensionService");
 
                 // TcapManagementMBean - stop
-        for (FastMap.Entry<String, TcapManagementJmx> n = beanTcapManagementJmxs.head(), end = beanTcapManagementJmxs.tail(); (n = n
-                .getNext()) != end;) {
+        for (Map.Entry<String, TcapManagementJmx> n : beanTcapManagementJmxs.entrySet()) {
             String beanName = n.getKey();
             TcapManagementJmx tcapManagementJmx = n.getValue();
             try {
@@ -508,8 +501,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // SccpManagementMBean - stop
-        for (FastMap.Entry<String, SccpManagementJmx> n = beanSccpManagementJmxs.head(), end = beanSccpManagementJmxs.tail(); (n = n
-                .getNext()) != end;) {
+        for (Map.Entry<String, SccpManagementJmx> n : beanSccpManagementJmxs.entrySet()) {
             String beanName = n.getKey();
             SccpManagementJmx sccpManagementJmx = n.getValue();
             try {
@@ -520,8 +512,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // M3uaManagementMBean - stop
-        for (FastMap.Entry<String, M3uaManagementJmx> n = beanM3uaManagementJmxs.head(), end = beanM3uaManagementJmxs.tail(); (n = n
-                .getNext()) != end;) {
+        for (Map.Entry<String, M3uaManagementJmx> n : beanM3uaManagementJmxs.entrySet()) {
             String beanName = n.getKey();
             M3uaManagementJmx m3uaManagementJmx = n.getValue();
             try {
@@ -532,8 +523,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // SctpManagementMBean - stop
-        for (FastMap.Entry<String, SctpManagementJmx> n = beanSctpManagementJmxs.head(), end = beanSctpManagementJmxs.tail(); (n = n
-                .getNext()) != end;) {
+        for (Map.Entry<String, SctpManagementJmx> n : beanSctpManagementJmxs.entrySet()) {
             String beanName = n.getKey();
             SctpManagementJmx sctpManagementJmx = n.getValue();
             try {
@@ -544,7 +534,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // Services - stop
-        for (FastMap.Entry<String, SS7Service> n = beanSS7Services.head(), end = beanSS7Services.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, SS7Service> n : beanSS7Services.entrySet()) {
             String beanName = n.getKey();
             SS7Service ss7Service = n.getValue();
             try {
@@ -563,7 +553,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // CAP - stop
-        for (FastMap.Entry<String, CAPStackImpl> n = beanCapStacks.head(), end = beanCapStacks.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, CAPStackImpl> n : beanCapStacks.entrySet()) {
             String beanName = n.getKey();
             CAPStackImpl capStack = n.getValue();
             try {
@@ -574,7 +564,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // MAP - stop
-        for (FastMap.Entry<String, MAPStackImpl> n = beanMapStacks.head(), end = beanMapStacks.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, MAPStackImpl> n : beanMapStacks.entrySet()) {
             String beanName = n.getKey();
             MAPStackImpl mapStack = n.getValue();
             try {
@@ -585,7 +575,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // TCAP - stop
-        for (FastMap.Entry<String, TCAPStackImpl> n = beanTcapStacks.head(), end = beanTcapStacks.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, TCAPStackImpl> n : beanTcapStacks.entrySet()) {
             String beanName = n.getKey();
             TCAPStackImpl tcapStack = n.getValue();
             try {
@@ -596,7 +586,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // SCCP - stop
-        for (FastMap.Entry<String, SccpStackImpl> n = beanSccpStacks.head(), end = beanSccpStacks.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, SccpStackImpl> n : beanSccpStacks.entrySet()) {
             String beanName = n.getKey();
             SccpStackImpl sccpStack = n.getValue();
             try {
@@ -607,7 +597,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // ISUP - stop
-        for (FastMap.Entry<String, ISUPStack> n = beanISUPStacks.head(), end = beanISUPStacks.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, ISUPStack> n : beanISUPStacks.entrySet()) {
             String beanName = n.getKey();
             ISUPStack isupStack = n.getValue();
             try {
@@ -626,7 +616,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // mtp3UserParts - stop
-        for (FastMap.Entry<String, Mtp3UserPart> n = beanMtp3UserParts.head(), end = beanMtp3UserParts.tail(); (n = n.getNext()) != end;) {
+        for (Map.Entry<String, Mtp3UserPart> n : beanMtp3UserParts.entrySet()) {
             String beanName = n.getKey();
             Mtp3UserPart mtp3UserPart = n.getValue();
             try {
@@ -637,8 +627,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         }
 
         // SCTPManagement - stop
-        for (FastMap.Entry<String, Management> n = beanSctpManagements.head(), end = beanSctpManagements.tail(); (n = n
-                .getNext()) != end;) {
+        for (Map.Entry<String, Management> n : beanSctpManagements.entrySet()) {
             String beanName = n.getKey();
             Management sctpManagement = n.getValue();
             try {
@@ -1079,7 +1068,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
 
     private void createSccpStack(ModelNode sccpNode, String beanName, String dataDir) throws StartException {
         // SccpStack
-        FastMap<Integer, Mtp3UserPart> mtp3UserPartsTemp = new FastMap<Integer, Mtp3UserPart>();
+        ConcurrentHashMap<Integer, Mtp3UserPart> mtp3UserPartsTemp = new ConcurrentHashMap<Integer, Mtp3UserPart>();
 
         // ModelNode mtp3UserPartsNode = sccpNode.get("mtp3UserParts");
         ModelNode mtp3UserPartsNode = peek(fullModel, "mbean", beanName, "property", "mtp3UserParts");
@@ -1150,7 +1139,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
 
     private void createSnifferImpl(ModelNode snifferNode, String beanName, String dataDir) throws StartException {
         // SnifferImpl
-        FastMap<Integer, Mtp3UserPart> mtp3UserPartsTemp = new FastMap<Integer, Mtp3UserPart>();
+        ConcurrentHashMap<Integer, Mtp3UserPart> mtp3UserPartsTemp = new ConcurrentHashMap<Integer, Mtp3UserPart>();
 
         // ModelNode mtp3UserPartsNode = snifferNode.get("mtp3UserParts");
         //ModelNode mtp3UserPartsNode = peek(fullModel, "mbean", beanName, "property", "mtp3UserParts");
@@ -1209,7 +1198,7 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
         boolean previewMode = getPropertyBoolean(beanName, "previewMode", false);
 
         ModelNode extraSsnsNode = peek(fullModel, "mbean", beanName, "property", "extraSsns");
-        List<Integer> extraSsnsNew = new FastList<Integer>();
+        List<Integer> extraSsnsNew = new ArrayList<Integer>();
 
         if (extraSsnsNode != null) {
             for (Property prop : extraSsnsNode.get("entry").asPropertyList()) {

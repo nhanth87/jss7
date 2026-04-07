@@ -15,7 +15,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import javolution.util.FastList;
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.mobicents.protocols.api.Association;
 import org.mobicents.protocols.api.AssociationListener;

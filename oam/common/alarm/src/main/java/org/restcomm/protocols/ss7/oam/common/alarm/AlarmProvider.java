@@ -2,14 +2,13 @@
 package org.restcomm.protocols.ss7.oam.common.alarm;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.management.NotCompliantMBeanException;
 import javax.management.NotificationBroadcasterSupport;
 
 import org.restcomm.protocols.ss7.oam.common.jmx.MBeanHost;
 import org.restcomm.protocols.ss7.oam.common.jmx.MBeanType;
-
-import javolution.util.FastList;
 
 /**
  *
@@ -23,7 +22,7 @@ public class AlarmProvider extends NotificationBroadcasterSupport implements Ala
     private final MBeanHost beanHost;
     private final AlarmMediator alarmMediator;
 
-    private List<AlarmMediator> alarmMediators = new FastList<AlarmMediator>();
+    private List<AlarmMediator> alarmMediators = new CopyOnWriteArrayList<AlarmMediator>();
     private long sequenceNumber = 0;
     private String alarmProviderObjectPath;
     private String alarmProviderObjectPathWithSlash;

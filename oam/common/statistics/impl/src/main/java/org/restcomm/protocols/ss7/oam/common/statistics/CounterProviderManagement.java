@@ -8,13 +8,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 import javolution.text.TextBuilder;
-import javolution.util.FastMap;
 import javolution.xml.XMLBinding;
 import javolution.xml.XMLObjectReader;
 import javolution.xml.XMLObjectWriter;
 import javolution.xml.stream.XMLStreamException;
+
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.oam.common.jmx.MBeanHost;
@@ -64,11 +66,11 @@ public class CounterProviderManagement implements CounterProviderManagementMBean
     /**
      * A list of registered CounterMediator by there names
      */
-    protected FastMap<String, CounterMediator> lstCounterMediator = new FastMap<String, CounterMediator>();
+    protected NonBlockingHashMap<String, CounterMediator> lstCounterMediator = new NonBlockingHashMap<String, CounterMediator>();
     /**
      * A list of registered CounterDefSet by names - values are corresponded CounterMediator's
      */
-    private FastMap<String, CounterMediator> lstCounterDefSet = new FastMap<String, CounterMediator>();
+    private NonBlockingHashMap<String, CounterMediator> lstCounterDefSet = new NonBlockingHashMap<String, CounterMediator>();
     protected CounterCampaignMap<String, CounterCampaignImpl> lstCounterCampaign = new CounterCampaignMap<String, CounterCampaignImpl>();
 
     public CounterProviderManagement(MBeanHost beanHost) {
@@ -363,17 +365,19 @@ public class CounterProviderManagement implements CounterProviderManagementMBean
                 }
                 CounterValueSetImpl res = new CounterValueSetImpl(startTime, endTime, duration, durationSeconds);
 
+                Map<String, SourceValueCounter> counters1 = svs1.getCounters();
                 for (SourceValueCounter sv2 : svs2.getCounters().values()) {
                     CounterDef cd2 = sv2.getCounterDef();
-                    SourceValueCounter sv1 = svs1.getCounters().get(sv2.getCounterDef().getCounterName());
+                    SourceValueCounter sv1 = counters1.get(sv2.getCounterDef().getCounterName());
                     if (sv1 == null)
                         continue;
                     CounterDef cd1 = sv1.getCounterDef();
                     if (cd1.getCounterType() != cd2.getCounterType())
                         continue;
 
+                    Map<String, SourceValueObject> objects1 = sv1.getObjects();
                     for (SourceValueObject obj2 : sv2.getObjects().values()) {
-                        SourceValueObject obj1 = sv1.getObjects().get(obj2.getObjectName());
+                        SourceValueObject obj1 = objects1.get(obj2.getObjectName());
                         if (obj1 == null
                                 && (cd2.getCounterType() != CounterType.Minimal && cd2.getCounterType() != CounterType.Maximal && cd2
                                         .getCounterType() != CounterType.ComplexValue))

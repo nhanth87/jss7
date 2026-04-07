@@ -2,6 +2,7 @@
 package org.restcomm.protocols.ss7.oam.common.jmxss7;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.oam.common.alarm.AlarmListener;
@@ -16,8 +17,7 @@ import org.restcomm.protocols.ss7.oam.common.jmx.MBeanType;
 import org.restcomm.protocols.ss7.oam.common.statistics.CounterProviderManagement;
 import org.restcomm.protocols.ss7.oam.common.statistics.api.CounterMediator;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 /**
  *
@@ -29,9 +29,9 @@ public class Ss7Management extends MBeanHostImpl implements Ss7ManagementMBean, 
     protected final Logger logger = Logger.getLogger(Ss7Management.class.getCanonicalName());
 
     private AlarmListenerCollection alc = new AlarmListenerCollection();
-    private List<AlarmMediator> alarmMediators = new FastList<AlarmMediator>();
+    private List<AlarmMediator> alarmMediators = new CopyOnWriteArrayList<AlarmMediator>();
     private CounterProviderManagement counterProvider;
-    private FastMap<String, CounterMediator> counterMediatorsRegistered = new FastMap<String, CounterMediator>();
+    private NonBlockingHashMap<String, CounterMediator> counterMediatorsRegistered = new NonBlockingHashMap<String, CounterMediator>();
 
     public Ss7Management() {
         this.setAlarmProviderObjectPath("SS7_Alarms");

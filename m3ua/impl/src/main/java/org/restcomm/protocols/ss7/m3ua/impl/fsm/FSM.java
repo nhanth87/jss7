@@ -1,8 +1,7 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl.fsm;
 
-import javolution.util.FastMap;
-
+import org.jctools.maps.NonBlockingHashMap;
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.impl.scheduler.M3UATask;
 
@@ -22,11 +21,11 @@ public class FSM extends M3UATask {
     protected FSMState end;
 
     // intermediate states
-    private FastMap<String, FSMState> states = new FastMap<String, FSMState>();
+    private final NonBlockingHashMap<String, FSMState> states = new NonBlockingHashMap<String, FSMState>();
 
     protected FSMState currentState;
 
-    private FastMap attributes = new FastMap();
+    private final NonBlockingHashMap<String, Object> attributes = new NonBlockingHashMap<String, Object>();
 
     private FSMState oldState;
 

@@ -2,8 +2,8 @@ package org.restcomm.protocols.ss7.map.api;
 
 import java.io.Serializable;
 import java.util.Arrays;
-
-import javolution.util.FastMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -15,8 +15,7 @@ public class MAPApplicationContext implements Serializable {
 
     private static long[] oidTemplate = new long[] { 0, 4, 0, 0, 1, 0, 0, 0 };
 
-    private static FastMap<MAPApplicationContextName, FastMap<MAPApplicationContextVersion, MAPApplicationContext>> appContextCache = new FastMap<MAPApplicationContextName, FastMap<MAPApplicationContextVersion, MAPApplicationContext>>()
-            .shared();
+    private static Map<MAPApplicationContextName, Map<MAPApplicationContextVersion, MAPApplicationContext>> appContextCache = new ConcurrentHashMap<MAPApplicationContextName, Map<MAPApplicationContextVersion, MAPApplicationContext>>();
 
     private MAPApplicationContextName contextName;
     private MAPApplicationContextVersion contextVersion;
@@ -46,11 +45,14 @@ public class MAPApplicationContext implements Serializable {
 
     private static MAPApplicationContext getMAPApplicationContext(MAPApplicationContextName contextName,
             MAPApplicationContextVersion contextVersion) {
-        FastMap<MAPApplicationContextVersion, MAPApplicationContext> verCache = appContextCache.get(contextName);
+        Map<MAPApplicationContextVersion, MAPApplicationContext> verCache = appContextCache.get(contextName);
 
         if (verCache == null) {
-            verCache = new FastMap<MAPApplicationContextVersion, MAPApplicationContext>();
-            appContextCache.put(contextName, verCache);
+            verCache = new ConcurrentHashMap<MAPApplicationContextVersion, MAPApplicationContext>();
+            Map<MAPApplicationContextVersion, MAPApplicationContext> existing = appContextCache.putIfAbsent(contextName, verCache);
+            if (existing != null) {
+                verCache = existing;
+            }
         }
 
         MAPApplicationContext mapApplicationContext = verCache.get(contextVersion);

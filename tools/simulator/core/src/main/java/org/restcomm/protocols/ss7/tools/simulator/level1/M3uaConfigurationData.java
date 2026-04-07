@@ -2,8 +2,9 @@
 package org.restcomm.protocols.ss7.tools.simulator.level1;
 
 import javolution.text.CharArray;
-import javolution.util.FastList;
 import javolution.xml.XMLFormat;
+import java.util.ArrayList;
+import java.util.List;
 import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.api.IpChannelType;
@@ -188,14 +189,13 @@ public class M3uaConfigurationData {
             return;
 
         String[] ss = val.split(" ");
-        FastList<String> fl = new FastList<String>();
+        List<String> fl = new ArrayList<String>();
         for (String s : ss) {
             if (s.length() != 0) {
                 fl.add(s);
             }
         }
-        extraHostAddresses = new String[fl.size()];
-        fl.toArray(extraHostAddresses);
+        extraHostAddresses = fl.toArray(new String[0]);
     }
 
     public int getDpc() {

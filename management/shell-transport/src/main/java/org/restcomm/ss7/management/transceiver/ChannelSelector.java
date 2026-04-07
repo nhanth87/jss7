@@ -5,7 +5,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Set;
 
-import javolution.util.FastSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>
@@ -77,8 +78,8 @@ public class ChannelSelector {
      * @return
      * @throws IOException If an I/O error occurs
      */
-    public FastSet<ChannelSelectionKey> selectNow() throws IOException {
-        FastSet<ChannelSelectionKey> selectedKey = new FastSet<ChannelSelectionKey>();
+    public Set<ChannelSelectionKey> selectNow() throws IOException {
+        Set<ChannelSelectionKey> selectedKey = ConcurrentHashMap.newKeySet();
         selector.selectNow();
         Set<SelectionKey> selection = selector.selectedKeys();
         for (SelectionKey key : selection) {

@@ -1,8 +1,9 @@
 package org.restcomm.ss7.congestion;
 
+import java.util.Map;
 import java.util.Map.Entry;
 
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 /**
  * The Congestion Ticket interface contains info for the source of congestion and the congestion level
@@ -14,7 +15,7 @@ public class CongestionTicketImpl implements CongestionTicket {
 
     private String source;
     private int level;
-    private FastMap<String, Object> attributeList;
+    private Map<String, Object> attributeList;
 
     public CongestionTicketImpl(String source, int level) {
         this.source = source;
@@ -23,7 +24,7 @@ public class CongestionTicketImpl implements CongestionTicket {
 
     public void setAttribute(String key, Object value) {
         if (attributeList == null)
-            attributeList = new FastMap<String, Object>();
+            attributeList = new NonBlockingHashMap<String, Object>();
         attributeList.put(key, value);
     }
 

@@ -88,9 +88,9 @@ import org.restcomm.protocols.ss7.tcap.asn.ReturnResultLastImpl;
 import org.restcomm.protocols.ss7.tcap.asn.comp.Problem;
 import org.restcomm.protocols.ss7.tcap.asn.comp.ReturnResultLast;
 
-import java.util.Random;
+import java.util.ArrayList;
 import java.util.List;
-import javolution.util.FastList;
+import java.util.Random;
 
 /**
  * @modified <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
@@ -230,7 +230,7 @@ public class Server extends TestHarnessSmsMt {
     }
 
     private void initTCAP() throws Exception {
-        List<Integer> extraSsns = new FastList<Integer>();
+        List<Integer> extraSsns = new ArrayList<Integer>();
         extraSsns.add(HLR_SSN);
         this.tcapStack = new TCAPStackImpl("TestServer", this.sccpStack.getSccpProvider(), MSC_SSN);
         this.tcapStack.setExtraSsns(extraSsns);

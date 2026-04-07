@@ -4,8 +4,8 @@ package org.restcomm.protocols.ss7.sccp;
 import java.io.IOException;
 import java.io.Serializable;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.restcomm.protocols.ss7.sccp.message.MessageFactory;
 import org.restcomm.protocols.ss7.sccp.message.SccpDataMessage;
@@ -92,7 +92,7 @@ public interface SccpProvider extends Serializable {
      *
      * @return The collection of pairs: networkId value - NetworkIdState (prohibited / congested state)
      */
-    FastMap<Integer, NetworkIdState> getNetworkIdStateList();
+    ConcurrentHashMap<Integer, NetworkIdState> getNetworkIdStateList();
 
     /**
      * @return ExecutorCongestionMonitor list that are responsible for measuring of congestion of the thread Executor that
@@ -102,7 +102,7 @@ public interface SccpProvider extends Serializable {
 
     SccpConnection newConnection(int localSsn, ProtocolClass protocolClass) throws MaxConnectionCountReached;
 
-    FastMap<LocalReference, SccpConnection> getConnections();
+    ConcurrentHashMap<LocalReference, SccpConnection> getConnections();
 
     /**
      * @return SCCP stack
@@ -115,6 +115,6 @@ public interface SccpProvider extends Serializable {
 
     void updateSPCongestion(Integer ssn, Integer congestionLevel);
 
-    FastList<SccpManagementEventListener> getManagementEventListeners();
+    CopyOnWriteArrayList<SccpManagementEventListener> getManagementEventListeners();
 
 }

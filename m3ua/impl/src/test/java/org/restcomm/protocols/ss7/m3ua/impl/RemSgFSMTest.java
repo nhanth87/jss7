@@ -14,8 +14,7 @@ import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.mobicents.protocols.api.Association;
 import org.mobicents.protocols.api.AssociationListener;
@@ -1577,7 +1576,7 @@ public class RemSgFSMTest {
 
     class NettyTransportManagement implements Management {
 
-        private FastMap<String, Association> associations = new FastMap<String, Association>();
+        private NonBlockingHashMap<String, Association> associations = new NonBlockingHashMap<String, Association>();
 
         @Override
         public Association addAssociation(String hostAddress, int hostPort, String peerAddress, int peerPort, String assocName)
@@ -2047,7 +2046,7 @@ public class RemSgFSMTest {
 
     private class M3UAManagementEventListenerImpl implements M3UAManagementEventListener {
 
-        private FastList<TestEvent> testEvents = new FastList<TestEvent>();
+        private ArrayList<TestEvent> testEvents = new ArrayList<TestEvent>();
         private int sequence = 0;
 
         @Override

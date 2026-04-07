@@ -15,7 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -111,7 +111,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 //    protected transient FastMap<PrevewDialogDataKey, PreviewDialogData> dialogPreviewList = new FastMap<PrevewDialogDataKey, PreviewDialogData>();
     protected transient ConcurrentHashMap<PreviewDialogDataKey, PreviewDialogData> dialogPreviewList = new ConcurrentHashMap<PreviewDialogDataKey, PreviewDialogData>();
 
-    private transient FastMap<Integer, NetworkIdState> networkIdStateList = new FastMap<Integer, NetworkIdState>().shared();
+    private transient NonBlockingHashMap<Integer, NetworkIdState> networkIdStateList = new NonBlockingHashMap<Integer, NetworkIdState>();
     private NetworkIdStateListUpdater currentNetworkIdStateListUpdater;
 
     private AtomicInteger seqControl = new AtomicInteger(1);
@@ -125,7 +125,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     private int executorCountWithCongestionLevel_2 = 0;
     private int executorCountWithCongestionLevel_3 = 0;
     private MemoryCongestionMonitorImpl memoryCongestionMonitor;
-    private transient FastMap<String, Integer> lstUserPartCongestionLevel = new FastMap<String, Integer>();
+    private transient NonBlockingHashMap<String, Integer> lstUserPartCongestionLevel = new NonBlockingHashMap<String, Integer>();
     private int userPartCongestionLevel_1 = 0;
     private int userPartCongestionLevel_2 = 0;
     private int userPartCongestionLevel_3 = 0;
@@ -1376,7 +1376,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     }
 
     @Override
-    public FastMap<Integer, NetworkIdState> getNetworkIdStateList() {
+    public NonBlockingHashMap<Integer, NetworkIdState> getNetworkIdStateList() {
         return networkIdStateList;
     }
 

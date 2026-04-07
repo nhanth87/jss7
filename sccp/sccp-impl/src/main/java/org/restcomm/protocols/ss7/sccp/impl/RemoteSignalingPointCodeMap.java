@@ -1,13 +1,13 @@
 
 package org.restcomm.protocols.ss7.sccp.impl;
 
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 /**
  * @author amit bhayani
  *
  */
 public class RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCodeImpl> extends
-        FastMap<Integer, RemoteSignalingPointCodeImpl> {
+        NonBlockingHashMap<Integer, RemoteSignalingPointCodeImpl> {
 
 }

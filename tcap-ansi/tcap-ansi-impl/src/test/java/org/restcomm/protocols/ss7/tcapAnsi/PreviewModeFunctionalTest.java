@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javolution.util.FastList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javolution.util.FastMap;
 
 import org.restcomm.protocols.ss7.sccp.MaxConnectionCountReached;

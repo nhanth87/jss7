@@ -1,7 +1,8 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl;
 
-import javolution.util.FastSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.State;
@@ -18,14 +19,14 @@ public class RouteRow implements AsStateListener {
     private static final Logger logger = Logger.getLogger(RouteRow.class);
 
     private int mtp3Status = Mtp3PausePrimitive.PAUSE;
-    private FastSet<AsImpl> servedByAsSet;
+    private final Set<AsImpl> servedByAsSet;
     private int dpc;
     private final M3UAManagementImpl m3uaManagement;
 
     RouteRow(int dpc, M3UAManagementImpl m3uaManagement) {
         this.dpc = dpc;
         this.m3uaManagement = m3uaManagement;
-        this.servedByAsSet = new FastSet<AsImpl>();
+        this.servedByAsSet = ConcurrentHashMap.newKeySet();
     }
 
     public int getDpc() {
@@ -74,8 +75,7 @@ public class RouteRow implements AsStateListener {
         // DPC
         if (this.mtp3Status != Mtp3Primitive.PAUSE) {
 
-            for (FastSet.Record r = this.servedByAsSet.head(), end = this.servedByAsSet.tail(); (r = r.getNext()) != end;) {
-                AsImpl asImplTmp = this.servedByAsSet.valueOf(r);
+            for (AsImpl asImplTmp : this.servedByAsSet) {
                 if ((asImplTmp.getState().getName().equals(State.STATE_ACTIVE))
                         || (asImplTmp.getState().getName().equals(State.STATE_PENDING))) {
                     // If there are more AS in ACTIVE || PENDING state, no need

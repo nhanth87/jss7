@@ -2,8 +2,7 @@
 package org.restcomm.protocols.ss7.oam.common.m3ua;
 
 import java.util.List;
-
-import javolution.util.FastList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.mobicents.protocols.api.Association;
 import org.restcomm.protocols.ss7.m3ua.Asp;
@@ -19,7 +18,7 @@ import org.restcomm.protocols.ss7.m3ua.parameter.ASPIdentifier;
 public class AspFactoryJmx implements AspFactoryJmxMBean {
 
     private final AspFactory wrappedAspFactory;
-    private FastList<Asp> appServerProcs = new FastList<Asp>();
+    private CopyOnWriteArrayList<Asp> appServerProcs = new CopyOnWriteArrayList<Asp>();
 
     public AspFactoryJmx(AspFactory wrappedAspFactory) {
         this.wrappedAspFactory = wrappedAspFactory;

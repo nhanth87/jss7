@@ -4,7 +4,7 @@ package org.restcomm.protocols.ss7.sccp.impl.router;
 import java.util.HashMap;
 import java.util.Map;
 
-import javolution.util.FastMap;
+import java.util.Map;
 import javolution.xml.XMLFormat;
 import javolution.xml.XMLSerializable;
 import javolution.xml.stream.XMLStreamException;
@@ -139,7 +139,7 @@ public class Mtp3ServiceAccessPointImpl implements Mtp3ServiceAccessPoint, XMLSe
     }
 
     public boolean matches(int dpc, int sls) {
-        for (FastMap.Entry<Integer, Mtp3Destination> e = this.dpcList.head(), end = this.dpcList.tail(); (e = e.getNext()) != end;) {
+        for (Map.Entry<Integer, Mtp3Destination> e : this.dpcList.entrySet()) {
             if (e.getValue().match(dpc, sls))
                 return true;
         }
@@ -147,7 +147,7 @@ public class Mtp3ServiceAccessPointImpl implements Mtp3ServiceAccessPoint, XMLSe
     }
 
     public boolean matches(int dpc) {
-        for (FastMap.Entry<Integer, Mtp3Destination> e = this.dpcList.head(), end = this.dpcList.tail(); (e = e.getNext()) != end;) {
+        for (Map.Entry<Integer, Mtp3Destination> e : this.dpcList.entrySet()) {
             if (e.getValue().match(dpc))
                 return true;
         }
@@ -162,7 +162,7 @@ public class Mtp3ServiceAccessPointImpl implements Mtp3ServiceAccessPoint, XMLSe
                 .append(", dpcList=[");
 
         boolean isFirst = true;
-        for (FastMap.Entry<Integer, Mtp3Destination> e = this.dpcList.head(), end = this.dpcList.tail(); (e = e.getNext()) != end;) {
+        for (Map.Entry<Integer, Mtp3Destination> e : this.dpcList.entrySet()) {
             Integer id = e.getKey();
             Mtp3Destination dest = e.getValue();
             if (isFirst)

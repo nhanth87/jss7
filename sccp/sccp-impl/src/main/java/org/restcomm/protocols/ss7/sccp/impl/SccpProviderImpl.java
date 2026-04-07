@@ -6,8 +6,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -47,8 +47,8 @@ public class SccpProviderImpl implements SccpProvider, Serializable {
     private static final Logger logger = Logger.getLogger(SccpProviderImpl.class);
 
     private transient SccpStackImpl stack;
-    protected FastMap<Integer, SccpListener> ssnToListener = new FastMap<Integer, SccpListener>();
-    protected FastList<SccpManagementEventListener> managementEventListeners = new FastList<SccpManagementEventListener>();
+    protected NonBlockingHashMap<Integer, SccpListener> ssnToListener = new NonBlockingHashMap<Integer, SccpListener>();
+    protected CopyOnWriteArrayList<SccpManagementEventListener> managementEventListeners = new CopyOnWriteArrayList<SccpManagementEventListener>();
 
     private MessageFactoryImpl messageFactory;
     private ParameterFactoryImpl parameterFactory;
@@ -62,7 +62,7 @@ public class SccpProviderImpl implements SccpProvider, Serializable {
         this.parameterFactory = new ParameterFactoryImpl();
     }
 
-    public FastList<SccpManagementEventListener> getManagementEventListeners() {
+    public CopyOnWriteArrayList<SccpManagementEventListener> getManagementEventListeners() {
         return this.managementEventListeners;
     }
 
@@ -83,7 +83,7 @@ public class SccpProviderImpl implements SccpProvider, Serializable {
                             listener, existingListener, ssn));
                 }
             }
-            FastMap<Integer, SccpListener> newListener = new FastMap<Integer, SccpListener>();
+            NonBlockingHashMap<Integer, SccpListener> newListener = new NonBlockingHashMap<Integer, SccpListener>();
             newListener.putAll(ssnToListener);
             newListener.put(ssn, listener);
             ssnToListener = newListener;
@@ -94,7 +94,7 @@ public class SccpProviderImpl implements SccpProvider, Serializable {
 
     public void deregisterSccpListener(int ssn) {
         synchronized (this) {
-            FastMap<Integer, SccpListener> newListener = new FastMap<Integer, SccpListener>();
+            NonBlockingHashMap<Integer, SccpListener> newListener = new NonBlockingHashMap<Integer, SccpListener>();
             newListener.putAll(ssnToListener);
             SccpListener existingListener = newListener.remove(ssn);
             if (existingListener == null) {
@@ -113,7 +113,7 @@ public class SccpProviderImpl implements SccpProvider, Serializable {
             if (this.managementEventListeners.contains(listener))
                 return;
 
-            FastList<SccpManagementEventListener> newManagementEventListeners = new FastList<SccpManagementEventListener>();
+            CopyOnWriteArrayList<SccpManagementEventListener> newManagementEventListeners = new CopyOnWriteArrayList<SccpManagementEventListener>();
             newManagementEventListeners.addAll(this.managementEventListeners);
             newManagementEventListeners.add(listener);
             this.managementEventListeners = newManagementEventListeners;
@@ -125,7 +125,7 @@ public class SccpProviderImpl implements SccpProvider, Serializable {
             if (!this.managementEventListeners.contains(listener))
                 return;
 
-            FastList<SccpManagementEventListener> newManagementEventListeners = new FastList<SccpManagementEventListener>();
+            CopyOnWriteArrayList<SccpManagementEventListener> newManagementEventListeners = new CopyOnWriteArrayList<SccpManagementEventListener>();
             newManagementEventListeners.addAll(this.managementEventListeners);
             newManagementEventListeners.remove(listener);
             this.managementEventListeners = newManagementEventListeners;
@@ -136,7 +136,7 @@ public class SccpProviderImpl implements SccpProvider, Serializable {
         return ssnToListener.get(ssn);
     }
 
-    public FastMap<Integer, SccpListener> getAllSccpListeners() {
+    public NonBlockingHashMap<Integer, SccpListener> getAllSccpListeners() {
         return ssnToListener;
     }
 
@@ -145,15 +145,15 @@ public class SccpProviderImpl implements SccpProvider, Serializable {
     }
 
     @Override
-    public FastMap<LocalReference, SccpConnection> getConnections() {
-        FastMap<LocalReference, SccpConnection> connections = new FastMap<>();
+    public ConcurrentHashMap<LocalReference, SccpConnection> getConnections() {
+        ConcurrentHashMap<LocalReference, SccpConnection> connections = new ConcurrentHashMap<>();
 
         if (stack.connections != null) {
             for (Map.Entry<Integer, SccpConnectionImpl> entry: stack.connections.entrySet()) {
                 connections.put(new LocalReferenceImpl(entry.getKey()), entry.getValue());
             }
         }
-        return connections.shared();
+        return connections;
     }
 
     @Override
@@ -182,7 +182,7 @@ public class SccpProviderImpl implements SccpProvider, Serializable {
     }
 
     @Override
-    public FastMap<Integer, NetworkIdState> getNetworkIdStateList() {
+    public ConcurrentHashMap<Integer, NetworkIdState> getNetworkIdStateList() {
         return this.stack.ss7ExtSccpDetailedInterface.getNetworkIdList(-1);
     }
 
@@ -195,8 +195,7 @@ public class SccpProviderImpl implements SccpProvider, Serializable {
     @Override
     public ExecutorCongestionMonitor[] getExecutorCongestionMonitorList() {
         ArrayList<ExecutorCongestionMonitor> res = new ArrayList<ExecutorCongestionMonitor>();
-        for (FastMap.Entry<Integer, Mtp3UserPart> e = this.stack.mtp3UserParts.head(), end = this.stack.mtp3UserParts.tail(); (e = e
-                .getNext()) != end;) {
+        for (Map.Entry<Integer, Mtp3UserPart> e : this.stack.mtp3UserParts.entrySet()) {
             Mtp3UserPart mup = e.getValue();
             ExecutorCongestionMonitor ecm = mup.getExecutorCongestionMonitor();
             if (ecm != null)

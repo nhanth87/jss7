@@ -5,9 +5,9 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.mobicents.protocols.api.Association;
 import org.mobicents.protocols.api.CongestionListener;
@@ -37,8 +37,8 @@ public class SctpManagementJmx implements SctpManagementJmxMBean, ManagementEven
 
     private final MBeanHost ss7Management;
     private final Management wrappedSctpManagement;
-    private FastList<Server> lstServers = new FastList<Server>();
-    private FastMap<String, Association> lstAssociations = new FastMap<String, Association>();
+    private CopyOnWriteArrayList<Server> lstServers = new CopyOnWriteArrayList<Server>();
+    private NonBlockingHashMap<String, Association> lstAssociations = new NonBlockingHashMap<String, Association>();
     private AlarmListenerCollection alc = new AlarmListenerCollection();
 
     public SctpManagementJmx(MBeanHost ss7Management, Management wrappedSctpManagement) {
@@ -221,12 +221,9 @@ public class SctpManagementJmx implements SctpManagementJmxMBean, ManagementEven
 
     @Override
     public Association getAssociation(String assocName) throws Exception {
-        for (FastMap.Entry<String, Association> n = this.lstAssociations.head(), end = this.lstAssociations.tail(); (n = n
-                .getNext()) != end;) {
-            String key = n.getKey();
-            if (key.equals(assocName)) {
-                return n.getValue();
-            }
+        Association assoc = this.lstAssociations.get(assocName);
+        if (assoc != null) {
+            return assoc;
         }
         return null;
     }

@@ -1,7 +1,7 @@
 
 package org.restcomm.protocols.ss7.sccp.impl.oam;
 
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.sccp.ConcernedSignalingPointCode;
@@ -30,7 +30,7 @@ public class SccpExecutor implements ShellExecutor {
 
     protected static final Logger logger = Logger.getLogger(SccpExecutor.class);
 
-    protected FastMap<String, SccpStackImpl> sccpStacks = new FastMap<String, SccpStackImpl>();
+    protected NonBlockingHashMap<String, SccpStackImpl> sccpStacks = new NonBlockingHashMap<String, SccpStackImpl>();
     protected SccpStackImpl sccpStack = null;
 
     public SccpExecutor() {
@@ -39,7 +39,7 @@ public class SccpExecutor implements ShellExecutor {
     public void setSccpStacks(Map<String, SccpStackImpl> sccpStacksTemp) {
         if (sccpStacksTemp != null) {
             synchronized (this) {
-                FastMap<String, SccpStackImpl> newSccpStacks = new FastMap<String, SccpStackImpl>();
+                NonBlockingHashMap<String, SccpStackImpl> newSccpStacks = new NonBlockingHashMap<String, SccpStackImpl>();
                 newSccpStacks.putAll(sccpStacksTemp);
                 this.sccpStacks = newSccpStacks;
             }
@@ -1597,8 +1597,7 @@ public class SccpExecutor implements ShellExecutor {
             return sb.toString();
         } else {
             StringBuilder sb = new StringBuilder();
-            for (FastMap.Entry<String, SccpStackImpl> e = this.sccpStacks.head(), end = this.sccpStacks.tail(); (e = e
-                    .getNext()) != end;) {
+            for (Map.Entry<String, SccpStackImpl> e : this.sccpStacks.entrySet()) {
 
                 SccpStackImpl managementImplTmp = e.getValue();
                 String stackname = e.getKey();

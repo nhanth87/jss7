@@ -3,7 +3,7 @@ package org.restcomm.protocols.ss7.tcap.api;
 
 import java.io.Serializable;
 
-import javolution.util.FastMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.restcomm.protocols.ss7.sccp.NetworkIdState;
 import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
@@ -72,7 +72,7 @@ public interface TCAPProvider extends Serializable {
      *
      * @return The collection of pairs: networkId value - NetworkIdState (prohibited / congested state)
      */
-    FastMap<Integer, NetworkIdState> getNetworkIdStateList();
+    ConcurrentHashMap<Integer, NetworkIdState> getNetworkIdStateList();
 
     /**
      * Returns the state of availability / congestion for a networkId subnetwork. Returns null if there is no info (we need to

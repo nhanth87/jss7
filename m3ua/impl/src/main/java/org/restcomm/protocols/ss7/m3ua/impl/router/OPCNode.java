@@ -1,6 +1,6 @@
 package org.restcomm.protocols.ss7.m3ua.impl.router;
 
-import javolution.util.FastList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.restcomm.protocols.ss7.m3ua.impl.AsImpl;
 
@@ -13,7 +13,7 @@ public class OPCNode {
 
     protected int dpc;
     protected int opc;
-    protected FastList<SINode> siList = new FastList<SINode>();
+    protected final CopyOnWriteArrayList<SINode> siList = new CopyOnWriteArrayList<SINode>();
 
     // Reference to wild card SINode.
     // If no matching SINode found for passed si and wildcard defined, use wildcard one.
@@ -25,8 +25,7 @@ public class OPCNode {
     }
 
     protected void addSi(int si, AsImpl asImpl) throws Exception {
-        for (FastList.Node<SINode> n = siList.head(), end = siList.tail(); (n = n.getNext()) != end;) {
-            SINode siNode = n.getValue();
+        for (SINode siNode : siList) {
             if (siNode.si == si) {
                 throw new Exception(String.format("Service indicator %d already exist for OPC %d and DPC %d", si, opc, dpc));
             }
@@ -41,8 +40,7 @@ public class OPCNode {
     }
 
     protected AsImpl getAs(short si) {
-        for (FastList.Node<SINode> n = siList.head(), end = siList.tail(); (n = n.getNext()) != end;) {
-            SINode siNode = n.getValue();
+        for (SINode siNode : siList) {
             if (siNode.si == si) {
                 return siNode.asImpl;
             }

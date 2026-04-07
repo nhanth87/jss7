@@ -4,10 +4,11 @@ package org.restcomm.protocols.ss7.m3ua.impl;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import javolution.util.FastList;
-import javolution.util.FastSet;
 import javolution.xml.XMLFormat;
 import javolution.xml.XMLSerializable;
 import javolution.xml.stream.XMLStreamException;
@@ -56,10 +57,10 @@ public class AsImpl implements XMLSerializable, As {
     protected int minAspActiveForLb = 1;
 
     // List of all the ASP's for this AS
-    protected FastList<Asp> appServerProcs = new FastList<Asp>();
+    protected final CopyOnWriteArrayList<Asp> appServerProcs = new CopyOnWriteArrayList<Asp>();
 
     // List of As state listeners
-    private FastSet<AsStateListener> asStateListeners = new FastSet<AsStateListener>();
+    private final Set<AsStateListener> asStateListeners = ConcurrentHashMap.newKeySet();
 
     private AspTrafficListener aspTrafficListener;
 
@@ -418,7 +419,7 @@ public class AsImpl implements XMLSerializable, As {
      * @return
      */
     public List<Asp> getAspList() {
-        return this.appServerProcs.unmodifiable();
+        return new CopyOnWriteArrayList<Asp>(this.appServerProcs);
     }
 
     /**
@@ -529,8 +530,8 @@ public class AsImpl implements XMLSerializable, As {
 
     protected AspImpl removeAppServerProcess(String aspName) throws Exception {
         AspImpl aspImpl = null;
-        for (FastList.Node<Asp> n = this.appServerProcs.head(), end = this.appServerProcs.tail(); (n = n.getNext()) != end;) {
-            AspImpl aspTemp = (AspImpl) n.getValue();
+        for (Asp asp : this.appServerProcs) {
+            AspImpl aspTemp = (AspImpl) asp;
             if (aspTemp.getName().equals(aspName)) {
                 aspImpl = aspTemp;
                 break;
@@ -715,7 +716,7 @@ public class AsImpl implements XMLSerializable, As {
             asImpl.networkAppearance = xml.get(NETWORK_APPEARANCE, NetworkAppearanceImpl.class);
             asImpl.trafficModeType = xml.get(TRAFFIC_MODE, TrafficModeTypeImpl.class);
             asImpl.defaultTrafficModeType = xml.get(DEFAULT_TRAFFIC_MODE, TrafficModeTypeImpl.class);
-            asImpl.appServerProcs = xml.get(ASP_LIST, FastList.class);
+            asImpl.appServerProcs.addAll(xml.get(ASP_LIST, CopyOnWriteArrayList.class));
             asImpl.init();
         }
 
@@ -733,7 +734,7 @@ public class AsImpl implements XMLSerializable, As {
             xml.add((NetworkAppearanceImpl) asImpl.networkAppearance, NETWORK_APPEARANCE, NetworkAppearanceImpl.class);
             xml.add((TrafficModeTypeImpl) asImpl.trafficModeType, TRAFFIC_MODE, TrafficModeTypeImpl.class);
             xml.add((TrafficModeTypeImpl) asImpl.defaultTrafficModeType, DEFAULT_TRAFFIC_MODE, TrafficModeTypeImpl.class);
-            xml.add(asImpl.appServerProcs, ASP_LIST, FastList.class);
+            xml.add(asImpl.appServerProcs, ASP_LIST, CopyOnWriteArrayList.class);
 
         }
     };
@@ -771,8 +772,8 @@ public class AsImpl implements XMLSerializable, As {
         sb.append(M3UAOAMMessages.NEW_LINE);
         sb.append(M3UAOAMMessages.SHOW_ASSIGNED_TO);
 
-        for (FastList.Node<Asp> n = this.appServerProcs.head(), end = this.appServerProcs.tail(); (n = n.getNext()) != end;) {
-            AspImpl aspTemp = (AspImpl) n.getValue();
+        for (Asp asp : this.appServerProcs) {
+            AspImpl aspTemp = (AspImpl) asp;
             AspFactoryImpl aspFactoryImpl = aspTemp.getAspFactory();
             sb.append(M3UAOAMMessages.TAB).append(M3UAOAMMessages.SHOW_ASP_NAME).append(aspFactoryImpl.getName())
                     .append(M3UAOAMMessages.SHOW_STARTED).append(aspFactoryImpl.getStatus());
@@ -798,7 +799,7 @@ public class AsImpl implements XMLSerializable, As {
         this.asStateListeners.remove(listener);
     }
 
-    public FastSet<AsStateListener> getAsStateListeners() {
+    public Set<AsStateListener> getAsStateListeners() {
         return asStateListeners;
     }
 

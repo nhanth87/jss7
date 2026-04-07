@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javolution.text.TextBuilder;
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 import javolution.xml.XMLBinding;
 import javolution.xml.XMLObjectReader;
 import javolution.xml.XMLObjectWriter;
@@ -139,7 +139,7 @@ public class RouterExtImpl implements RouterExt {
      */
     public Rule findRule(SccpAddress calledParty, SccpAddress callingParty, boolean isMtpOriginated, int msgNetworkId) {
 
-        for (FastMap.Entry<Integer, Rule> e = this.rulesMap.head(), end = this.rulesMap.tail(); (e = e.getNext()) != end;) {
+        for (Map.Entry<Integer, Rule> e : this.rulesMap.entrySet()) {
             Rule rule = e.getValue();
             if (rule.matches(calledParty, callingParty, isMtpOriginated, msgNetworkId)) {
                 return rule;
@@ -225,7 +225,7 @@ public class RouterExtImpl implements RouterExt {
             RuleImpl[] rulesArray = new RuleImpl[(this.rulesMap.size() + 1)];
             int count = 0;
 
-            for (FastMap.Entry<Integer, Rule> e = this.rulesMap.head(), end = this.rulesMap.tail(); (e = e.getNext()) != end;) {
+            for (Map.Entry<Integer, Rule> e : this.rulesMap.entrySet()) {
                 Integer ruleId = e.getKey();
                 RuleImpl ruleTemp1 = (RuleImpl) e.getValue();
                 ruleTemp1.setRuleId(ruleId);
@@ -302,7 +302,7 @@ public class RouterExtImpl implements RouterExt {
             // Remove the old rule so that it doesn't overwrite the new modifications
             this.removeRule( id );
 
-            for (FastMap.Entry<Integer, Rule> e = this.rulesMap.head(), end = this.rulesMap.tail(); (e = e.getNext()) != end;) {
+            for (Map.Entry<Integer, Rule> e : this.rulesMap.entrySet()) {
                 Integer ruleId = e.getKey();
                 RuleImpl ruleTemp1 = (RuleImpl) e.getValue();
                 ruleTemp1.setRuleId(ruleId);
@@ -396,7 +396,7 @@ public class RouterExtImpl implements RouterExt {
             // Remove the old rule so that it doesn't overwrite the new modifications
             this.removeRule( id );
 
-            for (FastMap.Entry<Integer, Rule> e = this.rulesMap.head(), end = this.rulesMap.tail(); (e = e.getNext()) != end;) {
+            for (Map.Entry<Integer, Rule> e : this.rulesMap.entrySet()) {
                 Integer ruleId = e.getKey();
                 RuleImpl ruleTemp1 = (RuleImpl) e.getValue();
                 ruleTemp1.setRuleId(ruleId);
@@ -638,14 +638,14 @@ public class RouterExtImpl implements RouterExt {
         }
     }
 
-    public FastMap<Integer, NetworkIdState> getNetworkIdStateList() {
+    public NonBlockingHashMap<Integer, NetworkIdState> getNetworkIdStateList() {
         return getNetworkIdList(-1);
     }
 
-    public FastMap<Integer, NetworkIdState> getNetworkIdList(int affectedPc) {
-        FastMap<Integer, NetworkIdState> res = new FastMap<Integer, NetworkIdState>();
+    public NonBlockingHashMap<Integer, NetworkIdState> getNetworkIdList(int affectedPc) {
+        NonBlockingHashMap<Integer, NetworkIdState> res = new NonBlockingHashMap<Integer, NetworkIdState>();
 
-        for (FastMap.Entry<Integer, Rule> e = this.rulesMap.head(), end = rulesMap.tail(); (e = e.getNext()) != end;) {
+        for (Map.Entry<Integer, Rule> e : this.rulesMap.entrySet()) {
             Rule rule = e.getValue();
             NetworkIdStateImpl networkIdState = getRoutingAddressStatusForRoutingRule(rule, affectedPc);
             if (networkIdState != null) {
@@ -828,7 +828,7 @@ public class RouterExtImpl implements RouterExt {
     }
 
     private void moveBackupToRoutingAddress(SccpAddressMap<Integer, SccpAddress> backupAddresses) {
-        FastMap<Integer, Integer> lstChange = new FastMap<Integer, Integer>();
+        NonBlockingHashMap<Integer, Integer> lstChange = new NonBlockingHashMap<Integer, Integer>();
         for (Integer bId : backupAddresses.keySet()) {
             SccpAddress addr = backupAddresses.get(bId);
 

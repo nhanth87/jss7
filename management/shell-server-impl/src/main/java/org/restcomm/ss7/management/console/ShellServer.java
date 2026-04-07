@@ -20,8 +20,10 @@ import java.util.concurrent.TimeUnit;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import javolution.util.FastList;
-import javolution.util.FastSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.jboss.security.SecurityContext;
@@ -75,7 +77,7 @@ public abstract class ShellServer extends Task implements ShellServerMBean {
     private String securityDomain = null;
     private SecurityContext securityContext = null;
 
-    private final FastList<ShellExecutor> shellExecutors = new FastList<ShellExecutor>();
+    private final List<ShellExecutor> shellExecutors = new CopyOnWriteArrayList<ShellExecutor>();
 
     private static final int EXECUTION_TIMEOUT = 25;
     private static final int THREAD_POOL_SIZE = 16;
@@ -191,7 +193,7 @@ public abstract class ShellServer extends Task implements ShellServerMBean {
         if (!this.started)
             return 0;
 
-        FastSet<ChannelSelectionKey> keys = null;
+        Set<ChannelSelectionKey> keys = null;
         try {
             keys = selector.selectNow();
         } catch (ChannelException ce) {
@@ -212,8 +214,7 @@ public abstract class ShellServer extends Task implements ShellServerMBean {
 
         try {
             if (keys != null) {
-                for (FastSet.Record record = keys.head(), end = keys.tail(); (record = record.getNext()) != end;) {
-                    ChannelSelectionKey key = keys.valueOf(record);
+                for (ChannelSelectionKey key : keys) {
                     String txMessage = "";
                     String rxMessage = "";
 
@@ -296,9 +297,7 @@ public abstract class ShellServer extends Task implements ShellServerMBean {
                                 } else {
                                     String[] options = rxMessage.split(" ");
                                     ShellExecutor shellExecutor = null;
-                                    for (FastList.Node<ShellExecutor> n = this.shellExecutors.head(), end1 = this.shellExecutors
-                                            .tail(); (n = n.getNext()) != end1;) {
-                                        ShellExecutor value = n.getValue();
+                                    for (ShellExecutor value : this.shellExecutors) {
                                         if (value.handles(options[0])) {
                                             shellExecutor = value;
                                         }

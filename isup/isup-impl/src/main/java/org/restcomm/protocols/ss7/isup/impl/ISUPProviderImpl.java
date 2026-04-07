@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javolution.util.FastList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -31,7 +30,7 @@ public class ISUPProviderImpl implements ISUPProvider {
 
     protected static final Logger logger = Logger.getLogger(ISUPProviderImpl.class);
 
-    protected final List<ISUPListener> listeners = new FastList<ISUPListener>();
+    protected final List<ISUPListener> listeners = new CopyOnWriteArrayList<ISUPListener>();
 
     protected final transient ISUPStackImpl stack;
     protected final transient ISUPMessageFactory messageFactory;

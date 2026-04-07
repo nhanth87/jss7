@@ -8,7 +8,7 @@ import io.netty.buffer.ByteBufAllocator;
 import java.util.List;
 import java.util.Map;
 
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.mobicents.protocols.api.Association;
 import org.mobicents.protocols.api.AssociationListener;

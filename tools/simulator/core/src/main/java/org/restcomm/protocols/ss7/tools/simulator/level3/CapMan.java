@@ -1,7 +1,8 @@
 
 package org.restcomm.protocols.ss7.tools.simulator.level3;
 
-import javolution.util.FastList;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Level;
 import org.restcomm.protocols.ss7.cap.CAPStackImpl;
@@ -115,7 +116,7 @@ public class CapMan implements CapManMBean, Stoppable {
         this.capStack = new CAPStackImpl("Simulator", sccpStack.getSccpProvider(), ssn);
 
         if (extraSsn > 0) {
-            FastList<Integer> extraSsnsNew = new FastList<Integer>();
+            List<Integer> extraSsnsNew = new ArrayList<Integer>();
             extraSsnsNew.add(extraSsn);
             this.capStack.getTCAPStack().setExtraSsns(extraSsnsNew);
         }

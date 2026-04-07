@@ -2,8 +2,9 @@
 package org.restcomm.protocols.ss7.statistics;
 
 import java.util.Date;
+import java.util.Map;
 
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.restcomm.protocols.ss7.statistics.api.StatCounterCollection;
 import org.restcomm.protocols.ss7.statistics.api.StatDataCollection;
@@ -20,7 +21,7 @@ import org.restcomm.protocols.ss7.statistics.api.StatResult;
 */
 public class StatDataCollectionImpl implements StatDataCollection {
 
-    private FastMap<String, StatCounterCollection> statsCounterCollection = new FastMap<String, StatCounterCollection>();
+    private Map<String, StatCounterCollection> statsCounterCollection = new NonBlockingHashMap<String, StatCounterCollection>();
 
     public StatCounterCollection registerStatCounterCollector(String counterName, StatDataCollectorType type) {
         synchronized (this) {

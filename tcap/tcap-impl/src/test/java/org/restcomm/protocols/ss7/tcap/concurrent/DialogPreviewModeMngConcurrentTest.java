@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
-import javolution.util.FastList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javolution.util.FastMap;
 import junit.framework.Assert;
 

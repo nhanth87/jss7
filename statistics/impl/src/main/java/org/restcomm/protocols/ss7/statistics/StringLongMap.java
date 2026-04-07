@@ -1,7 +1,9 @@
 
 package org.restcomm.protocols.ss7.statistics;
 
-import javolution.util.FastMap;
+import java.util.Map;
+
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.restcomm.protocols.ss7.statistics.api.LongValue;
 import org.restcomm.protocols.ss7.statistics.api.StatDataCollectorType;
@@ -14,7 +16,7 @@ import org.restcomm.protocols.ss7.statistics.api.StatResult;
 */
 public class StringLongMap extends StatDataCollectorAbstractImpl {
 
-    private FastMap<String, LongValue> data = new FastMap<String, LongValue>();
+    private Map<String, LongValue> data = new NonBlockingHashMap<String, LongValue>();
 
     public StringLongMap(String campaignName) {
         super(campaignName);
@@ -23,7 +25,7 @@ public class StringLongMap extends StatDataCollectorAbstractImpl {
     public StatResult restartAndGet() {
         synchronized (this) {
             StatResultStringLongMap res = new StatResultStringLongMap(this.data);
-            this.data = new FastMap<String, LongValue>();
+            this.data = new NonBlockingHashMap<String, LongValue>();
             this.reset();
             return res;
         }
@@ -58,9 +60,9 @@ public class StringLongMap extends StatDataCollectorAbstractImpl {
 
     public class StatResultStringLongMap implements StatResult {
 
-        private FastMap<String, LongValue> data;
+        private Map<String, LongValue> data;
 
-        public StatResultStringLongMap(FastMap<String, LongValue> data) {
+        public StatResultStringLongMap(Map<String, LongValue> data) {
             this.data = data;
         }
 
@@ -70,7 +72,7 @@ public class StringLongMap extends StatDataCollectorAbstractImpl {
         }
 
         @Override
-        public FastMap<String, LongValue> getStringLongValue() {
+        public Map<String, LongValue> getStringLongValue() {
             return data;
         }
 

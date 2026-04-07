@@ -9,10 +9,9 @@ import io.netty.util.ReferenceCountUtil;
 
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
 import javolution.xml.XMLFormat;
 import javolution.xml.XMLSerializable;
 import javolution.xml.stream.XMLStreamException;
@@ -89,7 +88,7 @@ public class AspFactoryImpl implements AssociationListener, XMLSerializable, Asp
     protected Association association = null;
     protected String associationName = null;
 
-    protected FastList<Asp> aspList = new FastList<Asp>();
+    protected final CopyOnWriteArrayList<Asp> aspList = new CopyOnWriteArrayList<Asp>();
 
     private ByteBuffer txBuffer = ByteBuffer.allocateDirect(8192);
 
@@ -126,8 +125,6 @@ public class AspFactoryImpl implements AssociationListener, XMLSerializable, Asp
 
     protected HeartBeatTimer heartBeatTimer = null;
     private boolean isHeartBeatEnabled = false;
-
-    private FastMap<Integer, AtomicInteger> congDpcList = new FastMap<Integer, AtomicInteger>().shared();
 
     public AspFactoryImpl() {
         // clean transmission buffer
@@ -195,8 +192,8 @@ public class AspFactoryImpl implements AssociationListener, XMLSerializable, Asp
                 ASPDown aspDown = (ASPDown) this.messageFactory.createMessage(MessageClass.ASP_STATE_MAINTENANCE,
                         MessageType.ASP_DOWN);
                 this.write(aspDown);
-                for (FastList.Node<Asp> n = aspList.head(), end = aspList.tail(); (n = n.getNext()) != end;) {
-                    AspImpl aspImpl = (AspImpl) n.getValue();
+                for (Asp asp : aspList) {
+                    AspImpl aspImpl = (AspImpl) asp;
 
                     try {
                         FSM aspLocalFSM = aspImpl.getLocalFSM();
@@ -217,8 +214,8 @@ public class AspFactoryImpl implements AssociationListener, XMLSerializable, Asp
                 aspFactoryStopTimer = new AspFactoryStopTimer(this);
                 this.m3UAManagementImpl.m3uaScheduler.execute(aspFactoryStopTimer);
             } else {
-                for (FastList.Node<Asp> n = aspList.head(), end = aspList.tail(); (n = n.getNext()) != end;) {
-                    AspImpl aspImpl = (AspImpl) n.getValue();
+                for (Asp asp : aspList) {
+                    AspImpl aspImpl = (AspImpl) asp;
 
                     try {
                         FSM aspLocalFSM = aspImpl.getLocalFSM();
@@ -616,10 +613,10 @@ public class AspFactoryImpl implements AssociationListener, XMLSerializable, Asp
     }
 
     private void sendCongestionInfoToMtp3Users(int congLevel, int dpc) {
-        AtomicInteger ai = congDpcList.get(dpc);
+        AtomicInteger ai = m3UAManagementImpl.getCongDpcList().get(dpc);
         if (ai == null) {
             ai = new AtomicInteger();
-            congDpcList.put(dpc, ai);
+            m3UAManagementImpl.getCongDpcList().put(dpc, ai);
         }
         if (ai.incrementAndGet() % 8 == 0) {
             Mtp3StatusPrimitive statusPrimitive = new Mtp3StatusPrimitive(dpc, Mtp3StatusCause.SignallingNetworkCongested,
@@ -629,13 +626,12 @@ public class AspFactoryImpl implements AssociationListener, XMLSerializable, Asp
     }
 
     private void sendCongestionEndInfoToMtp3Users(int congLevel, int dpc) {
-        AtomicInteger ai = congDpcList.get(dpc);
+        AtomicInteger ai = m3UAManagementImpl.getCongDpcList().get(dpc);
         if (ai == null) {
             return;
         }
 
-        ai = new AtomicInteger();
-        congDpcList.remove(dpc);
+        m3UAManagementImpl.getCongDpcList().remove(dpc);
         Mtp3EndCongestionPrimitive endCongestionPrimitive = new Mtp3EndCongestionPrimitive(dpc);
         this.m3UAManagementImpl.sendEndCongestionMessageToLocalUser(endCongestionPrimitive);
     }
@@ -659,15 +655,15 @@ public class AspFactoryImpl implements AssociationListener, XMLSerializable, Asp
     }
 
     public List<Asp> getAspList() {
-        return this.aspList.unmodifiable();
+        return new CopyOnWriteArrayList<Asp>(this.aspList);
     }
 
     protected AspImpl getAsp(long rc) {
-        for (FastList.Node<Asp> n = aspList.head(), end = aspList.tail(); (n = n.getNext()) != end;) {
-            Asp aspImpl = n.getValue();
+        for (Asp asp : aspList) {
+            AspImpl aspImpl = (AspImpl) asp;
             if (aspImpl.getAs().getRoutingContext() != null
                     && aspImpl.getAs().getRoutingContext().getRoutingContexts()[0] == rc) {
-                return (AspImpl) aspImpl;
+                return aspImpl;
             }
         }
         return null;
@@ -695,8 +691,8 @@ public class AspFactoryImpl implements AssociationListener, XMLSerializable, Asp
             this.heartBeatTimer.cancel();
         }
 
-        for (FastList.Node<Asp> n = aspList.head(), end = aspList.tail(); (n = n.getNext()) != end;) {
-            AspImpl aspImpl = (AspImpl) n.getValue();
+        for (Asp asp : aspList) {
+            AspImpl aspImpl = (AspImpl) asp;
             try {
                 FSM aspLocalFSM = aspImpl.getLocalFSM();
                 if (aspLocalFSM != null) {
@@ -754,8 +750,8 @@ public class AspFactoryImpl implements AssociationListener, XMLSerializable, Asp
             this.sendAspUp();
         }
 
-        for (FastList.Node<Asp> n = aspList.head(), end = aspList.tail(); (n = n.getNext()) != end;) {
-            AspImpl aspImpl = (AspImpl) n.getValue();
+        for (Asp asp : aspList) {
+            AspImpl aspImpl = (AspImpl) asp;
             try {
                 FSM aspLocalFSM = aspImpl.getLocalFSM();
                 if (aspLocalFSM != null) {
@@ -944,8 +940,8 @@ public class AspFactoryImpl implements AssociationListener, XMLSerializable, Asp
         sb.append(M3UAOAMMessages.NEW_LINE);
         sb.append(M3UAOAMMessages.SHOW_ASSIGNED_TO);
 
-        for (FastList.Node<Asp> n = aspList.head(), end = aspList.tail(); (n = n.getNext()) != end;) {
-            AspImpl aspImpl = (AspImpl) n.getValue();
+        for (Asp asp : aspList) {
+            AspImpl aspImpl = (AspImpl) asp;
             sb.append(M3UAOAMMessages.TAB).append(M3UAOAMMessages.SHOW_AS_NAME).append(aspImpl.getAs().getName())
                     .append(M3UAOAMMessages.SHOW_FUNCTIONALITY).append(this.functionality).append(M3UAOAMMessages.SHOW_MODE)
                     .append(this.exchangeType);
@@ -1010,42 +1006,43 @@ public class AspFactoryImpl implements AssociationListener, XMLSerializable, Asp
             case MessageClass.ASP_STATE_MAINTENANCE:
                 switch (message.getMessageType()) {
                     case MessageType.ASP_UP:
-                         m3UAManagementImpl.getCounterProviderImpl().updateAspUpPerAssTx(association.getName());
+                        m3UAManagementImpl.getCounterProviderImpl().updateAspUpPerAssTx(association.getName());
                         break;
                     case MessageType.ASP_UP_ACK:
-                         m3UAManagementImpl.getCounterProviderImpl().updateAspUpAckPerAssTx(association.getName());
+                        m3UAManagementImpl.getCounterProviderImpl().updateAspUpAckPerAssTx(association.getName());
                         break;
                     case MessageType.ASP_DOWN:
-                         m3UAManagementImpl.getCounterProviderImpl().updateAspDownPerAssTx(association.getName());
+                        m3UAManagementImpl.getCounterProviderImpl().updateAspDownPerAssTx(association.getName());
                         break;
                     case MessageType.ASP_DOWN_ACK:
-                         m3UAManagementImpl.getCounterProviderImpl().updateAspDownAckPerAssTx(association.getName());
+                        m3UAManagementImpl.getCounterProviderImpl().updateAspDownAckPerAssTx(association.getName());
                         break;
                     case MessageType.HEARTBEAT:
-                         m3UAManagementImpl.getCounterProviderImpl().updateBeatPerAssTx(association.getName());
+                        m3UAManagementImpl.getCounterProviderImpl().updateBeatPerAssTx(association.getName());
                         break;
                     case MessageType.HEARTBEAT_ACK:
-                         m3UAManagementImpl.getCounterProviderImpl().updateBeatAckPerAssTx(association.getName());
+                        m3UAManagementImpl.getCounterProviderImpl().updateBeatAckPerAssTx(association.getName());
                         break;
                 }
                 break;
             case MessageClass.ASP_TRAFFIC_MAINTENANCE:
                 switch (message.getMessageType()) {
                     case MessageType.ASP_ACTIVE:
-                         m3UAManagementImpl.getCounterProviderImpl().updateAspActivePerAssTx(association.getName());
+                        m3UAManagementImpl.getCounterProviderImpl().updateAspActivePerAssTx(association.getName());
                         break;
                     case MessageType.ASP_ACTIVE_ACK:
-                         m3UAManagementImpl.getCounterProviderImpl().updateAspActiveAckPerAssTx(association.getName());
+                        m3UAManagementImpl.getCounterProviderImpl().updateAspActiveAckPerAssTx(association.getName());
                         break;
                     case MessageType.ASP_INACTIVE:
-                         m3UAManagementImpl.getCounterProviderImpl().updateAspInactivePerAssTx(association.getName());
+                        m3UAManagementImpl.getCounterProviderImpl().updateAspInactivePerAssTx(association.getName());
                         break;
                     case MessageType.ASP_INACTIVE_ACK:
-                         m3UAManagementImpl.getCounterProviderImpl().updateAspInactiveAckPerAssTx(association.getName());
+                        m3UAManagementImpl.getCounterProviderImpl().updateAspInactiveAckPerAssTx(association.getName());
                         break;
                 }
                 break;
+            default:
+                break;
         }
     }
-
 }

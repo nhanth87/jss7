@@ -1,8 +1,8 @@
 package org.restcomm.ss7.congestion;
 
-import org.apache.log4j.Logger;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import javolution.util.FastList;
+import org.apache.log4j.Logger;
 
 /**
  * @author amit bhayani
@@ -12,7 +12,7 @@ import javolution.util.FastList;
 public abstract class BaseCongestionMonitor implements CongestionMonitor {
     protected static final Logger logger = Logger.getLogger(BaseCongestionMonitor.class);
 
-    private final FastList<CongestionListener> listeners = new FastList<CongestionListener>();
+    private final CopyOnWriteArrayList<CongestionListener> listeners = new CopyOnWriteArrayList<CongestionListener>();
 
     /*
      * (non-Javadoc)
@@ -76,8 +76,7 @@ public abstract class BaseCongestionMonitor implements CongestionMonitor {
 
             // Lets notify the listeners
             CongestionTicketImpl ticket = generateTicket();
-            for (FastList.Node<CongestionListener> n = listeners.head(), end = listeners.tail(); (n = n.getNext()) != end;) {
-                CongestionListener listener = n.getValue();
+            for (CongestionListener listener : listeners) {
                 listener.onCongestionFinish(ticket);
             }
         }
@@ -91,8 +90,7 @@ public abstract class BaseCongestionMonitor implements CongestionMonitor {
 
             // Lets notify the listeners
             CongestionTicketImpl ticket = generateTicket();
-            for (FastList.Node<CongestionListener> n = listeners.head(), end = listeners.tail(); (n = n.getNext()) != end;) {
-                CongestionListener listener = n.getValue();
+            for (CongestionListener listener : listeners) {
                 listener.onCongestionStart(ticket);
             }
         }

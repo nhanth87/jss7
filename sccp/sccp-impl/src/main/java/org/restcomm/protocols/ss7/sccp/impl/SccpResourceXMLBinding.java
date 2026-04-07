@@ -1,7 +1,7 @@
 
 package org.restcomm.protocols.ss7.sccp.impl;
 
-import javolution.util.FastMap;
+import java.util.Map;
 import javolution.xml.XMLBinding;
 import javolution.xml.XMLFormat;
 import javolution.xml.stream.XMLStreamException;
@@ -38,7 +38,7 @@ public class SccpResourceXMLBinding extends XMLBinding {
         @Override
         public void write(ConcernedSignalingPointCodeMap map, javolution.xml.XMLFormat.OutputElement xml)
                 throws XMLStreamException {
-            for (FastMap.Entry<Integer, ConcernedSignalingPointCodeImpl> e = map.head(), end = map.tail(); (e = e.getNext()) != end;) {
+            for (Map.Entry<Integer, ConcernedSignalingPointCodeImpl> e : map.entrySet()) {
                 Integer id = e.getKey();
                 ConcernedSignalingPointCodeImpl concernedSignalingPointCodeImpl = e.getValue();
 
@@ -67,7 +67,7 @@ public class SccpResourceXMLBinding extends XMLBinding {
         @Override
         public void write(RemoteSignalingPointCodeMap map, javolution.xml.XMLFormat.OutputElement xml)
                 throws XMLStreamException {
-            for (FastMap.Entry<Integer, RemoteSignalingPointCodeImpl> e = map.head(), end = map.tail(); (e = e.getNext()) != end;) {
+            for (Map.Entry<Integer, RemoteSignalingPointCodeImpl> e : map.entrySet()) {
                 Integer id = e.getKey();
                 RemoteSignalingPointCodeImpl remoteSignalingPointCodeImpl = e.getValue();
 
@@ -93,7 +93,7 @@ public class SccpResourceXMLBinding extends XMLBinding {
             RemoteSubSystemMap.class) {
         @Override
         public void write(RemoteSubSystemMap map, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            for (FastMap.Entry<Integer, RemoteSubSystemImpl> e = map.head(), end = map.tail(); (e = e.getNext()) != end;) {
+            for (Map.Entry<Integer, RemoteSubSystemImpl> e : map.entrySet()) {
                 Integer id = e.getKey();
                 RemoteSubSystemImpl remoteSubSystemImpl = e.getValue();
 

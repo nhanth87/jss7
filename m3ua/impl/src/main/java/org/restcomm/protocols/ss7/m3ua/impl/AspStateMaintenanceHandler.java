@@ -1,8 +1,6 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl;
 
-import javolution.util.FastList;
-
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.Asp;
 import org.restcomm.protocols.ss7.m3ua.ExchangeType;
@@ -57,9 +55,8 @@ public class AspStateMaintenanceHandler extends MessageHandler {
             // Application Servers, and all registered Routing Keys are
             // considered deregistered.
 
-            for (FastList.Node<Asp> n = this.aspFactoryImpl.aspList.head(), end = this.aspFactoryImpl.aspList.tail(); (n = n
-                    .getNext()) != end;) {
-                AspImpl aspImpl = (AspImpl) n.getValue();
+            for (Asp asp : this.aspFactoryImpl.aspList) {
+                AspImpl aspImpl = (AspImpl) asp;
 
                 // Set the ASPIdentifier for each ASP
                 aspImpl.setASPIdentifier(aspUp.getASPIdentifier());
@@ -117,9 +114,8 @@ public class AspStateMaintenanceHandler extends MessageHandler {
                 || (aspFactoryImpl.getFunctionality() == Functionality.IPSP
                         && aspFactoryImpl.getExchangeType() == ExchangeType.SE && aspFactoryImpl.getIpspType() == IPSPType.CLIENT)) {
 
-            for (FastList.Node<Asp> n = this.aspFactoryImpl.aspList.head(), end = this.aspFactoryImpl.aspList.tail(); (n = n
-                    .getNext()) != end;) {
-                AspImpl aspImpl = (AspImpl) n.getValue();
+            for (Asp asp : this.aspFactoryImpl.aspList) {
+                AspImpl aspImpl = (AspImpl) asp;
 
                 FSM aspLocalFSM = aspImpl.getLocalFSM();
                 if (aspLocalFSM == null) {
@@ -189,9 +185,8 @@ public class AspStateMaintenanceHandler extends MessageHandler {
             this.aspFactoryImpl.write(aspDwnAck);
 
             // ASPSM should be given to all ASP's
-            for (FastList.Node<Asp> n = this.aspFactoryImpl.aspList.head(), end = this.aspFactoryImpl.aspList.tail(); (n = n
-                    .getNext()) != end;) {
-                AspImpl aspImpl = (AspImpl) n.getValue();
+            for (Asp asp : this.aspFactoryImpl.aspList) {
+                AspImpl aspImpl = (AspImpl) asp;
 
                 FSM aspPeerFSM = aspImpl.getPeerFSM();
                 if (aspPeerFSM == null) {
@@ -232,9 +227,8 @@ public class AspStateMaintenanceHandler extends MessageHandler {
 
             boolean stopAssociation = true;
 
-            for (FastList.Node<Asp> n = this.aspFactoryImpl.aspList.head(), end = this.aspFactoryImpl.aspList.tail(); (n = n
-                    .getNext()) != end;) {
-                AspImpl aspImpl = (AspImpl) n.getValue();
+            for (Asp asp : this.aspFactoryImpl.aspList) {
+                AspImpl aspImpl = (AspImpl) asp;
                 FSM fsm = aspImpl.getLocalFSM();
                 if (fsm == null) {
                     logger.error(String.format("Received ASPDOWN_ACK=%s for ASP=%s. But local FSM is null.", aspUpAck,
@@ -310,8 +304,8 @@ public class AspStateMaintenanceHandler extends MessageHandler {
             return true;
         } else if (asImpl.getTrafficModeType().getMode() == TrafficModeType.Override) {
 
-            for (FastList.Node<Asp> n = asImpl.appServerProcs.head(), end = asImpl.appServerProcs.tail(); (n = n.getNext()) != end;) {
-                AspImpl aspTemp = (AspImpl) n.getValue();
+            for (Asp asp : asImpl.appServerProcs) {
+                AspImpl aspTemp = (AspImpl) asp;
                 FSM fsm = aspTemp.getLocalFSM();
                 AspState aspState = AspState.getState(fsm.getState().getName());
 

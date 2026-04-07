@@ -2,7 +2,7 @@ package org.restcomm.protocols.ss7.sccp.impl;
 
 import java.util.concurrent.Executors;
 
-import javolution.util.FastMap;
+import java.util.Map;
 
 import org.restcomm.protocols.ss7.mtp.Mtp3UserPart;
 import org.restcomm.protocols.ss7.sccp.SccpManagementEventListener;
@@ -43,8 +43,7 @@ public class NonPersistentSccpStackImpl extends SccpStackImpl {
 
         this.timerExecutors = Executors.newScheduledThreadPool(1);
 
-        for (FastMap.Entry<Integer, Mtp3UserPart> e = this.mtp3UserParts.head(), end = this.mtp3UserParts.tail(); (e = e
-                .getNext()) != end;) {
+        for (Map.Entry<Integer, Mtp3UserPart> e : this.mtp3UserParts.entrySet()) {
             Mtp3UserPart mup = e.getValue();
             mup.addMtp3UserPartListener(this);
         }

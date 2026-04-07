@@ -2,10 +2,8 @@
 package org.restcomm.protocols.ss7.oam.common.statistics.api;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.UUID;
-
-
-import javolution.util.FastMap;
 
 /**
 *
@@ -27,6 +25,6 @@ public interface SourceValueSet extends Serializable {
      */
     UUID getSessionId();
 
-    FastMap<String, SourceValueCounter> getCounters();
+    Map<String, SourceValueCounter> getCounters();
 
 }
