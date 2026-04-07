@@ -1,8 +1,7 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl;
 
-import javolution.util.FastList;
-import javolution.util.FastSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
@@ -57,9 +56,8 @@ public class AsStatePenTimeout implements FSMStateEventHandler {
 
         // check if there are any ASP's who are INACTIVE, transition to
         // INACTIVE, else transition to DOWN
-        for (FastList.Node<Asp> n = this.asImpl.appServerProcs.head(), end = this.asImpl.appServerProcs.tail(); (n = n
-                .getNext()) != end;) {
-            AspImpl aspImpl = (AspImpl) n.getValue();
+        for (Asp asp : this.asImpl.appServerProcs) {
+            AspImpl aspImpl = (AspImpl) asp;
 
             FSM aspLocalFSM = aspImpl.getLocalFSM();
 
@@ -86,9 +84,8 @@ public class AsStatePenTimeout implements FSMStateEventHandler {
         }
 
         // Now send MTP3 PAUSE
-        FastSet<AsStateListener> asStateListeners = this.asImpl.getAsStateListeners();
-        for (FastSet.Record r = asStateListeners.head(), end = asStateListeners.tail(); (r = r.getNext()) != end;) {
-            AsStateListener asAsStateListener = asStateListeners.valueOf(r);
+        Set<AsStateListener> asStateListeners = this.asImpl.getAsStateListeners();
+        for (AsStateListener asAsStateListener : asStateListeners) {
             try {
                 asAsStateListener.onAsInActive(this.asImpl);
             } catch (Exception e) {

@@ -8,8 +8,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.asn.AsnException;
@@ -101,7 +101,7 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
     protected final transient Logger loger;
 
 
-    private transient Collection<CAPDialogListener> dialogListeners = new FastList<CAPDialogListener>().shared();
+    private final transient CopyOnWriteArrayList<CAPDialogListener> dialogListeners = new CopyOnWriteArrayList<>();
 
 //    protected transient FastMap<Long, CAPDialogImpl> dialogs = new FastMap<Long, CAPDialogImpl>().shared();
     protected transient ConcurrentHashMap<Long, CAPDialogImpl> dialogs = new ConcurrentHashMap<Long, CAPDialogImpl>();
@@ -1278,7 +1278,7 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
     }
 
     @Override
-    public FastMap<Integer, NetworkIdState> getNetworkIdStateList() {
+    public Map<Integer, NetworkIdState> getNetworkIdStateList() {
         return this.tcapProvider.getNetworkIdStateList();
     }
 

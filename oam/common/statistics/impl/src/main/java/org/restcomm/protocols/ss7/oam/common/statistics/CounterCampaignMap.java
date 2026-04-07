@@ -1,13 +1,13 @@
 
 package org.restcomm.protocols.ss7.oam.common.statistics;
 
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class CounterCampaignMap<K, V>  extends FastMap<K, V> {
+public class CounterCampaignMap<K, V>  extends NonBlockingHashMap<K, V> {
 
 }

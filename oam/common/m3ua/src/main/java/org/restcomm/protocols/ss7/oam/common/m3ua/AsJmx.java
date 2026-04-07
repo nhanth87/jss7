@@ -2,8 +2,7 @@
 package org.restcomm.protocols.ss7.oam.common.m3ua;
 
 import java.util.List;
-
-import javolution.util.FastList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.restcomm.protocols.ss7.m3ua.As;
 import org.restcomm.protocols.ss7.m3ua.Asp;
@@ -23,7 +22,7 @@ public class AsJmx implements AsJmxMBean {
 
     private final As wrappedAs;
 
-    protected FastList<Asp> appServerProcs = new FastList<Asp>();
+    protected CopyOnWriteArrayList<Asp> appServerProcs = new CopyOnWriteArrayList<Asp>();
 
     /**
      *
@@ -149,8 +148,7 @@ public class AsJmx implements AsJmxMBean {
 
     protected AspJmx removeAppServerProcess(String aspName) {
         AspJmx aspJmx = null;
-        for (FastList.Node<Asp> n = this.appServerProcs.head(), end = this.appServerProcs.tail(); (n = n.getNext()) != end;) {
-            Asp asp = n.getValue();
+        for (Asp asp : this.appServerProcs) {
             if (asp.getName().equals(aspName)) {
                 aspJmx = (AspJmx) asp;
                 break;

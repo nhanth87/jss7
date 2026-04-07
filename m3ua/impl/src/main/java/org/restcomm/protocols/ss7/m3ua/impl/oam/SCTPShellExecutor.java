@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javolution.util.FastMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.api.Association;
@@ -18,7 +18,7 @@ public class SCTPShellExecutor implements ShellExecutor {
 
     private static final Logger logger = Logger.getLogger(SCTPShellExecutor.class);
 
-    private FastMap<String, Management> sctpManagements = new FastMap<String, Management>();
+    private final ConcurrentHashMap<String, Management> sctpManagements = new ConcurrentHashMap<String, Management>();
 
     private Management sctpManagement = null;
 
@@ -29,9 +29,8 @@ public class SCTPShellExecutor implements ShellExecutor {
     public void setSctpManagements(Map<String, Management> sctpManagementsTemp) {
         if (sctpManagementsTemp != null) {
             synchronized (this) {
-                FastMap<String, Management> newsctpManagements = new FastMap<String, Management>();
-                newsctpManagements.putAll(sctpManagementsTemp);
-                this.sctpManagements = newsctpManagements;
+                this.sctpManagements.clear();
+                this.sctpManagements.putAll(sctpManagementsTemp);
             }
         }
     }
@@ -767,8 +766,7 @@ public class SCTPShellExecutor implements ShellExecutor {
             this.setDefaultValue();
 
             StringBuilder sb = new StringBuilder();
-            for (FastMap.Entry<String, Management> e = this.sctpManagements.head(), end = this.sctpManagements.tail(); (e = e
-                    .getNext()) != end;) {
+            for (Map.Entry<String, Management> e : this.sctpManagements.entrySet()) {
 
                 Management managementImplTmp = e.getValue();
                 String stackname = e.getKey();

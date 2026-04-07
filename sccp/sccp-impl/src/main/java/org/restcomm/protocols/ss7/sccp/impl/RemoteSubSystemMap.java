@@ -1,12 +1,12 @@
 
 package org.restcomm.protocols.ss7.sccp.impl;
 
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 /**
  * @author amit bhayani
  *
  */
-public class RemoteSubSystemMap<Integer, RemoteSubSystemImpl> extends FastMap<Integer, RemoteSubSystemImpl> {
+public class RemoteSubSystemMap<Integer, RemoteSubSystemImpl> extends NonBlockingHashMap<Integer, RemoteSubSystemImpl> {
 
 }

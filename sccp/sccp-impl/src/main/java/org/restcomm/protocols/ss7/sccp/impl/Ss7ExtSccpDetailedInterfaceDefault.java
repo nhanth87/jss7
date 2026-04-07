@@ -1,7 +1,7 @@
 
 package org.restcomm.protocols.ss7.sccp.impl;
 
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.sccp.NetworkIdState;
@@ -63,8 +63,8 @@ public class Ss7ExtSccpDetailedInterfaceDefault implements Ss7ExtSccpDetailedInt
     }
 
     @Override
-    public FastMap<Integer, NetworkIdState> getNetworkIdList(int affectedPc) {
-        return new FastMap<Integer, NetworkIdState>();
+    public NonBlockingHashMap<Integer, NetworkIdState> getNetworkIdList(int affectedPc) {
+        return new NonBlockingHashMap<Integer, NetworkIdState>();
     }
 
     @Override

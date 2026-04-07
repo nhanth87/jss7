@@ -1,12 +1,12 @@
 
 package org.restcomm.protocols.ss7.sccpext.impl.router;
 
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 /**
  * @author amit bhayani
  *
  */
-public class RuleMap<Integer, Rule> extends FastMap<Integer, Rule> {
+public class RuleMap<Integer, Rule> extends NonBlockingHashMap<Integer, Rule> {
 
 }

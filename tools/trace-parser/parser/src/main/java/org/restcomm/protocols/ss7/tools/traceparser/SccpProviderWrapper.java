@@ -2,8 +2,10 @@ package org.restcomm.protocols.ss7.tools.traceparser;
 
 import java.io.IOException;
 
-import javolution.util.FastList;
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.restcomm.protocols.ss7.sccp.MaxConnectionCountReached;
 import org.restcomm.protocols.ss7.sccp.NetworkIdState;
@@ -92,7 +94,7 @@ public class SccpProviderWrapper implements SccpProvider {
     }
 
     @Override
-    public FastMap<Integer, NetworkIdState> getNetworkIdStateList() {
+    public NonBlockingHashMap<Integer, NetworkIdState> getNetworkIdStateList() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -110,7 +112,7 @@ public class SccpProviderWrapper implements SccpProvider {
     }
 
     @Override
-    public FastMap<LocalReference, SccpConnection> getConnections() {
+    public NonBlockingHashMap<LocalReference, SccpConnection> getConnections() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -133,7 +135,7 @@ public class SccpProviderWrapper implements SccpProvider {
     }
 
     @Override
-    public FastList<SccpManagementEventListener> getManagementEventListeners() {
+    public List<SccpManagementEventListener> getManagementEventListeners() {
         return null;
     }
 

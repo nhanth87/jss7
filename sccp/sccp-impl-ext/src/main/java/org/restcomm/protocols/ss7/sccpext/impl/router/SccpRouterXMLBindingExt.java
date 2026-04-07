@@ -1,7 +1,7 @@
 
 package org.restcomm.protocols.ss7.sccpext.impl.router;
 
-import javolution.util.FastMap;
+import java.util.Map;
 import javolution.xml.XMLBinding;
 import javolution.xml.XMLFormat;
 import javolution.xml.stream.XMLStreamException;
@@ -38,7 +38,7 @@ public class SccpRouterXMLBindingExt extends XMLBinding {
 
         @Override
         public void write(RuleMap obj, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            for (FastMap.Entry<Integer, RuleImpl> e = obj.head(), end = obj.tail(); (e = e.getNext()) != end;) {
+            for (Map.Entry<Integer, RuleImpl> e : obj.entrySet()) {
                 Integer id = e.getKey();
                 RuleImpl rule = e.getValue();
 
@@ -62,7 +62,7 @@ public class SccpRouterXMLBindingExt extends XMLBinding {
 
         @Override
         public void write(SccpAddressMap obj, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            for (FastMap.Entry<Integer, SccpAddress> e = obj.head(), end = obj.tail(); (e = e.getNext()) != end;) {
+            for (Map.Entry<Integer, SccpAddress> e : obj.entrySet()) {
                 Integer id = e.getKey();
                 SccpAddress sccpAddress = e.getValue();
 

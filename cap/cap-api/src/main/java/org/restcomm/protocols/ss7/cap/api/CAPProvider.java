@@ -2,8 +2,7 @@
 package org.restcomm.protocols.ss7.cap.api;
 
 import java.io.Serializable;
-
-import javolution.util.FastMap;
+import java.util.Map;
 
 import org.restcomm.protocols.ss7.cap.api.errors.CAPErrorMessageFactory;
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.CAPServiceCircuitSwitchedCall;
@@ -89,7 +88,7 @@ public interface CAPProvider extends Serializable {
      *
      * @return The collection of pairs: networkId value - NetworkIdState (prohibited / congested state)
      */
-    FastMap<Integer, NetworkIdState> getNetworkIdStateList();
+    Map<Integer, NetworkIdState> getNetworkIdStateList();
 
     /**
      * Returns the state of availability / congestion for a networkId subnetwork. Returns null if there is no info (we need to

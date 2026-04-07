@@ -31,6 +31,7 @@
 		<junit.version>3.8.1</junit.version>
 		<testng.version>6.2</testng.version>
 		<javolution.version>5.5.1</javolution.version>
+		<jctools.version>4.0.3</jctools.version>
 		<compiler.plugin.version>3.8.1</compiler.plugin.version>
 		<compile.source>11</compile.source>
 		<maven.compiler.source>11</maven.compiler.source>
@@ -281,6 +282,11 @@
 				<groupId>javolution</groupId>
 				<artifactId>javolution</artifactId>
 				<version>${javolution.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jctools</groupId>
+				<artifactId>jctools-core</artifactId>
+				<version>${jctools.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

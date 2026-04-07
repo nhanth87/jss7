@@ -2,7 +2,7 @@
 package org.restcomm.protocols.ss7.sccp.impl.router;
 
 import javolution.text.TextBuilder;
-import javolution.util.FastMap;
+import java.util.Map;
 import javolution.xml.XMLBinding;
 import javolution.xml.XMLObjectReader;
 import javolution.xml.XMLObjectWriter;
@@ -217,8 +217,7 @@ public class RouterImpl implements Router {
     }
 
     public LongMessageRule findLongMessageRule(int dpc) {
-        for (FastMap.Entry<Integer, LongMessageRule> e = this.longMessageRules.head(), end = this.longMessageRules.tail(); (e = e
-                .getNext()) != end;) {
+        for (Map.Entry<Integer, LongMessageRule> e : this.longMessageRules.entrySet()) {
             LongMessageRule rule = e.getValue();
             if (rule.matches(dpc)) {
                 return rule;
@@ -228,7 +227,7 @@ public class RouterImpl implements Router {
     }
 
     public Mtp3ServiceAccessPoint findMtp3ServiceAccessPoint(int dpc, int sls) {
-        for (FastMap.Entry<Integer, Mtp3ServiceAccessPoint> e = this.saps.head(), end = this.saps.tail(); (e = e.getNext()) != end;) {
+        for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
             Mtp3ServiceAccessPoint sap = e.getValue();
             if (sap.matches(dpc, sls)) {
                 return sap;
@@ -238,7 +237,7 @@ public class RouterImpl implements Router {
     }
 
     public Mtp3ServiceAccessPoint findMtp3ServiceAccessPoint(int dpc, int sls, int networkId) {
-        for (FastMap.Entry<Integer, Mtp3ServiceAccessPoint> e = this.saps.head(), end = this.saps.tail(); (e = e.getNext()) != end;) {
+        for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
             Mtp3ServiceAccessPoint sap = e.getValue();
             if (sap.matches(dpc, sls)) {
                 if (sap.getNetworkId() == networkId) {
@@ -251,7 +250,7 @@ public class RouterImpl implements Router {
 
     public Mtp3ServiceAccessPoint findMtp3ServiceAccessPointForIncMes(int localPC, int remotePC, String localGtDigits) {
         // a first step - sap's with LocalGtDigits
-        for (FastMap.Entry<Integer, Mtp3ServiceAccessPoint> e = this.saps.head(), end = this.saps.tail(); (e = e.getNext()) != end;) {
+        for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
             Mtp3ServiceAccessPoint sap = e.getValue();
             if (sap.getLocalGtDigits() != null && sap.getLocalGtDigits().length() > 0) {
                 if (sap.getOpc() == localPC && sap.matches(remotePC)
@@ -262,7 +261,7 @@ public class RouterImpl implements Router {
         }
 
         // a second step - sap's without LocalGtDigits
-        for (FastMap.Entry<Integer, Mtp3ServiceAccessPoint> e = this.saps.head(), end = this.saps.tail(); (e = e.getNext()) != end;) {
+        for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
             Mtp3ServiceAccessPoint sap = e.getValue();
             if (sap.getLocalGtDigits() == null || sap.getLocalGtDigits().length() == 0) {
                 if (sap.getOpc() == localPC && sap.matches(remotePC)) {
@@ -284,7 +283,7 @@ public class RouterImpl implements Router {
 
     @Override
     public boolean spcIsLocal(int spc) {
-        for (FastMap.Entry<Integer, Mtp3ServiceAccessPoint> e = this.saps.head(), end = this.saps.tail(); (e = e.getNext()) != end;) {
+        for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
             Mtp3ServiceAccessPoint sap = e.getValue();
             if (sap.getOpc() == spc) {
                 return true;
@@ -295,7 +294,7 @@ public class RouterImpl implements Router {
 
     //Check if the SCP is local using the networkId
     public boolean spcIsLocal(int spc, int networkId) {
-        for (FastMap.Entry<Integer, Mtp3ServiceAccessPoint> e = this.saps.head(), end = this.saps.tail(); (e = e.getNext()) != end;) {
+        for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
             Mtp3ServiceAccessPoint sap = e.getValue();
             if (sap.getOpc() == spc && sap.getNetworkId() == networkId) {
                 return true;
@@ -717,7 +716,7 @@ public class RouterImpl implements Router {
         longMessageRules = reader.read(LONG_MESSAGE_RULE, LongMessageRuleMap.class);
         saps = reader.read(MTP3_SERVICE_ACCESS_POINT, Mtp3ServiceAccessPointMap.class);
 
-        for (FastMap.Entry<Integer, Mtp3ServiceAccessPoint> e = this.saps.head(), end = this.saps.tail(); (e = e.getNext()) != end;) {
+        for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
             Mtp3ServiceAccessPoint sap = e.getValue();
             ((Mtp3ServiceAccessPointImpl)sap).setStackName(name);
         }
@@ -757,7 +756,7 @@ public class RouterImpl implements Router {
         longMessageRules = reader.read(LONG_MESSAGE_RULE, LongMessageRuleMap.class);
         saps = reader.read(MTP3_SERVICE_ACCESS_POINT, Mtp3ServiceAccessPointMap.class);
 
-        for (FastMap.Entry<Integer, Mtp3ServiceAccessPoint> e = this.saps.head(), end = this.saps.tail(); (e = e.getNext()) != end;) {
+        for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
             Mtp3ServiceAccessPoint sap = e.getValue();
             ((Mtp3ServiceAccessPointImpl)sap).setStackName(name);
         }
@@ -807,7 +806,7 @@ public class RouterImpl implements Router {
         longMessageRules = reader.read(LONG_MESSAGE_RULE, LongMessageRuleMap.class);
         saps = reader.read(MTP3_SERVICE_ACCESS_POINT, Mtp3ServiceAccessPointMap.class);
 
-        for (FastMap.Entry<Integer, Mtp3ServiceAccessPoint> e = this.saps.head(), end = this.saps.tail(); (e = e.getNext()) != end;) {
+        for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
             Mtp3ServiceAccessPoint sap = e.getValue();
             ((Mtp3ServiceAccessPointImpl)sap).setStackName(name);
         }

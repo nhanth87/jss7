@@ -1,7 +1,8 @@
 
 package org.restcomm.protocols.ss7.tools.simulator.level3;
 
-import javolution.util.FastList;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Level;
 import org.restcomm.protocols.ss7.map.MAPStackImpl;
@@ -246,7 +247,7 @@ public class MapMan implements MapManMBean, Stoppable {
         this.mapStack = new MAPStackImpl("Simulator", sccpStack.getSccpProvider(), ssn);
 
         if (extraSsn > 0) {
-            FastList<Integer> extraSsnsNew = new FastList<Integer>();
+            List<Integer> extraSsnsNew = new ArrayList<Integer>();
             extraSsnsNew.add(extraSsn);
             this.mapStack.getTCAPStack().setExtraSsns(extraSsnsNew);
         }

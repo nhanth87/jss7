@@ -4,7 +4,7 @@ package org.restcomm.protocols.ss7.oam.common.tcap;
 import java.util.List;
 import java.util.Map;
 
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.oam.common.jmx.MBeanHost;
@@ -41,7 +41,7 @@ public class TcapManagementJmx implements TcapManagementJmxMBean, CounterMediato
     private final MBeanHost ss7Management;
     private final TCAPStack wrappedTCAPStack;
 
-    private FastMap<String, CounterDefSet> lstCounters = new FastMap<String, CounterDefSet>();
+    private NonBlockingHashMap<String, CounterDefSet> lstCounters = new NonBlockingHashMap<String, CounterDefSet>();
 
     public TcapManagementJmx(MBeanHost ss7Management, TCAPStack wrappedTCAPStack) {
         this.ss7Management = ss7Management;
@@ -335,7 +335,7 @@ public class TcapManagementJmx implements TcapManagementJmxMBean, CounterMediato
     }
 
     private void setupCounterList() {
-        FastMap<String, CounterDefSet> lst = new FastMap<String, CounterDefSet>();
+        NonBlockingHashMap<String, CounterDefSet> lst = new NonBlockingHashMap<String, CounterDefSet>();
 
         CounterDefSetImpl cds = new CounterDefSetImpl(this.getCounterMediatorName() + "-Main");
         lst.put(cds.getName(), cds);

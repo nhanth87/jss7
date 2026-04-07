@@ -1,7 +1,7 @@
 
 package org.restcomm.protocols.ss7.sccp.impl.router;
 
-import javolution.util.FastMap;
+import java.util.Map;
 import javolution.xml.XMLBinding;
 import javolution.xml.XMLFormat;
 import javolution.xml.stream.XMLStreamException;
@@ -40,7 +40,7 @@ public class SccpRouterXMLBinding extends XMLBinding {
 
         @Override
         public void write(LongMessageRuleMap obj, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            for (FastMap.Entry<Integer, LongMessageRuleImpl> e = obj.head(), end = obj.tail(); (e = e.getNext()) != end;) {
+            for (Map.Entry<Integer, LongMessageRuleImpl> e : obj.entrySet()) {
                 Integer id = e.getKey();
                 LongMessageRuleImpl longMessageRule = e.getValue();
 
@@ -66,7 +66,7 @@ public class SccpRouterXMLBinding extends XMLBinding {
 
         @Override
         public void write(Mtp3ServiceAccessPointMap obj, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            for (FastMap.Entry<Integer, Mtp3ServiceAccessPointImpl> e = obj.head(), end = obj.tail(); (e = e.getNext()) != end;) {
+            for (Map.Entry<Integer, Mtp3ServiceAccessPointImpl> e : obj.entrySet()) {
                 Integer id = e.getKey();
                 Mtp3ServiceAccessPointImpl mtp3ServiceAccessPoint = e.getValue();
 
@@ -92,7 +92,7 @@ public class SccpRouterXMLBinding extends XMLBinding {
 
         @Override
         public void write(Mtp3DestinationMap obj, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            for (FastMap.Entry<Integer, Mtp3DestinationImpl> e = obj.head(), end = obj.tail(); (e = e.getNext()) != end;) {
+            for (Map.Entry<Integer, Mtp3DestinationImpl> e : obj.entrySet()) {
                 Integer id = e.getKey();
                 Mtp3DestinationImpl mtp3Destination = e.getValue();
 

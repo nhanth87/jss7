@@ -1,8 +1,6 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl;
 
-import javolution.util.FastList;
-
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.Asp;
 import org.restcomm.protocols.ss7.m3ua.Functionality;
@@ -79,9 +77,8 @@ public class THLocalAsActToPendRemAspInac implements TransitionHandler {
             if (this.asImpl.getTrafficModeType().getMode() == TrafficModeType.Loadshare) {
                 this.lbCount = 0;
 
-                for (FastList.Node<Asp> n = this.asImpl.appServerProcs.head(), end = this.asImpl.appServerProcs.tail(); (n = n
-                        .getNext()) != end;) {
-                    AspImpl remAspImpl = (AspImpl) n.getValue();
+                for (Asp asp : this.asImpl.appServerProcs) {
+                    AspImpl remAspImpl = (AspImpl) asp;
 
                     FSM aspPeerFSM = remAspImpl.getPeerFSM();
                     AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
@@ -106,9 +103,8 @@ public class THLocalAsActToPendRemAspInac implements TransitionHandler {
                     if (asImpl.getFunctionality() != Functionality.IPSP) {
                         // In any case send Notify only for ASP or SGW
 
-                        for (FastList.Node<Asp> n = this.asImpl.appServerProcs.head(), end = this.asImpl.appServerProcs.tail(); (n = n
-                                .getNext()) != end;) {
-                            remAsp = (AspImpl) n.getValue();
+                        for (Asp asp : this.asImpl.appServerProcs) {
+                            remAsp = (AspImpl) asp;
 
                             FSM aspPeerFSM = remAsp.getPeerFSM();
                             AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
@@ -131,9 +127,8 @@ public class THLocalAsActToPendRemAspInac implements TransitionHandler {
             if (asImpl.getFunctionality() != Functionality.IPSP) {
                 // Send Notify only for ASP or SGW
 
-                for (FastList.Node<Asp> n = this.asImpl.appServerProcs.head(), end = this.asImpl.appServerProcs.tail(); (n = n
-                        .getNext()) != end;) {
-                    remAsp = (AspImpl) n.getValue();
+                for (Asp asp : this.asImpl.appServerProcs) {
+                    remAsp = (AspImpl) asp;
 
                     FSM aspPeerFSM = remAsp.getPeerFSM();
                     AspState aspState = AspState.getState(aspPeerFSM.getState().getName());

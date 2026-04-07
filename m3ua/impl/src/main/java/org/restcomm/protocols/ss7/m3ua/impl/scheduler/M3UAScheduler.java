@@ -1,6 +1,6 @@
 package org.restcomm.protocols.ss7.m3ua.impl.scheduler;
 
-import javolution.util.FastList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 
@@ -13,9 +13,9 @@ public class M3UAScheduler implements Runnable {
     private static final Logger logger = Logger.getLogger(M3UAScheduler.class);
 
     // TODO : Synchronize tasks? Use Iterator?
-    protected FastList<M3UATask> tasks = new FastList<M3UATask>();
+    protected final CopyOnWriteArrayList<M3UATask> tasks = new CopyOnWriteArrayList<M3UATask>();
 
-    private FastList<M3UATask> removed = new FastList<M3UATask>();
+    private final CopyOnWriteArrayList<M3UATask> removed = new CopyOnWriteArrayList<M3UATask>();
 
     public void execute(M3UATask task) {
         if (task == null) {
@@ -26,8 +26,7 @@ public class M3UAScheduler implements Runnable {
 
     public void run() {
         long now = System.currentTimeMillis();
-        for (FastList.Node<M3UATask> n = tasks.head(), end = tasks.tail(); (n = n.getNext()) != end;) {
-            M3UATask task = n.getValue();
+        for (M3UATask task : tasks) {
             // check if has been canceled from different thread.
             if (task.isCanceled()) {
                 // tasks.delete(n);

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javolution.util.FastMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 import org.apache.log4j.Logger;
@@ -36,7 +36,7 @@ public class M3UAShellExecutor implements ShellExecutor {
 
     private static final Logger logger = Logger.getLogger(M3UAShellExecutor.class);
 
-    private FastMap<String, M3UAManagementImpl> m3uaManagements = new FastMap<String, M3UAManagementImpl>();
+    private final ConcurrentHashMap<String, M3UAManagementImpl> m3uaManagements = new ConcurrentHashMap<String, M3UAManagementImpl>();
 
     private M3UAManagementImpl m3uaManagement;
 
@@ -53,9 +53,8 @@ public class M3UAShellExecutor implements ShellExecutor {
     public void setM3uaManagements(Map<String, M3UAManagementImpl> m3uaManagementsTemp) {
         if (m3uaManagementsTemp != null) {
             synchronized (this) {
-                FastMap<String, M3UAManagementImpl> newM3uaManagements = new FastMap<String, M3UAManagementImpl>();
-                newM3uaManagements.putAll(m3uaManagementsTemp);
-                this.m3uaManagements = newM3uaManagements;
+                this.m3uaManagements.clear();
+                this.m3uaManagements.putAll(m3uaManagementsTemp);
             }
         }
     }
@@ -922,8 +921,7 @@ public class M3UAShellExecutor implements ShellExecutor {
             return sb.toString();
         } else {
             StringBuilder sb = new StringBuilder();
-            for (FastMap.Entry<String, M3UAManagementImpl> e = this.m3uaManagements.head(), end = this.m3uaManagements.tail(); (e = e
-                    .getNext()) != end;) {
+            for (Map.Entry<String, M3UAManagementImpl> e : this.m3uaManagements.entrySet()) {
 
                 M3UAManagementImpl managementImplTmp = e.getValue();
                 String stackname = e.getKey();

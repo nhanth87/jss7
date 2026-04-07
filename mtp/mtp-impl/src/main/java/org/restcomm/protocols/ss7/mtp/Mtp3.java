@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javolution.util.FastList;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -201,14 +202,14 @@ public class Mtp3 implements Runnable {
 
     public void run() {
         try {
-            FastList<SelectorKey> selected = selector.selectNow(StreamSelector.OP_READ, 20);
-            for (FastList.Node<SelectorKey> n = selected.head(), end = selected.tail(); (n = n.getNext()) != end;) {
-                ((Mtp2) ((Mtp1) n.getValue().getStream()).getLink()).doRead();
+            List<SelectorKey> selected = selector.selectNow(StreamSelector.OP_READ, 20);
+            for (SelectorKey key : selected) {
+                ((Mtp2) ((Mtp1) key.getStream()).getLink()).doRead();
             }
 
             selected = selector.selectNow(StreamSelector.OP_WRITE, 20);
-            for (FastList.Node<SelectorKey> n = selected.head(), end = selected.tail(); (n = n.getNext()) != end;) {
-                ((Mtp2) ((Mtp1) n.getValue().getStream()).getLink()).doWrite();
+            for (SelectorKey key : selected) {
+                ((Mtp2) ((Mtp1) key.getStream()).getLink()).doWrite();
             }
 
         } catch (Exception e) {

@@ -1,12 +1,12 @@
 
 package org.restcomm.protocols.ss7.oam.common.statistics;
 
+import java.util.Map;
 import java.util.UUID;
 
+import org.jctools.maps.NonBlockingHashMap;
 import org.restcomm.protocols.ss7.oam.common.statistics.api.SourceValueCounter;
 import org.restcomm.protocols.ss7.oam.common.statistics.api.SourceValueSet;
-
-import javolution.util.FastMap;
 
 /**
 *
@@ -16,7 +16,7 @@ import javolution.util.FastMap;
 public class SourceValueSetImpl implements SourceValueSet {
 
     private UUID sessionId;
-    private FastMap<String, SourceValueCounter> counters = new FastMap<String, SourceValueCounter>();
+    private Map<String, SourceValueCounter> counters = new NonBlockingHashMap<String, SourceValueCounter>();
 
     public void addCounter(SourceValueCounter val) {
         this.counters.put(val.getCounterDef().getCounterName(), val);
@@ -32,7 +32,7 @@ public class SourceValueSetImpl implements SourceValueSet {
     }
 
     @Override
-    public FastMap<String, SourceValueCounter> getCounters() {
+    public Map<String, SourceValueCounter> getCounters() {
         return this.counters;
     }
 

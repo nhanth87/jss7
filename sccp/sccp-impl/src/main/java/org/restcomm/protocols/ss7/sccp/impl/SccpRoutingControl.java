@@ -1,7 +1,7 @@
 
 package org.restcomm.protocols.ss7.sccp.impl;
 
-import javolution.util.FastMap;
+import java.util.Map;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -118,7 +118,7 @@ public class SccpRoutingControl implements SccpRoutingCtxInterface {
                 return;
             }
 
-            FastMap<Integer, SccpListener> listListeners = this.sccpProviderImpl.getAllSccpListeners();
+            Map<Integer, SccpListener> listListeners = this.sccpProviderImpl.getAllSccpListeners();
             for (Map.Entry<Integer, SccpListener> val : listListeners.entrySet()) {
                 SccpListener listener = val.getValue();
                 if (msg instanceof SccpDataMessage) {

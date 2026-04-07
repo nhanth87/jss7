@@ -1,6 +1,6 @@
 package org.restcomm.protocols.ss7.m3ua.impl.router;
 
-import javolution.util.FastList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.restcomm.protocols.ss7.m3ua.impl.AsImpl;
 
@@ -16,7 +16,7 @@ public class DPCNode {
 
     int dpc = -1;
 
-    private FastList<OPCNode> opcList = new FastList<OPCNode>();
+    private final CopyOnWriteArrayList<OPCNode> opcList = new CopyOnWriteArrayList<OPCNode>();
 
     private OPCNode wildCardOpcNode = null;
 
@@ -25,8 +25,7 @@ public class DPCNode {
     }
 
     protected void addSi(int opc, int si, AsImpl asImpl) throws Exception {
-        for (FastList.Node<OPCNode> n = opcList.head(), end = opcList.tail(); (n = n.getNext()) != end;) {
-            OPCNode opcNode = n.getValue();
+        for (OPCNode opcNode : opcList) {
             if (opcNode.opc == opc) {
                 opcNode.addSi(si, asImpl);
                 return;
@@ -45,8 +44,7 @@ public class DPCNode {
     }
 
     protected AsImpl getAs(int opc, short si) {
-        for (FastList.Node<OPCNode> n = opcList.head(), end = opcList.tail(); (n = n.getNext()) != end;) {
-            OPCNode opcNode = n.getValue();
+        for (OPCNode opcNode : opcList) {
             if (opcNode.opc == opc) {
                 return opcNode.getAs(si);
             }

@@ -2,7 +2,7 @@
 package org.restcomm.protocols.ss7.oam.common.alarm;
 
 import java.util.List;
-import javolution.util.FastList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -11,7 +11,7 @@ import javolution.util.FastList;
  */
 public class AlarmListenerCollection {
 
-    private transient List<AlarmListener> alarmListeners = new FastList<AlarmListener>();
+    private transient List<AlarmListener> alarmListeners = new CopyOnWriteArrayList<AlarmListener>();
     private String alarmProviderObjectPath;
     private String alarmProviderObjectPathWithSlash;
 

@@ -1,8 +1,6 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl;
 
-import javolution.util.FastList;
-
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.M3UAManagementEventListener;
 import org.restcomm.protocols.ss7.m3ua.State;
@@ -32,11 +30,7 @@ public class AspStateEnterDown implements FSMStateEventHandler {
             AspState oldState = AspState.getState(this.aspImpl.state.getName());
             this.aspImpl.state = AspState.DOWN;
 
-            FastList<M3UAManagementEventListener> managementEventListenersTmp = this.aspImpl.aspFactoryImpl.m3UAManagementImpl.managementEventListeners;
-
-            for (FastList.Node<M3UAManagementEventListener> n = managementEventListenersTmp.head(), end = managementEventListenersTmp
-                    .tail(); (n = n.getNext()) != end;) {
-                M3UAManagementEventListener m3uaManagementEventListener = n.getValue();
+            for (M3UAManagementEventListener m3uaManagementEventListener : this.aspImpl.aspFactoryImpl.m3UAManagementImpl.managementEventListeners) {
                 try {
                     m3uaManagementEventListener.onAspDown(this.aspImpl, oldState);
                 } catch (Throwable ee) {

@@ -1,7 +1,7 @@
 
 package org.restcomm.protocols.ss7.sccp.impl;
 
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.restcomm.protocols.ss7.sccp.NetworkIdState;
 import org.restcomm.protocols.ss7.sccp.RemoteSccpStatus;
@@ -92,7 +92,7 @@ public interface Ss7ExtSccpDetailedInterface extends Ss7ExtSccpInterface {
      * @param affectedPc
      * @return
      */
-    FastMap<Integer, NetworkIdState> getNetworkIdList(int affectedPc);
+    NonBlockingHashMap<Integer, NetworkIdState> getNetworkIdList(int affectedPc);
 
     /**
      * Adding of an extension part of a remote signal point when a RemoteSignalingPoint creating

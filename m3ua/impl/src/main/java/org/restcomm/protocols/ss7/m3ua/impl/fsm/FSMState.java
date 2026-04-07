@@ -1,7 +1,7 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl.fsm;
 
-import javolution.util.FastList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -14,7 +14,7 @@ public class FSMState {
     private String name;
     private FSM fsm;
 
-    private FastList<Transition> transitions = new FastList<Transition>();
+    private final CopyOnWriteArrayList<Transition> transitions = new CopyOnWriteArrayList<Transition>();
     protected long timeout;
 
     // The time in ms when this state was entered

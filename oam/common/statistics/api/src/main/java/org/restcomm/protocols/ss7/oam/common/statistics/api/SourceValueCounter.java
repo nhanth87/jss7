@@ -2,9 +2,7 @@
 package org.restcomm.protocols.ss7.oam.common.statistics.api;
 
 import java.io.Serializable;
-
-
-import javolution.util.FastMap;
+import java.util.Map;
 
 /**
 * This value is supplied by CounterMediator and consumed by CounterProvider.
@@ -17,6 +15,6 @@ public interface SourceValueCounter extends Serializable {
 
     CounterDef getCounterDef();
 
-    FastMap<String, SourceValueObject> getObjects();
+    Map<String, SourceValueObject> getObjects();
 
 }

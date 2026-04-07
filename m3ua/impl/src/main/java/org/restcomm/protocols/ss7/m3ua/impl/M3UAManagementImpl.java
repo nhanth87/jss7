@@ -14,13 +14,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javolution.text.TextBuilder;
-import javolution.util.FastList;
-import javolution.util.FastMap;
 import javolution.xml.XMLObjectReader;
 import javolution.xml.XMLObjectWriter;
 import javolution.xml.stream.XMLStreamException;
@@ -90,8 +89,8 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
 
     protected static final int MAX_SEQUENCE_NUMBER = 256;
 
-    protected FastList<As> appServers = new FastList<As>();
-    protected FastList<AspFactory> aspFactories = new FastList<AspFactory>();
+    protected final CopyOnWriteArrayList<As> appServers = new CopyOnWriteArrayList<As>();
+    protected final CopyOnWriteArrayList<AspFactory> aspFactories = new CopyOnWriteArrayList<AspFactory>();
 
     protected M3UAScheduler m3uaScheduler = new M3UAScheduler();
     protected M3UACounterProviderImpl m3uaCounterProvider;
@@ -121,7 +120,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
     private long statisticsTaskPeriod = 5000;
     private boolean routingKeyManagementEnabled = false;
 
-    protected FastList<M3UAManagementEventListener> managementEventListeners = new FastList<M3UAManagementEventListener>();
+    protected final CopyOnWriteArrayList<M3UAManagementEventListener> managementEventListeners = new CopyOnWriteArrayList<M3UAManagementEventListener>();
 
     /**
      * Maximum sequence number received from SCTP user. If SCTP users sends seq number greater than max, packet will be
@@ -282,9 +281,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         fsmTicker = Executors.newSingleThreadScheduledExecutor();
         fsmTicker.scheduleAtFixedRate(m3uaScheduler, 500, 500, TimeUnit.MILLISECONDS);
 
-        for (FastList.Node<M3UAManagementEventListener> n = this.managementEventListeners.head(), end = this.managementEventListeners
-                .tail(); (n = n.getNext()) != end;) {
-            M3UAManagementEventListener m3uaManagementEventListener = n.getValue();
+        for (M3UAManagementEventListener m3uaManagementEventListener : this.managementEventListeners) {
             try {
                 m3uaManagementEventListener.onServiceStarted();
             } catch (Throwable ee) {
@@ -309,9 +306,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
 
     public void stop() throws Exception {
 
-        for (FastList.Node<M3UAManagementEventListener> n = this.managementEventListeners.head(), end = this.managementEventListeners
-                .tail(); (n = n.getNext()) != end;) {
-            M3UAManagementEventListener m3uaManagementEventListener = n.getValue();
+        for (M3UAManagementEventListener m3uaManagementEventListener : this.managementEventListeners) {
             try {
                 m3uaManagementEventListener.onServiceStopped();
             } catch (Throwable ee) {
@@ -334,40 +329,22 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
 
     @Override
     public void addM3UAManagementEventListener(M3UAManagementEventListener m3uaManagementEventListener) {
-        synchronized (this) {
-            if (this.managementEventListeners.contains(m3uaManagementEventListener))
-                return;
-
-            FastList<M3UAManagementEventListener> newManagementEventListeners = new FastList<M3UAManagementEventListener>();
-            newManagementEventListeners.addAll(this.managementEventListeners);
-            newManagementEventListeners.add(m3uaManagementEventListener);
-            this.managementEventListeners = newManagementEventListeners;
+        if (!this.managementEventListeners.contains(m3uaManagementEventListener)) {
+            this.managementEventListeners.add(m3uaManagementEventListener);
         }
     }
 
     @Override
     public void removeM3UAManagementEventListener(M3UAManagementEventListener m3uaManagementEventListener) {
-        synchronized (this) {
-            if (!this.managementEventListeners.contains(m3uaManagementEventListener))
-                return;
-
-            FastList<M3UAManagementEventListener> newManagementEventListeners = new FastList<M3UAManagementEventListener>();
-            newManagementEventListeners.addAll(this.managementEventListeners);
-            newManagementEventListeners.remove(m3uaManagementEventListener);
-            this.managementEventListeners = newManagementEventListeners;
-        }
+        this.managementEventListeners.remove(m3uaManagementEventListener);
     }
 
     public List<As> getAppServers() {
-        FastList<As> appServersTmp = new FastList<As>();
-        appServersTmp.addAll(this.appServers);
-        return appServersTmp;
+        return new ArrayList<As>(this.appServers);
     }
 
     public List<AspFactory> getAspfactories() {
-        FastList<AspFactory> aspfactoriesTmpe = new FastList<AspFactory>();
-        aspfactoriesTmpe.addAll(this.aspFactories);
-        return aspfactoriesTmpe;
+        return new ArrayList<AspFactory>(this.aspFactories);
     }
 
     public Map<String, RouteAs> getRoute() {
@@ -377,8 +354,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
     }
 
     protected As getAs(String asName) {
-        for (FastList.Node<As> n = appServers.head(), end = appServers.tail(); (n = n.getNext()) != end;) {
-            As as = n.getValue();
+        for (As as : appServers) {
             if (as.getName().equals(asName)) {
                 return as;
             }
@@ -434,9 +410,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
 
         this.store();
 
-        for (FastList.Node<M3UAManagementEventListener> n = this.managementEventListeners.head(), end = this.managementEventListeners
-                .tail(); (n = n.getNext()) != end;) {
-            M3UAManagementEventListener m3uaManagementEventListener = n.getValue();
+        for (M3UAManagementEventListener m3uaManagementEventListener : this.managementEventListeners) {
             try {
                 m3uaManagementEventListener.onAsCreated(as);
             } catch (Throwable ee) {
@@ -458,11 +432,9 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
             throw new Exception(String.format(M3UAOAMMessages.DESTROY_AS_FAILED_ASP_ASSIGNED, asName));
         }
 
-        for (FastMap.Entry<String, RouteAsImpl> e = this.routeManagement.route.head(), end = this.routeManagement.route.tail(); (e = e
-                .getNext()) != end;) {
-            RouteAsImpl asList = e.getValue();
+        for (RouteAsImpl asList : this.routeManagement.route.values()) {
             if(asList.hasAs(as)){
-                throw new Exception(String.format(M3UAOAMMessages.AS_USED_IN_ROUTE_ERROR, asName, e.getKey()));
+                throw new Exception(String.format(M3UAOAMMessages.AS_USED_IN_ROUTE_ERROR, asName, asList));
             }
         }
 
@@ -480,9 +452,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
 
         this.store();
 
-        for (FastList.Node<M3UAManagementEventListener> n = this.managementEventListeners.head(), end = this.managementEventListeners
-                .tail(); (n = n.getNext()) != end;) {
-            M3UAManagementEventListener m3uaManagementEventListener = n.getValue();
+        for (M3UAManagementEventListener m3uaManagementEventListener : this.managementEventListeners) {
             try {
                 m3uaManagementEventListener.onAsDestroyed(as);
             } catch (Throwable ee) {
@@ -524,8 +494,8 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
                 break;
             }
 
-            for (FastList.Node<AspFactory> n = aspFactories.head(), end = aspFactories.tail(); (n = n.getNext()) != end;) {
-                AspFactoryImpl aspFactoryImpl = (AspFactoryImpl) n.getValue();
+            for (AspFactory aspFactory : aspFactories) {
+                AspFactoryImpl aspFactoryImpl = (AspFactoryImpl) aspFactory;
                 if (aspid == aspFactoryImpl.getAspId().getAspId()) {
                     regenerateFlag = true;
                     break;
@@ -577,8 +547,8 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
             throw new Exception(String.format(M3UAOAMMessages.ASSOCIATION_IS_ASSOCIATED, associationName));
         }
 
-        for (FastList.Node<AspFactory> n = aspFactories.head(), end = aspFactories.tail(); (n = n.getNext()) != end;) {
-            AspFactoryImpl aspFactoryImpl = (AspFactoryImpl) n.getValue();
+        for (AspFactory aspFactory : aspFactories) {
+            AspFactoryImpl aspFactoryImpl = (AspFactoryImpl) aspFactory;
             if (aspId == aspFactoryImpl.getAspId().getAspId()) {
                 throw new Exception(String.format(M3UAOAMMessages.ASP_ID_TAKEN, aspId));
             }
@@ -593,9 +563,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
 
         this.store();
 
-        for (FastList.Node<M3UAManagementEventListener> n = this.managementEventListeners.head(), end = this.managementEventListeners
-                .tail(); (n = n.getNext()) != end;) {
-            M3UAManagementEventListener m3uaManagementEventListener = n.getValue();
+        for (M3UAManagementEventListener m3uaManagementEventListener : this.managementEventListeners) {
             try {
                 m3uaManagementEventListener.onAspFactoryCreated(factory);
             } catch (Throwable ee) {
@@ -619,9 +587,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         this.aspFactories.remove(aspFactory);
         this.store();
 
-        for (FastList.Node<M3UAManagementEventListener> n = this.managementEventListeners.head(), end = this.managementEventListeners
-                .tail(); (n = n.getNext()) != end;) {
-            M3UAManagementEventListener m3uaManagementEventListener = n.getValue();
+        for (M3UAManagementEventListener m3uaManagementEventListener : this.managementEventListeners) {
             try {
                 m3uaManagementEventListener.onAspFactoryDestroyed(aspFactory);
             } catch (Throwable ee) {
@@ -655,15 +621,15 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         }
 
         // If ASP already assigned to AS we don't want to re-assign
-        for (FastList.Node<Asp> n = asImpl.appServerProcs.head(), end = asImpl.appServerProcs.tail(); (n = n.getNext()) != end;) {
-            AspImpl aspImpl = (AspImpl) n.getValue();
+        for (Asp asp : asImpl.appServerProcs) {
+            AspImpl aspImpl = (AspImpl) asp;
             if (aspImpl.getName().equals(aspName)) {
                 throw new Exception(String.format(M3UAOAMMessages.ADD_ASP_TO_AS_FAIL_ALREADY_ASSIGNED_TO_THIS_AS, aspName,
                         asName));
             }
         }
 
-        FastList<Asp> aspImplList = aspFactory.aspList;
+        List<Asp> aspImplList = aspFactory.aspList;
 
         // Checks for RoutingContext. We know that for null RC there will always
         // be a single ASP assigned to AS and ASP cannot be shared
@@ -713,9 +679,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
 
         this.store();
 
-        for (FastList.Node<M3UAManagementEventListener> n = this.managementEventListeners.head(), end = this.managementEventListeners
-                .tail(); (n = n.getNext()) != end;) {
-            M3UAManagementEventListener m3uaManagementEventListener = n.getValue();
+        for (M3UAManagementEventListener m3uaManagementEventListener : this.managementEventListeners) {
             try {
                 m3uaManagementEventListener.onAspAssignedToAs(asImpl, aspImpl);
             } catch (Throwable ee) {
@@ -738,9 +702,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         aspImpl.getAspFactory().destroyAsp(aspImpl);
         this.store();
 
-        for (FastList.Node<M3UAManagementEventListener> n = this.managementEventListeners.head(), end = this.managementEventListeners
-                .tail(); (n = n.getNext()) != end;) {
-            M3UAManagementEventListener m3uaManagementEventListener = n.getValue();
+        for (M3UAManagementEventListener m3uaManagementEventListener : this.managementEventListeners) {
             try {
                 m3uaManagementEventListener.onAspUnassignedFromAs(asImpl, aspImpl);
             } catch (Throwable ee) {
@@ -775,9 +737,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         aspFactoryImpl.start();
         this.store();
 
-        for (FastList.Node<M3UAManagementEventListener> n = this.managementEventListeners.head(), end = this.managementEventListeners
-                .tail(); (n = n.getNext()) != end;) {
-            M3UAManagementEventListener m3uaManagementEventListener = n.getValue();
+        for (M3UAManagementEventListener m3uaManagementEventListener : this.managementEventListeners) {
             try {
                 m3uaManagementEventListener.onAspFactoryStarted(aspFactoryImpl);
             } catch (Throwable ee) {
@@ -836,9 +796,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         // m3uaManagementEventListener.onAspFactoryStopped() be before actual
         // stop of aspFactory? The problem is ASP_DOWN and AS_INACTIV callbacks
         // are before AspFactoryStopped. Is it ok?
-        for (FastList.Node<M3UAManagementEventListener> n = this.managementEventListeners.head(), end = this.managementEventListeners
-                .tail(); (n = n.getNext()) != end;) {
-            M3UAManagementEventListener m3uaManagementEventListener = n.getValue();
+        for (M3UAManagementEventListener m3uaManagementEventListener : this.managementEventListeners) {
             try {
                 m3uaManagementEventListener.onAspFactoryStopped(aspFactoryImpl);
             } catch (Throwable ee) {
@@ -880,25 +838,24 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         this.routeManagement.removeAllResources();
 
         // Unassign asp from as
-        FastMap<String, FastList<String>> lstAsAsp = new FastMap<String, FastList<String>>();
+        Map<String, List<String>> lstAsAsp = new HashMap<String, List<String>>();
 
         for (As as : this.appServers) {
             AsImpl asImpl = (AsImpl) as;
-            FastList<String> lstAsps = new FastList<String>();
+            List<String> lstAsps = new ArrayList<String>();
 
-            for (FastList.Node<Asp> n = asImpl.appServerProcs.head(), end = asImpl.appServerProcs.tail(); (n = n.getNext()) != end;) {
-                AspImpl aspImpl = (AspImpl) n.getValue();
+            for (Asp asp : asImpl.appServerProcs) {
+                AspImpl aspImpl = (AspImpl) asp;
                 lstAsps.add(aspImpl.getName());
             }
             lstAsAsp.put(asImpl.getName(), lstAsps);
         }
 
-        for (FastMap.Entry<String, FastList<String>> e = lstAsAsp.head(), end = lstAsAsp.tail(); (e = e.getNext()) != end;) {
-            String asName = e.getKey();
-            FastList<String> lstAsps = e.getValue();
+        for (Map.Entry<String, List<String>> entry : lstAsAsp.entrySet()) {
+            String asName = entry.getKey();
+            List<String> lstAsps = entry.getValue();
 
-            for (FastList.Node<String> n = lstAsps.head(), end1 = lstAsps.tail(); (n = n.getNext()) != end1;) {
-                String aspName = n.getValue();
+            for (String aspName : lstAsps) {
                 this.unassignAspFromAs(asName, aspName);
             }
 
@@ -925,9 +882,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         // We store the cleared state
         this.store();
 
-        for (FastList.Node<M3UAManagementEventListener> n = this.managementEventListeners.head(), end = this.managementEventListeners
-                .tail(); (n = n.getNext()) != end;) {
-            M3UAManagementEventListener m3uaManagementEventListener = n.getValue();
+        for (M3UAManagementEventListener m3uaManagementEventListener : this.managementEventListeners) {
             try {
                 m3uaManagementEventListener.onRemoveAllResources();
             } catch (Throwable ee) {
@@ -985,8 +940,8 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
     }
 
     private AspFactoryImpl getAspFactory(String aspName) {
-        for (FastList.Node<AspFactory> n = aspFactories.head(), end = aspFactories.tail(); (n = n.getNext()) != end;) {
-            AspFactoryImpl aspFactoryImpl = (AspFactoryImpl) n.getValue();
+        for (AspFactory aspFactory : aspFactories) {
+            AspFactoryImpl aspFactoryImpl = (AspFactoryImpl) aspFactory;
             if (aspFactoryImpl.getName().equals(aspName)) {
                 return aspFactoryImpl;
             }
@@ -1017,8 +972,8 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
             writer.write(this.routingKeyManagementEnabled, ROUTING_KEY_MANAGEMENT_ENABLED, Boolean.class);
             writer.write(this.isUseLsbForLinksetSelection(), USE_LSB_FOR_LINKSET_SELECTION, Boolean.class);
 
-            writer.write(aspFactories, ASP_FACTORY_LIST, FastList.class);
-            writer.write(appServers, AS_LIST, FastList.class);
+            writer.write(aspFactories, ASP_FACTORY_LIST, CopyOnWriteArrayList.class);
+            writer.write(appServers, AS_LIST, CopyOnWriteArrayList.class);
             writer.write(this.routeManagement.route, DPC_VS_AS_LIST, RouteMap.class);
 
             writer.close();
@@ -1112,15 +1067,15 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
             }
         }
 
-        aspFactories = reader.read(ASP_FACTORY_LIST, FastList.class);
-        appServers = reader.read(AS_LIST, FastList.class);
+        aspFactories = reader.read(ASP_FACTORY_LIST, CopyOnWriteArrayList.class);
+        appServers = reader.read(AS_LIST, CopyOnWriteArrayList.class);
         this.routeManagement.route = reader.read(DPC_VS_AS_LIST, RouteMap.class);
 
         this.routeManagement.reset();
 
         // Create Asp's and assign to each of the AS. Schedule the FSMs
-        for (FastList.Node<As> n = appServers.head(), end = appServers.tail(); (n = n.getNext()) != end;) {
-            AsImpl asImpl = (AsImpl) n.getValue();
+        for (As as : appServers) {
+            AsImpl asImpl = (AsImpl) as;
             asImpl.setM3UAManagement(this);
             FSM asLocalFSM = asImpl.getLocalFSM();
             m3uaScheduler.execute(asLocalFSM);
@@ -1129,14 +1084,14 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
             m3uaScheduler.execute(asPeerFSM);
 
             // All the Asp's for this As added in temp list
-            FastList<Asp> tempAsp = new FastList<Asp>();
+            List<Asp> tempAsp = new ArrayList<Asp>();
             tempAsp.addAll(asImpl.appServerProcs);
 
             // Clear Asp's from this As
             asImpl.appServerProcs.clear();
 
-            for (FastList.Node<Asp> n1 = tempAsp.head(), end1 = tempAsp.tail(); (n1 = n1.getNext()) != end1;) {
-                AspImpl aspImpl = (AspImpl) n1.getValue();
+            for (Asp asp : tempAsp) {
+                AspImpl aspImpl = (AspImpl) asp;
 
                 try {
                     // Now let the Asp's be created from respective
@@ -1149,8 +1104,8 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         }
 
         // Set the transportManagement
-        for (FastList.Node<AspFactory> n = aspFactories.head(), end = aspFactories.tail(); (n = n.getNext()) != end;) {
-            AspFactoryImpl factory = (AspFactoryImpl) n.getValue();
+        for (AspFactory aspFactory : aspFactories) {
+            AspFactoryImpl factory = (AspFactoryImpl) aspFactory;
             factory.setTransportManagement(this.transportManagement);
             factory.setM3UAManagement(this);
             try {
@@ -1192,7 +1147,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
     }
 
     protected void loadVer2(String fn) throws XMLStreamException, IOException{
-        XMLObjectReader reader = XMLObjectReader.newInstance(new FileInputStream(fn));
+        XMLObjectReader reader = XMLObjectWriter.newInstance(new FileInputStream(fn));
         reader.setBinding(binding);
         this.loadActualData(reader);
         reader.close();

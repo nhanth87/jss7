@@ -2,9 +2,9 @@
 package org.restcomm.protocols.ss7.m3ua.impl;
 
 import java.util.Arrays;
-
-import javolution.util.FastList;
-import javolution.util.FastSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.As;
@@ -59,7 +59,7 @@ public class M3UARouteManagement {
     /**
      * Persists DPC vs As's serving this DPC. Used for notifying M3UA-user of MTP3 primitive PAUSE, RESUME.
      */
-    private FastSet<RouteRow> routeTable = new FastSet<RouteRow>();
+    private final Set<RouteRow> routeTable = ConcurrentHashMap.newKeySet();
 
     private int count = 0;
 
@@ -136,16 +136,14 @@ public class M3UARouteManagement {
      * Reset the routeTable. Called after the persistence state of route is read from xml file.
      */
     protected void reset() {
-        for (RouteMap.Entry<String, RouteAsImpl> e = this.route.head(), end = this.route.tail(); (e = e.getNext()) != end;) {
-            String key = e.getKey();
-            RouteAsImpl routeAs = e.getValue();
+        for (RouteAsImpl routeAs : this.route.values()) {
             routeAs.setM3uaManagement(this.m3uaManagement);
             routeAs.reset();
 
             As[] asList = routeAs.getAsArray();
 
             try {
-                String[] keys = key.split(KEY_SEPARATOR);
+                String[] keys = routeAs.toString().split(KEY_SEPARATOR);
                 int dpc = Integer.parseInt(keys[0]);
                 for (count = 0; count < asList.length; count++) {
                     AsImpl asImpl = (AsImpl) asList[count];
@@ -154,7 +152,7 @@ public class M3UARouteManagement {
                     }
                 }
             } catch (Exception ex) {
-                logger.error(String.format("Error while adding key=%s to As list=%s", key, Arrays.toString(asList)));
+                logger.error(String.format("Error while adding key=%s to As list=%s", routeAs, Arrays.toString(asList)));
             }
         }
     }
@@ -170,10 +168,9 @@ public class M3UARouteManagement {
      */
     protected void addRoute(int dpc, int opc, int si, String asName, int traffmode) throws Exception {
         AsImpl asImpl = null;
-        for (FastList.Node<As> n = this.m3uaManagement.appServers.head(), end = this.m3uaManagement.appServers.tail(); (n = n
-                .getNext()) != end;) {
-            if (n.getValue().getName().compareTo(asName) == 0) {
-                asImpl = (AsImpl) n.getValue();
+        for (As as : this.m3uaManagement.appServers) {
+            if (as.getName().compareTo(asName) == 0) {
+                asImpl = (AsImpl) as;
                 break;
             }
         }
@@ -212,10 +209,9 @@ public class M3UARouteManagement {
      */
     protected void removeRoute(int dpc, int opc, int si, String asName) throws Exception {
         AsImpl asImpl = null;
-        for (FastList.Node<As> n = this.m3uaManagement.appServers.head(), end = this.m3uaManagement.appServers.tail(); (n = n
-                .getNext()) != end;) {
-            if (n.getValue().getName().compareTo(asName) == 0) {
-                asImpl = (AsImpl) n.getValue();
+        for (As as : this.m3uaManagement.appServers) {
+            if (as.getName().compareTo(asName) == 0) {
+                asImpl = (AsImpl) as;
                 break;
             }
         }
@@ -293,8 +289,7 @@ public class M3UARouteManagement {
 
     private void addAsToDPC(int dpc, AsImpl asImpl) {
         RouteRow row = null;
-        for (FastSet.Record r = routeTable.head(), end = routeTable.tail(); (r = r.getNext()) != end;) {
-            RouteRow value = routeTable.valueOf(r);
+        for (RouteRow value : routeTable) {
             if (value.getDpc() == dpc) {
                 row = value;
                 break;
@@ -315,21 +310,15 @@ public class M3UARouteManagement {
         // Now decide if we should remove As from RouteRow? If the same As is
         // assigned as route for different key combination we shouldn't remove
         // it from RouteRow
-        for (RouteMap.Entry<String, RouteAsImpl> e = this.route.head(), end = this.route.tail(); (e = e.getNext()) != end;) {
-            String key = e.getKey();
-            String[] keys = key.split(KEY_SEPARATOR);
-            if (keys[0].equals(Integer.toString(dpc))) {
-                RouteAsImpl asList = e.getValue();
-                if(asList.hasAs(asImpl)){
-                    return;
-                }
+        for (RouteAsImpl asList : this.route.values()) {
+            if(asList.hasAs(asImpl)){
+                return;
             }
         }
 
         // We reached here means time to remove this As from RouteRow.
         RouteRow row = null;
-        for (FastSet.Record r = routeTable.head(), end = routeTable.tail(); (r = r.getNext()) != end;) {
-            RouteRow value = routeTable.valueOf(r);
+        for (RouteRow value : routeTable) {
             if (value.getDpc() == dpc) {
                 row = value;
                 break;

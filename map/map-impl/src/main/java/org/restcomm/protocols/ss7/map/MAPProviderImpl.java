@@ -4,11 +4,10 @@ package org.restcomm.protocols.ss7.map;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javolution.util.FastList;
-import javolution.util.FastMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.asn.AsnException;
@@ -118,7 +117,7 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
     protected final transient Logger loger;
 
 
-    private transient Collection<MAPDialogListener> dialogListeners = new FastList<MAPDialogListener>().shared();
+    private transient Collection<MAPDialogListener> dialogListeners = new CopyOnWriteArrayList<MAPDialogListener>();
 
 //    protected transient FastMap<Long, MAPDialogImpl> dialogs = new FastMap<Long, MAPDialogImpl>().shared();
     protected transient ConcurrentHashMap<Long, MAPDialogImpl> dialogs = new ConcurrentHashMap<Long, MAPDialogImpl>();
@@ -2133,7 +2132,7 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
     }
 
     @Override
-    public FastMap<Integer, NetworkIdState> getNetworkIdStateList() {
+    public Map<Integer, NetworkIdState> getNetworkIdStateList() {
         return this.tcapProvider.getNetworkIdStateList();
     }
 

@@ -3,7 +3,7 @@ package org.restcomm.protocols.ss7.m3ua.impl;
 
 import static org.testng.Assert.assertEquals;
 
-import javolution.util.FastList;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.api.IpChannelType;

@@ -1,12 +1,12 @@
 
 package org.restcomm.protocols.ss7.sccp.impl.router;
 
-import javolution.util.FastMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 /**
  * @author abhayani
  *
  */
-public class Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> extends FastMap<Integer, Mtp3ServiceAccessPoint> {
+public class Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> extends NonBlockingHashMap<Integer, Mtp3ServiceAccessPoint> {
 
 }

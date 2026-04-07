@@ -1,8 +1,7 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl;
 
-import javolution.util.FastList;
-import javolution.util.FastSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.Asp;
@@ -51,9 +50,8 @@ public class THLocalAsInactToAct implements TransitionHandler {
                 lbCount = this.asImpl.getMinAspActiveForLb();
 
                 // Find out how many ASP's are ACTIVE now
-                for (FastList.Node<Asp> n = this.asImpl.appServerProcs.head(), end = this.asImpl.appServerProcs.tail(); (n = n
-                        .getNext()) != end;) {
-                    AspImpl remAspImpl = (AspImpl) n.getValue();
+                for (Asp asp : this.asImpl.appServerProcs) {
+                    AspImpl remAspImpl = (AspImpl) asp;
                     FSM aspPeerFSM = remAspImpl.getPeerFSM();
                     AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
 
@@ -73,9 +71,8 @@ public class THLocalAsInactToAct implements TransitionHandler {
             if (asImpl.getFunctionality() != Functionality.IPSP) {
                 // Send Notify only for ASP or SGW
 
-                for (FastList.Node<Asp> n = this.asImpl.appServerProcs.head(), end = this.asImpl.appServerProcs.tail(); (n = n
-                        .getNext()) != end;) {
-                    AspImpl remAspImpl = (AspImpl) n.getValue();
+                for (Asp asp : this.asImpl.appServerProcs) {
+                    AspImpl remAspImpl = (AspImpl) asp;
 
                     FSM aspPeerFSM = remAspImpl.getPeerFSM();
                     AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
@@ -89,9 +86,8 @@ public class THLocalAsInactToAct implements TransitionHandler {
 
             // We want to pass MTP3 RESUME only for SE. If its DE the peer transition handler will take care of MTP3 RESUME
             if (asImpl.getExchangeType() == ExchangeType.SE) {
-                FastSet<AsStateListener> asStateListeners = this.asImpl.getAsStateListeners();
-                for (FastSet.Record r = asStateListeners.head(), end = asStateListeners.tail(); (r = r.getNext()) != end;) {
-                    AsStateListener asAsStateListener = asStateListeners.valueOf(r);
+                Set<AsStateListener> asStateListeners = this.asImpl.getAsStateListeners();
+                for (AsStateListener asAsStateListener : asStateListeners) {
                     try {
                         asAsStateListener.onAsActive(this.asImpl);
                     } catch (Exception e) {

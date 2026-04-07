@@ -2,8 +2,7 @@
 package org.restcomm.protocols.ss7.statistics;
 
 import java.util.Date;
-
-import javolution.util.FastMap;
+import java.util.Map;
 
 import org.restcomm.protocols.ss7.statistics.api.LongValue;
 import org.restcomm.protocols.ss7.statistics.api.StatResult;
@@ -42,7 +41,7 @@ public abstract class StatDataCollectorLongImpl extends StatDataCollectorAbstrac
         }
 
         @Override
-        public FastMap<String, LongValue> getStringLongValue() {
+        public Map<String, LongValue> getStringLongValue() {
             return null;
         }
 

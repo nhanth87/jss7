@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javolution.text.TextBuilder;
-import javolution.util.FastMap;
+import java.util.Map;
 import javolution.xml.XMLBinding;
 import javolution.xml.XMLObjectReader;
 import javolution.xml.XMLObjectWriter;
@@ -174,7 +174,7 @@ public class SccpResourceImpl implements SccpResource {
     }
 
     public RemoteSubSystem getRemoteSsn(int spc, int remoteSsn) {
-        for (FastMap.Entry<Integer, RemoteSubSystem> e = this.remoteSsns.head(), end = this.remoteSsns.tail(); (e = e.getNext()) != end; ) {
+        for (Map.Entry<Integer, RemoteSubSystem> e : this.remoteSsns.entrySet()) {
             RemoteSubSystem remoteSubSystem = e.getValue();
             if (remoteSubSystem.getRemoteSpc() == spc && remoteSsn == remoteSubSystem.getRemoteSsn()) {
                 return remoteSubSystem;
@@ -496,9 +496,9 @@ public class SccpResourceImpl implements SccpResource {
             XMLBinding binding2 = new XMLBinding();
             binding2.setClassAttribute(CLASS_ATTRIBUTE);
 
-            FastMap<Integer, RemoteSubSystem> remoteSsnsX = reader.read(REMOTE_SSN_V1, FastMap.class);
-            FastMap<Integer, RemoteSignalingPointCode> remoteSpcsX = reader.read(REMOTE_SPC_V1, FastMap.class);
-            FastMap<Integer, ConcernedSignalingPointCode> concernedSpcsX = reader.read(CONCERNED_SPC_V1, FastMap.class);
+            RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsnsX = reader.read(REMOTE_SSN_V1, RemoteSubSystemMap.class);
+            RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcsX = reader.read(REMOTE_SPC_V1, RemoteSignalingPointCodeMap.class);
+            ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode> concernedSpcsX = reader.read(CONCERNED_SPC_V1, ConcernedSignalingPointCodeMap.class);
 
             reader.close();
 

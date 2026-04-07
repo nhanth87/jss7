@@ -4,7 +4,7 @@ package org.restcomm.protocols.ss7.isup.impl;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import javolution.util.ReentrantLock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.restcomm.protocols.ss7.isup.ISUPEvent;
 import org.restcomm.protocols.ss7.isup.ISUPTimeoutEvent;

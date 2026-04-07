@@ -3,7 +3,8 @@ package org.restcomm.protocols.ss7.sccpext.impl;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import javolution.util.FastMap;
+import java.util.Map;
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.indicator.RoutingIndicator;
@@ -428,15 +429,15 @@ public class SccpExtModuleImpl implements SccpExtModule {
 
     @Override
     public void onAllowRsp(int affectedPc, RemoteSccpStatus remoteSccpStatus) {
-        FastMap<Integer, NetworkIdState> lst = routerExt.getNetworkIdList(affectedPc);
-        FastMap<Integer, SccpListener> listeners = this.sccpProviderImpl.getAllSccpListeners();
-        for (FastMap.Entry<Integer, SccpListener> e1 = listeners.head(), end1 = listeners.tail(); (e1 = e1.getNext()) != end1;) {
+        NonBlockingHashMap<Integer, NetworkIdState> lst = routerExt.getNetworkIdList(affectedPc);
+        NonBlockingHashMap<Integer, SccpListener> listeners = this.sccpProviderImpl.getAllSccpListeners();
+        for (Map.Entry<Integer, SccpListener> e1 : listeners.entrySet()) {
             try {
                 e1.getValue().onPcState(affectedPc, SignallingPointStatus.ACCESSIBLE, 0, remoteSccpStatus);
             } catch (Exception ee) {
                 logger.error("Exception while invoking onPcState", ee);
             }
-            for (FastMap.Entry<Integer, NetworkIdState> e2 = lst.head(), end2 = lst.tail(); (e2 = e2.getNext()) != end2;) {
+            for (Map.Entry<Integer, NetworkIdState> e2 : lst.entrySet()) {
                 try {
                     e1.getValue().onNetworkIdState(e2.getKey(), e2.getValue());
                 } catch (Exception ee) {
@@ -448,9 +449,9 @@ public class SccpExtModuleImpl implements SccpExtModule {
 
     @Override
     public void onProhibitRsp(int affectedPc, RemoteSccpStatus remoteSccpStatus, RemoteSignalingPointCodeImpl remoteSpc) {
-        FastMap<Integer, NetworkIdState> lst = routerExt.getNetworkIdList(affectedPc);
-        FastMap<Integer, SccpListener> listeners = this.sccpProviderImpl.getAllSccpListeners();
-        for (FastMap.Entry<Integer, SccpListener> e1 = listeners.head(), end1 = listeners.tail(); (e1 = e1.getNext()) != end1;) {
+        NonBlockingHashMap<Integer, NetworkIdState> lst = routerExt.getNetworkIdList(affectedPc);
+        NonBlockingHashMap<Integer, SccpListener> listeners = this.sccpProviderImpl.getAllSccpListeners();
+        for (Map.Entry<Integer, SccpListener> e1 : listeners.entrySet()) {
             try {
                 e1.getValue().onPcState(
                         affectedPc,
@@ -459,7 +460,7 @@ public class SccpExtModuleImpl implements SccpExtModule {
             } catch (Exception ee) {
                 logger.error("Exception while invoking onPcState", ee);
             }
-            for (FastMap.Entry<Integer, NetworkIdState> e2 = lst.head(), end2 = lst.tail(); (e2 = e2.getNext()) != end2;) {
+            for (Map.Entry<Integer, NetworkIdState> e2 : lst.entrySet()) {
                 try {
                     e1.getValue().onNetworkIdState(e2.getKey(), e2.getValue());
                 } catch (Exception ee) {
@@ -473,9 +474,9 @@ public class SccpExtModuleImpl implements SccpExtModule {
     public void onRestrictionLevelChange(int affectedPc, int restrictionLevel, boolean levelEncreased) {
         int congLevel = SccpCongestionControl.generateSccpUserCongLevel(restrictionLevel);
 
-        FastMap<Integer, NetworkIdState> lst = routerExt.getNetworkIdList(affectedPc);
-        FastMap<Integer, SccpListener> listeners = this.sccpProviderImpl.getAllSccpListeners();
-        for (FastMap.Entry<Integer, SccpListener> e1 = listeners.head(), end1 = listeners.tail(); (e1 = e1.getNext()) != end1;) {
+        NonBlockingHashMap<Integer, NetworkIdState> lst = routerExt.getNetworkIdList(affectedPc);
+        NonBlockingHashMap<Integer, SccpListener> listeners = this.sccpProviderImpl.getAllSccpListeners();
+        for (Map.Entry<Integer, SccpListener> e1 : listeners.entrySet()) {
             try {
                 e1.getValue().onPcState(affectedPc,
                         levelEncreased ? SignallingPointStatus.CONGESTED : SignallingPointStatus.CONGESTION_REDUCED, congLevel,
@@ -483,7 +484,7 @@ public class SccpExtModuleImpl implements SccpExtModule {
             } catch (Exception ee) {
                 logger.error("Exception while invoking onPcState", ee);
             }
-            for (FastMap.Entry<Integer, NetworkIdState> e2 = lst.head(), end2 = lst.tail(); (e2 = e2.getNext()) != end2;) {
+            for (Map.Entry<Integer, NetworkIdState> e2 : lst.entrySet()) {
                 try {
                     e1.getValue().onNetworkIdState(e2.getKey(), e2.getValue());
                 } catch (Exception ee) {
@@ -494,7 +495,7 @@ public class SccpExtModuleImpl implements SccpExtModule {
     }
 
     @Override
-    public FastMap<Integer, NetworkIdState> getNetworkIdList(int affectedPc) {
+    public NonBlockingHashMap<Integer, NetworkIdState> getNetworkIdList(int affectedPc) {
         return this.routerExt.getNetworkIdList(affectedPc);
     }
 

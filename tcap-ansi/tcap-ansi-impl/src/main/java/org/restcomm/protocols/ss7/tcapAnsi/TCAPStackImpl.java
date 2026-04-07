@@ -8,7 +8,7 @@ import java.io.FileOutputStream;
 import java.util.List;
 
 import javolution.text.TextBuilder;
-import javolution.util.FastList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javolution.xml.XMLBinding;
 import javolution.xml.XMLObjectReader;
 import javolution.xml.XMLObjectWriter;
@@ -92,7 +92,7 @@ public class TCAPStackImpl implements TCAPStack {
     private long dialogIdRangeStart = 1;
     private long dialogIdRangeEnd = Integer.MAX_VALUE;
     private boolean previewMode = false;
-    private List<Integer> extraSsns = new FastList<Integer>();
+    private List<Integer> extraSsns = new CopyOnWriteArrayList<Integer>();
     private boolean statisticsEnabled = false;
 
     // if true incoming TCAP messages will be blocked (depending on congestion level, from level 2 - new incoming dialogs are
@@ -375,7 +375,7 @@ public class TCAPStackImpl implements TCAPStack {
 
         if (extraSsnsNew != null) {
             synchronized (this) {
-                List<Integer> extraSsnsTemp = new FastList<Integer>();
+                List<Integer> extraSsnsTemp = new CopyOnWriteArrayList<Integer>();
                 extraSsnsTemp.addAll(extraSsnsNew);
                 this.extraSsns = extraSsnsTemp;
             }
