@@ -6,6 +6,7 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
 import javax.naming.NamingException;
@@ -23,14 +24,12 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import javolution.util.FastList;
-
 public class CliTest {
     private static final String SERVER_ADDRESS = "127.0.0.1";
     private static final int SERVER_PORT = 5522;
 
     private Scheduler scheduler = new Scheduler();
-    private List<ShellExecutor> shellExecutors = new FastList<ShellExecutor>();
+    private List<ShellExecutor> shellExecutors = new CopyOnWriteArrayList<ShellExecutor>();
     private MessageFactory messageFactory = ChannelProvider.provider().createMessageFactory();
     private ShellServer shellServer;
 

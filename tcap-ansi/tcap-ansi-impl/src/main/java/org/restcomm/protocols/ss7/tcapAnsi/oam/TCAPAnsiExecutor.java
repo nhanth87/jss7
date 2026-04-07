@@ -197,8 +197,7 @@ public class TCAPAnsiExecutor implements ShellExecutor {
 
             StringBuilder sb = new StringBuilder();
 
-            for (FastMap.Entry<String, TCAPStackImpl> e = this.tcapStacks.head(), end = this.tcapStacks.tail(); (e = e
-                    .getNext()) != end;) {
+            for (Map.Entry<String, TCAPStackImpl> e : this.tcapStacks.entrySet()) {
                 TCAPStackImpl tcapStackImpl = e.getValue();
                 String tcapStackname = e.getKey();
 

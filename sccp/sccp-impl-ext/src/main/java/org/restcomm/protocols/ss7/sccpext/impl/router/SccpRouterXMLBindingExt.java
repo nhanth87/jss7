@@ -38,7 +38,7 @@ public class SccpRouterXMLBindingExt extends XMLBinding {
 
         @Override
         public void write(RuleMap obj, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            for (Map.Entry<Integer, RuleImpl> e : obj.entrySet()) {
+            for (@SuppressWarnings("unchecked") Map.Entry<Integer, RuleImpl> e : (java.util.Set<Map.Entry<Integer, RuleImpl>>) obj.entrySet()) {
                 Integer id = e.getKey();
                 RuleImpl rule = e.getValue();
 
@@ -62,7 +62,7 @@ public class SccpRouterXMLBindingExt extends XMLBinding {
 
         @Override
         public void write(SccpAddressMap obj, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            for (Map.Entry<Integer, SccpAddress> e : obj.entrySet()) {
+            for (@SuppressWarnings("unchecked") Map.Entry<Integer, SccpAddress> e : (java.util.Set<Map.Entry<Integer, SccpAddress>>) obj.entrySet()) {
                 Integer id = e.getKey();
                 SccpAddress sccpAddress = e.getValue();
 

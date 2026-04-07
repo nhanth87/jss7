@@ -1,4 +1,4 @@
-﻿package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
+package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;

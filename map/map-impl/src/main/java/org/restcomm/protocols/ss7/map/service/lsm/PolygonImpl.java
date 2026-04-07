@@ -1,4 +1,4 @@
-﻿package org.restcomm.protocols.ss7.map.service.lsm;
+package org.restcomm.protocols.ss7.map.service.lsm;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;

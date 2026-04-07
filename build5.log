@@ -1,0 +1,1290 @@
+[INFO] Scanning for projects...
+[INFO] Inspecting build with total of 19 modules...
+[INFO] Not installing Nexus Staging features:
+[INFO]  * Preexisting staging related goal bindings found in 19 modules.
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] RestComm jSS7 :: ss7-parent                                        [pom]
+[INFO] Restcomm jSS7 :: Scheduler :: scheduler                            [jar]
+[INFO] Restcomm jSS7 :: Congestion :: congestion                          [jar]
+[INFO] Restcomm jSS7 :: Statistics :: Parent :: statistics-parent         [pom]
+[INFO] Restcomm jSS7 :: Statistics :: Api :: statistics-api               [jar]
+[INFO] Restcomm jSS7 :: Statistics :: Impl :: statistics-impl             [jar]
+[INFO] Restcomm jSS7 :: management                                        [pom]
+[INFO] Restcomm jSS7 :: Management :: shell-server-api                    [jar]
+[INFO] Restcomm jSS7 :: SS7-Ext :: Parent :: ss7-ext-parent               [pom]
+[INFO] Restcomm jSS7 :: SS7-Ext :: API :: ss7-ext-api                     [jar]
+[INFO] Restcomm jSS7 :: MTP :: Parent :: mtp-parent                       [pom]
+[INFO] Restcomm jSS7 :: MTP :: Impl :: mtp-api                            [jar]
+[INFO] Restcomm jSS7 :: MTP :: Impl :: mtp                                [jar]
+[INFO] Restcomm jSS7 :: M3UA :: Parent :: m3ua                            [pom]
+[INFO] Restcomm jSS7 :: M3UA :: Api :: m3ua-api                           [jar]
+[INFO] Restcomm jSS7 :: M3UA :: Impl :: m3ua-impl                         [jar]
+[INFO] Restcomm jSS7 :: SCCP :: Parent :: sccp-parent                     [pom]
+[INFO] Restcomm jSS7 :: SCCP :: Api :: sccp-api                           [jar]
+[INFO] Restcomm jSS7 :: SCCP :: Impl :: sccp-impl                         [jar]
+[INFO] 
+[INFO] ---------------< org.restcomm.protocols.ss7:ss7-parent >----------------
+[INFO] Building RestComm jSS7 :: ss7-parent 9.2.0                        [1/19]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ ss7-parent ---
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ ss7-parent ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ ss7-parent ---
+[WARNING] Ignoring project type pom - supportedProjectTypes = [jar, bundle, war]
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ ss7-parent ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\ss7-parent\9.2.0\ss7-parent-9.2.0.pom
+[INFO] 
+[INFO] -----------< org.restcomm.protocols.ss7.scheduler:scheduler >-----------
+[INFO] Building Restcomm jSS7 :: Scheduler :: scheduler 9.2.0            [2/19]
+[INFO]   from scheduler\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ scheduler ---
+[INFO] Deleting C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\scheduler\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ scheduler ---
+[INFO] skip non existing resourceDirectory C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\scheduler\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ scheduler ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 9 source files to C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\scheduler\target\classes
+[INFO] /C:/Users/Windows/Desktop/ethiopia-working-dir/jSS7/scheduler/src/main/java/org/restcomm/protocols/ss7/scheduler/ConcurrentLinkedList.java: Some input files use unchecked or unsafe operations.
+[INFO] /C:/Users/Windows/Desktop/ethiopia-working-dir/jSS7/scheduler/src/main/java/org/restcomm/protocols/ss7/scheduler/ConcurrentLinkedList.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ scheduler ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ scheduler ---
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ scheduler ---
+[INFO] Not copying test resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ scheduler ---
+[INFO] Not compiling test sources
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ scheduler ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:2.3.1:jar (default-jar) @ scheduler ---
+[INFO] Building jar: C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\scheduler\target\restcomm-scheduler-9.2.0.jar
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ scheduler ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\scheduler\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\scheduler\scheduler\9.2.0\scheduler-9.2.0.pom
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\scheduler\target\restcomm-scheduler-9.2.0.jar to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\scheduler\scheduler\9.2.0\scheduler-9.2.0.jar
+[INFO] 
+[INFO] ----------< org.restcomm.protocols.ss7.congestion:congestion >----------
+[INFO] Building Restcomm jSS7 :: Congestion :: congestion 9.2.0          [3/19]
+[INFO]   from congestion\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ congestion ---
+[INFO] Deleting C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\congestion\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ congestion ---
+[INFO] skip non existing resourceDirectory C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\congestion\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ congestion ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 9 source files to C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\congestion\target\classes
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ congestion ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ congestion ---
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ congestion ---
+[INFO] Not copying test resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ congestion ---
+[INFO] Not compiling test sources
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ congestion ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:2.3.1:jar (default-jar) @ congestion ---
+[INFO] Building jar: C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\congestion\target\restcomm-congestion-9.2.0.jar
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ congestion ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\congestion\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\congestion\congestion\9.2.0\congestion-9.2.0.pom
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\congestion\target\restcomm-congestion-9.2.0.jar to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\congestion\congestion\9.2.0\congestion-9.2.0.jar
+[INFO] 
+[INFO] ------< org.restcomm.protocols.ss7.statistics:statistics-parent >-------
+[INFO] Building Restcomm jSS7 :: Statistics :: Parent :: statistics-parent 9.2.0 [4/19]
+[INFO]   from statistics\pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ statistics-parent ---
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ statistics-parent ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ statistics-parent ---
+[WARNING] Ignoring project type pom - supportedProjectTypes = [jar, bundle, war]
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ statistics-parent ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\statistics\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\statistics\statistics-parent\9.2.0\statistics-parent-9.2.0.pom
+[INFO] 
+[INFO] --------< org.restcomm.protocols.ss7.statistics:statistics-api >--------
+[INFO] Building Restcomm jSS7 :: Statistics :: Api :: statistics-api 9.2.0 [5/19]
+[INFO]   from statistics\api\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ statistics-api ---
+[INFO] Deleting C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\statistics\api\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ statistics-api ---
+[INFO] skip non existing resourceDirectory C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\statistics\api\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ statistics-api ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 5 source files to C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\statistics\api\target\classes
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ statistics-api ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ statistics-api ---
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ statistics-api ---
+[INFO] Not copying test resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ statistics-api ---
+[INFO] Not compiling test sources
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ statistics-api ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:2.3.1:jar (default-jar) @ statistics-api ---
+[INFO] Building jar: C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\statistics\api\target\restcomm-statistics-9.2.0.jar
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ statistics-api ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\statistics\api\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\statistics\statistics-api\9.2.0\statistics-api-9.2.0.pom
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\statistics\api\target\restcomm-statistics-9.2.0.jar to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\statistics\statistics-api\9.2.0\statistics-api-9.2.0.jar
+[INFO] 
+[INFO] -------< org.restcomm.protocols.ss7.statistics:statistics-impl >--------
+[INFO] Building Restcomm jSS7 :: Statistics :: Impl :: statistics-impl 9.2.0 [6/19]
+[INFO]   from statistics\impl\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ statistics-impl ---
+[INFO] Deleting C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\statistics\impl\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ statistics-impl ---
+[INFO] skip non existing resourceDirectory C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\statistics\impl\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ statistics-impl ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 8 source files to C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\statistics\impl\target\classes
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ statistics-impl ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ statistics-impl ---
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ statistics-impl ---
+[INFO] Not copying test resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ statistics-impl ---
+[INFO] Not compiling test sources
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ statistics-impl ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:2.3.1:jar (default-jar) @ statistics-impl ---
+[INFO] Building jar: C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\statistics\impl\target\restcomm-statistics-9.2.0.jar
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ statistics-impl ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\statistics\impl\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\statistics\statistics-impl\9.2.0\statistics-impl-9.2.0.pom
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\statistics\impl\target\restcomm-statistics-9.2.0.jar to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\statistics\statistics-impl\9.2.0\statistics-impl-9.2.0.jar
+[INFO] 
+[INFO] ----------< org.restcomm.protocols.ss7.management:management >----------
+[INFO] Building Restcomm jSS7 :: management 9.2.0                        [7/19]
+[INFO]   from management\pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ management ---
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ management ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ management ---
+[WARNING] Ignoring project type pom - supportedProjectTypes = [jar, bundle, war]
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ management ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\management\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\management\management\9.2.0\management-9.2.0.pom
+[INFO] 
+[INFO] -------< org.restcomm.protocols.ss7.management:shell-server-api >-------
+[INFO] Building Restcomm jSS7 :: Management :: shell-server-api 9.2.0    [8/19]
+[INFO]   from management\shell-server-api\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ shell-server-api ---
+[INFO] Deleting C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\management\shell-server-api\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ shell-server-api ---
+[INFO] skip non existing resourceDirectory C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\management\shell-server-api\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ shell-server-api ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 1 source file to C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\management\shell-server-api\target\classes
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ shell-server-api ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ shell-server-api ---
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ shell-server-api ---
+[INFO] Not copying test resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ shell-server-api ---
+[INFO] Not compiling test sources
+[INFO] 
+[INFO] --- surefire:2.19.1:test (default-test) @ shell-server-api ---
+[WARNING]  Parameter 'systemProperties' is deprecated: Use systemPropertyVariables instead.
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:2.3.1:jar (default-jar) @ shell-server-api ---
+[INFO] Building jar: C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\management\shell-server-api\target\shell-server-api-9.2.0.jar
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ shell-server-api ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\management\shell-server-api\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\management\shell-server-api\9.2.0\shell-server-api-9.2.0.pom
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\management\shell-server-api\target\shell-server-api-9.2.0.jar to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\management\shell-server-api\9.2.0\shell-server-api-9.2.0.jar
+[INFO] 
+[INFO] ----------< org.restcomm.protocols.ss7.ss7ext:ss7-ext-parent >----------
+[INFO] Building Restcomm jSS7 :: SS7-Ext :: Parent :: ss7-ext-parent 9.2.0 [9/19]
+[INFO]   from ss7-ext\pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ ss7-ext-parent ---
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ ss7-ext-parent ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ ss7-ext-parent ---
+[WARNING] Ignoring project type pom - supportedProjectTypes = [jar, bundle, war]
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ ss7-ext-parent ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\ss7-ext\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\ss7ext\ss7-ext-parent\9.2.0\ss7-ext-parent-9.2.0.pom
+[INFO] 
+[INFO] -----------< org.restcomm.protocols.ss7.ss7ext:ss7-ext-api >------------
+[INFO] Building Restcomm jSS7 :: SS7-Ext :: API :: ss7-ext-api 9.2.0    [10/19]
+[INFO]   from ss7-ext\ss7-ext-api\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ ss7-ext-api ---
+[INFO] Deleting C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\ss7-ext\ss7-ext-api\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ ss7-ext-api ---
+[INFO] skip non existing resourceDirectory C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\ss7-ext\ss7-ext-api\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ ss7-ext-api ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 3 source files to C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\ss7-ext\ss7-ext-api\target\classes
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ ss7-ext-api ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ ss7-ext-api ---
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ ss7-ext-api ---
+[INFO] Not copying test resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ ss7-ext-api ---
+[INFO] Not compiling test sources
+[INFO] 
+[INFO] --- surefire:2.19.1:test (default-test) @ ss7-ext-api ---
+[WARNING]  Parameter 'systemProperties' is deprecated: Use systemPropertyVariables instead.
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:2.3.1:jar (default-jar) @ ss7-ext-api ---
+[INFO] Building jar: C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\ss7-ext\ss7-ext-api\target\ss7-ext-api-9.2.0.jar
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ ss7-ext-api ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\ss7-ext\ss7-ext-api\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\ss7ext\ss7-ext-api\9.2.0\ss7-ext-api-9.2.0.pom
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\ss7-ext\ss7-ext-api\target\ss7-ext-api-9.2.0.jar to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\ss7ext\ss7-ext-api\9.2.0\ss7-ext-api-9.2.0.jar
+[INFO] 
+[INFO] -------------< org.restcomm.protocols.ss7.mtp:mtp-parent >--------------
+[INFO] Building Restcomm jSS7 :: MTP :: Parent :: mtp-parent 9.2.0      [11/19]
+[INFO]   from mtp\pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ mtp-parent ---
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ mtp-parent ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ mtp-parent ---
+[WARNING] Ignoring project type pom - supportedProjectTypes = [jar, bundle, war]
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ mtp-parent ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\mtp\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\mtp\mtp-parent\9.2.0\mtp-parent-9.2.0.pom
+[INFO] 
+[INFO] ---------------< org.restcomm.protocols.ss7.mtp:mtp-api >---------------
+[INFO] Building Restcomm jSS7 :: MTP :: Impl :: mtp-api 9.2.0           [12/19]
+[INFO]   from mtp\mtp-api\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ mtp-api ---
+[INFO] Deleting C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\mtp\mtp-api\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ mtp-api ---
+[INFO] skip non existing resourceDirectory C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\mtp\mtp-api\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ mtp-api ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 11 source files to C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\mtp\mtp-api\target\classes
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ mtp-api ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ mtp-api ---
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ mtp-api ---
+[INFO] Not copying test resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ mtp-api ---
+[INFO] Not compiling test sources
+[INFO] 
+[INFO] --- surefire:2.19.1:test (default-test) @ mtp-api ---
+[WARNING]  Parameter 'systemProperties' is deprecated: Use systemPropertyVariables instead.
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:2.3.1:jar (default-jar) @ mtp-api ---
+[INFO] Building jar: C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\mtp\mtp-api\target\mtp-api-9.2.0.jar
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ mtp-api ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\mtp\mtp-api\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\mtp\mtp-api\9.2.0\mtp-api-9.2.0.pom
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\mtp\mtp-api\target\mtp-api-9.2.0.jar to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\mtp\mtp-api\9.2.0\mtp-api-9.2.0.jar
+[INFO] 
+[INFO] -----------------< org.restcomm.protocols.ss7.mtp:mtp >-----------------
+[INFO] Building Restcomm jSS7 :: MTP :: Impl :: mtp 9.2.0               [13/19]
+[INFO]   from mtp\mtp-impl\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ mtp ---
+[INFO] Deleting C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\mtp\mtp-impl\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ mtp ---
+[INFO] skip non existing resourceDirectory C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\mtp\mtp-impl\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ mtp ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 15 source files to C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\mtp\mtp-impl\target\classes
+[INFO] /C:/Users/Windows/Desktop/ethiopia-working-dir/jSS7/mtp/mtp-impl/src/main/java/org/restcomm/protocols/ss7/mtp/TxQueue.java: Some input files use unchecked or unsafe operations.
+[INFO] /C:/Users/Windows/Desktop/ethiopia-working-dir/jSS7/mtp/mtp-impl/src/main/java/org/restcomm/protocols/ss7/mtp/TxQueue.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ mtp ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ mtp ---
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ mtp ---
+[INFO] Not copying test resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ mtp ---
+[INFO] Not compiling test sources
+[INFO] 
+[INFO] --- surefire:2.19.1:test (default-test) @ mtp ---
+[WARNING]  Parameter 'systemProperties' is deprecated: Use systemPropertyVariables instead.
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:2.3.1:jar (default-jar) @ mtp ---
+[INFO] Building jar: C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\mtp\mtp-impl\target\mtp-9.2.0.jar
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ mtp ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\mtp\mtp-impl\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\mtp\mtp\9.2.0\mtp-9.2.0.pom
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\mtp\mtp-impl\target\mtp-9.2.0.jar to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\mtp\mtp\9.2.0\mtp-9.2.0.jar
+[INFO] 
+[INFO] ----------------< org.restcomm.protocols.ss7.m3ua:m3ua >----------------
+[INFO] Building Restcomm jSS7 :: M3UA :: Parent :: m3ua 9.2.0           [14/19]
+[INFO]   from m3ua\pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ m3ua ---
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ m3ua ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ m3ua ---
+[WARNING] Ignoring project type pom - supportedProjectTypes = [jar, bundle, war]
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ m3ua ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\m3ua\m3ua\9.2.0\m3ua-9.2.0.pom
+[INFO] 
+[INFO] --------------< org.restcomm.protocols.ss7.m3ua:m3ua-api >--------------
+[INFO] Building Restcomm jSS7 :: M3UA :: Api :: m3ua-api 9.2.0          [15/19]
+[INFO]   from m3ua\api\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ m3ua-api ---
+[INFO] Deleting C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\api\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ m3ua-api ---
+[INFO] skip non existing resourceDirectory C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\api\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ m3ua-api ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 65 source files to C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\api\target\classes
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ m3ua-api ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ m3ua-api ---
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ m3ua-api ---
+[INFO] Not copying test resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ m3ua-api ---
+[INFO] Not compiling test sources
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ m3ua-api ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:2.3.1:jar (default-jar) @ m3ua-api ---
+[INFO] Building jar: C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\api\target\m3ua-api-9.2.0.jar
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ m3ua-api ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\api\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\m3ua\m3ua-api\9.2.0\m3ua-api-9.2.0.pom
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\api\target\m3ua-api-9.2.0.jar to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\m3ua\m3ua-api\9.2.0\m3ua-api-9.2.0.jar
+[INFO] 
+[INFO] -------------< org.restcomm.protocols.ss7.m3ua:m3ua-impl >--------------
+[INFO] Building Restcomm jSS7 :: M3UA :: Impl :: m3ua-impl 9.2.0        [16/19]
+[INFO]   from m3ua\impl\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ m3ua-impl ---
+[INFO] Deleting C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ m3ua-impl ---
+[INFO] skip non existing resourceDirectory C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ m3ua-impl ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 135 source files to C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\target\classes
+[INFO] /C:/Users/Windows/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/src/main/java/org/restcomm/protocols/ss7/m3ua/impl/M3UAManagementImpl.java: Some input files use or override a deprecated API.
+[INFO] /C:/Users/Windows/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/src/main/java/org/restcomm/protocols/ss7/m3ua/impl/M3UAManagementImpl.java: Recompile with -Xlint:deprecation for details.
+[INFO] /C:/Users/Windows/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/src/main/java/org/restcomm/protocols/ss7/m3ua/impl/AsImpl.java: Some input files use unchecked or unsafe operations.
+[INFO] /C:/Users/Windows/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/src/main/java/org/restcomm/protocols/ss7/m3ua/impl/AsImpl.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ m3ua-impl ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ m3ua-impl ---
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ m3ua-impl ---
+[INFO] Not copying test resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ m3ua-impl ---
+[INFO] Not compiling test sources
+[INFO] 
+[INFO] --- surefire:2.19.1:test (default-test) @ m3ua-impl ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:2.3.1:jar (default-jar) @ m3ua-impl ---
+[INFO] Building jar: C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\target\m3ua-impl-9.2.0.jar
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ m3ua-impl ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\m3ua\m3ua-impl\9.2.0\m3ua-impl-9.2.0.pom
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\target\m3ua-impl-9.2.0.jar to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\m3ua\m3ua-impl\9.2.0\m3ua-impl-9.2.0.jar
+[INFO] 
+[INFO] ------------< org.restcomm.protocols.ss7.sccp:sccp-parent >-------------
+[INFO] Building Restcomm jSS7 :: SCCP :: Parent :: sccp-parent 9.2.0    [17/19]
+[INFO]   from sccp\pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ sccp-parent ---
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ sccp-parent ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ sccp-parent ---
+[WARNING] Ignoring project type pom - supportedProjectTypes = [jar, bundle, war]
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ sccp-parent ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\sccp\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\sccp\sccp-parent\9.2.0\sccp-parent-9.2.0.pom
+[INFO] 
+[INFO] --------------< org.restcomm.protocols.ss7.sccp:sccp-api >--------------
+[INFO] Building Restcomm jSS7 :: SCCP :: Api :: sccp-api 9.2.0          [18/19]
+[INFO]   from sccp\sccp-api\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ sccp-api ---
+[INFO] Deleting C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\sccp\sccp-api\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ sccp-api ---
+[INFO] skip non existing resourceDirectory C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\sccp\sccp-api\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ sccp-api ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 80 source files to C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\sccp\sccp-api\target\classes
+[INFO] 
+[INFO] --- checkstyle:2.9.1:checkstyle (check-style) @ sccp-api ---
+[WARNING]  Parameter 'headerFile' (user property 'basedir'/LICENSE.txt) is deprecated: Use headerLocation instead.
+[INFO] 
+[INFO] --- bundle:2.3.4:manifest (bundle-manifest) @ sccp-api ---
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+java.lang.ArrayIndexOutOfBoundsException: Index 18 out of bounds for length 13
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:412)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:333)
+	at aQute.lib.osgi.Clazz.parseClassFileWithCollector(Clazz.java:323)
+	at aQute.lib.osgi.Clazz.parseClassFile(Clazz.java:313)
+	at aQute.lib.osgi.Analyzer.analyzeJar(Analyzer.java:1646)
+	at aQute.lib.osgi.Analyzer.analyzeBundleClasspath(Analyzer.java:1534)
+	at aQute.lib.osgi.Analyzer.analyze(Analyzer.java:115)
+	at aQute.lib.osgi.Builder.analyze(Builder.java:296)
+	at aQute.lib.osgi.Analyzer.calcManifest(Analyzer.java:292)
+	at aQute.lib.osgi.Builder.build(Builder.java:68)
+	at org.apache.felix.bundleplugin.BundlePlugin.buildOSGiBundle(BundlePlugin.java:375)
+	at org.apache.felix.bundleplugin.ManifestPlugin.execute(ManifestPlugin.java:60)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:224)
+	at org.apache.felix.bundleplugin.BundlePlugin.execute(BundlePlugin.java:215)
+	at org.apache.maven.plugin.DefaultBuildPluginManager.executeMojo(DefaultBuildPluginManager.java:126)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute2(MojoExecutor.java:328)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.doExecute(MojoExecutor.java:316)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:212)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:174)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.access$000(MojoExecutor.java:75)
+	at org.apache.maven.lifecycle.internal.MojoExecutor$1.run(MojoExecutor.java:162)
+	at org.apache.maven.plugin.DefaultMojosExecutionStrategy.execute(DefaultMojosExecutionStrategy.java:39)
+	at org.apache.maven.lifecycle.internal.MojoExecutor.execute(MojoExecutor.java:159)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:105)
+	at org.apache.maven.lifecycle.internal.LifecycleModuleBuilder.buildProject(LifecycleModuleBuilder.java:73)
+	at org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder.build(SingleThreadedBuilder.java:53)
+	at org.apache.maven.lifecycle.internal.LifecycleStarter.execute(LifecycleStarter.java:118)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:261)
+	at org.apache.maven.DefaultMaven.doExecute(DefaultMaven.java:173)
+	at org.apache.maven.DefaultMaven.execute(DefaultMaven.java:101)
+	at org.apache.maven.cli.MavenCli.execute(MavenCli.java:919)
+	at org.apache.maven.cli.MavenCli.doMain(MavenCli.java:285)
+	at org.apache.maven.cli.MavenCli.main(MavenCli.java:207)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launchEnhanced(Launcher.java:255)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.launch(Launcher.java:201)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.mainWithExitCode(Launcher.java:361)
+	at org.codehaus.plexus.classworlds.launcher.Launcher.main(Launcher.java:314)
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ sccp-api ---
+[INFO] Not copying test resources
+[INFO] 
+[INFO] --- compiler:3.8.1:testCompile (default-testCompile) @ sccp-api ---
+[INFO] Not compiling test sources
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ sccp-api ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:2.3.1:jar (default-jar) @ sccp-api ---
+[INFO] Building jar: C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\sccp\sccp-api\target\sccp-api-9.2.0.jar
+[INFO] 
+[INFO] --- install:3.1.2:install (default-install) @ sccp-api ---
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\sccp\sccp-api\pom.xml to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\sccp\sccp-api\9.2.0\sccp-api-9.2.0.pom
+[INFO] Installing C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\sccp\sccp-api\target\sccp-api-9.2.0.jar to C:\Users\Windows\.m2\repository\org\restcomm\protocols\ss7\sccp\sccp-api\9.2.0\sccp-api-9.2.0.jar
+[INFO] 
+[INFO] -------------< org.restcomm.protocols.ss7.sccp:sccp-impl >--------------
+[INFO] Building Restcomm jSS7 :: SCCP :: Impl :: sccp-impl 9.2.0        [19/19]
+[INFO]   from sccp\sccp-impl\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ sccp-impl ---
+[INFO] Deleting C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\sccp\sccp-impl\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ sccp-impl ---
+[INFO] skip non existing resourceDirectory C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\sccp\sccp-impl\src\main\resources
+[INFO] 
+[INFO] --- compiler:3.8.1:compile (default-compile) @ sccp-impl ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 88 source files to C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\sccp\sccp-impl\target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/Users/Windows/Desktop/ethiopia-working-dir/jSS7/sccp/sccp-impl/src/main/java/org/restcomm/protocols/ss7/sccp/impl/router/RouterImpl.java:[614,25] unreported exception java.io.IOException; must be caught or declared to be thrown
+  exception thrown from implicit call to close() on resource variable 'reader'
+[INFO] 1 error
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for RestComm jSS7 :: ss7-parent 9.2.0:
+[INFO] 
+[INFO] RestComm jSS7 :: ss7-parent ........................ SUCCESS [  2.126 s]
+[INFO] Restcomm jSS7 :: Scheduler :: scheduler ............ SUCCESS [  7.589 s]
+[INFO] Restcomm jSS7 :: Congestion :: congestion .......... SUCCESS [  1.711 s]
+[INFO] Restcomm jSS7 :: Statistics :: Parent :: statistics-parent SUCCESS [  0.111 s]
+[INFO] Restcomm jSS7 :: Statistics :: Api :: statistics-api SUCCESS [  2.657 s]
+[INFO] Restcomm jSS7 :: Statistics :: Impl :: statistics-impl SUCCESS [  1.877 s]
+[INFO] Restcomm jSS7 :: management ........................ SUCCESS [  0.051 s]
+[INFO] Restcomm jSS7 :: Management :: shell-server-api .... SUCCESS [  1.038 s]
+[INFO] Restcomm jSS7 :: SS7-Ext :: Parent :: ss7-ext-parent SUCCESS [  0.056 s]
+[INFO] Restcomm jSS7 :: SS7-Ext :: API :: ss7-ext-api ..... SUCCESS [  1.082 s]
+[INFO] Restcomm jSS7 :: MTP :: Parent :: mtp-parent ....... SUCCESS [  0.058 s]
+[INFO] Restcomm jSS7 :: MTP :: Impl :: mtp-api ............ SUCCESS [  1.967 s]
+[INFO] Restcomm jSS7 :: MTP :: Impl :: mtp ................ SUCCESS [  2.726 s]
+[INFO] Restcomm jSS7 :: M3UA :: Parent :: m3ua ............ SUCCESS [  0.042 s]
+[INFO] Restcomm jSS7 :: M3UA :: Api :: m3ua-api ........... SUCCESS [  3.578 s]
+[INFO] Restcomm jSS7 :: M3UA :: Impl :: m3ua-impl ......... SUCCESS [ 14.054 s]
+[INFO] Restcomm jSS7 :: SCCP :: Parent :: sccp-parent ..... SUCCESS [  0.051 s]
+[INFO] Restcomm jSS7 :: SCCP :: Api :: sccp-api ........... SUCCESS [  3.289 s]
+[INFO] Restcomm jSS7 :: SCCP :: Impl :: sccp-impl ......... FAILURE [  4.245 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  53.183 s
+[INFO] Finished at: 2026-04-07T20:37:29+07:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.8.1:compile (default-compile) on project sccp-impl: Compilation failure
+[ERROR] /C:/Users/Windows/Desktop/ethiopia-working-dir/jSS7/sccp/sccp-impl/src/main/java/org/restcomm/protocols/ss7/sccp/impl/router/RouterImpl.java:[614,25] unreported exception java.io.IOException; must be caught or declared to be thrown
+[ERROR]   exception thrown from implicit call to close() on resource variable 'reader'
+[ERROR] 
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :sccp-impl

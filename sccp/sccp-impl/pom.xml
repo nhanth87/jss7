@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>sccp-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7.sccp</groupId>
-		<version>9.0.0-318</version>
+		<version>9.2.0</version>
 	</parent>
 
 	<artifactId>sccp-impl</artifactId>
@@ -48,12 +48,12 @@
 		</dependency>
 
 		<dependency>
-			<groupId>javolution</groupId>
-			<artifactId>javolution</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.restcomm.protocols.ss7.mtp</groupId>
 			<artifactId>mtp</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
 		</dependency>
 	</dependencies>
 
