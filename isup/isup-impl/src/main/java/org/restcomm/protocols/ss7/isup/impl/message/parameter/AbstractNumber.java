@@ -5,9 +5,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.isup.ParameterException;
 import org.restcomm.protocols.ss7.isup.message.parameter.Number;
@@ -38,10 +35,6 @@ import org.restcomm.protocols.ss7.isup.message.parameter.Number;
  * @author <a href="mailto:baranowb@gmail.com"> Bartosz Baranowski </a>
  */
 public abstract class AbstractNumber extends AbstractISUPParameter implements Number {
-
-    private static final String ADDRESS = "address";
-
-    private static final String DEFAULT_ADDRESS = "";
 
     protected Logger logger = Logger.getLogger(this.getClass());
     /**
@@ -386,22 +379,5 @@ public abstract class AbstractNumber extends AbstractISUPParameter implements Nu
     protected boolean skipDigits(){
         return false;
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<AbstractNumber> ISUP_ABSTRACT_NUMBER_XML = new XMLFormat<AbstractNumber>(
-            AbstractNumber.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, AbstractNumber abstractNumber) throws XMLStreamException {
-            abstractNumber.setAddress(xml.getAttribute(ADDRESS, DEFAULT_ADDRESS));
-        }
-
-        @Override
-        public void write(AbstractNumber abstractNumber, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(ADDRESS, abstractNumber.address);
-        }
-    };
 
 }
