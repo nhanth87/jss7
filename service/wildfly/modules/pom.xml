@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.restcomm.protocols.ss7</groupId>
         <artifactId>restcomm-ss7-wildfly</artifactId>
-        <version>8.3.0-SNAPSHOT</version>
+        <version>9.0.0-318</version>
     </parent>
 
     <artifactId>restcomm-ss7-wildfly-modules</artifactId>
@@ -349,17 +349,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- PAiC License Enforcer -->
-        <dependency>
-            <groupId>LICENSE4J-Runtime-Library</groupId>
-            <artifactId>LICENSE4J-Runtime-Library</artifactId>
-            <version>LICENSE4J-Runtime-Library</version>
-        </dependency>
-        <dependency>
-            <groupId>com.paic.licenser</groupId>
-            <artifactId>PAiClicenser</artifactId>
-            <version>2.0</version>
-        </dependency>
     </dependencies>
 
     <profiles>

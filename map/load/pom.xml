@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>map-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7.map</groupId>
-		<version>8.3.0-SNAPSHOT</version>
+		<version>9.0.0-318</version>
 	</parent>
 
 	<artifactId>map-load</artifactId>
@@ -149,17 +149,7 @@
 		   <version>1.3.2</version>
 		</dependency>
 
-		<!-- lic dep -->
-	        <dependency>
-			<groupId>LICENSE4J-Runtime-Library</groupId>
-			<artifactId>LICENSE4J-Runtime-Library</artifactId>
-			<version>LICENSE4J-Runtime-Library</version>
-	        </dependency>
-        	<dependency>
-			<groupId>com.paic.licenser</groupId>
-			<artifactId>PAiClicenser</artifactId>
-			<version>2.0</version>
-		</dependency>
+
 
 		<!-- SS7 stats -->
 		<dependency>
@@ -607,33 +597,7 @@
 											</destFileName>
 										</artifactItem>
 
-										<!-- license dependencies -->
-                                                                                <artifactItem>
-                                                                                        <groupId>LICENSE4J-Runtime-Library</groupId>
-                                                                                        <artifactId>LICENSE4J-Runtime-Library</artifactId>
-                                                                                        <type>jar</type>
-                                                                                        <overWrite>true</overWrite>
-                                                                                        <outputDirectory>
-                                                                                                ${assemble.dir}
-                                                                                        </outputDirectory>
-                                                                                        <destFileName>
-                                                                                                LICENSE4J-Runtime-Library.jar
-                                                                                        </destFileName>
-                                                                                </artifactItem>
-                                                                                <artifactItem>
-                                                                                        <groupId>com.paic.licenser</groupId>
-                                                                                        <artifactId>PAiClicenser</artifactId>
-                                                                                        <type>jar</type>
-                                                                                        <overWrite>true</overWrite>
-                                                                                        <outputDirectory>
-                                                                                                ${assemble.dir}
-                                                                                        </outputDirectory>
-                                                                                        <destFileName>
-                                                                                                PAiClicenser.jar
-                                                                                        </destFileName>
-                                                                                </artifactItem>
 
-										<!-- lic dep 2 -->
 																				
 										<!-- <artifactItem> <groupId>org.mobicents.external.appframework</groupId> 
 											<artifactId>appframework</artifactId> <type>jar</type> <overWrite>true</overWrite> 

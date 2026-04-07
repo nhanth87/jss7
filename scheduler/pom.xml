@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>ss7-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7</groupId>
-		<version>8.3.0-SNAPSHOT</version>
+		<version>9.0.0-318</version>
 	</parent>
 
 	<groupId>org.restcomm.protocols.ss7.scheduler</groupId>
@@ -29,8 +29,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>11</source>
+					<target>11</target>
 				</configuration>
 			</plugin>
 			<plugin>
