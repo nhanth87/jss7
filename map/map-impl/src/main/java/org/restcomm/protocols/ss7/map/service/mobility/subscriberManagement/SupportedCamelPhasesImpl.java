@@ -66,51 +66,6 @@ public class SupportedCamelPhasesImpl extends BitStringBase implements Supported
         return this.bitString.get(_INDEX_Phase3);
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<SupportedCamelPhasesImpl> SUPPORTED_CAMEL_PHASES_XML = new XMLFormat<SupportedCamelPhasesImpl>(SupportedCamelPhasesImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, SupportedCamelPhasesImpl supportedCamelPhases) throws XMLStreamException {
-
-            boolean phase1 = false;
-            boolean phase2 = false;
-            boolean phase3 = false;
-            boolean phase4 = false;
-            Boolean bval = xml.getAttribute(PHASE1, DEFAULT_BOOLEAN_VALUE);
-            if (bval != null) {
-                phase1 = bval;
-            }
-            bval = xml.getAttribute(PHASE2, DEFAULT_BOOLEAN_VALUE);
-            if (bval != null) {
-                phase2 = bval;
-            }
-            bval = xml.getAttribute(PHASE3, DEFAULT_BOOLEAN_VALUE);
-            if (bval != null) {
-                phase3 = bval;
-            }
-            bval = xml.getAttribute(PHASE4, DEFAULT_BOOLEAN_VALUE);
-            if (bval != null) {
-                phase4 = bval;
-            }
-
-            supportedCamelPhases.setData(phase1, phase2, phase3, phase4);
-        }
-
-        @Override
-        public void write(SupportedCamelPhasesImpl supportedCamelPhases, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (supportedCamelPhases.getPhase1Supported())
-                xml.setAttribute(PHASE1, true);
-            if (supportedCamelPhases.getPhase2Supported())
-                xml.setAttribute(PHASE2, true);
-            if (supportedCamelPhases.getPhase3Supported())
-                xml.setAttribute(PHASE3, true);
-            if (supportedCamelPhases.getPhase4Supported())
-                xml.setAttribute(PHASE4, true);
-        }
-    };
-
     /*
      * (non-Javadoc)
      *

@@ -84,26 +84,4 @@ public class Ext3QoSSubscribedImpl extends OctetStringBase implements Ext3QoSSub
         }
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<Ext3QoSSubscribedImpl> EXT3_QOS_SUBSCRIBED_XML = new XMLFormat<Ext3QoSSubscribedImpl>(Ext3QoSSubscribedImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, Ext3QoSSubscribedImpl qos3Subscribed) throws XMLStreamException {
-            ExtQoSSubscribed_BitRateExtended maximumBitRateForUplinkExtended = new ExtQoSSubscribed_BitRateExtendedImpl(xml.getAttribute(MAX_BIT_RATE_FOR_UPLINK_EXT, DEFAULT_INT_VALUE), false);
-            ExtQoSSubscribed_BitRateExtended guaranteedBitRateForUplinkExtended = new ExtQoSSubscribed_BitRateExtendedImpl(xml.getAttribute(GUARANTEED_BIT_RATE_FOR_UPLINK_EXT, DEFAULT_INT_VALUE), false);
-            qos3Subscribed.setData(maximumBitRateForUplinkExtended, guaranteedBitRateForUplinkExtended);
-        }
-
-        @Override
-        public void write(Ext3QoSSubscribedImpl qos3Subscribed, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (qos3Subscribed.data != null) {
-                if (qos3Subscribed.getMaximumBitRateForUplinkExtended() != null)
-                    xml.setAttribute(MAX_BIT_RATE_FOR_UPLINK_EXT, qos3Subscribed.getMaximumBitRateForUplinkExtended().getBitRate());
-                if (qos3Subscribed.getGuaranteedBitRateForUplinkExtended() != null)
-                    xml.setAttribute(GUARANTEED_BIT_RATE_FOR_UPLINK_EXT, qos3Subscribed.getGuaranteedBitRateForUplinkExtended().getBitRate());
-            }
-        }
-    };
 }

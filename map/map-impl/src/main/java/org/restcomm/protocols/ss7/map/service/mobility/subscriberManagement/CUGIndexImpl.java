@@ -115,20 +115,6 @@ public class CUGIndexImpl implements MAPAsnPrimitive, CUGIndex {
         }
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<CUGIndexImpl> CUG_INDEX_XML = new XMLFormat<CUGIndexImpl>(CUGIndexImpl.class) {
-
-        public void read(javolution.xml.XMLFormat.InputElement xml, CUGIndexImpl cugIndex) throws XMLStreamException {
-            cugIndex.data = xml.get("value", Integer.class);
-        }
-
-        public void write(CUGIndexImpl cugIndex, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.add(cugIndex.data, "value", Integer.class);
-        }
-    };
-
     @Override
     public String toString() {
 

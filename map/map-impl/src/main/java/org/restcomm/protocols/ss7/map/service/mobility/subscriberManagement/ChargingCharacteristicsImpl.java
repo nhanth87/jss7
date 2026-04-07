@@ -1,8 +1,6 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-import jakarta.xml.bind.DatatypeConverter;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.ChargingCharacteristics;
@@ -126,34 +124,4 @@ public class ChargingCharacteristicsImpl extends OctetStringBase implements Char
             return super.toString();
         }
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ChargingCharacteristicsImpl> CHARGING_CHARACTERISTICS_XML = new XMLFormat<ChargingCharacteristicsImpl>(ChargingCharacteristicsImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ChargingCharacteristicsImpl chargingCharacteristics) throws XMLStreamException {
-            String s = xml.getAttribute(DATA, DEFAULT_VALUE);
-            if (s != null) {
-                chargingCharacteristics.data = DatatypeConverter.parseHexBinary(s);
-            }
-            boolean isNormalCharging = xml.getAttribute(IS_NORMAL_CHARGING, DEFAULT_BOOL_VALUE);
-            boolean isPrepaidCharging = xml.getAttribute(IS_PREPAID_CHARGING, DEFAULT_BOOL_VALUE);
-            boolean isFlatRateChargingCharging = xml.getAttribute(IS_FLAT_RATE_CHARGING, DEFAULT_BOOL_VALUE);
-            boolean isChargingByHotBillingCharging = xml.getAttribute(IS_BY_HOT_BILLING_CHARGING, DEFAULT_BOOL_VALUE);
-            chargingCharacteristics.setData(isNormalCharging, isPrepaidCharging, isFlatRateChargingCharging, isChargingByHotBillingCharging);
-        }
-
-        @Override
-        public void write(ChargingCharacteristicsImpl chargingCharacteristics, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (chargingCharacteristics.data != null) {
-                xml.setAttribute(DATA, DatatypeConverter.printHexBinary(chargingCharacteristics.data));
-            }
-            xml.setAttribute(IS_NORMAL_CHARGING, chargingCharacteristics.isNormalCharging());
-            xml.setAttribute(IS_PREPAID_CHARGING, chargingCharacteristics.isPrepaidCharging());
-            xml.setAttribute(IS_FLAT_RATE_CHARGING, chargingCharacteristics.isFlatRateChargingCharging());
-            xml.setAttribute(IS_BY_HOT_BILLING_CHARGING, chargingCharacteristics.isChargingByHotBillingCharging());
-        }
-    };
 }

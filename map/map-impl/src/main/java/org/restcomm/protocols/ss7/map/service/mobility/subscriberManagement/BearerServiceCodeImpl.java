@@ -54,25 +54,4 @@ public class BearerServiceCodeImpl extends OctetStringLength1Base implements Bea
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<BearerServiceCodeImpl> BEARER_SERVICE_CODE_XML = new XMLFormat<BearerServiceCodeImpl>(
-            BearerServiceCodeImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, BearerServiceCodeImpl ssCode) throws XMLStreamException {
-            ssCode.data = xml.get(DATA, Integer.class);
-
-            String str = xml.get(BEARER_SERVICE_CODE_VALUE, String.class);
-        }
-
-        @Override
-        public void write(BearerServiceCodeImpl ssCode, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.add(ssCode.getData(), DATA, Integer.class);
-
-            if (ssCode.getBearerServiceCodeValue() != null)
-                xml.add((String) ssCode.getBearerServiceCodeValue().toString(), BEARER_SERVICE_CODE_VALUE, String.class);
-        }
-    };
 }
