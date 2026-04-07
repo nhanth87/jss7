@@ -2,9 +2,6 @@ package org.restcomm.protocols.ss7.inap.isup;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -27,8 +24,6 @@ import org.restcomm.protocols.ss7.isup.message.parameter.UserTeleserviceInformat
 public class HighLayerCompatibilityInapImpl implements HighLayerCompatibilityInap, INAPAsnPrimitive {
 
     public static final String _PrimitiveName = "HighLayerCompatibilityInap";
-
-    private static final String ISUP_USER_TELESERVICE_INFORMATION_XML = "isupUserTeleserviceInformation";
 
     private byte[] data;
 
@@ -186,33 +181,4 @@ public class HighLayerCompatibilityInapImpl implements HighLayerCompatibilityIna
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<HighLayerCompatibilityInapImpl> HIGH_LAYER_COMPATIBILITY_INAP_XML = new XMLFormat<HighLayerCompatibilityInapImpl>(
-            HighLayerCompatibilityInapImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, HighLayerCompatibilityInapImpl highLayerCompatibilityInap)
-                throws XMLStreamException {
-            try {
-                highLayerCompatibilityInap.setHighLayerCompatibility(xml.get(ISUP_USER_TELESERVICE_INFORMATION_XML,
-                        UserTeleserviceInformationImpl.class));
-            } catch (INAPException e) {
-                throw new XMLStreamException(e);
-            }
-        }
-
-        @Override
-        public void write(HighLayerCompatibilityInapImpl highLayerCompatibilityInap, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            try {
-                xml.add(((UserTeleserviceInformationImpl) highLayerCompatibilityInap.getHighLayerCompatibility()),
-                        ISUP_USER_TELESERVICE_INFORMATION_XML, UserTeleserviceInformationImpl.class);
-            } catch (INAPException e) {
-                throw new XMLStreamException(e);
-            }
-        }
-    };
 }

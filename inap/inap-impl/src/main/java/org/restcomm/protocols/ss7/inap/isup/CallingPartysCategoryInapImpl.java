@@ -2,9 +2,6 @@ package org.restcomm.protocols.ss7.inap.isup;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -26,8 +23,6 @@ import org.restcomm.protocols.ss7.isup.message.parameter.CallingPartyCategory;
 public class CallingPartysCategoryInapImpl implements CallingPartysCategoryInap, INAPAsnPrimitive {
 
     public static final String _PrimitiveName = "CallingPartysCategoryInap";
-
-    private static final String ISUP_CALLING_PARTYS_CATEGORY_XML = "isupCallingPartysCategory";
 
     private byte[] data;
 
@@ -185,34 +180,4 @@ public class CallingPartysCategoryInapImpl implements CallingPartysCategoryInap,
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<CallingPartysCategoryInapImpl> CALLING_PARTYS_CATEGORY_INAP_XML = new XMLFormat<CallingPartysCategoryInapImpl>(
-            CallingPartysCategoryInapImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, CallingPartysCategoryInapImpl callingPartysCategory)
-                throws XMLStreamException {
-            try {
-                callingPartysCategory.setCallingPartysCategory(xml.get(ISUP_CALLING_PARTYS_CATEGORY_XML,
-                        CallingPartyCategoryImpl.class));
-            } catch (INAPException e) {
-                throw new XMLStreamException(e);
-            }
-        }
-
-        @Override
-        public void write(CallingPartysCategoryInapImpl callingPartysCategory, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            try {
-                xml.add(((CallingPartyCategoryImpl) callingPartysCategory.getCallingPartyCategory()),
-                        ISUP_CALLING_PARTYS_CATEGORY_XML, CallingPartyCategoryImpl.class);
-            } catch (INAPException e) {
-                throw new XMLStreamException(e);
-            }
-        }
-    };
-
 }
