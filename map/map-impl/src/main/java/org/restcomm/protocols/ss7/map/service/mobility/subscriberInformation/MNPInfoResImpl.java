@@ -325,42 +325,4 @@ public class MNPInfoResImpl implements MNPInfoRes, MAPAsnPrimitive {
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MNPInfoResImpl> MNP_INFO_RES_XML = new XMLFormat<MNPInfoResImpl>(MNPInfoResImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MNPInfoResImpl mNPInfoRes)
-                throws XMLStreamException {
-            mNPInfoRes.routeingNumber = xml.get(ROUTEING_NUMBER, RouteingNumberImpl.class);
-            mNPInfoRes.imsi = xml.get(IMSI, IMSIImpl.class);
-            mNPInfoRes.msisdn = xml.get(MSISDN, ISDNAddressStringImpl.class);
-            String nps = xml.get(NUMBER_PORTABILITY_STATUS, String.class);
-            if (nps != null) {
-                mNPInfoRes.numberPortabilityStatus = Enum.valueOf(NumberPortabilityStatus.class, nps);
-            }
-            mNPInfoRes.extensionContainer = xml.get(EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-
-        @Override
-        public void write(MNPInfoResImpl mNPInfoRes, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (mNPInfoRes.routeingNumber != null) {
-                xml.add((RouteingNumberImpl) mNPInfoRes.routeingNumber, ROUTEING_NUMBER, RouteingNumberImpl.class);
-            }
-            if (mNPInfoRes.imsi != null) {
-                xml.add((IMSIImpl) mNPInfoRes.imsi, IMSI, IMSIImpl.class);
-            }
-            if (mNPInfoRes.msisdn != null) {
-                xml.add((ISDNAddressStringImpl) mNPInfoRes.msisdn, MSISDN, ISDNAddressStringImpl.class);
-            }
-            if (mNPInfoRes.numberPortabilityStatus != null) {
-                xml.add(mNPInfoRes.numberPortabilityStatus.toString(), NUMBER_PORTABILITY_STATUS, String.class);
-            }
-            if (mNPInfoRes.extensionContainer != null) {
-                xml.add((MAPExtensionContainerImpl) mNPInfoRes.extensionContainer, EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-            }
-        }
-    };
 }

@@ -258,22 +258,4 @@ public class AnyTimeInterrogationResponseImpl extends MobilityMessageImpl implem
         return sb.toString();
     }
 
-    protected static final XMLFormat<AnyTimeInterrogationResponseImpl> ANY_TIME_INTERROGATION_RESPONSE_XML = new XMLFormat<AnyTimeInterrogationResponseImpl>(
-            AnyTimeInterrogationResponseImpl.class) {
-
-        @Override
-        public void write(AnyTimeInterrogationResponseImpl obj, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.add((SubscriberInfoImpl) obj.subscriberInfo, SUBSCRIBER_INFO, SubscriberInfoImpl.class);
-            if (obj.extensionContainer != null) {
-                xml.add((MAPExtensionContainerImpl) obj.extensionContainer, EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-            }
-        }
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, AnyTimeInterrogationResponseImpl obj) throws XMLStreamException {
-            obj.subscriberInfo = xml.get(SUBSCRIBER_INFO, SubscriberInfoImpl.class);
-            obj.extensionContainer = xml.get(EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-
-    };
 }

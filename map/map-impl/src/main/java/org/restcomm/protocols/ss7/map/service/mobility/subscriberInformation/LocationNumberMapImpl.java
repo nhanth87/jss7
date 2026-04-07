@@ -87,33 +87,4 @@ public class LocationNumberMapImpl extends OctetStringBase implements LocationNu
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<LocationNumberMapImpl> LOCATION_NUMBER_MAP_XML = new XMLFormat<LocationNumberMapImpl>(
-            LocationNumberMapImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, LocationNumberMapImpl locationNumberMap)
-                throws XMLStreamException {
-            try {
-                locationNumberMap.setLocationNumber(xml.get(LOCATION_NUMBER, LocationNumberImpl.class));
-            } catch (MAPException e) {
-                throw new XMLStreamException("MAPException when deserializing LocationNumberMapImpl", e);
-            }
-        }
-
-        @Override
-        public void write(LocationNumberMapImpl locationNumberMap, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            try {
-                if (locationNumberMap.getLocationNumber() != null) {
-                    xml.add((LocationNumberImpl) locationNumberMap.getLocationNumber(), LOCATION_NUMBER,
-                            LocationNumberImpl.class);
-                }
-            } catch (MAPException e) {
-                throw new XMLStreamException("MAPException when serializing LocationNumberMapImpl", e);
-            }
-        }
-    };
 }

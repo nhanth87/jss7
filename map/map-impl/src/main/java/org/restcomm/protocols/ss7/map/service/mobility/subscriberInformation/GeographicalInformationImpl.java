@@ -193,40 +193,4 @@ public class GeographicalInformationImpl extends OctetStringBase implements Geog
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<GeographicalInformationImpl> GEOGRAPHICAL_INFORMATION_XML = new XMLFormat<GeographicalInformationImpl>(
-            GeographicalInformationImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, GeographicalInformationImpl geographicalInformation)
-                throws XMLStreamException {
-            String str = xml.getAttribute(TYPE_OF_SHAPE, DEFAULT_STRING_VALUE);
-            TypeOfShape tos = null;
-            if (str != null)
-                tos = Enum.valueOf(TypeOfShape.class, str);
-
-            double lat = xml.getAttribute(LATITUDE, DEFAULT_DOUBLE_VALUE);
-            double lng = xml.getAttribute(LONGITUDE, DEFAULT_DOUBLE_VALUE);
-            double unc = xml.getAttribute(UNCERTAINTY, DEFAULT_DOUBLE_VALUE);
-
-            try {
-                geographicalInformation.setData(tos, lat, lng, unc);
-            } catch (MAPException e) {
-                throw new XMLStreamException("MAPException when deserializing GeographicalInformation", e);
-            }
-        }
-
-        @Override
-        public void write(GeographicalInformationImpl geographicalInformation, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (geographicalInformation.getTypeOfShape() != null) {
-                xml.setAttribute(TYPE_OF_SHAPE, geographicalInformation.getTypeOfShape().toString());
-            }
-            xml.setAttribute(LATITUDE, geographicalInformation.getLatitude());
-            xml.setAttribute(LONGITUDE, geographicalInformation.getLongitude());
-            xml.setAttribute(UNCERTAINTY, geographicalInformation.getUncertainty());
-        }
-    };
 }
