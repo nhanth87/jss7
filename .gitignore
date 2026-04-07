@@ -354,3 +354,5 @@ sccp/sccp-impl-ext/Test_sccprouter3.xml
 sccp/sccp-impl-ext/Test_sccprouter3_ext.xml
 
 *.checkstyle
+*.log
+build*.log
