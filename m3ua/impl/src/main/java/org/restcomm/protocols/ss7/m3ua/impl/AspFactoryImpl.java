@@ -12,10 +12,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.XMLSerializable;
-import javolution.xml.stream.XMLStreamException;
-
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.api.Association;
 import org.mobicents.protocols.api.AssociationListener;
@@ -68,7 +64,7 @@ import org.restcomm.protocols.ss7.mtp.Mtp3StatusPrimitive;
  * @author amit bhayani
  *
  */
-public class AspFactoryImpl implements AssociationListener, XMLSerializable, AspFactory {
+public class AspFactoryImpl implements AssociationListener, AspFactory {
 
     private static final Logger logger = Logger.getLogger(AspFactoryImpl.class);
 
@@ -776,38 +772,6 @@ public class AspFactoryImpl implements AssociationListener, XMLSerializable, Asp
             }
         }
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<AspFactoryImpl> ASP_FACTORY_XML = new XMLFormat<AspFactoryImpl>(AspFactoryImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, AspFactoryImpl aspFactoryImpl) throws XMLStreamException {
-            aspFactoryImpl.name = xml.getAttribute(NAME, "");
-            aspFactoryImpl.associationName = xml.getAttribute(ASSOCIATION_NAME, "");
-            aspFactoryImpl.started = xml.getAttribute(STARTED).toBoolean();
-            aspFactoryImpl.maxSequenceNumber = xml.getAttribute(MAX_SEQUENCE_NUMBER, M3UAManagementImpl.MAX_SEQUENCE_NUMBER);
-            aspFactoryImpl.slsTable = new int[aspFactoryImpl.maxSequenceNumber];
-
-            // For backward compatible
-            long aspIdTemp = xml.getAttribute(ASP_ID, aspFactoryImpl.generateId());
-
-            aspFactoryImpl.aspId = aspFactoryImpl.parameterFactory.createASPIdentifier(aspIdTemp);
-
-            aspFactoryImpl.isHeartBeatEnabled = xml.getAttribute(HEART_BEAT, false);
-        }
-
-        @Override
-        public void write(AspFactoryImpl aspFactoryImpl, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(NAME, aspFactoryImpl.name);
-            xml.setAttribute(ASSOCIATION_NAME, aspFactoryImpl.associationName);
-            xml.setAttribute(STARTED, aspFactoryImpl.started);
-            xml.setAttribute(MAX_SEQUENCE_NUMBER, aspFactoryImpl.maxSequenceNumber);
-            xml.setAttribute(ASP_ID, aspFactoryImpl.aspId.getAspId());
-            xml.setAttribute(HEART_BEAT, aspFactoryImpl.isHeartBeatEnabled);
-        }
-    };
 
     /**
      * AssociationListener methods

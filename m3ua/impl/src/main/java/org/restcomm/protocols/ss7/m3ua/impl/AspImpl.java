@@ -1,9 +1,7 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.XMLSerializable;
-import javolution.xml.stream.XMLStreamException;
+
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.As;
@@ -21,7 +19,7 @@ import org.restcomm.protocols.ss7.m3ua.parameter.ASPIdentifier;
  * @author amit bhayani
  * @author <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
  */
-public class AspImpl implements XMLSerializable, Asp {
+public class AspImpl implements Asp {
 
     private static final Logger logger = Logger.getLogger(AspImpl.class);
 
@@ -333,19 +331,4 @@ public class AspImpl implements XMLSerializable, Asp {
         return messageFactory;
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<AspImpl> ASP_XML = new XMLFormat<AspImpl>(AspImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, AspImpl aspImpl) throws XMLStreamException {
-            aspImpl.name = xml.getAttribute(NAME, "");
-        }
-
-        @Override
-        public void write(AspImpl aspImpl, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(NAME, aspImpl.name);
-        }
-    };
 }

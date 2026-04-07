@@ -1,8 +1,7 @@
 
 package org.restcomm.protocols.ss7.tools.simulator.common;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
+
 
 import org.restcomm.protocols.ss7.tools.simulator.level1.DialogicConfigurationData;
 import org.restcomm.protocols.ss7.tools.simulator.level1.M3uaConfigurationData;
@@ -262,124 +261,5 @@ public class ConfigurationData {
     public void setTestPsiServerConfigurationData(TestPsiServerConfigurationData testPsiServerConfigurationData) {
         this.testPsiServerConfigurationData = testPsiServerConfigurationData;
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ConfigurationData> CONFIGURATION_DATA_XML = new XMLFormat<ConfigurationData>(
-            ConfigurationData.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ConfigurationData data) throws XMLStreamException {
-            data.instance_L1 = Instance_L1.createInstance(xml.get(INSTANCE_L1, String.class));
-            data.instance_L2 = Instance_L2.createInstance(xml.get(INSTANCE_L2, String.class));
-            data.instance_L3 = Instance_L3.createInstance(xml.get(INSTANCE_L3, String.class));
-            data.instance_TestTask = Instance_TestTask.createInstance(xml.get(INSTANCE_TESTTASK, String.class));
-
-            M3uaConfigurationData m3ua = xml.get(M3UA, M3uaConfigurationData.class);
-            if (m3ua != null)
-                data.m3uaConfigurationData = m3ua;
-
-            DialogicConfigurationData dial = xml.get(DIALOGIC, DialogicConfigurationData.class);
-            if (dial != null)
-                data.dialogicConfigurationData = dial;
-
-            SccpConfigurationData sccp = xml.get(SCCP, SccpConfigurationData.class);
-            if (sccp != null)
-                data.setSccpConfigurationData(sccp);
-
-            MapConfigurationData map = xml.get(MAP, MapConfigurationData.class);
-            if (map != null)
-                data.setMapConfigurationData(map);
-
-            CapConfigurationData cap = xml.get(CAP, CapConfigurationData.class);
-            if (cap != null)
-                data.setCapConfigurationData(cap);
-
-            TestUssdClientConfigurationData ussdClient = xml.get(TEST_USSD_CLIENT, TestUssdClientConfigurationData.class);
-            if (ussdClient != null)
-                data.setTestUssdClientConfigurationData(ussdClient);
-
-            TestUssdServerConfigurationData ussdServer = xml.get(TEST_USSD_SERVER, TestUssdServerConfigurationData.class);
-            if (ussdServer != null)
-                data.setTestUssdServerConfigurationData(ussdServer);
-
-            TestSmsClientConfigurationData smsClient = xml.get(TEST_SMS_CLIENT, TestSmsClientConfigurationData.class);
-            if (smsClient != null)
-                data.setTestSmsClientConfigurationData(smsClient);
-
-            TestSmsServerConfigurationData smsServer = xml.get(TEST_SMS_SERVER, TestSmsServerConfigurationData.class);
-            if (smsServer != null)
-                data.setTestSmsServerConfigurationData(smsServer);
-
-            TestAtiClientConfigurationData atiClient = xml.get(TEST_ATI_CLIENT, TestAtiClientConfigurationData.class);
-            if (atiClient != null)
-                data.setTestAtiClientConfigurationData(atiClient);
-
-            TestAtiServerConfigurationData atiServer = xml.get(TEST_ATI_SERVER, TestAtiServerConfigurationData.class);
-            if (atiServer != null)
-                data.setTestAtiServerConfigurationData(atiServer);
-
-            TestCapScfConfigurationData capScf = xml.get(TEST_CAP_SCF, TestCapScfConfigurationData.class);
-            if (capScf != null)
-                data.setTestCapScfConfigurationData(capScf);
-
-            TestCapSsfConfigurationData capSsf = xml.get(TEST_CAP_SSF, TestCapSsfConfigurationData.class);
-            if (capSsf != null)
-                data.setTestCapSsfConfigurationData(capSsf);
-
-            TestCheckImeiClientConfigurationData checkImeiClient = xml.get(TEST_CHECK_IMEI_CLIENT, TestCheckImeiClientConfigurationData.class);
-            if (checkImeiClient != null)
-                data.setTestCheckImeiClientConfigurationData(checkImeiClient);
-
-            TestCheckImeiServerConfigurationData checkImeiServer = xml.get(TEST_CHECK_IMEI_SERVER, TestCheckImeiServerConfigurationData.class);
-            if (checkImeiServer != null)
-                data.setTestCheckImeiServerConfigurationData(checkImeiServer);
-
-            TestLcsClientConfigurationData mapLcsClient = xml.get(TEST_MAP_LCS_CLIENT, TestLcsClientConfigurationData.class);
-            if (mapLcsClient != null)
-                data.setTestLcsClientConfigurationData(mapLcsClient);
-
-            TestLcsServerConfigurationData mapLcsServer = xml.get(TEST_MAP_LCS_SERVER, TestLcsServerConfigurationData.class);
-            if (mapLcsServer != null)
-                data.setTestLcsServerConfigurationData(mapLcsServer);
-
-            TestPsiServerConfigurationData mapPsiServer = xml.get(TEST_MAP_PSI_SERVER, TestPsiServerConfigurationData.class);
-            if (mapPsiServer != null)
-                data.setTestPsiServerConfigurationData(mapPsiServer);
-
-            // while (xml.hasNext()) {
-            // Object o = xml.getNext();
-            // }
-        }
-
-        @Override
-        public void write(ConfigurationData data, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.add(data.instance_L1.toString(), INSTANCE_L1, String.class);
-            xml.add(data.instance_L2.toString(), INSTANCE_L2, String.class);
-            xml.add(data.instance_L3.toString(), INSTANCE_L3, String.class);
-            xml.add(data.instance_TestTask.toString(), INSTANCE_TESTTASK, String.class);
-
-            xml.add(data.m3uaConfigurationData, M3UA, M3uaConfigurationData.class);
-            xml.add(data.dialogicConfigurationData, DIALOGIC, DialogicConfigurationData.class);
-            xml.add(data.getSccpConfigurationData(), SCCP, SccpConfigurationData.class);
-            xml.add(data.getMapConfigurationData(), MAP, MapConfigurationData.class);
-            xml.add(data.getCapConfigurationData(), CAP, CapConfigurationData.class);
-
-            xml.add(data.getTestUssdClientConfigurationData(), TEST_USSD_CLIENT, TestUssdClientConfigurationData.class);
-            xml.add(data.getTestUssdServerConfigurationData(), TEST_USSD_SERVER, TestUssdServerConfigurationData.class);
-            xml.add(data.getTestSmsClientConfigurationData(), TEST_SMS_CLIENT, TestSmsClientConfigurationData.class);
-            xml.add(data.getTestSmsServerConfigurationData(), TEST_SMS_SERVER, TestSmsServerConfigurationData.class);
-            xml.add(data.getTestAtiClientConfigurationData(), TEST_ATI_CLIENT, TestAtiClientConfigurationData.class);
-            xml.add(data.getTestAtiServerConfigurationData(), TEST_ATI_SERVER, TestAtiServerConfigurationData.class);
-            xml.add(data.getTestCapScfConfigurationData(), TEST_CAP_SCF, TestCapScfConfigurationData.class);
-            xml.add(data.getTestCapSsfConfigurationData(), TEST_CAP_SSF, TestCapSsfConfigurationData.class);
-            xml.add(data.getTestCheckImeiClientConfigurationData(), TEST_CHECK_IMEI_CLIENT, TestCheckImeiClientConfigurationData.class);
-            xml.add(data.getTestCheckImeiServerConfigurationData(), TEST_CHECK_IMEI_SERVER, TestCheckImeiServerConfigurationData.class);
-            xml.add(data.getTestLcsClientConfigurationData(), TEST_MAP_LCS_CLIENT, TestLcsClientConfigurationData.class);
-            xml.add(data.getTestLcsServerConfigurationData(), TEST_MAP_LCS_SERVER, TestLcsServerConfigurationData.class);
-            xml.add(data.getTestPsiServerConfigurationData(), TEST_MAP_PSI_SERVER, TestPsiServerConfigurationData.class);
-        }
-    };
 
 }

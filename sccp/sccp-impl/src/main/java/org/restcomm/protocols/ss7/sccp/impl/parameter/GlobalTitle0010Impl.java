@@ -5,8 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
+
 
 import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
 import org.restcomm.protocols.ss7.sccp.SccpProtocolVersion;
@@ -109,16 +108,4 @@ public class GlobalTitle0010Impl extends AbstractGlobalTitle implements GlobalTi
                 + encodingScheme + "]";
     }
 
-    protected static final XMLFormat<GlobalTitle0010Impl> XML = new XMLFormat<GlobalTitle0010Impl>(GlobalTitle0010Impl.class) {
-
-        public void write(GlobalTitle0010Impl ai, OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(TRANSLATION_TYPE, ai.translationType);
-            xml.setAttribute(DIGITS, ai.digits);
-        }
-
-        public void read(InputElement xml, GlobalTitle0010Impl ai) throws XMLStreamException {
-            ai.translationType = xml.getAttribute(TRANSLATION_TYPE).toInt();
-            ai.digits = xml.getAttribute(DIGITS).toString();
-        }
-    };
 }
