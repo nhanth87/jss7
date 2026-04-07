@@ -283,44 +283,4 @@ public class MAPErrorMessageSystemFailureImpl extends MAPErrorMessageImpl implem
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessageSystemFailureImpl> MAP_ERROR_MESSAGE_SYSTEM_FAILURE_XML = new XMLFormat<MAPErrorMessageSystemFailureImpl>(
-            MAPErrorMessageSystemFailureImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessageSystemFailureImpl errorMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, errorMessage);
-            errorMessage.mapProtocolVersion = xml.get(MAP_PROTOCOL_VERSION, Long.class);
-
-            String str = xml.get(NETWORK_RESOURCE, String.class);
-            if (str != null)
-                errorMessage.networkResource = Enum.valueOf(NetworkResource.class, str);
-
-            str = xml.get(ADDITIONAL_NETWORK_RESOURCE, String.class);
-            if (str != null)
-                errorMessage.additionalNetworkResource = Enum.valueOf(AdditionalNetworkResource.class, str);
-
-            errorMessage.extensionContainer = xml.get(MAP_EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-
-        @Override
-        public void write(MAPErrorMessageSystemFailureImpl errorMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(errorMessage, xml);
-            xml.add(errorMessage.getMapProtocolVersion(), MAP_PROTOCOL_VERSION, Long.class);
-
-            if (errorMessage.getNetworkResource() != null)
-                xml.add((String) errorMessage.getNetworkResource().toString(), NETWORK_RESOURCE, String.class);
-
-            if (errorMessage.getAdditionalNetworkResource() != null)
-                xml.add((String) errorMessage.getAdditionalNetworkResource().toString(), ADDITIONAL_NETWORK_RESOURCE,
-                        String.class);
-
-            xml.add((MAPExtensionContainerImpl) errorMessage.extensionContainer, MAP_EXTENSION_CONTAINER,
-                    MAPExtensionContainerImpl.class);
-        }
-    };
 }

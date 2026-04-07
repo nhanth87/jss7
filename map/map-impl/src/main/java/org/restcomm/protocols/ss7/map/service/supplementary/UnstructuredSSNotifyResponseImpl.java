@@ -123,19 +123,4 @@ public class UnstructuredSSNotifyResponseImpl extends SupplementaryMessageImpl i
         return sb.toString();
     }
 
-    protected static final XMLFormat<UnstructuredSSNotifyResponseImpl> UNSTRUCTURED_SS_NOTIFY_RESPONSE_XML = new XMLFormat<UnstructuredSSNotifyResponseImpl>(
-            UnstructuredSSNotifyResponseImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, UnstructuredSSNotifyResponseImpl ussdMessage)
-                throws XMLStreamException {
-            USSD_MESSAGE_XML.read(xml, ussdMessage);
-        }
-
-        @Override
-        public void write(UnstructuredSSNotifyResponseImpl ussdMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            USSD_MESSAGE_XML.write(ussdMessage, xml);
-        }
-    };
 }

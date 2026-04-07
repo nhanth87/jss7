@@ -284,36 +284,4 @@ public class MAPErrorMessageCallBarredImpl extends MAPErrorMessageImpl implement
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessageCallBarredImpl> MAP_ERROR_MESSAGE_CALL_BARRED_XML = new XMLFormat<MAPErrorMessageCallBarredImpl>(
-            MAPErrorMessageCallBarredImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessageCallBarredImpl errorMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, errorMessage);
-            errorMessage.mapProtocolVersion = xml.get(MAP_PROTOCOL_VERSION, Long.class);
-
-            String str = xml.get(CALL_BARRING_CAUSE, String.class);
-            if (str != null)
-                errorMessage.callBarringCause = Enum.valueOf(CallBarringCause.class, str);
-
-            errorMessage.unauthorisedMessageOriginator = xml.get(UNAUTHORISED_MESSAGE_ORIGINATOR, Boolean.class);
-            errorMessage.extensionContainer = xml.get(MAP_EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-
-        @Override
-        public void write(MAPErrorMessageCallBarredImpl errorMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(errorMessage, xml);
-            xml.add(errorMessage.getMapProtocolVersion(), MAP_PROTOCOL_VERSION, Long.class);
-            if (errorMessage.getCallBarringCause() != null)
-                xml.add((String) errorMessage.getCallBarringCause().toString(), CALL_BARRING_CAUSE, String.class);
-            xml.add(errorMessage.getUnauthorisedMessageOriginator(), UNAUTHORISED_MESSAGE_ORIGINATOR, Boolean.class);
-            xml.add((MAPExtensionContainerImpl) errorMessage.extensionContainer, MAP_EXTENSION_CONTAINER,
-                    MAPExtensionContainerImpl.class);
-        }
-    };
 }

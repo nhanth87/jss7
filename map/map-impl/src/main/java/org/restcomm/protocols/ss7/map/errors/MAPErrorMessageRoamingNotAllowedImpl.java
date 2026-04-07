@@ -251,40 +251,4 @@ public class MAPErrorMessageRoamingNotAllowedImpl extends MAPErrorMessageImpl im
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessageRoamingNotAllowedImpl> MAP_ERROR_MESSAGE_ROAMING_NOT_ALLOWED_XML = new XMLFormat<MAPErrorMessageRoamingNotAllowedImpl>(
-            MAPErrorMessageRoamingNotAllowedImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessageRoamingNotAllowedImpl errorMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, errorMessage);
-            String str = xml.get(ROAMING_NOT_ALLOWED_CAUSE, String.class);
-            if (str != null)
-                errorMessage.roamingNotAllowedCause = Enum.valueOf(RoamingNotAllowedCause.class, str);
-
-            str = xml.get(ADDITIONAL_ROAMING_NOT_ALLOWED_CAUSE, String.class);
-            if (str != null)
-                errorMessage.additionalRoamingNotAllowedCause = Enum.valueOf(AdditionalRoamingNotAllowedCause.class, str);
-
-            errorMessage.extensionContainer = xml.get(MAP_EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-
-        @Override
-        public void write(MAPErrorMessageRoamingNotAllowedImpl errorMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(errorMessage, xml);
-            if (errorMessage.getRoamingNotAllowedCause() != null)
-                xml.add((String) errorMessage.getRoamingNotAllowedCause().toString(), ROAMING_NOT_ALLOWED_CAUSE, String.class);
-            if (errorMessage.getAdditionalRoamingNotAllowedCause() != null)
-                xml.add((String) errorMessage.getAdditionalRoamingNotAllowedCause().toString(),
-                        ADDITIONAL_ROAMING_NOT_ALLOWED_CAUSE, String.class);
-
-            xml.add((MAPExtensionContainerImpl) errorMessage.extensionContainer, MAP_EXTENSION_CONTAINER,
-                    MAPExtensionContainerImpl.class);
-        }
-    };
-
 }

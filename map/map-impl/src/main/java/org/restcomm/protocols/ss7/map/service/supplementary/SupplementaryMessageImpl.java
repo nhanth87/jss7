@@ -70,47 +70,4 @@ public abstract class SupplementaryMessageImpl extends MessageImpl implements Su
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<SupplementaryMessageImpl> USSD_MESSAGE_XML = new XMLFormat<SupplementaryMessageImpl>(
-            SupplementaryMessageImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, SupplementaryMessageImpl ussdMessage)
-                throws XMLStreamException {
-            MAP_MESSAGE_XML.read(xml, ussdMessage);
-
-            int cbs = xml.getAttribute(DATA_CODING_SCHEME,-1);
-            if(cbs != -1){
-                ussdMessage.ussdDataCodingSch = new CBSDataCodingSchemeImpl(cbs);
-            }
-
-            String encodedString = xml.getAttribute(STRING, null);
-            if (encodedString != null)
-                try {
-                    ussdMessage.ussdString = new USSDStringImpl(encodedString, ussdMessage.ussdDataCodingSch, null);
-                } catch (MAPException e) {
-                    logger.error("Error while trying to read ussd string", e);
-                }
-        }
-
-        @Override
-        public void write(SupplementaryMessageImpl ussdMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_MESSAGE_XML.write(ussdMessage, xml);
-            if (ussdMessage.ussdDataCodingSch != null)
-                xml.setAttribute(DATA_CODING_SCHEME, ussdMessage.ussdDataCodingSch.getCode());
-
-            if (ussdMessage.ussdString != null)
-                try {
-                    String ussdStr = ussdMessage.ussdString.getString(null);
-                    if (ussdStr != null)
-                        xml.setAttribute(STRING, ussdStr);
-                } catch (MAPException e) {
-                    logger.error("Error while trying to write ussd string", e);
-                }
-
-        }
-    };
 }

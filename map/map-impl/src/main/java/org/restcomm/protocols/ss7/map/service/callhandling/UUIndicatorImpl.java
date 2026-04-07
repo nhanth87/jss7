@@ -25,23 +25,4 @@ public class UUIndicatorImpl extends OctetStringLength1Base implements UUIndicat
         return data;
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<UUIndicatorImpl> UU_INDICATOR_XML = new XMLFormat<UUIndicatorImpl>(UUIndicatorImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, UUIndicatorImpl uuIndicator) throws XMLStreamException {
-            Integer i1 = xml.getAttribute(DATA, DEFAULT_VALUE);
-            if (i1 != null) {
-                uuIndicator.data = i1;
-            }
-        }
-
-        @Override
-        public void write(UUIndicatorImpl uuIndicator, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(DATA, uuIndicator.data);
-        }
-    };
-
 }

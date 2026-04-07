@@ -56,25 +56,4 @@ public class SSCodeImpl extends OctetStringLength1Base implements SSCode {
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<SSCodeImpl> SS_CODE = new XMLFormat<SSCodeImpl>(SSCodeImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, SSCodeImpl ssCode) throws XMLStreamException {
-            ssCode.data = xml.get(DATA, Integer.class);
-
-            String str = xml.get(SUPPLEMENTARY_CODE_VALUE, String.class);
-        }
-
-        @Override
-        public void write(SSCodeImpl ssCode, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.add(ssCode.getData(), DATA, Integer.class);
-
-            if (ssCode.getSupplementaryCodeValue() != null)
-                xml.add((String) ssCode.getSupplementaryCodeValue().toString(), SUPPLEMENTARY_CODE_VALUE, String.class);
-        }
-    };
-
 }

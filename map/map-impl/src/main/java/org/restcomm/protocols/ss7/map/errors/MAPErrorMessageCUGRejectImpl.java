@@ -203,33 +203,4 @@ public class MAPErrorMessageCUGRejectImpl extends MAPErrorMessageImpl implements
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessageCUGRejectImpl> MAP_ERROR_MESSAGE_CALL_BARRED_XML = new XMLFormat<MAPErrorMessageCUGRejectImpl>(
-            MAPErrorMessageCUGRejectImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessageCUGRejectImpl errorMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, errorMessage);
-
-            String str = xml.get(CUG_REJECT_CAUSE, String.class);
-            if (str != null)
-                errorMessage.cugRejectCause = Enum.valueOf(CUGRejectCause.class, str);
-
-            errorMessage.extensionContainer = xml.get(MAP_EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-
-        @Override
-        public void write(MAPErrorMessageCUGRejectImpl errorMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(errorMessage, xml);
-            if (errorMessage.getCUGRejectCause() != null)
-                xml.add((String) errorMessage.getCUGRejectCause().toString(), CUG_REJECT_CAUSE, String.class);
-            xml.add((MAPExtensionContainerImpl) errorMessage.extensionContainer, MAP_EXTENSION_CONTAINER,
-                    MAPExtensionContainerImpl.class);
-        }
-    };
-
 }

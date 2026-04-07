@@ -242,28 +242,4 @@ public class ProcessUnstructuredSSRequestImpl extends SupplementaryMessageImpl i
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ProcessUnstructuredSSRequestImpl> PROCESS_UNSTRUCTURED_SS_REQUEST_XML = new XMLFormat<ProcessUnstructuredSSRequestImpl>(
-            ProcessUnstructuredSSRequestImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ProcessUnstructuredSSRequestImpl ussdMessage)
-                throws XMLStreamException {
-            USSD_MESSAGE_XML.read(xml, ussdMessage);
-            ussdMessage.msisdnAddressString = xml.get(MSISDN, ISDNAddressStringImpl.class);
-            ussdMessage.alertingPattern = xml.get(ALERTING_PATTERN, AlertingPatternImpl.class);
-
-        }
-
-        @Override
-        public void write(ProcessUnstructuredSSRequestImpl ussdMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            USSD_MESSAGE_XML.write(ussdMessage, xml);
-            xml.add(((ISDNAddressStringImpl) ussdMessage.msisdnAddressString), MSISDN, ISDNAddressStringImpl.class);
-            xml.add(((AlertingPatternImpl) ussdMessage.alertingPattern), ALERTING_PATTERN, AlertingPatternImpl.class);
-        }
-    };
-
 }
