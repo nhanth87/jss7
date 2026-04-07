@@ -3,8 +3,7 @@ package org.restcomm.protocols.ss7.map.primitives;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -17,14 +16,8 @@ import org.restcomm.protocols.ss7.map.api.primitives.GlobalCellId;
 * @author sergey vetyutnev
 *
 */
+@XStreamAlias("globalCellId")
 public class GlobalCellIdImpl extends OctetStringBase implements GlobalCellId {
-
-    private static final String MCC = "mcc";
-    private static final String MNC = "mnc";
-    private static final String LAC = "lac";
-    private static final String CELL_ID = "cellId";
-
-    private static final int DEFAULT_INT_VALUE = 0;
 
     public GlobalCellIdImpl() {
         super(5, 7, "GlobalCellId");
@@ -196,37 +189,5 @@ public class GlobalCellIdImpl extends OctetStringBase implements GlobalCellId {
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<GlobalCellIdImpl> GLOBAL_CELL_ID_XML = new XMLFormat<GlobalCellIdImpl>(GlobalCellIdImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, GlobalCellIdImpl globalCellId) throws XMLStreamException {
-            int mcc = xml.getAttribute(MCC, DEFAULT_INT_VALUE);
-            int mnc = xml.getAttribute(MNC, DEFAULT_INT_VALUE);
-            int lac = xml.getAttribute(LAC, DEFAULT_INT_VALUE);
-            int cellId = xml.getAttribute(CELL_ID, DEFAULT_INT_VALUE);
-
-            try {
-                globalCellId.setData(mcc, mnc, lac, cellId);
-            } catch (MAPException e) {
-                throw new XMLStreamException("MAPException when deserializing GlobalCellId", e);
-            }
-        }
-
-        @Override
-        public void write(GlobalCellIdImpl globalCellId, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            try {
-                xml.setAttribute(MCC, globalCellId.getMcc());
-                xml.setAttribute(MNC, globalCellId.getMnc());
-                xml.setAttribute(LAC, globalCellId.getLac());
-                xml.setAttribute(CELL_ID, globalCellId.getCellId());
-            } catch (MAPException e) {
-                throw new XMLStreamException("MAPException when serializing GlobalCellId", e);
-            }
-        }
-    };
 
 }

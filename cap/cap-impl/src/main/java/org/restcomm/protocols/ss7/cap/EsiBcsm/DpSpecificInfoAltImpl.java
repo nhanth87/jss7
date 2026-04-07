@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -20,12 +18,15 @@ import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class DpSpecificInfoAltImpl extends SequenceBase implements DpSpecificInfoAlt {
+@XStreamAlias("dpSpecificInfoAlt")
+ extends SequenceBase implements DpSpecificInfoAlt {
 
     private static final String O_SERVICE_CHANGE_SPECIFIC_INFO = "oServiceChangeSpecificInfo";
     private static final String COLLECTED_INFO_SPECIFIC_INFO = "collectedInfoSpecificInfo";
@@ -146,31 +147,4 @@ public class DpSpecificInfoAltImpl extends SequenceBase implements DpSpecificInf
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<DpSpecificInfoAltImpl> DP_SPECIFIC_INFO_ALT_XML = new XMLFormat<DpSpecificInfoAltImpl>(DpSpecificInfoAltImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, DpSpecificInfoAltImpl dpSpecificInfoAlt) throws XMLStreamException {
-            dpSpecificInfoAlt.oServiceChangeSpecificInfo = xml.get(O_SERVICE_CHANGE_SPECIFIC_INFO, OServiceChangeSpecificInfoImpl.class);
-            dpSpecificInfoAlt.collectedInfoSpecificInfo = xml.get(COLLECTED_INFO_SPECIFIC_INFO, CollectedInfoSpecificInfoImpl.class);
-            dpSpecificInfoAlt.tServiceChangeSpecificInfo = xml.get(T_SERVICE_CHANGE_SPECIFIC_INFO, TServiceChangeSpecificInfoImpl.class);
-        }
-
-        @Override
-        public void write(DpSpecificInfoAltImpl dpSpecificInfoAlt, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (dpSpecificInfoAlt.oServiceChangeSpecificInfo != null)
-                xml.add((OServiceChangeSpecificInfoImpl) dpSpecificInfoAlt.oServiceChangeSpecificInfo, O_SERVICE_CHANGE_SPECIFIC_INFO,
-                        OServiceChangeSpecificInfoImpl.class);
-            if (dpSpecificInfoAlt.collectedInfoSpecificInfo != null)
-                xml.add((CollectedInfoSpecificInfoImpl) dpSpecificInfoAlt.collectedInfoSpecificInfo, COLLECTED_INFO_SPECIFIC_INFO,
-                        CollectedInfoSpecificInfoImpl.class);
-            if (dpSpecificInfoAlt.tServiceChangeSpecificInfo != null)
-                xml.add((TServiceChangeSpecificInfoImpl) dpSpecificInfoAlt.tServiceChangeSpecificInfo, T_SERVICE_CHANGE_SPECIFIC_INFO,
-                        TServiceChangeSpecificInfoImpl.class);
-        }
-    };
-
 }

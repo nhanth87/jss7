@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
 import jakarta.xml.bind.DatatypeConverter;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.LSAIdentity;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
 
@@ -14,12 +13,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("lSAIdentityImpl")
 public class LSAIdentityImpl extends OctetStringBase implements LSAIdentity {
-
-    private static final String DATA = "data";
-
-    private static final String DEFAULT_VALUE = null;
-
     public LSAIdentityImpl() {
         super(3, 3, "LSAIdentity");
     }

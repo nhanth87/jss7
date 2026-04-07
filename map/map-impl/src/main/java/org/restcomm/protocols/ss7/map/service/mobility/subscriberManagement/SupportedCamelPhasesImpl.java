@@ -1,9 +1,8 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.SupportedCamelPhases;
 import org.restcomm.protocols.ss7.map.primitives.BitStringBase;
 
@@ -12,20 +11,13 @@ import org.restcomm.protocols.ss7.map.primitives.BitStringBase;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("supportedCamelPhasesImpl")
 public class SupportedCamelPhasesImpl extends BitStringBase implements SupportedCamelPhases {
 
     private static final int _INDEX_Phase1 = 0;
     private static final int _INDEX_Phase2 = 1;
     private static final int _INDEX_Phase3 = 2;
     private static final int _INDEX_Phase4 = 3;
-
-    private static final String PHASE1 = "phase1";
-    private static final String PHASE2 = "phase2";
-    private static final String PHASE3 = "phase3";
-    private static final String PHASE4 = "phase4";
-
-    private static final boolean DEFAULT_BOOLEAN_VALUE = false;
-
     public SupportedCamelPhasesImpl() {
         super(1, 16, 4, "SupportedCamelPhases");
     }

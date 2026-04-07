@@ -1,8 +1,7 @@
-package org.restcomm.protocols.ss7.map.errors;
+﻿package org.restcomm.protocols.ss7.map.errors;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.map.api.MAPException;
@@ -15,6 +14,7 @@ import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessageParameterless;
  * @author sergey vetyutnev
  * @author amit bhayani
  */
+@XStreamAlias("mAPErrorMessageParameterlessImpl")
 public class MAPErrorMessageParameterlessImpl extends MAPErrorMessageImpl implements MAPErrorMessageParameterless {
 
     public MAPErrorMessageParameterlessImpl() {

@@ -3,8 +3,7 @@ package org.restcomm.protocols.ss7.map.primitives;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -18,13 +17,8 @@ import org.restcomm.protocols.ss7.map.api.primitives.LAIFixedLength;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("laiFixedLength")
 public class LAIFixedLengthImpl extends OctetStringBase implements LAIFixedLength {
-
-    private static final String MCC = "mcc";
-    private static final String MNC = "mnc";
-    private static final String LAC = "lac";
-
-    private static final int DEFAULT_INT_VALUE = 0;
 
     public LAIFixedLengthImpl() {
         super(5, 5, "LAIFixedLength");
@@ -178,36 +172,4 @@ public class LAIFixedLengthImpl extends OctetStringBase implements LAIFixedLengt
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<LAIFixedLengthImpl> LAI_FIXED_LENGTH_XML = new XMLFormat<LAIFixedLengthImpl>(
-            LAIFixedLengthImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, LAIFixedLengthImpl laiFixedLength)
-                throws XMLStreamException {
-            int mcc = xml.getAttribute(MCC, DEFAULT_INT_VALUE);
-            int mnc = xml.getAttribute(MNC, DEFAULT_INT_VALUE);
-            int lac = xml.getAttribute(LAC, DEFAULT_INT_VALUE);
-
-            try {
-                laiFixedLength.setData(mcc, mnc, lac);
-            } catch (MAPException e) {
-                throw new XMLStreamException("MAPException when deserializing LAIFixedLengthImpl", e);
-            }
-        }
-
-        @Override
-        public void write(LAIFixedLengthImpl laiFixedLength, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            try {
-                xml.setAttribute(MCC, laiFixedLength.getMCC());
-                xml.setAttribute(MNC, laiFixedLength.getMNC());
-                xml.setAttribute(LAC, laiFixedLength.getLac());
-            } catch (MAPException e) {
-                throw new XMLStreamException("MAPException when serializing LAIFixedLengthImpl", e);
-            }
-        }
-    };
 }

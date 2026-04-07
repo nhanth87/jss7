@@ -1,10 +1,8 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.Ext2QoSSubscribed;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.Ext2QoSSubscribed_SourceStatisticsDescriptor;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.ExtQoSSubscribed_BitRateExtended;
@@ -15,19 +13,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("ext2QoSSubscribedImpl")
 public class Ext2QoSSubscribedImpl extends OctetStringBase implements Ext2QoSSubscribed {
-
-    private static final String DATA = "data";
-
-    private static final String SOURCE_STATISTICS_DESCRIPTOR = "sourceStatisticsDescriptor";
-    private static final String OPTIMISED_FOR_SIGNALLING_TRAFFIC = "optimisedForSignallingTraffic";
-    private static final String MAX_BIT_RATE_FOR_DOWNLINK_EXTENDED = "maximumBitRateForDownlinkExtended";
-    private static final String GUARANTEED_BIT_RATE_FOR_DOWNLINK_EXTENDED = "guaranteedBitRateForDownlinkExtended";
-
-    private static final String DEFAULT_VALUE = null;
-    private static final int DEFAULT_INT_VALUE = 0;
-    private static final boolean DEFAULT_BOOL_VALUE = false;
-
     public Ext2QoSSubscribedImpl() {
         super(1, 3, "Ext2QoSSubscribed");
     }

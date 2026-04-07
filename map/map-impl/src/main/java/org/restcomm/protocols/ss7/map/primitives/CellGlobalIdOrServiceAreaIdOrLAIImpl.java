@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.primitives;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -22,13 +21,11 @@ import org.restcomm.protocols.ss7.map.api.primitives.LAIFixedLength;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("cellGlobalIdOrServiceAreaIdOrLAIImpl")
 public class CellGlobalIdOrServiceAreaIdOrLAIImpl implements CellGlobalIdOrServiceAreaIdOrLAI, MAPAsnPrimitive {
 
     private static final int _TAG_CELL_GLOBAL_ID_OR_SERVICE_AREAR_ID = 0;
     private static final int _TAG_LAI = 1;
-
-    private static final String CELL_GLOBAL_ID_OR_SERVICE_AREA_ID_FIXED_LENGTH = "cellGlobalIdOrServiceAreaIdFixedLength";
-    private static final String LAI_FIXED_LENGTH = "laiFixedLength";
 
     private CellGlobalIdOrServiceAreaIdFixedLength cellGlobalIdOrServiceAreaIdFixedLength = null;
     private LAIFixedLength laiFixedLength = null;

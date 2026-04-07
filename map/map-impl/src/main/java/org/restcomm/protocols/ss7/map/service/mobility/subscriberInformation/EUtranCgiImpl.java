@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import jakarta.xml.bind.DatatypeConverter;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.map.api.MAPException;
@@ -19,19 +18,8 @@ import java.io.IOException;
 /**
  * @author <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
  */
+@XStreamAlias("eUtranCgiImpl")
 public class EUtranCgiImpl extends OctetStringBase implements EUtranCgi {
-
-    private static final String MCC = "mcc";
-    private static final String MNC = "mnc";
-    private static final String ECI = "eci";
-    private static final String ENB = "enb";
-    private static final String CI = "cellId";
-
-    private static final int DEFAULT_INT_VALUE = 0;
-    private static final String DATA = "data";
-
-    private static final String DEFAULT_VALUE = null;
-
     public EUtranCgiImpl() {
         super(7, 7, "EUtranCgi");
     }

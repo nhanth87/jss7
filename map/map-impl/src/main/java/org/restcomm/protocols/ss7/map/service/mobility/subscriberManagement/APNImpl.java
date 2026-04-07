@@ -1,12 +1,11 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.APN;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
@@ -16,12 +15,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("aPNImpl")
 public class APNImpl extends OctetStringBase implements APN {
-
-    private static final String DATA = "data";
-
-    private static final String DEFAULT_VALUE = null;
-
     private static Charset ascii = Charset.forName("US-ASCII");
 
     public APNImpl() {

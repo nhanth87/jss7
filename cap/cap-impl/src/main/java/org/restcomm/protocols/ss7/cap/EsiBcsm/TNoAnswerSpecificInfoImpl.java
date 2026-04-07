@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -18,12 +16,15 @@ import org.restcomm.protocols.ss7.cap.isup.CalledPartyNumberCapImpl;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class TNoAnswerSpecificInfoImpl extends SequenceBase implements TNoAnswerSpecificInfo {
+@XStreamAlias("tNoAnswerSpecificInfo")
+ extends SequenceBase implements TNoAnswerSpecificInfo {
 
     private static final String CALL_FORWARDED = "callForwarded";
     private static final String FORWARDING_DESTINATION_NUMBER = "forwardingDestinationNumber";
@@ -124,32 +125,4 @@ public class TNoAnswerSpecificInfoImpl extends SequenceBase implements TNoAnswer
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<TNoAnswerSpecificInfoImpl> T_NO_ANSWER_SPECIFIC_INFO = new XMLFormat<TNoAnswerSpecificInfoImpl>(
-            TNoAnswerSpecificInfoImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, TNoAnswerSpecificInfoImpl tNoAnswerSpecificInfo)
-                throws XMLStreamException {
-            Boolean bval = xml.get(CALL_FORWARDED, Boolean.class);
-            if (bval != null)
-                tNoAnswerSpecificInfo.callForwarded = bval;
-            tNoAnswerSpecificInfo.forwardingDestinationNumber = xml.get(FORWARDING_DESTINATION_NUMBER,
-                    CalledPartyNumberCapImpl.class);
-        }
-
-        @Override
-        public void write(TNoAnswerSpecificInfoImpl tNoAnswerSpecificInfo, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (tNoAnswerSpecificInfo.callForwarded)
-                xml.add(tNoAnswerSpecificInfo.callForwarded, CALL_FORWARDED, Boolean.class);
-            if (tNoAnswerSpecificInfo.forwardingDestinationNumber != null) {
-                xml.add((CalledPartyNumberCapImpl) tNoAnswerSpecificInfo.forwardingDestinationNumber,
-                        FORWARDING_DESTINATION_NUMBER, CalledPartyNumberCapImpl.class);
-            }
-        }
-    };
 }

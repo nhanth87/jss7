@@ -1,9 +1,8 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.supplementary;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.supplementary.SSStatus;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringLength1Base;
 
@@ -13,13 +12,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringLength1Base;
  * @author amit bhayani
  *
  */
+@XStreamAlias("sSStatusImpl")
 public class SSStatusImpl extends OctetStringLength1Base implements SSStatus {
-
-    private static final String DATA = "data";
-    private static final String Q_BIT = "qBit";
-    private static final String P_BIT = "pBit";
-    private static final String R_BIT = "rBit";
-    private static final String A_BIT = "aBit";
 
     public static final int _mask_QBit = 0x08;
     public static final int _mask_PBit = 0x04;

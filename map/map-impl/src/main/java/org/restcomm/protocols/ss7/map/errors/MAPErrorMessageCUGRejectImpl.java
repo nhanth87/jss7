@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.errors;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -24,10 +23,8 @@ import org.restcomm.protocols.ss7.map.primitives.MAPExtensionContainerImpl;
  * @author sergey vetyutnev
  * @author amit bhayani
  */
+@XStreamAlias("mAPErrorMessageCUGRejectImpl")
 public class MAPErrorMessageCUGRejectImpl extends MAPErrorMessageImpl implements MAPErrorMessageCUGReject {
-
-    private static final String CUG_REJECT_CAUSE = "cugRejectCause";
-    private static final String MAP_EXTENSION_CONTAINER = "mapExtensionContainer";
 
     private CUGRejectCause cugRejectCause;
     private MAPExtensionContainer extensionContainer;

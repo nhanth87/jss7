@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.callhandling;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -24,17 +23,13 @@ import org.restcomm.protocols.ss7.map.primitives.SequenceBase;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("uUDataImpl")
 public class UUDataImpl extends SequenceBase implements UUData {
 
     public static final int _ID_uuIndicator = 0;
     public static final int _ID_uuI = 1;
     public static final int _ID_uusCFInteraction = 2;
     public static final int _ID_extensionContainer = 3;
-
-    private static final String UU_INDICATOR = "uuIndicator";
-    private static final String UU_I = "uuI";
-    private static final String UUS_CF_INTERACTION = "uusCFInteraction";
-    private static final String EXTENSION_CONTAINER = "extensionContainer";
 
     private UUIndicator uuIndicator;
     private UUI uuI;

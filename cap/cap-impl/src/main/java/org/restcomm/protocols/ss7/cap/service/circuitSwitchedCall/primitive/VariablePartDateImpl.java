@@ -1,18 +1,19 @@
 
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.VariablePartDate;
 import org.restcomm.protocols.ss7.cap.primitives.OctetStringBase;
+
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class VariablePartDateImpl extends OctetStringBase implements VariablePartDate {
+@XStreamAlias("variablePartDate")
+ extends OctetStringBase implements VariablePartDate {
 
     private static final String YEAR = "year";
     private static final String MONTH = "month";
@@ -119,29 +120,4 @@ public class VariablePartDateImpl extends OctetStringBase implements VariablePar
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<VariablePartDateImpl> VARIABLE_PART_DATE_XML = new XMLFormat<VariablePartDateImpl>(
-            VariablePartDateImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, VariablePartDateImpl variablePartDate)
-                throws XMLStreamException {
-            variablePartDate.data = new byte[4];
-
-            variablePartDate.setYear(xml.getAttribute(YEAR, 0));
-            variablePartDate.setMonth(xml.getAttribute(MONTH, 0));
-            variablePartDate.setDay(xml.getAttribute(DAY, 0));
-        }
-
-        @Override
-        public void write(VariablePartDateImpl variablePartDate, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            xml.setAttribute(YEAR, variablePartDate.getYear());
-            xml.setAttribute(MONTH, variablePartDate.getMonth());
-            xml.setAttribute(DAY, variablePartDate.getDay());
-        }
-    };
 }

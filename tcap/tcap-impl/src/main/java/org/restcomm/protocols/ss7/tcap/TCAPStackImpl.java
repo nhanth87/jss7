@@ -2,17 +2,14 @@
 package org.restcomm.protocols.ss7.tcap;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 import javolution.text.TextBuilder;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javolution.xml.XMLBinding;
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.sccp.SccpProvider;
@@ -67,7 +64,7 @@ public class TCAPStackImpl implements TCAPStack {
     private static final String CONG_CONTROL_BACK_TO_NORMAL_MEMORY_THRESHOLD_3 = "congControl_BackToNormalMemoryThreshold_3";
 
 
-    protected static final XMLBinding binding = new XMLBinding();
+
 
     // default value of idle timeout and after TC_END remove of task.
     public static final long _DIALOG_TIMEOUT = 60000;
@@ -133,7 +130,7 @@ public class TCAPStackImpl implements TCAPStack {
         this.name = name;
         this.logger = Logger.getLogger(TCAPStackImpl.class.getCanonicalName() + "-" + this.name);
 
-        binding.setClassAttribute(CLASS_ATTRIBUTE);
+
 
         setPersistFile();
     }
@@ -693,71 +690,55 @@ public class TCAPStackImpl implements TCAPStack {
      * Persist
      */
     public void store() {
-
-        // TODO : Should we keep reference to Objects rather than recreating
-        // everytime?
         try {
-            XMLObjectWriter writer = XMLObjectWriter.newInstance(new FileOutputStream(persistFile.toString()));
+            TCAPConfig config = new TCAPConfig();
+            config.dialogTimeout = this.dialogTimeout;
+            config.invokeTimeout = this.invokeTimeout;
+            config.maxDialogs = this.maxDialogs;
+            config.dialogIdRangeStart = this.dialogIdRangeStart;
+            config.dialogIdRangeEnd = this.dialogIdRangeEnd;
+            config.ssn = this.ssn;
+            config.previewMode = this.previewMode;
+            config.doNotSendProtocolVersion = this.doNotSendProtocolVersion;
+            config.congControl_blockingIncomingTcapMessages = this.congControl_blockingIncomingTcapMessages;
+            config.congControl_ExecutorDelayThreshold = this.congControl_ExecutorDelayThreshold;
+            config.congControl_ExecutorBackToNormalDelayThreshold = this.congControl_ExecutorBackToNormalDelayThreshold;
+            config.congControl_MemoryThreshold = this.congControl_MemoryThreshold;
+            config.congControl_BackToNormalMemoryThreshold = this.congControl_BackToNormalMemoryThreshold;
+            config.statisticsEnabled = this.statisticsEnabled;
+            config.slsRange = this.slsRange.toString();
+            config.isSwapTcapIdBytes = this.isSwapTcapIdBytes;
 
-            writer.setBinding(binding);
-            // Enables cross-references.
-            // writer.setReferenceResolver(new XMLReferenceResolver());
-            writer.setIndentation(TAB_INDENT);
-
-            writer.write(this.dialogTimeout, DIALOG_IDLE_TIMEOUT, Long.class);
-            writer.write(this.invokeTimeout, INVOKE_TIMEOUT, Long.class);
-            writer.write(this.maxDialogs, MAX_DIALOGS, Integer.class);
-            writer.write(this.dialogIdRangeStart, DIALOG_ID_RANGE_START, Long.class);
-            writer.write(this.dialogIdRangeEnd, DIALOG_ID_RANGE_END, Long.class);
-            writer.write(this.ssn, SUB_SYSTEM_NUMBER, Integer.class);
-
-            writer.write(this.previewMode, PREVIEW_MODE, Boolean.class);
-
-            writer.write(this.doNotSendProtocolVersion, DO_NOT_SEND_PROTOCOL_VERSION, Boolean.class);
-
-            writer.write(this.congControl_blockingIncomingTcapMessages, CONG_CONTROL_BLOCKING_INCOMING_TCAP_MESSAGES,
-                    Boolean.class);
-            if (this.congControl_ExecutorDelayThreshold != null && this.congControl_ExecutorDelayThreshold.length == 3) {
-                writer.write(this.congControl_ExecutorDelayThreshold[0], CONG_CONTROL_EXECUTOR_DELAY_THRESHOLD_1, Double.class);
-                writer.write(this.congControl_ExecutorDelayThreshold[1], CONG_CONTROL_EXECUTOR_DELAY_THRESHOLD_2, Double.class);
-                writer.write(this.congControl_ExecutorDelayThreshold[2], CONG_CONTROL_EXECUTOR_DELAY_THRESHOLD_3, Double.class);
+            String xml = TCAPXStreamHelper.toXML(config);
+            try (FileWriter writer = new FileWriter(persistFile.toString())) {
+                writer.write(xml);
             }
-            if (this.congControl_ExecutorBackToNormalDelayThreshold != null
-                    && this.congControl_ExecutorBackToNormalDelayThreshold.length == 3) {
-                writer.write(this.congControl_ExecutorBackToNormalDelayThreshold[0],
-                        CONG_CONTROL_EXECUTOR_BACK_TO_NORMAL_DELAY_THRESHOLD_1, Double.class);
-                writer.write(this.congControl_ExecutorBackToNormalDelayThreshold[1],
-                        CONG_CONTROL_EXECUTOR_BACK_TO_NORMAL_DELAY_THRESHOLD_2, Double.class);
-                writer.write(this.congControl_ExecutorBackToNormalDelayThreshold[2],
-                        CONG_CONTROL_EXECUTOR_BACK_TO_NORMAL_DELAY_THRESHOLD_3, Double.class);
-            }
-            if (this.congControl_MemoryThreshold != null && this.congControl_MemoryThreshold.length == 3) {
-                writer.write(this.congControl_MemoryThreshold[0], CONG_CONTROL_MEMORY_THRESHOLD_1, Double.class);
-                writer.write(this.congControl_MemoryThreshold[1], CONG_CONTROL_MEMORY_THRESHOLD_2, Double.class);
-                writer.write(this.congControl_MemoryThreshold[2], CONG_CONTROL_MEMORY_THRESHOLD_3, Double.class);
-            }
-            if (this.congControl_BackToNormalMemoryThreshold != null
-                    && this.congControl_BackToNormalMemoryThreshold.length == 3) {
-                writer.write(this.congControl_BackToNormalMemoryThreshold[0], CONG_CONTROL_BACK_TO_NORMAL_MEMORY_THRESHOLD_1,
-                        Double.class);
-                writer.write(this.congControl_BackToNormalMemoryThreshold[1], CONG_CONTROL_BACK_TO_NORMAL_MEMORY_THRESHOLD_2,
-                        Double.class);
-                writer.write(this.congControl_BackToNormalMemoryThreshold[2], CONG_CONTROL_BACK_TO_NORMAL_MEMORY_THRESHOLD_3,
-                        Double.class);
-            }
-
-            writer.write(this.statisticsEnabled, STATISTICS_ENABLED, Boolean.class);
-
-            writer.write(this.slsRange.toString(), SLS_RANGE, String.class);
-
-            writer.write(this.isSwapTcapIdBytes, SWAP_TCAP_ID_BYTES, Boolean.class);
-
-
-            writer.close();
         } catch (Exception e) {
             this.logger.error(
                     String.format("Error while persisting the TCAP Resource state in file=%s", persistFile.toString()), e);
         }
+    }
+
+    /**
+     * Configuration class for TCAP persistence
+     */
+    public static class TCAPConfig {
+        public long dialogTimeout;
+        public long invokeTimeout;
+        public int maxDialogs;
+        public long dialogIdRangeStart;
+        public long dialogIdRangeEnd;
+        public int ssn;
+        public boolean previewMode;
+        public boolean doNotSendProtocolVersion;
+        public boolean congControl_blockingIncomingTcapMessages;
+        public double[] congControl_ExecutorDelayThreshold;
+        public double[] congControl_ExecutorBackToNormalDelayThreshold;
+        public double[] congControl_MemoryThreshold;
+        public double[] congControl_BackToNormalMemoryThreshold;
+        public boolean statisticsEnabled;
+        public String slsRange;
+        public boolean isSwapTcapIdBytes;
     }
 
     /**
@@ -766,95 +747,50 @@ public class TCAPStackImpl implements TCAPStack {
      * @throws Exception
      */
     protected void load() throws FileNotFoundException {
-        XMLObjectReader reader;
         try {
-            reader = XMLObjectReader.newInstance(new FileInputStream(persistFile.toString()));
-
-            reader.setBinding(binding);
-            load(reader);
-        } catch (XMLStreamException ex) {
+            File f = new File(persistFile.toString());
+            if (!f.exists()) {
+                return;
+            }
+            try (FileReader reader = new FileReader(persistFile.toString())) {
+                TCAPConfig config = (TCAPConfig) TCAPXStreamHelper.fromXML(reader);
+                if (config != null) {
+                    load(config);
+                }
+            }
+        } catch (Exception ex) {
             this.logger.error(
                     String.format("Error while reading the TCAP Resource state in file=%s", persistFile), ex);
         }
     }
 
-     protected void load(XMLObjectReader reader) throws XMLStreamException{
-            Long vall = reader.read(DIALOG_IDLE_TIMEOUT, Long.class);
-            if (vall != null)
-                this.dialogTimeout = vall;
-            vall = reader.read(INVOKE_TIMEOUT, Long.class);
-            if (vall != null)
-                this.invokeTimeout = vall;
-            Integer vali = reader.read(MAX_DIALOGS, Integer.class);
-            if (vali != null)
-                this.maxDialogs = vali;
-            vall = reader.read(DIALOG_ID_RANGE_START, Long.class);
-            if (vall != null)
-                this.dialogIdRangeStart = vall;
-            vall = reader.read(DIALOG_ID_RANGE_END, Long.class);
-            if (vall != null)
-                this.dialogIdRangeEnd = vall;
-            Integer subSystemNumber = reader.read(SUB_SYSTEM_NUMBER, Integer.class);
-            if (subSystemNumber != null)
-                this.ssn = subSystemNumber;
-            Boolean pm = reader.read(PREVIEW_MODE, Boolean.class);
-            if (pm != null)
-                this.previewMode = pm;
-            Boolean volb = reader.read(DO_NOT_SEND_PROTOCOL_VERSION, Boolean.class);
-            if (volb != null)
-                this.doNotSendProtocolVersion = volb;
-
-            Boolean valb = reader.read(CONG_CONTROL_BLOCKING_INCOMING_TCAP_MESSAGES, Boolean.class);
-            if (valb != null)
-                this.congControl_blockingIncomingTcapMessages = valb;
-
-            Double valTH1 = reader.read(CONG_CONTROL_EXECUTOR_DELAY_THRESHOLD_1, Double.class);
-            Double valTH2 = reader.read(CONG_CONTROL_EXECUTOR_DELAY_THRESHOLD_2, Double.class);
-            Double valTH3 = reader.read(CONG_CONTROL_EXECUTOR_DELAY_THRESHOLD_3, Double.class);
-            Double valTB1 = reader.read(CONG_CONTROL_EXECUTOR_BACK_TO_NORMAL_DELAY_THRESHOLD_1, Double.class);
-            Double valTB2 = reader.read(CONG_CONTROL_EXECUTOR_BACK_TO_NORMAL_DELAY_THRESHOLD_2, Double.class);
-            Double valTB3 = reader.read(CONG_CONTROL_EXECUTOR_BACK_TO_NORMAL_DELAY_THRESHOLD_3, Double.class);
-            if (valTH1 != null && valTH2 != null && valTH3 != null && valTB1 != null && valTB2 != null && valTB3 != null) {
-                this.congControl_ExecutorDelayThreshold = new double[3];
-                this.congControl_ExecutorDelayThreshold[0] = valTH1;
-                this.congControl_ExecutorDelayThreshold[1] = valTH2;
-                this.congControl_ExecutorDelayThreshold[2] = valTH3;
-                this.congControl_ExecutorBackToNormalDelayThreshold = new double[3];
-                this.congControl_ExecutorBackToNormalDelayThreshold[0] = valTB1;
-                this.congControl_ExecutorBackToNormalDelayThreshold[1] = valTB2;
-                this.congControl_ExecutorBackToNormalDelayThreshold[2] = valTB3;
-            }
-
-            valTH1 = reader.read(CONG_CONTROL_MEMORY_THRESHOLD_1, Double.class);
-            valTH2 = reader.read(CONG_CONTROL_MEMORY_THRESHOLD_2, Double.class);
-            valTH3 = reader.read(CONG_CONTROL_MEMORY_THRESHOLD_3, Double.class);
-            valTB1 = reader.read(CONG_CONTROL_BACK_TO_NORMAL_MEMORY_THRESHOLD_1, Double.class);
-            valTB2 = reader.read(CONG_CONTROL_BACK_TO_NORMAL_MEMORY_THRESHOLD_2, Double.class);
-            valTB3 = reader.read(CONG_CONTROL_BACK_TO_NORMAL_MEMORY_THRESHOLD_3, Double.class);
-            if (valTH1 != null && valTH2 != null && valTH3 != null && valTB1 != null && valTB2 != null && valTB3 != null) {
-                this.congControl_MemoryThreshold = new double[3];
-                this.congControl_MemoryThreshold[0] = valTH1;
-                this.congControl_MemoryThreshold[1] = valTH2;
-                this.congControl_MemoryThreshold[2] = valTH3;
-                this.congControl_BackToNormalMemoryThreshold = new double[3];
-                this.congControl_BackToNormalMemoryThreshold[0] = valTB1;
-                this.congControl_BackToNormalMemoryThreshold[1] = valTB2;
-                this.congControl_BackToNormalMemoryThreshold[2] = valTB3;
-            }
-
-            volb = reader.read(STATISTICS_ENABLED, Boolean.class);
-            if (volb != null)
-                this.statisticsEnabled = volb;
-
-            String vals = reader.read(SLS_RANGE, String.class);
-            if (vals != null)
-                this.slsRange = Enum.valueOf(SlsRangeType.class, vals);
-
-            volb = reader.read(SWAP_TCAP_ID_BYTES, Boolean.class);
-            if (volb != null)
-                this.isSwapTcapIdBytes = volb;
-
-            reader.close();
+    protected void load(TCAPConfig config) {
+        this.dialogTimeout = config.dialogTimeout;
+        this.invokeTimeout = config.invokeTimeout;
+        this.maxDialogs = config.maxDialogs;
+        this.dialogIdRangeStart = config.dialogIdRangeStart;
+        this.dialogIdRangeEnd = config.dialogIdRangeEnd;
+        this.ssn = config.ssn;
+        this.previewMode = config.previewMode;
+        this.doNotSendProtocolVersion = config.doNotSendProtocolVersion;
+        this.congControl_blockingIncomingTcapMessages = config.congControl_blockingIncomingTcapMessages;
+        if (config.congControl_ExecutorDelayThreshold != null && config.congControl_ExecutorDelayThreshold.length == 3) {
+            this.congControl_ExecutorDelayThreshold = config.congControl_ExecutorDelayThreshold;
+        }
+        if (config.congControl_ExecutorBackToNormalDelayThreshold != null && config.congControl_ExecutorBackToNormalDelayThreshold.length == 3) {
+            this.congControl_ExecutorBackToNormalDelayThreshold = config.congControl_ExecutorBackToNormalDelayThreshold;
+        }
+        if (config.congControl_MemoryThreshold != null && config.congControl_MemoryThreshold.length == 3) {
+            this.congControl_MemoryThreshold = config.congControl_MemoryThreshold;
+        }
+        if (config.congControl_BackToNormalMemoryThreshold != null && config.congControl_BackToNormalMemoryThreshold.length == 3) {
+            this.congControl_BackToNormalMemoryThreshold = config.congControl_BackToNormalMemoryThreshold;
+        }
+        this.statisticsEnabled = config.statisticsEnabled;
+        if (config.slsRange != null) {
+            this.slsRange = Enum.valueOf(SlsRangeType.class, config.slsRange);
+        }
+        this.isSwapTcapIdBytes = config.isSwapTcapIdBytes;
     }
 
     @Override

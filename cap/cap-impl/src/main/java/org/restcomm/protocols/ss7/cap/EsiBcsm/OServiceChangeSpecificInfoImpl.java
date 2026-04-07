@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -20,12 +18,15 @@ import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.ExtBasicServiceCode;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.ExtBasicServiceCodeImpl;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class OServiceChangeSpecificInfoImpl extends SequenceBase implements OServiceChangeSpecificInfo {
+@XStreamAlias("oServiceChangeSpecificInfo")
+ extends SequenceBase implements OServiceChangeSpecificInfo {
 
     public static final String EXT_BASIC_SERVICE_CODE = "extBasicServiceCode";
 
@@ -114,27 +115,4 @@ public class OServiceChangeSpecificInfoImpl extends SequenceBase implements OSer
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<OServiceChangeSpecificInfoImpl> O_SERVICE_CHANGE_SPECIFIC_INFO_XML = new XMLFormat<OServiceChangeSpecificInfoImpl>(
-            OServiceChangeSpecificInfoImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, OServiceChangeSpecificInfoImpl oServiceChangeSpecificInfo)
-                throws XMLStreamException {
-            oServiceChangeSpecificInfo.extBasicServiceCode = xml.get(EXT_BASIC_SERVICE_CODE, ExtBasicServiceCodeImpl.class);
-        }
-
-        @Override
-        public void write(OServiceChangeSpecificInfoImpl oServiceChangeSpecificInfo, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-
-            if (oServiceChangeSpecificInfo.extBasicServiceCode != null) {
-                xml.add(((ExtBasicServiceCodeImpl) oServiceChangeSpecificInfo.extBasicServiceCode), EXT_BASIC_SERVICE_CODE, ExtBasicServiceCodeImpl.class);
-            }
-        }
-    };
-
 }

@@ -1,9 +1,6 @@
 
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
 import org.restcomm.protocols.ss7.cap.api.EsiBcsm.ChargeIndicator;
 import org.restcomm.protocols.ss7.cap.api.EsiBcsm.ChargeIndicatorValue;
 import org.restcomm.protocols.ss7.cap.primitives.OctetStringLength1Base;
@@ -13,9 +10,11 @@ import org.restcomm.protocols.ss7.cap.primitives.OctetStringLength1Base;
 * @author sergey vetyutnev
 *
 */
-public class ChargeIndicatorImpl extends OctetStringLength1Base implements ChargeIndicator {
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-    private static final String VALUE = "value";
+@XStreamAlias("chargeIndicator")
+public class ChargeIndicatorImpl extends OctetStringLength1Base implements ChargeIndicator {
 
     private static final String DEFAULT_VALUE = "";
 
@@ -44,29 +43,11 @@ public class ChargeIndicatorImpl extends OctetStringLength1Base implements Charg
         return ChargeIndicatorValue.getInstance(data);
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ChargeIndicatorImpl> CHARGE_INDICATOR_XML = new XMLFormat<ChargeIndicatorImpl>(ChargeIndicatorImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ChargeIndicatorImpl chargeIndicator) throws XMLStreamException {
-            String val = xml.getAttribute(VALUE, DEFAULT_VALUE);
-            if (val != null) {
-                ChargeIndicatorValue value = Enum.valueOf(ChargeIndicatorValue.class, val);
-                if (value != null) {
-                    chargeIndicator.data = value.getCode();
-                }
-            }
-        }
-
-        @Override
-        public void write(ChargeIndicatorImpl chargeIndicator, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            ChargeIndicatorValue value = chargeIndicator.getChargeIndicatorValue();
-            if (value != null)
-                xml.setAttribute(VALUE, value.toString());
-        }
-    };
+    @XStreamAsAttribute
+    public String getValue() {
+        ChargeIndicatorValue value = getChargeIndicatorValue();
+        return value != null ? value.toString() : DEFAULT_VALUE;
+    }
 
     @Override
     public String toString() {

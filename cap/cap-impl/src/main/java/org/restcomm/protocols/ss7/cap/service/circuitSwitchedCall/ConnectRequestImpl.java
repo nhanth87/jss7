@@ -4,8 +4,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -51,12 +49,15 @@ import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.
 import org.restcomm.protocols.ss7.map.primitives.ArrayListSerializingBase;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.CUGInterlockImpl;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  * @author tamas gyorgyey
  */
-public class ConnectRequestImpl extends CircuitSwitchedCallMessageImpl implements ConnectRequest {
+@XStreamAlias("connectRequest")
+ extends CircuitSwitchedCallMessageImpl implements ConnectRequest {
 
     public static final int _ID_destinationRoutingAddress = 0;
     public static final int _ID_alertingPattern = 1;
@@ -648,122 +649,7 @@ public class ConnectRequestImpl extends CircuitSwitchedCallMessageImpl implement
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ConnectRequestImpl> CONNECT_REQUEST_XML = new XMLFormat<ConnectRequestImpl>(
-            ConnectRequestImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ConnectRequestImpl connectRequest)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.read(xml, connectRequest);
-
-            connectRequest.destinationRoutingAddress = xml
-                    .get(DESTINATION_ROUTING_ADDRESS, DestinationRoutingAddressImpl.class);
-            connectRequest.alertingPattern = xml.get(ALERTING_PATTERN, AlertingPatternCapImpl.class);
-            connectRequest.originalCalledPartyID = xml.get(ORIGINAL_CALLED_PARTY_ID, OriginalCalledNumberCapImpl.class);
-            connectRequest.capExtensions = xml.get(EXTENSIONS, CAPExtensionsImpl.class);
-            connectRequest.carrier = xml.get(CARRIER, CarrierImpl.class);
-            connectRequest.callingPartysCategory = xml.get(CALLING_PARTYS_CATEGORY, CallingPartysCategoryInapImpl.class);
-
-            connectRequest.redirectingPartyID = xml.get(REDIRECTING_PARTY_ID, RedirectingPartyIDCapImpl.class);
-            connectRequest.redirectionInformation = xml.get(REDIRECTION_INFORMATION, RedirectionInformationInapImpl.class);
-
-            ConnectRequest_GenericNumbers al = xml.get(GENERIC_NUMBER_LIST, ConnectRequest_GenericNumbers.class);
-            if (al != null) {
-                connectRequest.genericNumbers = al.getData();
-            }
-
-            connectRequest.serviceInteractionIndicatorsTwo = xml.get(SERVICE_INTERACTION_INDICATORS_TWO, ServiceInteractionIndicatorsTwoImpl.class);
-            connectRequest.chargeNumber = xml.get(CHARGE_NUMBER, LocationNumberCapImpl.class);
-            connectRequest.legToBeConnected = xml.get(LEG_TO_BE_CONNECTED, LegIDImpl.class);
-            connectRequest.cugInterlock = xml.get(CUG_INTERLOCK, CUGInterlockImpl.class);
-
-            Boolean bval = xml.get(CUG_OUTGOING_ACCESS, Boolean.class);
-            if (bval != null)
-                connectRequest.cugOutgoingAccess = bval;
-            bval = xml.get(SUPPRESSION_OF_ANNOUNCEMENT, Boolean.class);
-            if (bval != null)
-                connectRequest.suppressionOfAnnouncement = bval;
-            bval = xml.get(OCSI_APPLICABLE, Boolean.class);
-            if (bval != null)
-                connectRequest.ocsIApplicable = bval;
-
-            connectRequest.naoliInfo = xml.get(NA_OLI_INFO, NAOliInfoImpl.class);
-
-            bval = xml.get(BOR_INTERROGATION_REQUESTED, Boolean.class);
-            if (bval != null)
-                connectRequest.borInterrogationRequested = bval;
-            bval = xml.get(SUPPRESS_N_CSI, Boolean.class);
-            if (bval != null)
-                connectRequest.suppressNCSI = bval;
-
-        }
-
-        @Override
-        public void write(ConnectRequestImpl connectRequest, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.write(connectRequest, xml);
-
-            if (connectRequest.getDestinationRoutingAddress() != null)
-                xml.add((DestinationRoutingAddressImpl) connectRequest.getDestinationRoutingAddress(),
-                        DESTINATION_ROUTING_ADDRESS, DestinationRoutingAddressImpl.class);
-            if (connectRequest.getAlertingPattern() != null)
-                xml.add((AlertingPatternCapImpl) connectRequest.getAlertingPattern(), ALERTING_PATTERN,
-                        AlertingPatternCapImpl.class);
-            if (connectRequest.getOriginalCalledPartyID() != null)
-                xml.add((OriginalCalledNumberCapImpl) connectRequest.getOriginalCalledPartyID(), ORIGINAL_CALLED_PARTY_ID,
-                        OriginalCalledNumberCapImpl.class);
-            if (connectRequest.getExtensions() != null)
-                xml.add((CAPExtensionsImpl) connectRequest.getExtensions(), EXTENSIONS, CAPExtensionsImpl.class);
-            if (connectRequest.carrier != null)
-                xml.add((CarrierImpl) connectRequest.carrier, CARRIER, CarrierImpl.class);
-            if (connectRequest.getCallingPartysCategory() != null)
-                xml.add((CallingPartysCategoryInapImpl) connectRequest.getCallingPartysCategory(), CALLING_PARTYS_CATEGORY,
-                        CallingPartysCategoryInapImpl.class);
-
-            if (connectRequest.getRedirectingPartyID() != null)
-                xml.add((RedirectingPartyIDCapImpl) connectRequest.getRedirectingPartyID(), REDIRECTING_PARTY_ID,
-                        RedirectingPartyIDCapImpl.class);
-            if (connectRequest.getRedirectionInformation() != null)
-                xml.add((RedirectionInformationInapImpl) connectRequest.getRedirectionInformation(), REDIRECTION_INFORMATION,
-                        RedirectionInformationInapImpl.class);
-
-            if (connectRequest.getGenericNumbers() != null) {
-                ConnectRequest_GenericNumbers al = new ConnectRequest_GenericNumbers(connectRequest.getGenericNumbers());
-                xml.add(al, GENERIC_NUMBER_LIST, ConnectRequest_GenericNumbers.class);
-            }
-
-            if (connectRequest.serviceInteractionIndicatorsTwo != null)
-                xml.add((ServiceInteractionIndicatorsTwoImpl) connectRequest.serviceInteractionIndicatorsTwo, SERVICE_INTERACTION_INDICATORS_TWO,
-                        ServiceInteractionIndicatorsTwoImpl.class);
-            if (connectRequest.chargeNumber != null)
-                xml.add((LocationNumberCapImpl) connectRequest.chargeNumber, CHARGE_NUMBER, LocationNumberCapImpl.class);
-            if (connectRequest.legToBeConnected != null)
-                xml.add((LegIDImpl) connectRequest.legToBeConnected, LEG_TO_BE_CONNECTED, LegIDImpl.class);
-            if (connectRequest.cugInterlock != null)
-                xml.add((CUGInterlockImpl) connectRequest.cugInterlock, CUG_INTERLOCK, CUGInterlockImpl.class);
-
-            if (connectRequest.cugOutgoingAccess)
-                xml.add(true, CUG_OUTGOING_ACCESS, Boolean.class);
-            if (connectRequest.getSuppressionOfAnnouncement())
-                xml.add(true, SUPPRESSION_OF_ANNOUNCEMENT, Boolean.class);
-            if (connectRequest.getOCSIApplicable())
-                xml.add(true, OCSI_APPLICABLE, Boolean.class);
-
-            if (connectRequest.getNAOliInfo() != null)
-                xml.add((NAOliInfoImpl) connectRequest.getNAOliInfo(), NA_OLI_INFO, NAOliInfoImpl.class);
-
-            if (connectRequest.borInterrogationRequested)
-                xml.add(true, BOR_INTERROGATION_REQUESTED, Boolean.class);
-            if (connectRequest.suppressNCSI)
-                xml.add(true, SUPPRESS_N_CSI, Boolean.class);
-        }
-    };
-
-    public static class ConnectRequest_GenericNumbers extends ArrayListSerializingBase<GenericNumberCap> {
+public static class ConnectRequest_GenericNumbers extends ArrayListSerializingBase<GenericNumberCap> {
 
         public ConnectRequest_GenericNumbers() {
             super(GENERIC_NUMBER, GenericNumberCapImpl.class);

@@ -1,8 +1,7 @@
 
 package org.restcomm.protocols.ss7.map.primitives;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
@@ -16,6 +15,7 @@ import org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("isdnAddressString")
 public class ISDNAddressStringImpl extends AddressStringImpl implements ISDNAddressString {
 
     public ISDNAddressStringImpl() {
@@ -49,22 +49,4 @@ public class ISDNAddressStringImpl extends AddressStringImpl implements ISDNAddr
                 + this.address + "]";
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ISDNAddressStringImpl> ISDN_ADDRESS_STRING_XML = new XMLFormat<ISDNAddressStringImpl>(
-            ISDNAddressStringImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ISDNAddressStringImpl isdnAddressStringImpl)
-                throws XMLStreamException {
-            ADDRESS_STRING_XML.read(xml, isdnAddressStringImpl);
-        }
-
-        @Override
-        public void write(ISDNAddressStringImpl isdnAddressStringImpl, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            ADDRESS_STRING_XML.write(isdnAddressStringImpl, xml);
-        }
-    };
 }

@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -21,12 +19,15 @@ import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.cap.primitives.SendingSideIDImpl;
 import org.restcomm.protocols.ss7.inap.api.primitives.LegType;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class FCIBCCCAMELsequence1Impl implements FCIBCCCAMELsequence1, CAPAsnPrimitive {
+@XStreamAlias("fCIBCCCAMELsequence1")
+ implements FCIBCCCAMELsequence1, CAPAsnPrimitive {
 
     public static final int _ID_freeFormatData = 0;
     public static final int _ID_partyToCharge = 1;
@@ -239,31 +240,4 @@ public class FCIBCCCAMELsequence1Impl implements FCIBCCCAMELsequence1, CAPAsnPri
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<FCIBCCCAMELsequence1Impl> FCIBCC_CAMEL_SEQUENCE1_XML = new XMLFormat<FCIBCCCAMELsequence1Impl>(FCIBCCCAMELsequence1Impl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, FCIBCCCAMELsequence1Impl fciBCCCAMELsequence1)
-                throws XMLStreamException {
-            String vals = xml.getAttribute(APPEND_FREE_FORMAT_DATA, "");
-            if (vals != null && vals.length() > 0)
-                fciBCCCAMELsequence1.appendFreeFormatData = Enum.valueOf(AppendFreeFormatData.class, vals);
-
-            fciBCCCAMELsequence1.freeFormatData = xml.get(FREE_FORMAT_DATA, FreeFormatDataImpl.class);
-            fciBCCCAMELsequence1.partyToCharge = xml.get(PARTY_TO_CHARGE, SendingSideIDImpl.class);
-        }
-
-        @Override
-        public void write(FCIBCCCAMELsequence1Impl fciBCCCAMELsequence1, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (fciBCCCAMELsequence1.appendFreeFormatData != null)
-                xml.setAttribute(APPEND_FREE_FORMAT_DATA, fciBCCCAMELsequence1.appendFreeFormatData.toString());
-
-            xml.add((FreeFormatDataImpl) fciBCCCAMELsequence1.freeFormatData, FREE_FORMAT_DATA, FreeFormatDataImpl.class);
-            xml.add((SendingSideIDImpl) fciBCCCAMELsequence1.partyToCharge, PARTY_TO_CHARGE, SendingSideIDImpl.class);
-        }
-    };
 }

@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -20,12 +18,15 @@ import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.ExtBasicServiceCode;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.ExtBasicServiceCodeImpl;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class TServiceChangeSpecificInfoImpl extends SequenceBase implements TServiceChangeSpecificInfo {
+@XStreamAlias("tServiceChangeSpecificInfo")
+ extends SequenceBase implements TServiceChangeSpecificInfo {
 
     public static final String EXT_BASIC_SERVICE_CODE = "extBasicServiceCode";
 
@@ -114,27 +115,4 @@ public class TServiceChangeSpecificInfoImpl extends SequenceBase implements TSer
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<TServiceChangeSpecificInfoImpl> T_SERVICE_CHANGE_SPECIFIC_INFO_XML = new XMLFormat<TServiceChangeSpecificInfoImpl>(
-            TServiceChangeSpecificInfoImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, TServiceChangeSpecificInfoImpl tServiceChangeSpecificInfo)
-                throws XMLStreamException {
-            tServiceChangeSpecificInfo.extBasicServiceCode = xml.get(EXT_BASIC_SERVICE_CODE, ExtBasicServiceCodeImpl.class);
-        }
-
-        @Override
-        public void write(TServiceChangeSpecificInfoImpl tServiceChangeSpecificInfo, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-
-            if (tServiceChangeSpecificInfo.extBasicServiceCode != null) {
-                xml.add(((ExtBasicServiceCodeImpl) tServiceChangeSpecificInfo.extBasicServiceCode), EXT_BASIC_SERVICE_CODE, ExtBasicServiceCodeImpl.class);
-            }
-        }
-    };
-
 }

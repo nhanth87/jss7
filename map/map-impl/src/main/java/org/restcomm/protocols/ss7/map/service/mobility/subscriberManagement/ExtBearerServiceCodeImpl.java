@@ -1,9 +1,8 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.BearerServiceCodeValue;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.ExtBearerServiceCode;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
@@ -13,11 +12,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("extBearerServiceCodeImpl")
 public class ExtBearerServiceCodeImpl extends OctetStringBase implements ExtBearerServiceCode {
-
-    private static final String BEARER_SERVICE_CODE_VALUE = "bearerServiceCodeValue";
-    private static final String DEFAULT_STRING_VALUE = null;
-
     public ExtBearerServiceCodeImpl() {
         super(1, 5, "ExtBearerServiceCode");
     }

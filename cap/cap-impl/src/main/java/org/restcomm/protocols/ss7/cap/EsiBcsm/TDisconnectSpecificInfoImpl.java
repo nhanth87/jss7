@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -18,12 +16,15 @@ import org.restcomm.protocols.ss7.cap.isup.CauseCapImpl;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class TDisconnectSpecificInfoImpl extends SequenceBase implements TDisconnectSpecificInfo {
+@XStreamAlias("tDisconnectSpecificInfo")
+ extends SequenceBase implements TDisconnectSpecificInfo {
 
     private static final String RELEASE_CAUSE = "releaseCause";
 
@@ -96,26 +97,4 @@ public class TDisconnectSpecificInfoImpl extends SequenceBase implements TDiscon
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<TDisconnectSpecificInfoImpl> ROUTE_SELECT_FAILURE_SPECIFIC_INFO_XML = new XMLFormat<TDisconnectSpecificInfoImpl>(
-            TDisconnectSpecificInfoImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, TDisconnectSpecificInfoImpl oCalledPartyBusySpecificInfo)
-                throws XMLStreamException {
-            oCalledPartyBusySpecificInfo.releaseCause = xml.get(RELEASE_CAUSE, CauseCapImpl.class);
-        }
-
-        @Override
-        public void write(TDisconnectSpecificInfoImpl oCalledPartyBusySpecificInfo, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-
-            if (oCalledPartyBusySpecificInfo.releaseCause != null) {
-                xml.add(((CauseCapImpl) oCalledPartyBusySpecificInfo.releaseCause), RELEASE_CAUSE, CauseCapImpl.class);
-            }
-        }
-    };
 }

@@ -1,9 +1,8 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.supplementary;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.supplementary.SSCode;
 import org.restcomm.protocols.ss7.map.api.service.supplementary.SupplementaryCodeValue;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringLength1Base;
@@ -14,10 +13,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringLength1Base;
  * @author amit bhayani
  *
  */
+@XStreamAlias("sSCodeImpl")
 public class SSCodeImpl extends OctetStringLength1Base implements SSCode {
-
-    private static final String SUPPLEMENTARY_CODE_VALUE = "supplementaryCodeValue";
-    private static final String DATA = "data";
 
     public SSCodeImpl() {
         super("SSCode");

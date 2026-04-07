@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -17,12 +15,15 @@ import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class ChangeOfLocationAltImpl extends SequenceBase implements ChangeOfLocationAlt {
+@XStreamAlias("changeOfLocationAlt")
+ extends SequenceBase implements ChangeOfLocationAlt {
 
 //    private static final String O_SERVICE_CHANGE_SPECIFIC_INFO = "oServiceChangeSpecificInfo";
 //
@@ -86,23 +87,4 @@ public class ChangeOfLocationAltImpl extends SequenceBase implements ChangeOfLoc
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ChangeOfLocationAltImpl> CHANGE_OF_LOCATION_ALT_XML = new XMLFormat<ChangeOfLocationAltImpl>(ChangeOfLocationAltImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ChangeOfLocationAltImpl changeOfLocationAlt) throws XMLStreamException {
-//            dpSpecificInfoAlt.oServiceChangeSpecificInfo = xml.get(O_SERVICE_CHANGE_SPECIFIC_INFO, OServiceChangeSpecificInfoImpl.class);
-        }
-
-        @Override
-        public void write(ChangeOfLocationAltImpl changeOfLocationAlt, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-//            if (dpSpecificInfoAlt.oServiceChangeSpecificInfo != null)
-//                xml.add((OServiceChangeSpecificInfoImpl) dpSpecificInfoAlt.oServiceChangeSpecificInfo, O_SERVICE_CHANGE_SPECIFIC_INFO,
-//                        OServiceChangeSpecificInfoImpl.class);
-        }
-    };
-
 }

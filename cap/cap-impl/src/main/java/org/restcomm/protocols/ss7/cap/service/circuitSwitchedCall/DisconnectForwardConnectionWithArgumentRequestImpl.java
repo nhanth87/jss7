@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -21,12 +19,15 @@ import org.restcomm.protocols.ss7.cap.primitives.CAPExtensionsImpl;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author Povilas Jurna
  *
  */
-public class DisconnectForwardConnectionWithArgumentRequestImpl extends CircuitSwitchedCallMessageImpl implements DisconnectForwardConnectionWithArgumentRequest {
+@XStreamAlias("disconnectForwardConnectionWithArgumentRequest")
+ extends CircuitSwitchedCallMessageImpl implements DisconnectForwardConnectionWithArgumentRequest {
 
     public static final int _ID_callSegmentID = 1;
     public static final int _ID_extensions = 2;
@@ -194,38 +195,7 @@ public class DisconnectForwardConnectionWithArgumentRequestImpl extends CircuitS
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<DisconnectForwardConnectionWithArgumentRequestImpl> CONNECT_REQUEST_XML = new XMLFormat<DisconnectForwardConnectionWithArgumentRequestImpl>(
-            DisconnectForwardConnectionWithArgumentRequestImpl.class) {
-
-        public void read(javolution.xml.XMLFormat.InputElement xml,
-                DisconnectForwardConnectionWithArgumentRequestImpl disconnectForwardConnectionWithArgumentRequest)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.read(xml, disconnectForwardConnectionWithArgumentRequest);
-
-            disconnectForwardConnectionWithArgumentRequest.callSegmentID = xml.get(CALL_SEGMENT_ID, Integer.class);
-            disconnectForwardConnectionWithArgumentRequest.extensions = xml.get(EXTENSIONS, CAPExtensionsImpl.class);
-
-        }
-
-        public void write(
-                DisconnectForwardConnectionWithArgumentRequestImpl disconnectForwardConnectionWithArgumentRequest,
-                javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.write(disconnectForwardConnectionWithArgumentRequest, xml);
-
-            if (disconnectForwardConnectionWithArgumentRequest.getCallSegmentID() != null)
-                xml.add(disconnectForwardConnectionWithArgumentRequest.getCallSegmentID(), CALL_SEGMENT_ID,
-                        Integer.class);
-            if (disconnectForwardConnectionWithArgumentRequest.getExtensions() != null)
-                xml.add((CAPExtensionsImpl) disconnectForwardConnectionWithArgumentRequest.getExtensions(), EXTENSIONS,
-                        CAPExtensionsImpl.class);
-        }
-    };
-
-    @Override
+@Override
     public Integer getCallSegmentID() {
         return callSegmentID;
     }

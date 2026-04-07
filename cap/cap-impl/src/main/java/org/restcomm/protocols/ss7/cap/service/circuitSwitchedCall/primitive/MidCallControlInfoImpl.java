@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -18,12 +16,15 @@ import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class MidCallControlInfoImpl extends SequenceBase implements MidCallControlInfo {
+@XStreamAlias("midCallControlInfo")
+ extends SequenceBase implements MidCallControlInfo {
 
     private static final String MINIMUM_NUMBER_OF_DIGITS = "minimumNumberOfDigits";
     private static final String MAXIMUM_NUMBER_OF_DIGITS = "maximumNumberOfDigits";
@@ -328,38 +329,4 @@ public class MidCallControlInfoImpl extends SequenceBase implements MidCallContr
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MidCallControlInfoImpl> MID_CALL_CONTROL_INFO_XML = new XMLFormat<MidCallControlInfoImpl>(
-            MidCallControlInfoImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MidCallControlInfoImpl midCallControlInfo) throws XMLStreamException {
-            midCallControlInfo.minimumNumberOfDigits = xml.get(MINIMUM_NUMBER_OF_DIGITS, Integer.class);
-            midCallControlInfo.maximumNumberOfDigits = xml.get(MAXIMUM_NUMBER_OF_DIGITS, Integer.class);
-            midCallControlInfo.endOfReplyDigit = xml.get(END_OF_REPLY_DIGIT, String.class);
-            midCallControlInfo.cancelDigit = xml.get(CANCEL_DIGIT, String.class);
-            midCallControlInfo.startDigit = xml.get(START_DIGIT, String.class);
-            midCallControlInfo.interDigitTimeout = xml.get(INTER_DIGIT_TIMEOUT, Integer.class);
-        }
-
-        @Override
-        public void write(MidCallControlInfoImpl midCallControlInfo, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (midCallControlInfo.minimumNumberOfDigits != null)
-                xml.add((Integer) midCallControlInfo.minimumNumberOfDigits, MINIMUM_NUMBER_OF_DIGITS, Integer.class);
-            if (midCallControlInfo.maximumNumberOfDigits != null)
-                xml.add((Integer) midCallControlInfo.maximumNumberOfDigits, MAXIMUM_NUMBER_OF_DIGITS, Integer.class);
-            if (midCallControlInfo.endOfReplyDigit != null)
-                xml.add((String) midCallControlInfo.endOfReplyDigit, END_OF_REPLY_DIGIT, String.class);
-            if (midCallControlInfo.cancelDigit != null)
-                xml.add((String) midCallControlInfo.cancelDigit, CANCEL_DIGIT, String.class);
-            if (midCallControlInfo.startDigit != null)
-                xml.add((String) midCallControlInfo.startDigit, START_DIGIT, String.class);
-            if (midCallControlInfo.interDigitTimeout != null)
-                xml.add((Integer) midCallControlInfo.interDigitTimeout, INTER_DIGIT_TIMEOUT, Integer.class);
-        }
-    };
-
 }

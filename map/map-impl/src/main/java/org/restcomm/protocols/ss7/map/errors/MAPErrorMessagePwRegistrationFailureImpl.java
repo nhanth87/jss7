@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.errors;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -22,10 +21,8 @@ import org.restcomm.protocols.ss7.map.api.errors.PWRegistrationFailureCause;
  * @author sergey vetyutnev
  * @author amit bhayani
  */
+@XStreamAlias("mAPErrorMessagePwRegistrationFailureImpl")
 public class MAPErrorMessagePwRegistrationFailureImpl extends MAPErrorMessageImpl implements MAPErrorMessagePwRegistrationFailure {
-
-    private static final String PW_REGIS_FAILURE_CAUSE = "pwRegistrationFailureCause";
-
     private PWRegistrationFailureCause pwRegistrationFailureCause;
 
     protected String _PrimitiveName = "MAPErrorMessagePwRegistrationFailure";

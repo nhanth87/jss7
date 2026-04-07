@@ -1,10 +1,9 @@
-package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
+﻿package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -25,12 +24,10 @@ import org.restcomm.protocols.ss7.map.service.mobility.MobilityMessageImpl;
  * @author amit bhayani
  *
  */
+@XStreamAlias("anyTimeInterrogationResponseImpl")
 public class AnyTimeInterrogationResponseImpl extends MobilityMessageImpl implements AnyTimeInterrogationResponse, MAPAsnPrimitive {
 
     public static final String _PrimitiveName = "AnyTimeInterrogationResponse";
-
-    private static final String SUBSCRIBER_INFO = "subscriberInfo";
-    private static final String EXTENSION_CONTAINER = "extensionContainer";
 
     private SubscriberInfo subscriberInfo;
     private MAPExtensionContainer extensionContainer;

@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -18,12 +16,15 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.ByteArrayContainer;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class CollectedDigitsImpl extends SequenceBase implements CollectedDigits {
+@XStreamAlias("collectedDigits")
+ extends SequenceBase implements CollectedDigits {
 
     public static final int _ID_minimumNumberOfDigits = 0;
     public static final int _ID_maximumNumberOfDigits = 1;
@@ -337,90 +338,4 @@ public class CollectedDigitsImpl extends SequenceBase implements CollectedDigits
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<CollectedDigitsImpl> COLLECTED_DIGITS_XML = new XMLFormat<CollectedDigitsImpl>(
-            CollectedDigitsImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, CollectedDigitsImpl collectedDigits)
-                throws XMLStreamException {
-            int vali = xml.getAttribute(MINIMUM_NB_OF_DIGITS, -1);
-            if (vali != -1)
-                collectedDigits.minimumNumberOfDigits = vali;
-            collectedDigits.maximumNumberOfDigits = xml.getAttribute(MAXIMUM_NB_OF_DIGITS, 1);
-
-            vali = xml.getAttribute(FIRST_DIGIT_TIME_OUT, -1);
-            if (vali != -1)
-                collectedDigits.firstDigitTimeOut = vali;
-            vali = xml.getAttribute(INTER_DIGIT_TIME_OUT, -1);
-            if (vali != -1)
-                collectedDigits.interDigitTimeOut = vali;
-
-            String vals = xml.getAttribute(ERROR_TREATMENT, "");
-            if (vals != null && vals.length() > 0)
-                collectedDigits.errorTreatment = Enum.valueOf(ErrorTreatment.class, vals);
-
-            vals = xml.getAttribute(INTERRUPTABLE_ANN_IND, "");
-            if (vals != null && vals.length() > 0)
-                collectedDigits.interruptableAnnouncementIndicator = Boolean.valueOf(vals);
-            vals = xml.getAttribute(VOICE_INFORMATION, "");
-            if (vals != null && vals.length() > 0)
-                collectedDigits.voiceInformation = Boolean.valueOf(vals);
-            vals = xml.getAttribute(VOICE_BACK, "");
-            if (vals != null && vals.length() > 0)
-                collectedDigits.voiceBack = Boolean.valueOf(vals);
-
-            ByteArrayContainer bc = xml.get(END_OF_REPLY_DIGIT, ByteArrayContainer.class);
-            if (bc != null) {
-                collectedDigits.endOfReplyDigit = bc.getData();
-            }
-            bc = xml.get(CANCEL_DIGIT, ByteArrayContainer.class);
-            if (bc != null) {
-                collectedDigits.cancelDigit = bc.getData();
-            }
-            bc = xml.get(START_DIGIT, ByteArrayContainer.class);
-            if (bc != null) {
-                collectedDigits.startDigit = bc.getData();
-            }
-        }
-
-        @Override
-        public void write(CollectedDigitsImpl collectedDigits, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (collectedDigits.minimumNumberOfDigits != null)
-                xml.setAttribute(MINIMUM_NB_OF_DIGITS, collectedDigits.minimumNumberOfDigits);
-            xml.setAttribute(MAXIMUM_NB_OF_DIGITS, collectedDigits.maximumNumberOfDigits);
-
-            if (collectedDigits.firstDigitTimeOut != null)
-                xml.setAttribute(FIRST_DIGIT_TIME_OUT, (int) collectedDigits.firstDigitTimeOut);
-            if (collectedDigits.interDigitTimeOut != null)
-                xml.setAttribute(INTER_DIGIT_TIME_OUT, (int)collectedDigits.interDigitTimeOut);
-
-            if (collectedDigits.errorTreatment != null)
-                xml.setAttribute(ERROR_TREATMENT, collectedDigits.errorTreatment.toString());
-
-            if (collectedDigits.interruptableAnnouncementIndicator != null)
-                xml.setAttribute(INTERRUPTABLE_ANN_IND, (boolean)collectedDigits.interruptableAnnouncementIndicator);
-            if (collectedDigits.voiceInformation != null)
-                xml.setAttribute(VOICE_INFORMATION, (boolean)collectedDigits.voiceInformation);
-            if (collectedDigits.voiceBack != null)
-                xml.setAttribute(VOICE_BACK, (boolean)collectedDigits.voiceBack);
-
-            if (collectedDigits.endOfReplyDigit != null) {
-                ByteArrayContainer bac = new ByteArrayContainer(collectedDigits.endOfReplyDigit);
-                xml.add(bac, END_OF_REPLY_DIGIT, ByteArrayContainer.class);
-            }
-            if (collectedDigits.cancelDigit != null) {
-                ByteArrayContainer bac = new ByteArrayContainer(collectedDigits.cancelDigit);
-                xml.add(bac, CANCEL_DIGIT, ByteArrayContainer.class);
-            }
-            if (collectedDigits.startDigit != null) {
-                ByteArrayContainer bac = new ByteArrayContainer(collectedDigits.startDigit);
-                xml.add(bac, START_DIGIT, ByteArrayContainer.class);
-            }
-        }
-    };
 }

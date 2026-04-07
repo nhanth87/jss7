@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -17,12 +15,15 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.MessageID;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class InbandInfoImpl extends SequenceBase implements InbandInfo {
+@XStreamAlias("inbandInfo")
+ extends SequenceBase implements InbandInfo {
 
     public static final int _ID_messageID = 0;
     public static final int _ID_numberOfRepetitions = 1;
@@ -172,37 +173,4 @@ public class InbandInfoImpl extends SequenceBase implements InbandInfo {
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<InbandInfoImpl> INBAND_INFO_XML = new XMLFormat<InbandInfoImpl>(InbandInfoImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, InbandInfoImpl inbandInfo) throws XMLStreamException {
-            int vali = xml.getAttribute(NUMBER_OF_REPETITIONS, -1);
-            if (vali != -1)
-                inbandInfo.numberOfRepetitions = vali;
-            vali = xml.getAttribute(DURATION, -1);
-            if (vali != -1)
-                inbandInfo.duration = vali;
-            vali = xml.getAttribute(INTERVAL, -1);
-            if (vali != -1)
-                inbandInfo.interval = vali;
-
-            inbandInfo.messageID = xml.get(MESSAGE_ID, MessageIDImpl.class);
-        }
-
-        @Override
-        public void write(InbandInfoImpl inbandInfo, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (inbandInfo.numberOfRepetitions != null)
-                xml.setAttribute(NUMBER_OF_REPETITIONS, (int) inbandInfo.numberOfRepetitions);
-            if (inbandInfo.duration != null)
-                xml.setAttribute(DURATION, (int) inbandInfo.duration);
-            if (inbandInfo.interval != null)
-                xml.setAttribute(INTERVAL, (int) inbandInfo.interval);
-
-            xml.add((MessageIDImpl) inbandInfo.messageID, MESSAGE_ID, MessageIDImpl.class);
-        }
-    };
 }

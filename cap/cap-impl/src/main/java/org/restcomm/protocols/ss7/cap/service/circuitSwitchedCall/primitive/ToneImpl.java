@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -16,12 +14,15 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.Tone;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class ToneImpl extends SequenceBase implements Tone {
+@XStreamAlias("tone")
+ extends SequenceBase implements Tone {
 
     public static final int _ID_toneID = 0;
     public static final int _ID_duration = 1;
@@ -123,25 +124,4 @@ public class ToneImpl extends SequenceBase implements Tone {
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ToneImpl> TONE_XML = new XMLFormat<ToneImpl>(ToneImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ToneImpl tone) throws XMLStreamException {
-            tone.toneID = xml.getAttribute(TONE_ID, 0);
-            int vali = xml.getAttribute(DURATION, -1);
-            if (vali != -1)
-                tone.duration = vali;
-        }
-
-        @Override
-        public void write(ToneImpl tone, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(TONE_ID, tone.toneID);
-            if (tone.duration != null)
-                xml.setAttribute(DURATION, (int) tone.duration);
-        }
-    };
 }

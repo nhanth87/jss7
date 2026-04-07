@@ -3,9 +3,6 @@ package org.restcomm.protocols.ss7.cap.isup;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -25,14 +22,14 @@ import org.restcomm.protocols.ss7.isup.message.parameter.CauseIndicators;
  * @author Amit Bhayani
  *
  */
-public class CauseCapImpl implements CauseCap, CAPAsnPrimitive {
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-    private static final String CAUSE_INDICATORS = "causeIndicators";
+@XStreamAlias("causeCap")
+public class CauseCapImpl implements CauseCap, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "CauseCap";
 
-    private static final String ISUP_CAUSE_INDICATORS_XML = "isupCauseIndicators";
-
+    @XStreamAlias("isupCauseIndicators")
     private byte[] data;
 
     public CauseCapImpl() {
@@ -197,28 +194,4 @@ public class CauseCapImpl implements CauseCap, CAPAsnPrimitive {
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<CauseCapImpl> CAUSE_CAP_XML = new XMLFormat<CauseCapImpl>(CauseCapImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, CauseCapImpl causeCap) throws XMLStreamException {
-            try {
-                causeCap.setCauseIndicators(xml.get(ISUP_CAUSE_INDICATORS_XML, CauseIndicatorsImpl.class));
-            } catch (CAPException e) {
-                throw new XMLStreamException(e);
-            }
-        }
-
-        @Override
-        public void write(CauseCapImpl causeCap, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            try {
-                xml.add(((CauseIndicatorsImpl) causeCap.getCauseIndicators()), ISUP_CAUSE_INDICATORS_XML,
-                        CauseIndicatorsImpl.class);
-            } catch (CAPException e) {
-                throw new XMLStreamException(e);
-            }
-        }
-    };
 }

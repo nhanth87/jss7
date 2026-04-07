@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -18,12 +16,15 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.Tone;
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class InformationToSendImpl implements InformationToSend, CAPAsnPrimitive {
+@XStreamAlias("informationToSend")
+ implements InformationToSend, CAPAsnPrimitive {
 
     public static final int _ID_inbandInfo = 0;
     public static final int _ID_tone = 1;
@@ -189,37 +190,4 @@ public class InformationToSendImpl implements InformationToSend, CAPAsnPrimitive
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<InformationToSendImpl> INFORMATION_TO_SEND_XML = new XMLFormat<InformationToSendImpl>(
-            InformationToSendImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, InformationToSendImpl informationToSend)
-                throws XMLStreamException {
-            informationToSend.inbandInfo = xml.get(INBAND_INFO, InbandInfoImpl.class);
-            informationToSend.tone = xml.get(TONE, ToneImpl.class);
-
-            int choiceCount = 0;
-            if (informationToSend.inbandInfo != null)
-                choiceCount++;
-            if (informationToSend.tone != null)
-                choiceCount++;
-
-            if (choiceCount != 1)
-                throw new XMLStreamException("MessageID decoding error: there must be one choice selected, found: "
-                        + choiceCount);
-        }
-
-        @Override
-        public void write(InformationToSendImpl informationToSend, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (informationToSend.inbandInfo != null)
-                xml.add((InbandInfoImpl) informationToSend.inbandInfo, INBAND_INFO, InbandInfoImpl.class);
-            if (informationToSend.tone != null)
-                xml.add((ToneImpl) informationToSend.tone, TONE, ToneImpl.class);
-        }
-    };
 }

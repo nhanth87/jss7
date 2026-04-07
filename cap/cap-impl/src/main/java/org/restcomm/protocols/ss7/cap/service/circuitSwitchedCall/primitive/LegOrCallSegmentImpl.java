@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -21,12 +19,15 @@ import org.restcomm.protocols.ss7.inap.api.primitives.LegID;
 import org.restcomm.protocols.ss7.inap.primitives.LegIDImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author Povilas Jurna
  *
  */
-public class LegOrCallSegmentImpl implements LegOrCallSegment, CAPAsnPrimitive {
+@XStreamAlias("legOrCallSegment")
+ implements LegOrCallSegment, CAPAsnPrimitive {
 
     private static final String CALL_SEGMENT_ID = "callSegmentID";
     private static final String LEG_ID = "legID";
@@ -205,35 +206,7 @@ public class LegOrCallSegmentImpl implements LegOrCallSegment, CAPAsnPrimitive {
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<LegOrCallSegmentImpl> TIME_INFORMATION_XML = new XMLFormat<LegOrCallSegmentImpl>(
-            LegOrCallSegmentImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, LegOrCallSegmentImpl legOrCallSegment)
-                throws XMLStreamException {
-            legOrCallSegment.callSegmentID = xml.get(CALL_SEGMENT_ID, Integer.class);
-            legOrCallSegment.legID = xml.get(LEG_ID, LegIDImpl.class);
-        }
-
-        @Override
-        public void write(LegOrCallSegmentImpl legOrCallSegment, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-
-            if (legOrCallSegment.callSegmentID != null) {
-                xml.add(legOrCallSegment.callSegmentID, CALL_SEGMENT_ID, Integer.class);
-            }
-
-            if (legOrCallSegment.legID != null) {
-                xml.add((LegIDImpl) legOrCallSegment.legID, LEG_ID, LegIDImpl.class);
-            }
-        }
-    };
-
-    @Override
+@Override
     public Integer getCallSegmentID() {
         return callSegmentID;
     }

@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -17,12 +15,15 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.LegOrCallSegment;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author Povilas Jurna
  *
  */
-public class ContinueWithArgumentArgExtensionImpl extends SequenceBase implements ContinueWithArgumentArgExtension {
+@XStreamAlias("continueWithArgumentArgExtension")
+ extends SequenceBase implements ContinueWithArgumentArgExtension {
 
     private static final String SUPPRESS_D_CSI = "suppressDCSI";
     private static final String SUPPRESS_N_CSI = "suppressNCSI";
@@ -153,53 +154,7 @@ public class ContinueWithArgumentArgExtensionImpl extends SequenceBase implement
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ContinueWithArgumentArgExtensionImpl> CALL_SEGMENT_TO_CANCEL_XML = new XMLFormat<ContinueWithArgumentArgExtensionImpl>(
-            ContinueWithArgumentArgExtensionImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml,
-                ContinueWithArgumentArgExtensionImpl continueWithArgumentArgExtension) throws XMLStreamException {
-
-            Boolean bval = xml.get(SUPPRESS_D_CSI, Boolean.class);
-            if (bval != null)
-                continueWithArgumentArgExtension.suppressDCSI = bval;
-            bval = xml.get(SUPPRESS_N_CSI, Boolean.class);
-            if (bval != null)
-                continueWithArgumentArgExtension.suppressNCSI = bval;
-            bval = xml.get(SUPPRESS_OUTGOING_CALL_BARRING, Boolean.class);
-            if (bval != null)
-                continueWithArgumentArgExtension.suppressOutgoingCallBarring = bval;
-            continueWithArgumentArgExtension.legOrCallSegment = xml
-                    .get(LEG_OR_CALL_SEGMENT, LegOrCallSegmentImpl.class);
-        }
-
-        @Override
-        public void write(ContinueWithArgumentArgExtensionImpl continueWithArgumentArgExtension,
-                javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-
-            if (continueWithArgumentArgExtension.suppressDCSI) {
-                xml.add(((Boolean) continueWithArgumentArgExtension.suppressDCSI), SUPPRESS_D_CSI, Boolean.class);
-            }
-            if (continueWithArgumentArgExtension.suppressNCSI) {
-                xml.add(((Boolean) continueWithArgumentArgExtension.suppressNCSI), SUPPRESS_N_CSI, Boolean.class);
-            }
-            if (continueWithArgumentArgExtension.suppressOutgoingCallBarring) {
-                xml.add(((Boolean) continueWithArgumentArgExtension.suppressOutgoingCallBarring),
-                        SUPPRESS_OUTGOING_CALL_BARRING, Boolean.class);
-            }
-            if (continueWithArgumentArgExtension.legOrCallSegment != null) {
-                xml.add(((LegOrCallSegmentImpl) continueWithArgumentArgExtension.legOrCallSegment),
-                        LEG_OR_CALL_SEGMENT, LegOrCallSegmentImpl.class);
-            }
-
-        }
-    };
-
-    @Override
+@Override
     public boolean getSuppressDCsi() {
         return suppressDCSI;
     }

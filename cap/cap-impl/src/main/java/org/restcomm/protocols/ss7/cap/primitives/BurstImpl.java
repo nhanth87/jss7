@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.primitives;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -17,12 +15,15 @@ import org.restcomm.protocols.ss7.cap.api.primitives.Burst;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class BurstImpl extends SequenceBase implements Burst {
+@XStreamAlias("burst")
+ extends SequenceBase implements Burst {
 
     public static final int _ID_numberOfBursts = 0;
     public static final int _ID_burstInterval = 1;
@@ -208,34 +209,4 @@ public class BurstImpl extends SequenceBase implements Burst {
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<BurstImpl> BURST_XML = new XMLFormat<BurstImpl>(BurstImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, BurstImpl burst) throws XMLStreamException {
-            burst.numberOfBursts = xml.get(NUMBER_OF_BURSTS, Integer.class);
-            burst.burstInterval = xml.get(BURST_INTERVAL, Integer.class);
-            burst.numberOfTonesInBurst = xml.get(NUMBER_OF_TONES_IN_BURST, Integer.class);
-            burst.toneDuration = xml.get(TONE_DURATION, Integer.class);
-            burst.toneInterval = xml.get(TONE_INTERVAL, Integer.class);
-        }
-
-        @Override
-        public void write(BurstImpl burst, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (burst.numberOfBursts != null)
-                xml.add(burst.numberOfBursts, NUMBER_OF_BURSTS, Integer.class);
-            if (burst.burstInterval != null)
-                xml.add(burst.burstInterval, BURST_INTERVAL, Integer.class);
-            if (burst.numberOfTonesInBurst != null)
-                xml.add(burst.numberOfTonesInBurst, NUMBER_OF_TONES_IN_BURST, Integer.class);
-            if (burst.toneDuration != null)
-                xml.add(burst.toneDuration, TONE_DURATION, Integer.class);
-            if (burst.toneInterval != null)
-                xml.add(burst.toneInterval, TONE_INTERVAL, Integer.class);
-        }
-    };
-
 }

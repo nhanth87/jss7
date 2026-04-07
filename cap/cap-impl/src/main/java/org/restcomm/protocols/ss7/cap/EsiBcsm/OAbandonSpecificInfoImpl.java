@@ -3,9 +3,6 @@ package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -21,12 +18,14 @@ import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
  * @author sergey vetyutnev
  *
  */
-public class OAbandonSpecificInfoImpl extends SequenceBase implements OAbandonSpecificInfo {
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-    private static final String ROUTE_NOT_PERMITTED = "routeNotPermitted";
+@XStreamAlias("oAbandonSpecificInfo")
+public class OAbandonSpecificInfoImpl extends SequenceBase implements OAbandonSpecificInfo {
 
     public static final int _ID_routeNotPermitted = 50;
 
+    @XStreamAlias("routeNotPermitted")
     private boolean routeNotPermitted;
 
     public OAbandonSpecificInfoImpl() {
@@ -105,25 +104,4 @@ public class OAbandonSpecificInfoImpl extends SequenceBase implements OAbandonSp
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<OAbandonSpecificInfoImpl> T_BUSY_SPECIFIC_INFO = new XMLFormat<OAbandonSpecificInfoImpl>(
-            OAbandonSpecificInfoImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, OAbandonSpecificInfoImpl oAbandonSpecificInfo)
-                throws XMLStreamException {
-            Boolean bval = xml.get(ROUTE_NOT_PERMITTED, Boolean.class);
-            if (bval != null)
-                oAbandonSpecificInfo.routeNotPermitted = bval;
-        }
-
-        @Override
-        public void write(OAbandonSpecificInfoImpl oAbandonSpecificInfo, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (oAbandonSpecificInfo.routeNotPermitted)
-                xml.add(oAbandonSpecificInfo.routeNotPermitted, ROUTE_NOT_PERMITTED, Boolean.class);
-        }
-    };
 }

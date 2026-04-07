@@ -1,8 +1,7 @@
-package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
+﻿package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberInformation.RouteingNumber;
 import org.restcomm.protocols.ss7.map.primitives.TbcdString;
 
@@ -11,10 +10,8 @@ import org.restcomm.protocols.ss7.map.primitives.TbcdString;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("routeingNumberImpl")
 public class RouteingNumberImpl extends TbcdString implements RouteingNumber {
-
-    private static final String NUMBER = "number";
-
     public RouteingNumberImpl() {
         super(1, 5, "RouteingNumber");
     }

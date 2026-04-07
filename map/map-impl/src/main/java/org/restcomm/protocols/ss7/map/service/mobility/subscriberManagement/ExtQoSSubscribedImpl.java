@@ -1,10 +1,8 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.ExtQoSSubscribed;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.ExtQoSSubscribed_BitRate;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.ExtQoSSubscribed_DeliveryOfErroneousSdus;
@@ -22,24 +20,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("extQoSSubscribedImpl")
 public class ExtQoSSubscribedImpl extends OctetStringBase implements ExtQoSSubscribed {
-
-    private static final String ALLOCATION_RETENTION_PRIORITY = "allocationRetentionPriority";
-    private static final String DELIVERY_OF_ERRONEOUS_SDUS = "deliveryOfErroneousSdus";
-    private static final String DELIVERY_ORDER = "deliveryOrder";
-    private static final String TRAFFIC_CLASS = "trafficClass";
-    private static final String MAXIMUM_SDU_SIZE = "maximumSduSize";
-    private static final String MAXIMUM_BIT_RATE_FOR_UPLINK = "maximumBitRateForUplink";
-    private static final String MAXIMUM_BIT_RATE_FOR_DOWNLINK = "maximumBitRateForDownlink";
-    private static final String RESIDUAL_BER = "residualBER";
-    private static final String SDU_ERROR_RATIO = "sduErrorRatio";
-    private static final String TRAFFIC_HANDLING_PRIORITY = "trafficHandlingPriority";
-    private static final String TRANSFER_DELAY = "transferDelay";
-    private static final String GUARANTEED_BIT_RATE_FOR_UPLINK = "guaranteedBitRateForUplink";
-    private static final String GUARANTEED_BIT_RATE_FOR_DOWNLINK = "guaranteedBitRateForDownlink";
-
-    private static final int DEFAULT_INT_VALUE = 0;
-
     public ExtQoSSubscribedImpl() {
         super(1, 9, "ExtQoSSubscribed");
     }

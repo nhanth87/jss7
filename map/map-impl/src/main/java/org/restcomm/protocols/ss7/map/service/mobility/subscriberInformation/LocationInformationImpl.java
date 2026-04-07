@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -34,6 +33,7 @@ import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.LSAI
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("locationInformationImpl")
 public class LocationInformationImpl extends SequenceBase implements LocationInformation {
 
     public static final int _ID_geographicalInformation = 0;
@@ -48,20 +48,6 @@ public class LocationInformationImpl extends SequenceBase implements LocationInf
     public static final int _ID_sai_Present = 9;
     public static final int _ID_locationInformationEPS = 10;
     public static final int _ID_userCSGInformation = 11;
-
-    private static final String AGE_OF_LOCATION_INFORMATION = "ageOfLocationInformation";
-    private static final String GEOGRAPHICAL_INFORMATION = "geographicalInformation";
-    private static final String VLR_NUMBER = "vlrNumber";
-    private static final String LOCATION_NUMBER = "locationNumber";
-    private static final String CELL_GLOBAL_ID_OR_SERVICE_AREA_ID_OR_LAI = "cellGlobalIdOrServiceAreaIdOrLAI";
-    private static final String EXTENSION_CONTAINER = "extensionContainer";
-    private static final String SELECTED_LSA_ID = "selectedLSAId";
-    private static final String MSC_NUMBER = "mscNumber";
-    private static final String GEODETIC_INFORMATION = "geodeticInformation";
-    private static final String CURRENT_LOCATION_RETRIEVED = "currentLocationRetrieved";
-    private static final String SAI_PRESENT = "saiPresent";
-    private static final String LOCATION_INFORMATION_EPS = "locationInformationEPS";
-    private static final String USER_CSG_INFORMATION = "userCSGInformation";
 
     private Integer ageOfLocationInformation;
     private GeographicalInformation geographicalInformation;

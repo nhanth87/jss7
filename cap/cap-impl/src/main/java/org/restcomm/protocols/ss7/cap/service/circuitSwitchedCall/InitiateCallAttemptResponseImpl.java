@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -26,12 +24,15 @@ import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.OfferedCamel4FunctionalitiesImpl;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.SupportedCamelPhasesImpl;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author Povilas Jurna
  *
  */
-public class InitiateCallAttemptResponseImpl extends CircuitSwitchedCallMessageImpl implements InitiateCallAttemptResponse {
+@XStreamAlias("initiateCallAttemptResponse")
+ extends CircuitSwitchedCallMessageImpl implements InitiateCallAttemptResponse {
 
     public static final int _ID_supportedCamelPhases = 0;
     public static final int _ID_offeredCamel4Functionalities = 1;
@@ -236,46 +237,7 @@ public class InitiateCallAttemptResponseImpl extends CircuitSwitchedCallMessageI
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<InitiateCallAttemptResponseImpl> CONNECT_REQUEST_XML = new XMLFormat<InitiateCallAttemptResponseImpl>(
-            InitiateCallAttemptResponseImpl.class) {
-
-        public void read(javolution.xml.XMLFormat.InputElement xml,
-                InitiateCallAttemptResponseImpl initiateCallAttemptResponse) throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.read(xml, initiateCallAttemptResponse);
-
-            initiateCallAttemptResponse.supportedCamelPhases = xml.get(SUPPORTED_CAMEL_PHASES,
-                    SupportedCamelPhasesImpl.class);
-            initiateCallAttemptResponse.extensions = xml.get(EXTENSIONS, CAPExtensionsImpl.class);
-            initiateCallAttemptResponse.offeredCamel4Functionalities = xml.get(OFFERED_CAMEL4_FUNCTIONALITIES,
-                    OfferedCamel4FunctionalitiesImpl.class);
-            Boolean bval = xml.get(RELEASE_CALL_ARG_EXTENSION_ALLOWED, Boolean.class);
-            if (bval != null)
-                initiateCallAttemptResponse.releaseCallArgExtensionAllowed = bval;
-        }
-
-        public void write(InitiateCallAttemptResponseImpl initiateCallAttemptResponse,
-                javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.write(initiateCallAttemptResponse, xml);
-
-            if (initiateCallAttemptResponse.getSupportedCamelPhases() != null)
-                xml.add((SupportedCamelPhasesImpl) initiateCallAttemptResponse.getSupportedCamelPhases(),
-                        SUPPORTED_CAMEL_PHASES, SupportedCamelPhasesImpl.class);
-            if (initiateCallAttemptResponse.getExtensions() != null)
-                xml.add((CAPExtensionsImpl) initiateCallAttemptResponse.getExtensions(), EXTENSIONS,
-                        CAPExtensionsImpl.class);
-            if (initiateCallAttemptResponse.getOfferedCamel4Functionalities() != null)
-                xml.add((OfferedCamel4FunctionalitiesImpl) initiateCallAttemptResponse.getOfferedCamel4Functionalities(), OFFERED_CAMEL4_FUNCTIONALITIES,
-                        OfferedCamel4FunctionalitiesImpl.class);
-            if (initiateCallAttemptResponse.getReleaseCallArgExtensionAllowed())
-                xml.add(true, RELEASE_CALL_ARG_EXTENSION_ALLOWED, Boolean.class);
-        }
-    };
-
-    @Override
+@Override
     public SupportedCamelPhases getSupportedCamelPhases() {
         return supportedCamelPhases;
     }

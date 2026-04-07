@@ -1,8 +1,6 @@
 
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -13,12 +11,15 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentException;
 import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.ActivityTestResponse;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class ActivityTestResponseImpl extends CircuitSwitchedCallMessageImpl implements ActivityTestResponse {
+@XStreamAlias("activityTestResponse")
+ extends CircuitSwitchedCallMessageImpl implements ActivityTestResponse {
 
     public static final String _PrimitiveName = "ActivityTestResponse";
 
@@ -73,27 +74,7 @@ public class ActivityTestResponseImpl extends CircuitSwitchedCallMessageImpl imp
     public void encodeData(AsnOutputStream asnOutputStream) throws CAPException {
         throw new CAPException("Parameter " + _PrimitiveName + ": does not support encoding");
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ActivityTestResponseImpl> ACTIVITY_TEST_RESPONSE_XML = new XMLFormat<ActivityTestResponseImpl>(
-            ActivityTestResponseImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ActivityTestResponseImpl activityTestResponse)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.read(xml, activityTestResponse);
-        }
-
-        @Override
-        public void write(ActivityTestResponseImpl activityTestResponse, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.write(activityTestResponse, xml);
-        }
-    };
-
-    @Override
+@Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();

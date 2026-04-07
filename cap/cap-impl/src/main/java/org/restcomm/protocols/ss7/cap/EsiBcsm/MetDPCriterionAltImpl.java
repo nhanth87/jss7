@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -17,12 +15,15 @@ import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class MetDPCriterionAltImpl extends SequenceBase implements MetDPCriterionAlt {
+@XStreamAlias("metDPCriterionAlt")
+ extends SequenceBase implements MetDPCriterionAlt {
 
     public MetDPCriterionAltImpl() {
         super("MetDPCriterionAlt");
@@ -87,27 +88,4 @@ public class MetDPCriterionAltImpl extends SequenceBase implements MetDPCriterio
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MetDPCriterionAltImpl> MET_DP_CRITERION_ALT_INFO = new XMLFormat<MetDPCriterionAltImpl>(
-            MetDPCriterionAltImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MetDPCriterionAltImpl metDPCriterionAlt)
-                throws XMLStreamException {
-//            Boolean bval = xml.get(ROUTE_NOT_PERMITTED, Boolean.class);
-//            if (bval != null)
-//                metDPCriterionAlt.routeNotPermitted = bval;
-        }
-
-        @Override
-        public void write(MetDPCriterionAltImpl metDPCriterionAlt, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-//            if (metDPCriterionAlt.routeNotPermitted)
-//                xml.add(metDPCriterionAlt.routeNotPermitted, ROUTE_NOT_PERMITTED, Boolean.class);
-        }
-    };
-
 }

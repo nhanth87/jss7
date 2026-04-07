@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -29,6 +28,7 @@ import org.restcomm.protocols.ss7.map.primitives.SequenceBase;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("locationInformationEPSImpl")
 public class LocationInformationEPSImpl extends SequenceBase implements LocationInformationEPS {
 
     public static final int _ID_eUtranCellGlobalIdentity = 0;
@@ -39,15 +39,6 @@ public class LocationInformationEPSImpl extends SequenceBase implements Location
     public static final int _ID_currentLocationRetrieved = 5;
     public static final int _ID_ageOfLocationInformation = 6;
     public static final int _ID_mme_Name = 7;
-
-    private static final String E_UTRAN_CELL_GLOBAL_IDENTITY = "eUtranCellGlobalIdentity";
-    private static final String TRACKING_AREA_IDENTITY = "trackingAreaIdentity";
-    private static final String EXTENSION_CONTAINER = "extensionContainer";
-    private static final String GEOGRAPHICAL_INFORMATION = "geographicalInformation";
-    private static final String GEODETIC_INFORMATION = "geodeticInformation";
-    private static final String CURRENT_LOCATION_RETRIEVED = "currentLocationRetrieved";
-    private static final String AGE_OF_LOCATION_INFORMATION = "ageOfLocationInformation";
-    private static final String MME_NAME = "mmeName";
 
     private EUtranCgi eUtranCellGlobalIdentity = null;
     private TAId trackingAreaIdentity = null;

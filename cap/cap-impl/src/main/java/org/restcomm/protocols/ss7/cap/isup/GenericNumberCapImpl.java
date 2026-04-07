@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.isup;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -19,13 +17,16 @@ import org.restcomm.protocols.ss7.isup.ParameterException;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.GenericNumberImpl;
 import org.restcomm.protocols.ss7.isup.message.parameter.GenericNumber;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  *
  * @author sergey vetyutnev
  * @author tamas gyorgyey
  */
-public class GenericNumberCapImpl implements GenericNumberCap, CAPAsnPrimitive {
+@XStreamAlias("genericNumberCap")
+ implements GenericNumberCap, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "GenericNumberCap";
 
@@ -201,32 +202,4 @@ public class GenericNumberCapImpl implements GenericNumberCap, CAPAsnPrimitive {
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<GenericNumberCapImpl> GENERIC_NUMBER_CAP_XML = new XMLFormat<GenericNumberCapImpl>(
-            GenericNumberCapImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, GenericNumberCapImpl genericNumber)
-                throws XMLStreamException {
-            try {
-                genericNumber.setGenericNumber(xml.get(ISUP_GENERIC_NUMBER_XML, GenericNumberImpl.class));
-            } catch (CAPException e) {
-                throw new XMLStreamException(e);
-            }
-        }
-
-        @Override
-        public void write(GenericNumberCapImpl genericNumber, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            try {
-                xml.add(((GenericNumberImpl) genericNumber.getGenericNumber()), ISUP_GENERIC_NUMBER_XML,
-                        GenericNumberImpl.class);
-            } catch (CAPException e) {
-                throw new XMLStreamException(e);
-            }
-        }
-    };
 }

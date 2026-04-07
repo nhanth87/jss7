@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -19,6 +17,8 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.cap.primitives.CAPExtensionsImpl;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
@@ -26,7 +26,8 @@ import org.restcomm.protocols.ss7.cap.primitives.CAPExtensionsImpl;
  * @author alerant appngin
  *
  */
-public class CAMELAChBillingChargingCharacteristicsImpl implements CAMELAChBillingChargingCharacteristics, CAPAsnPrimitive {
+@XStreamAlias("cAMELAChBillingChargingCharacteristics")
+ implements CAMELAChBillingChargingCharacteristics, CAPAsnPrimitive {
 
     private static final String MAX_CALL_PERIOD_DURATION = "maxCallPeriodDuration";
     private static final String RELEASED_IF_DURATION_EXCEEDED = "releaseIfDurationExceeded";
@@ -379,47 +380,4 @@ public class CAMELAChBillingChargingCharacteristicsImpl implements CAMELAChBilli
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<CAMELAChBillingChargingCharacteristicsImpl> CAMEL_ACH_BILLING_CHARGING_CHARACTERISTIC_XML = new XMLFormat<CAMELAChBillingChargingCharacteristicsImpl>(
-            CAMELAChBillingChargingCharacteristicsImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml,
-                CAMELAChBillingChargingCharacteristicsImpl camelAChBillingChargingCharacteristics) throws XMLStreamException {
-            camelAChBillingChargingCharacteristics.capVersion = xml.getAttribute(CAP_VERSION, 2);
-
-            camelAChBillingChargingCharacteristics.maxCallPeriodDuration = xml.get(MAX_CALL_PERIOD_DURATION, Long.class);
-            camelAChBillingChargingCharacteristics.releaseIfDurationExceeded = xml.get(RELEASED_IF_DURATION_EXCEEDED,
-                    Boolean.class);
-            camelAChBillingChargingCharacteristics.tariffSwitchInterval = xml.get(TARIFF_SWITCH_INTERVAL, Long.class);
-            camelAChBillingChargingCharacteristics.extensions = xml.get(EXTENSIONS, CAPExtensionsImpl.class);
-            camelAChBillingChargingCharacteristics.audibleIndicator = xml.get(AUDIBLE_INDICATOR, AudibleIndicatorImpl.class);
-
-        }
-
-        @Override
-        public void write(CAMELAChBillingChargingCharacteristicsImpl camelAChBillingChargingCharacteristics,
-                javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(CAP_VERSION, camelAChBillingChargingCharacteristics.capVersion);
-
-            xml.add(camelAChBillingChargingCharacteristics.maxCallPeriodDuration, MAX_CALL_PERIOD_DURATION, Long.class);
-            xml.add(camelAChBillingChargingCharacteristics.releaseIfDurationExceeded, RELEASED_IF_DURATION_EXCEEDED,
-                    Boolean.class);
-
-            if (camelAChBillingChargingCharacteristics.tariffSwitchInterval != null) {
-                xml.add(camelAChBillingChargingCharacteristics.tariffSwitchInterval, TARIFF_SWITCH_INTERVAL, Long.class);
-            }
-            if (camelAChBillingChargingCharacteristics.extensions != null) {
-                xml.add((CAPExtensionsImpl) camelAChBillingChargingCharacteristics.extensions, EXTENSIONS,
-                        CAPExtensionsImpl.class);
-            }
-
-            if (camelAChBillingChargingCharacteristics.audibleIndicator != null) {
-                xml.add(((AudibleIndicatorImpl) camelAChBillingChargingCharacteristics.audibleIndicator), AUDIBLE_INDICATOR, AudibleIndicatorImpl.class);
-            }
-        }
-    };
 }

@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.gap;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -18,11 +16,14 @@ import org.restcomm.protocols.ss7.cap.api.gap.CompoundCriteria;
 import org.restcomm.protocols.ss7.cap.api.gap.GapCriteria;
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
-public class GapCriteriaImpl implements GapCriteria, CAPAsnPrimitive {
+@XStreamAlias("gapCriteria")
+public class GapCriteriaImpl implements GapCriteria, CAPAsnPrimitive {
 
     private static final String BASIC_GAP_CRITERIA = "basicGapCriteria";
     private static final String COMPOUND_CRITERIA = "compoundCriteria";
@@ -158,24 +159,7 @@ public class GapCriteriaImpl implements GapCriteria, CAPAsnPrimitive {
         }
     }
 
-    protected static final XMLFormat<GapCriteriaImpl> GAP_CRITERIA_XML = new XMLFormat<GapCriteriaImpl>(GapCriteriaImpl.class) {
 
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, GapCriteriaImpl gapCriteria) throws XMLStreamException {
-            gapCriteria.basicGapCriteria = xml.get(BASIC_GAP_CRITERIA, BasicGapCriteriaImpl.class);
-            gapCriteria.compoundCriteria = xml.get(COMPOUND_CRITERIA, CompoundCriteriaImpl.class);
-        }
-
-        @Override
-        public void write(GapCriteriaImpl gapCriteria, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (gapCriteria.basicGapCriteria != null) {
-                xml.add((BasicGapCriteriaImpl) gapCriteria.basicGapCriteria, BASIC_GAP_CRITERIA, BasicGapCriteriaImpl.class);
-            }
-            if (gapCriteria.compoundCriteria != null) {
-                xml.add((CompoundCriteriaImpl) gapCriteria.compoundCriteria, COMPOUND_CRITERIA, CompoundCriteriaImpl.class);
-            }
-        }
-    };
 
     @Override
     public String toString() {

@@ -1,7 +1,7 @@
-package org.restcomm.protocols.ss7.map.service.lsm;
+﻿package org.restcomm.protocols.ss7.map.service.lsm;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.service.lsm.EllipsoidPoint;
 import org.restcomm.protocols.ss7.map.api.service.lsm.Polygon;
@@ -13,11 +13,8 @@ import jakarta.xml.bind.DatatypeConverter;
 /**
  * @author <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
  */
+@XStreamAlias("polygonImpl")
 public class PolygonImpl extends OctetStringBase implements Polygon {
-
-    private static final String DEFAULT_VALUE = null;
-    private static final String DATA = "data";
-
     public PolygonImpl() {
         super(19, 91, "Polygon");
     }

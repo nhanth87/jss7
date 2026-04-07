@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.errors;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -23,11 +22,8 @@ import org.restcomm.protocols.ss7.map.primitives.MAPExtensionContainerImpl;
  * @author sergey vetyutnev
  * @author amit bhayani
  */
+@XStreamAlias("mAPErrorMessageBusySubscriberImpl")
 public class MAPErrorMessageBusySubscriberImpl extends MAPErrorMessageImpl implements MAPErrorMessageBusySubscriber {
-
-    private static final String CCBS_POSSIBLE = "ccbsPossible";
-    private static final String CCBS_BUSY = "ccbsBusy";
-    private static final String MAP_EXTENSION_CONTAINER = "mapExtensionContainer";
 
     public static final int _tag_ccbs_Possible = 0;
     public static final int _tag_ccbs_Busy = 1;
@@ -240,31 +236,5 @@ public class MAPErrorMessageBusySubscriberImpl extends MAPErrorMessageImpl imple
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessageBusySubscriberImpl> MAP_ERROR_MESSAGE_BUSY_SUBSCRIBER_XML = new XMLFormat<MAPErrorMessageBusySubscriberImpl>(
-            MAPErrorMessageBusySubscriberImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessageBusySubscriberImpl errorMessage)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.read(xml, errorMessage);
-            errorMessage.ccbsPossible = xml.get(CCBS_POSSIBLE, Boolean.class);
-            errorMessage.ccbsBusy = xml.get(CCBS_BUSY, Boolean.class);
-            errorMessage.extensionContainer = xml.get(MAP_EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-        }
-
-        @Override
-        public void write(MAPErrorMessageBusySubscriberImpl errorMessage, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            MAP_ERROR_MESSAGE_XML.write(errorMessage, xml);
-            xml.add(errorMessage.getCcbsPossible(), CCBS_POSSIBLE, Boolean.class);
-            xml.add(errorMessage.getCcbsBusy(), CCBS_BUSY, Boolean.class);
-            xml.add((MAPExtensionContainerImpl) errorMessage.extensionContainer, MAP_EXTENSION_CONTAINER,
-                    MAPExtensionContainerImpl.class);
-        }
-    };
 
 }

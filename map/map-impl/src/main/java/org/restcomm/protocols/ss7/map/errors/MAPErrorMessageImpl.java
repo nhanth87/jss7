@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.errors;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessage;
 import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessageAbsentSubscriber;
@@ -32,10 +32,10 @@ import org.restcomm.protocols.ss7.map.primitives.MAPAsnPrimitive;
  * @author amit bhayani
  *
  */
+@XStreamAlias("mapErrorMessage")
 public abstract class MAPErrorMessageImpl implements MAPErrorMessage, MAPAsnPrimitive {
 
-    private static final String ERROR_CODE = "errorCode";
-
+    @XStreamAsAttribute
     protected Long errorCode;
 
     protected MAPErrorMessageImpl(Long errorCode) {
@@ -192,22 +192,5 @@ public abstract class MAPErrorMessageImpl implements MAPErrorMessage, MAPAsnPrim
     public MAPErrorMessagePwRegistrationFailure getEmPwRegistrationFailure() {
         return null;
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MAPErrorMessageImpl> MAP_ERROR_MESSAGE_XML = new XMLFormat<MAPErrorMessageImpl>(
-            MAPErrorMessageImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MAPErrorMessageImpl message) throws XMLStreamException {
-            message.errorCode = xml.getAttribute(ERROR_CODE, -1L);
-        }
-
-        @Override
-        public void write(MAPErrorMessageImpl message, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(ERROR_CODE, message.errorCode);
-        }
-    };
 
 }

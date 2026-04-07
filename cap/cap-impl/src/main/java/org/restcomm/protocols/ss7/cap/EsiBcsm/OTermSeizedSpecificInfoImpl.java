@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -20,12 +18,15 @@ import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberInformation.LocationInformation;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation.LocationInformationImpl;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class OTermSeizedSpecificInfoImpl extends SequenceBase implements OTermSeizedSpecificInfo {
+@XStreamAlias("oTermSeizedSpecificInfo")
+ extends SequenceBase implements OTermSeizedSpecificInfo {
 
     public static final String LOCATION_INFORMATION = "locationInformation";
 
@@ -107,27 +108,4 @@ public class OTermSeizedSpecificInfoImpl extends SequenceBase implements OTermSe
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<OTermSeizedSpecificInfoImpl> O_TERM_SEIZED_SPECIFIC_INFO_XML = new XMLFormat<OTermSeizedSpecificInfoImpl>(
-            OTermSeizedSpecificInfoImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, OTermSeizedSpecificInfoImpl oTermSeizedSpecificInfo)
-                throws XMLStreamException {
-            oTermSeizedSpecificInfo.locationInformation = xml.get(LOCATION_INFORMATION, LocationInformationImpl.class);
-        }
-
-        @Override
-        public void write(OTermSeizedSpecificInfoImpl oTermSeizedSpecificInfo, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-
-            if (oTermSeizedSpecificInfo.locationInformation != null) {
-                xml.add(((LocationInformationImpl) oTermSeizedSpecificInfo.locationInformation), LOCATION_INFORMATION, LocationInformationImpl.class);
-            }
-        }
-    };
-
 }

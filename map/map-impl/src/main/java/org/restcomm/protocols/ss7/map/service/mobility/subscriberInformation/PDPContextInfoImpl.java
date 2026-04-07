@@ -1,10 +1,9 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import java.io.IOException;
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -45,6 +44,7 @@ import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.PDPT
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("pDPContextInfoImpl")
 public class PDPContextInfoImpl implements PDPContextInfo, MAPAsnPrimitive {
 
     public static final int _ID_pdpContextIdentifier = 0;
@@ -79,39 +79,7 @@ public class PDPContextInfoImpl implements PDPContextInfo, MAPAsnPrimitive {
 
     public static final String _PrimitiveName = "PDPContextInfo";
 
-    private static final String PDP_CONTEXT_IDENTIFIER = "pdpContextIdentifier";
-    private static final String PDP_CONTEXT_ACTIVE = "pdpContextActive";
-    private static final String PDP_TYPE = "pdpType";
-    private static final String PDP_ADDRESS = "pdpAddress";
-    private static final String APN_SUBSCRIBED = "apnSubscribed";
-    private static final String APN_IN_USE = "apnInUse";
-    private static final String NSAPI = "nsapi";
-    private static final String TRANSACTION_ID = "transactionId";
-    private static final String TEID_FOR_GN_AND_GP = "teidForGnAndGp";
-    private static final String TEID_FOR_IU = "teidForIu";
-    private static final String GGSN_ADDRESS = "ggsnAddress";
-    private static final String QOS_SUBSCRIBED = "qosSubscribed";
-    private static final String QOS_REQUESTED = "qosRequested";
-    private static final String QOS_NEGOTIATED = "qosNegotiated";
-    private static final String CHARGING_ID = "chargingId";
-    private static final String CHARGING_CHARACTERISTICS = "chargingCharacteristics";
-    private static final String RNC_ADDRESS = "rncAddress";
-    private static final String EXTENTSION_CONTAINER = "extensionContainer";
-    private static final String QOS2_SUBSCRIBED = "qos2Subscribed";
-    private static final String QOS2_REQUESTED = "qos2Requested";
-    private static final String QOS2_NEGOTIATED = "qos2Negotiated";
-    private static final String QOS3_SUBSCRIBED = "qos3Subscribed";
-    private static final String QOS3_REQUESTED = "qos3Requested";
-    private static final String QOS3_NEGOTIATED = "qos3Negotiated";
-    private static final String QOS4_SUBSCRIBED = "qos4Subscribed";
-    private static final String QOS4_REQUESTED = "qos4Requested";
-    private static final String QOS4_NEGOTIATED = "qos4Negotiated";
-    private static final String EXT_PDP_TYPE = "extPdpType";
-    private static final String EXT_PDP_ADDRESS = "extPdpAddress";
-
     private static final Integer DEFAULT_INTEGER_VALUE = 0;
-    private static final Boolean DEFAULT_BOOL_VALUE = false;
-
     private int pdpContextIdentifier;
     private boolean pdpContextActive;
     private PDPType pdpType;

@@ -1,23 +1,8 @@
-
 package org.restcomm.protocols.ss7.sccp.impl;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-
-import javolution.text.TextBuilder;
-import java.util.Map;
-import javolution.xml.XMLBinding;
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.sccp.ConcernedSignalingPointCode;
@@ -133,27 +118,6 @@ public class SccpResourceImpl implements SccpResource {
         }
     }
 
-    /*public void modifyRemoteSsn(int remoteSsnid, Integer remoteSpc, Integer remoteSsn, Integer remoteSsnFlag,
-            Boolean markProhibitedWhenSpcResuming) throws Exception {
-        RemoteSubSystemImpl rsscObj = (RemoteSubSystemImpl) this.remoteSsns.get(remoteSsnid);
-        if (rsscObj == null) {
-            throw new Exception(String.format(SccpOAMMessage.RSS_DOESNT_EXIST, this.name));
-        }
-
-        synchronized (this) {
-            if(remoteSsn!=null)
-                rsscObj.setRemoteSsn(remoteSsn);
-            if(remoteSpc!=null)
-                rsscObj.setRemoteSpc(remoteSpc);
-            if(remoteSsnFlag!=null)
-                rsscObj.setRemoteSsnFlag(remoteSsnFlag);
-            if(markProhibitedWhenSpcResuming != null)
-                rsscObj.setMarkProhibitedWhenSpcResuming(markProhibitedWhenSpcResuming);
-
-            this.store();
-        }
-    }*/
-
     public void removeRemoteSsn(int remoteSsnid) throws Exception {
 
         if (this.getRemoteSsn(remoteSsnid) == null) {
@@ -226,24 +190,6 @@ public class SccpResourceImpl implements SccpResource {
         }
     }
 
-    /*public void modifyRemoteSpc(int remoteSpcId, Integer remoteSpc, Integer remoteSpcFlag, Integer mask) throws Exception {
-        RemoteSignalingPointCodeImpl remoteSignalingPointCode = (RemoteSignalingPointCodeImpl) this.getRemoteSpc(remoteSpcId);
-        if (remoteSignalingPointCode == null) {
-            throw new Exception(String.format(SccpOAMMessage.RSPC_DOESNT_EXIST, this.name));
-        }
-
-        synchronized (this) {
-            if(remoteSpc != null)
-                remoteSignalingPointCode.setRemoteSpc(remoteSpc);
-            if(remoteSpcFlag != null)
-                remoteSignalingPointCode.setRemoteSpcFlag(remoteSpcFlag);
-            if(mask != null)
-                remoteSignalingPointCode.setMask(mask);
-
-            this.store();
-        }
-    }*/
-
     public void removeRemoteSpc(int remoteSpcId) throws Exception {
         if (this.getRemoteSpc(remoteSpcId) == null) {
             throw new Exception(String.format(SccpOAMMessage.RSPC_DOESNT_EXIST, this.name));
@@ -263,8 +209,7 @@ public class SccpResourceImpl implements SccpResource {
     }
 
     public RemoteSignalingPointCode getRemoteSpcByPC(int remotePC) {
-        for (FastMap.Entry<Integer, RemoteSignalingPointCode> e = this.remoteSpcs.head(), end = this.remoteSpcs.tail(); (e = e
-                .getNext()) != end; ) {
+        for (Map.Entry<Integer, RemoteSignalingPointCode> e : this.remoteSpcs.entrySet()) {
             RemoteSignalingPointCode remoteSignalingPointCode = e.getValue();
             if (remoteSignalingPointCode.getRemoteSpc() == remotePC) {
                 return remoteSignalingPointCode;
@@ -328,13 +273,11 @@ public class SccpResourceImpl implements SccpResource {
     }
 
     public ConcernedSignalingPointCode getConcernedSpcByPC(int remotePC) {
-        for (FastMap.Entry<Integer, ConcernedSignalingPointCode> e = this.concernedSpcs.head(), end = this.concernedSpcs.tail(); (e = e
-                .getNext()) != end; ) {
+        for (Map.Entry<Integer, ConcernedSignalingPointCode> e : this.concernedSpcs.entrySet()) {
             ConcernedSignalingPointCode concernedSubSystem = e.getValue();
             if (concernedSubSystem.getRemoteSpc() == remotePC) {
                 return concernedSubSystem;
             }
-
         }
         return null;
     }
@@ -366,88 +309,79 @@ public class SccpResourceImpl implements SccpResource {
 
         private static final String SCCP_RESOURCE_PERSIST_DIR_KEY = "sccpresource.persist.dir";
         private static final String USER_DIR_KEY = "user.dir";
-        private static final String PERSIST_FILE_NAME = "sccpresource2.xml";
+        private static final String PERSIST_FILE_NAME = "sccpresource3.xml";
 
-        private static final String REMOTE_SSN = "remoteSsns";
-        private static final String REMOTE_SPC = "remoteSpcs";
-        private static final String CONCERNED_SPC = "concernedSpcs";
-
-        private final TextBuilder persistFile = TextBuilder.newInstance();
-
-        protected static final SccpResourceXMLBinding binding = new SccpResourceXMLBinding();
-        private static final String TAB_INDENT = "\t";
-        private static final String CLASS_ATTRIBUTE = "type";
+        private String persistFile;
 
         protected PersistentStorage() {
-            binding.setClassAttribute(CLASS_ATTRIBUTE);
-            binding.setAlias(RemoteSubSystemImpl.class, "remoteSubSystem");
         }
 
         private void setPersistDir(String persistDir, String stackName) {
-            this.persistFile.clear();
-
             if (persistDir != null) {
-                this.persistFile.append(persistDir).append(File.separator).append(stackName).append("_").append(PERSIST_FILE_NAME);
+                this.persistFile = persistDir + File.separator + stackName + "_" + PERSIST_FILE_NAME;
             } else {
-                persistFile.append(System.getProperty(SCCP_RESOURCE_PERSIST_DIR_KEY, System.getProperty(USER_DIR_KEY)))
-                        .append(File.separator).append(stackName).append("_").append(PERSIST_FILE_NAME);
+                this.persistFile = System.getProperty(SCCP_RESOURCE_PERSIST_DIR_KEY, System.getProperty(USER_DIR_KEY))
+                        + File.separator + stackName + "_" + PERSIST_FILE_NAME;
             }
 
-            logger.info(String.format("SCCP Resource configuration file path %s", persistFile.toString()));
+            logger.info(String.format("SCCP Resource configuration file path %s", this.persistFile));
+        }
+
+        /**
+         * Configuration class for XStream persistence
+         */
+        public static class ResourcesConfig {
+            public RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsns;
+            public RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcs;
+            public ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode> concernedSpcs;
         }
 
         /**
          * Persist
-         *
-         * @param remoteSpcs
-         * @param remoteSsns
-         * @param concernedSpcs
          */
-        private void store(RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcs, RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsns, ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode> concernedSpcs) {
-
-            // TODO : Should we keep reference to Objects rather than recreating
-            // everytime?
+        private void store(RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcs, 
+                          RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsns, 
+                          ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode> concernedSpcs) {
             try {
-                XMLObjectWriter writer = XMLObjectWriter.newInstance(new FileOutputStream(persistFile.toString()));
-                writer.setBinding(binding);
-                // Enables cross-references.
-                // writer.setReferenceResolver(new XMLReferenceResolver());
-                writer.setIndentation(TAB_INDENT);
-                writer.write(remoteSsns, REMOTE_SSN, RemoteSubSystemMap.class);
-                writer.write(remoteSpcs, REMOTE_SPC, RemoteSignalingPointCodeMap.class);
-                writer.write(concernedSpcs, CONCERNED_SPC, ConcernedSignalingPointCodeMap.class);
+                ResourcesConfig config = new ResourcesConfig();
+                config.remoteSsns = remoteSsns;
+                config.remoteSpcs = remoteSpcs;
+                config.concernedSpcs = concernedSpcs;
 
-                writer.close();
+                String xml = SCCPXStreamHelper.toXML(config);
+                try (FileWriter writer = new FileWriter(this.persistFile)) {
+                    writer.write(xml);
+                }
             } catch (Exception e) {
-                this.logger.error("Error while persisting the Sccp Resource state in file", e);
+                logger.error("Error while persisting the Sccp Resource state in file", e);
             }
         }
 
         /**
-         * Load and create LinkSets and Link from persisted file
-         *
-         * @throws Exception
+         * Load and create from persisted file
          */
         protected ResourcesSet load(Ss7ExtSccpDetailedInterface ss7ExtSccpDetailedInterface) {
             ResourcesSet resources = null;
             try {
-                File f = new File(persistFile.toString());
+                File f = new File(this.persistFile);
                 if (f.exists()) {
-                    // we have V3 config
-                    resources = loadVer3(persistFile.toString());
+                    // we have V3 config (XStream format)
+                    resources = loadVer3(this.persistFile);
                 } else {
-                    String s1 = persistFile.toString().replace("2.xml", ".xml");
+                    // Try legacy format (sccpresource2.xml)
+                    String s1 = this.persistFile.replace("3.xml", "2.xml");
                     f = new File(s1);
                     if (f.exists()) {
-                        resources = loadVer1(s1);
-                        if (resources == null) {
-                            resources = loadVer2(s1);
+                        logger.warn("Legacy SCCP Resource config format (v2) not supported, using defaults");
+                    } else {
+                        // Try legacy format (sccpresource.xml)
+                        s1 = this.persistFile.replace("3.xml", ".xml");
+                        f = new File(s1);
+                        if (f.exists()) {
+                            logger.warn("Legacy SCCP Resource config format (v1) not supported, using defaults");
                         }
                     }
-                    f.delete();
                 }
-            } catch (XMLStreamException ex) {
-                logger.error(String.format("Failed to load the SS7 configuration file. \n%s", ex.getMessage()));
             } catch (FileNotFoundException e) {
                 logger.warn(String.format("Failed to load the SS7 configuration file. \n%s", e.getMessage()));
             } catch (IOException e) {
@@ -469,89 +403,14 @@ public class SccpResourceImpl implements SccpResource {
             }
         }
 
-        private ResourcesSet loadVer1(String fn) throws XMLStreamException, IOException {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fn)));
-            StringBuilder sb = new StringBuilder();
-            while (true) {
-                String s1 = br.readLine();
-                if (s1 == null)
-                    break;
-                sb.append(s1);
-                sb.append("\n");
+        protected ResourcesSet loadVer3(String fn) throws FileNotFoundException {
+            try (FileReader reader = new FileReader(fn)) {
+                ResourcesConfig config = (ResourcesConfig) SCCPXStreamHelper.fromXML(reader);
+                if (config != null) {
+                    return new ResourcesSet(config.remoteSpcs, config.remoteSsns, config.concernedSpcs);
+                }
             }
-            br.close();
-            String s2 = sb.toString();
-            s2 = s2.replace("impl.RemoteSubSystem", "impl.RemoteSubSystemImpl");
-            s2 = s2.replace("impl.RemoteSignalingPointCode", "impl.RemoteSignalingPointCodeImpl");
-            s2 = s2.replace("impl.ConcernedSignalingPointCode", "impl.ConcernedSignalingPointCodeImpl");
-
-            StringReader sr = new StringReader(s2);
-            XMLObjectReader reader = XMLObjectReader.newInstance(sr);
-
-            reader.setBinding(binding);
-
-            String REMOTE_SSN_V1 = "remoteSsn";
-            String REMOTE_SPC_V1 = "remoteSpc";
-            String CONCERNED_SPC_V1 = "concernedSpc";
-            XMLBinding binding2 = new XMLBinding();
-            binding2.setClassAttribute(CLASS_ATTRIBUTE);
-
-            RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsnsX = reader.read(REMOTE_SSN_V1, RemoteSubSystemMap.class);
-            RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcsX = reader.read(REMOTE_SPC_V1, RemoteSignalingPointCodeMap.class);
-            ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode> concernedSpcsX = reader.read(CONCERNED_SPC_V1, ConcernedSignalingPointCodeMap.class);
-
-            reader.close();
-
-            if (remoteSsnsX == null)
-                return null;
-
-            RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsns = new RemoteSubSystemMap<Integer, RemoteSubSystem>();
-            RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcs = new RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode>();
-            ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode> concernedSpcs = new ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode>();
-
-            for (Integer id : remoteSsnsX.keySet()) {
-                RemoteSubSystem val = remoteSsnsX.get(id);
-                remoteSsns.put(id, val);
-            }
-
-            for (Integer id : remoteSpcsX.keySet()) {
-                RemoteSignalingPointCode val = remoteSpcsX.get(id);
-                remoteSpcs.put(id, val);
-            }
-
-            for (Integer id : concernedSpcsX.keySet()) {
-                ConcernedSignalingPointCode val = concernedSpcsX.get(id);
-                concernedSpcs.put(id, val);
-            }
-
-            return new ResourcesSet(remoteSpcs, remoteSsns, concernedSpcs);
-        }
-
-        private ResourcesSet loadVer2(String fn) throws XMLStreamException, FileNotFoundException {
-            XMLObjectReader reader = XMLObjectReader.newInstance(new FileInputStream(fn));
-
-            reader.setBinding(binding);
-            RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsns = reader.read(REMOTE_SSN, RemoteSubSystemMap.class);
-            RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcs = reader.read(REMOTE_SPC, RemoteSignalingPointCodeMap.class);
-            ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode> concernedSpcs = reader.read(CONCERNED_SPC, ConcernedSignalingPointCodeMap.class);
-            reader.close();
-
-            return new ResourcesSet(remoteSpcs, remoteSsns, concernedSpcs);
-        }
-
-        protected ResourcesSet loadVer3(String fn) throws XMLStreamException, FileNotFoundException {
-            XMLObjectReader reader = XMLObjectReader.newInstance(new FileInputStream(fn));
-
-            reader.setBinding(binding);
-            return loadVer3(reader);
-        }
-        protected ResourcesSet loadVer3(XMLObjectReader reader) throws XMLStreamException{
-            RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsns = reader.read(REMOTE_SSN, RemoteSubSystemMap.class);
-            RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcs = reader.read(REMOTE_SPC, RemoteSignalingPointCodeMap.class);
-            ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode> concernedSpcs = reader.read(CONCERNED_SPC, ConcernedSignalingPointCodeMap.class);
-            reader.close();
-
-            return new ResourcesSet(remoteSpcs, remoteSsns, concernedSpcs);
+            return null;
         }
 
         static class ResourcesSet {

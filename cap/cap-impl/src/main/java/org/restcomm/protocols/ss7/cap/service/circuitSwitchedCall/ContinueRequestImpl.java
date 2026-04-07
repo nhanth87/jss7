@@ -1,8 +1,6 @@
 
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -13,13 +11,16 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentException;
 import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.ContinueRequest;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  * @author Amit Bhayani
  *
  */
-public class ContinueRequestImpl extends CircuitSwitchedCallMessageImpl implements ContinueRequest {
+@XStreamAlias("continueRequest")
+ extends CircuitSwitchedCallMessageImpl implements ContinueRequest {
 
     public static final String _PrimitiveName = "ContinueRequest";
 
@@ -87,23 +88,4 @@ public class ContinueRequestImpl extends CircuitSwitchedCallMessageImpl implemen
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ContinueRequestImpl> CONTINUE_REQUEST_XML = new XMLFormat<ContinueRequestImpl>(
-            ContinueRequestImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ContinueRequestImpl continueRequest)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.read(xml, continueRequest);
-        }
-
-        @Override
-        public void write(ContinueRequestImpl continueRequest, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.write(continueRequest, xml);
-        }
-    };
 }
