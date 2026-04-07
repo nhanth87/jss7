@@ -1,14 +1,9 @@
 
 package org.restcomm.protocols.ss7.isup.impl.message.parameter;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
 import org.restcomm.protocols.ss7.isup.ParameterException;
 import org.restcomm.protocols.ss7.isup.message.parameter.GenericDigits;
 import org.restcomm.protocols.ss7.isup.util.BcdHelper;
-
-import jakarta.xml.bind.DatatypeConverter;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -22,12 +17,7 @@ import java.nio.charset.Charset;
  */
 public class GenericDigitsImpl extends AbstractISUPParameter implements GenericDigits {
 
-    private static final String ENCODING_SCHEME = "encodingScheme";
-    private static final String TYPE_OF_DIGITS = "typeOfDigits";
-    private static final String DIGITS = "digits";
     private static final Charset asciiCharset = Charset.forName("ASCII");
-
-    private static final int DEFAULT_VALUE = 0;
 
     private int encodingScheme;
     private int typeOfDigits;
@@ -164,50 +154,11 @@ public class GenericDigitsImpl extends AbstractISUPParameter implements GenericD
         sb.append(", typeOfDigits=");
         sb.append(typeOfDigits);
         if (digits != null) {
-            sb.append(", encodedDigits=[");
-            sb.append(DatatypeConverter.printHexBinary(digits));
-            sb.append("]");
-
-            try {
-                String s = getDecodedDigits();
-                sb.append(", decodedDigits=[");
-                sb.append(s);
-                sb.append("]");
-            } catch (Exception e) {
-            }
+            sb.append(", digits=<binary>");
         }
         sb.append("]");
 
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<GenericDigitsImpl> ISUP_GENERIC_DIGITS_XML = new XMLFormat<GenericDigitsImpl>(
-            GenericDigitsImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, GenericDigitsImpl genericDigits) throws XMLStreamException {
-            genericDigits.encodingScheme = xml.getAttribute(ENCODING_SCHEME, DEFAULT_VALUE);
-            genericDigits.typeOfDigits = xml.getAttribute(TYPE_OF_DIGITS, DEFAULT_VALUE);
-
-            ByteArrayContainer bc = xml.get(DIGITS, ByteArrayContainer.class);
-            if (bc != null) {
-                genericDigits.digits = bc.getData();
-            }
-        }
-
-        @Override
-        public void write(GenericDigitsImpl genericDigits, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            xml.setAttribute(ENCODING_SCHEME, genericDigits.encodingScheme);
-            xml.setAttribute(TYPE_OF_DIGITS, genericDigits.typeOfDigits);
-
-            if (genericDigits.digits != null) {
-                ByteArrayContainer bac = new ByteArrayContainer(genericDigits.digits);
-                xml.add(bac, DIGITS, ByteArrayContainer.class);
-            }
-        }
-    };
 }
