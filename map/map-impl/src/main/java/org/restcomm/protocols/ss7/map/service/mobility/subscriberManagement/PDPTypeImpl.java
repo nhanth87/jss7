@@ -1,10 +1,8 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.PDPType;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.PDPTypeValue;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
@@ -14,12 +12,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("pDPTypeImpl")
 public class PDPTypeImpl extends OctetStringBase implements PDPType {
-
-    private static final String PDP_TYPE_VALUE = "pdpTypeValue";
-
-    private static final String DEFAULT_VALUE = null;
-
     public static final int _VALUE_ETSI = 0xF0 + 0; // PPP
     public static final int _VALUE_IETF = 0xF0 + 1; // IPv4, IPv6
 

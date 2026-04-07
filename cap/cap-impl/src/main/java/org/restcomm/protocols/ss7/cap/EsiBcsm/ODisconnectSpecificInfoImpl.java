@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -18,12 +16,15 @@ import org.restcomm.protocols.ss7.cap.isup.CauseCapImpl;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class ODisconnectSpecificInfoImpl extends SequenceBase implements ODisconnectSpecificInfo {
+@XStreamAlias("oDisconnectSpecificInfo")
+ extends SequenceBase implements ODisconnectSpecificInfo {
 
     private static final String RELEASE_CAUSE = "releaseCause";
 
@@ -96,26 +97,4 @@ public class ODisconnectSpecificInfoImpl extends SequenceBase implements ODiscon
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ODisconnectSpecificInfoImpl> O_DISCONNECT_SPECIFIC_INFO_XML = new XMLFormat<ODisconnectSpecificInfoImpl>(
-            ODisconnectSpecificInfoImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ODisconnectSpecificInfoImpl oDisconnectSpecificInfo)
-                throws XMLStreamException {
-            oDisconnectSpecificInfo.releaseCause = xml.get(RELEASE_CAUSE, CauseCapImpl.class);
-        }
-
-        @Override
-        public void write(ODisconnectSpecificInfoImpl oDisconnectSpecificInfo, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-
-            if (oDisconnectSpecificInfo.releaseCause != null) {
-                xml.add((CauseCapImpl) oDisconnectSpecificInfo.releaseCause, RELEASE_CAUSE, CauseCapImpl.class);
-            }
-        }
-    };
 }

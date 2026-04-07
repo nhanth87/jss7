@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -26,12 +24,15 @@ import org.restcomm.protocols.ss7.inap.api.primitives.LegID;
 import org.restcomm.protocols.ss7.inap.primitives.LegIDImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author Povilas Jurna
  *
  */
-public class DisconnectLegRequestImpl extends CircuitSwitchedCallMessageImpl implements DisconnectLegRequest {
+@XStreamAlias("disconnectLegRequest")
+ extends CircuitSwitchedCallMessageImpl implements DisconnectLegRequest {
 
     public static final int _ID_legToBeReleased = 0;
     public static final int _ID_releaseCause = 1;
@@ -235,34 +236,4 @@ public class DisconnectLegRequestImpl extends CircuitSwitchedCallMessageImpl imp
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<DisconnectLegRequestImpl> CONNECT_REQUEST_XML = new XMLFormat<DisconnectLegRequestImpl>(
-            DisconnectLegRequestImpl.class) {
-
-        public void read(javolution.xml.XMLFormat.InputElement xml, DisconnectLegRequestImpl disconnectLegRequest)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.read(xml, disconnectLegRequest);
-
-            disconnectLegRequest.legToBeReleased = xml.get(LEG_TO_BE_RELEASED, LegIDImpl.class);
-            disconnectLegRequest.capReleaseCause = xml.get(RELEASE_CAUSE, CauseCapImpl.class);
-            disconnectLegRequest.extensions = xml.get(EXTENSIONS, CAPExtensionsImpl.class);
-
-        }
-
-        public void write(DisconnectLegRequestImpl disconnectLegRequest, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.write(disconnectLegRequest, xml);
-
-            if (disconnectLegRequest.getLegToBeReleased() != null)
-                xml.add((LegIDImpl) disconnectLegRequest.getLegToBeReleased(), LEG_TO_BE_RELEASED, LegIDImpl.class);
-            if (disconnectLegRequest.getReleaseCause() != null)
-                xml.add((CauseCapImpl) disconnectLegRequest.getReleaseCause(), RELEASE_CAUSE, CauseCapImpl.class);
-            if (disconnectLegRequest.getExtensions() != null)
-                xml.add((CAPExtensionsImpl) disconnectLegRequest.getExtensions(), EXTENSIONS, CAPExtensionsImpl.class);
-        }
-    };
-
 }

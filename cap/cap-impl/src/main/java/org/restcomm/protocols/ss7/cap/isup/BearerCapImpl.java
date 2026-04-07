@@ -3,9 +3,6 @@ package org.restcomm.protocols.ss7.cap.isup;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -25,12 +22,14 @@ import org.restcomm.protocols.ss7.isup.message.parameter.UserServiceInformation;
  * @author sergey vetyutnev
  *
  */
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+@XStreamAlias("bearerCap")
 public class BearerCapImpl implements BearerCap, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "BearerCap";
 
-    private static final String USER_SERVICE_INFORMATION_XML = "userServiceInformation";
-
+    @XStreamAlias("userServiceInformation")
     private byte[] data;
 
     public BearerCapImpl() {
@@ -195,28 +194,4 @@ public class BearerCapImpl implements BearerCap, CAPAsnPrimitive {
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<BearerCapImpl> BEARER_CAP_XML = new XMLFormat<BearerCapImpl>(BearerCapImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, BearerCapImpl bearerCap) throws XMLStreamException {
-            try {
-                bearerCap.setUserServiceInformation(xml.get(USER_SERVICE_INFORMATION_XML, UserServiceInformationImpl.class));
-            } catch (CAPException e) {
-                throw new XMLStreamException(e);
-            }
-        }
-
-        @Override
-        public void write(BearerCapImpl bearerCap, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            try {
-                xml.add(((UserServiceInformationImpl) bearerCap.getUserServiceInformation()), USER_SERVICE_INFORMATION_XML,
-                        UserServiceInformationImpl.class);
-            } catch (CAPException e) {
-                throw new XMLStreamException(e);
-            }
-        }
-    };
 }

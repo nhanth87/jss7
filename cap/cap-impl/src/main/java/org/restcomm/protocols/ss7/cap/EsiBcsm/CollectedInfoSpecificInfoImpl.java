@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -19,12 +17,15 @@ import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class CollectedInfoSpecificInfoImpl extends SequenceBase implements CollectedInfoSpecificInfo {
+@XStreamAlias("collectedInfoSpecificInfo")
+ extends SequenceBase implements CollectedInfoSpecificInfo {
 
     private static final String CALLED_PARTY_NUMBER = "calledPartyNumber";
 
@@ -98,25 +99,4 @@ public class CollectedInfoSpecificInfoImpl extends SequenceBase implements Colle
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<CollectedInfoSpecificInfoImpl> COLLECTED_INFO_SPECIFIC_INFO_XML = new XMLFormat<CollectedInfoSpecificInfoImpl>(
-            CollectedInfoSpecificInfoImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, CollectedInfoSpecificInfoImpl collectedInfoSpecificInfo) throws XMLStreamException {
-            collectedInfoSpecificInfo.calledPartyNumber = xml.get(CALLED_PARTY_NUMBER, CalledPartyNumberCapImpl.class);
-        }
-
-        @Override
-        public void write(CollectedInfoSpecificInfoImpl collectedInfoSpecificInfo, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-
-            if (collectedInfoSpecificInfo.calledPartyNumber != null) {
-                xml.add(((CalledPartyNumberCapImpl) collectedInfoSpecificInfo.calledPartyNumber), CALLED_PARTY_NUMBER, CalledPartyNumberCapImpl.class);
-            }
-        }
-    };
-
 }

@@ -1,9 +1,8 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.TeleserviceCode;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.TeleserviceCodeValue;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringLength1Base;
@@ -14,9 +13,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringLength1Base;
  * @author amit bhayani
  *
  */
+@XStreamAlias("teleserviceCodeImpl")
 public class TeleserviceCodeImpl extends OctetStringLength1Base implements TeleserviceCode {
-    private static final String TELE_SERVICE_CODE_VALUE = "teleserviceCodeValue";
-    private static final String DATA = "data";
 
     public TeleserviceCodeImpl() {
         super("TeleserviceCode");

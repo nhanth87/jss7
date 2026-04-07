@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -23,12 +21,15 @@ import org.restcomm.protocols.ss7.cap.primitives.CAPExtensionsImpl;
 import org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive.CollectedInfoImpl;
 import org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive.InformationToSendImpl;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class PromptAndCollectUserInformationRequestImpl extends CircuitSwitchedCallMessageImpl implements PromptAndCollectUserInformationRequest {
+@XStreamAlias("promptAndCollectUserInformationRequest")
+ extends CircuitSwitchedCallMessageImpl implements PromptAndCollectUserInformationRequest {
 
     public static final int _ID_collectedInfo = 0;
     public static final int _ID_disconnectFromIPForbidden = 1;
@@ -304,56 +305,4 @@ public class PromptAndCollectUserInformationRequestImpl extends CircuitSwitchedC
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<PromptAndCollectUserInformationRequestImpl> PROMPT_AND_COLLECT_USER_INFORMATION_REQUEST_XML = new XMLFormat<PromptAndCollectUserInformationRequestImpl>(
-            PromptAndCollectUserInformationRequestImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml,
-                PromptAndCollectUserInformationRequestImpl promptAndCollectUserInformationRequest) throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.read(xml, promptAndCollectUserInformationRequest);
-
-            String vals = xml.getAttribute(DISCONNECT_FROM_IP_FORBIDDEN, "");
-            if (vals != null && vals.length() > 0)
-                promptAndCollectUserInformationRequest.disconnectFromIPForbidden = Boolean.valueOf(vals);
-            int vali = xml.getAttribute(CALL_SEGMENT_ID, -1);
-            if (vali != -1)
-                promptAndCollectUserInformationRequest.callSegmentID = vali;
-            vals = xml.getAttribute(REQUEST_ANNOUNCEMENT_STARTED_NOTIFICATION, "");
-            if (vals != null && vals.length() > 0)
-                promptAndCollectUserInformationRequest.requestAnnouncementStartedNotification = Boolean.valueOf(vals);
-
-            promptAndCollectUserInformationRequest.collectedInfo = xml.get(COLLECTED_INFO, CollectedInfoImpl.class);
-            promptAndCollectUserInformationRequest.informationToSend = xml
-                    .get(INFORMATION_TO_SEND, InformationToSendImpl.class);
-            promptAndCollectUserInformationRequest.extensions = xml.get(EXTENSIONS, CAPExtensionsImpl.class);
-        }
-
-        @Override
-        public void write(PromptAndCollectUserInformationRequestImpl promptAndCollectUserInformationRequest,
-                javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.write(promptAndCollectUserInformationRequest, xml);
-
-            if (promptAndCollectUserInformationRequest.disconnectFromIPForbidden != null)
-                xml.setAttribute(DISCONNECT_FROM_IP_FORBIDDEN, promptAndCollectUserInformationRequest.disconnectFromIPForbidden);
-            if (promptAndCollectUserInformationRequest.callSegmentID != null)
-                xml.setAttribute(CALL_SEGMENT_ID, promptAndCollectUserInformationRequest.callSegmentID);
-            if (promptAndCollectUserInformationRequest.requestAnnouncementStartedNotification != null)
-                xml.setAttribute(REQUEST_ANNOUNCEMENT_STARTED_NOTIFICATION,
-                        promptAndCollectUserInformationRequest.requestAnnouncementStartedNotification);
-
-            if (promptAndCollectUserInformationRequest.collectedInfo != null)
-                xml.add((CollectedInfoImpl) promptAndCollectUserInformationRequest.collectedInfo, COLLECTED_INFO,
-                        CollectedInfoImpl.class);
-            if (promptAndCollectUserInformationRequest.informationToSend != null)
-                xml.add((InformationToSendImpl) promptAndCollectUserInformationRequest.informationToSend, INFORMATION_TO_SEND,
-                        InformationToSendImpl.class);
-            if (promptAndCollectUserInformationRequest.getExtensions() != null)
-                xml.add((CAPExtensionsImpl) promptAndCollectUserInformationRequest.getExtensions(), EXTENSIONS,
-                        CAPExtensionsImpl.class);
-        }
-    };
 }

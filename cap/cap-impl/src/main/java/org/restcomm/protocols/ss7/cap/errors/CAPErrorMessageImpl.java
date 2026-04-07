@@ -1,8 +1,5 @@
 package org.restcomm.protocols.ss7.cap.errors;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
 import org.restcomm.protocols.ss7.cap.api.errors.CAPErrorMessage;
 import org.restcomm.protocols.ss7.cap.api.errors.CAPErrorMessageCancelFailed;
 import org.restcomm.protocols.ss7.cap.api.errors.CAPErrorMessageParameterless;
@@ -17,10 +14,13 @@ import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
  * @author sergey vetyutnev
  *
  */
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
+@XStreamAlias("capErrorMessage")
 public abstract class CAPErrorMessageImpl implements CAPErrorMessage, CAPAsnPrimitive {
 
-    private static final String ERROR_CODE = "errorCode";
-
+    @XStreamAsAttribute
     protected Long errorCode;
 
     protected CAPErrorMessageImpl(Long errorCode) {
@@ -85,20 +85,4 @@ public abstract class CAPErrorMessageImpl implements CAPErrorMessage, CAPAsnPrim
         return null;
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    public static final XMLFormat<CAPErrorMessageImpl> CAP_ERROR_MESSAGE_XML = new XMLFormat<CAPErrorMessageImpl>(
-            CAPErrorMessageImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, CAPErrorMessageImpl message) throws XMLStreamException {
-            message.errorCode = xml.getAttribute(ERROR_CODE, -1L);
-        }
-
-        @Override
-        public void write(CAPErrorMessageImpl message, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(ERROR_CODE, message.errorCode);
-        }
-    };
 }

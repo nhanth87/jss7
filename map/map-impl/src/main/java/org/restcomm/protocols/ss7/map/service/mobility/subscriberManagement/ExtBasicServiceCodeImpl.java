@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -23,10 +22,8 @@ import org.restcomm.protocols.ss7.map.primitives.MAPAsnPrimitive;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("extBasicServiceCodeImpl")
 public class ExtBasicServiceCodeImpl implements ExtBasicServiceCode, MAPAsnPrimitive {
-
-    private static final String EXT_BEARER_SERVICE = "extBearerService";
-    private static final String EXT_TELE_SERVICE = "extTeleservice";
 
     public static final int _ID_ext_BearerService = 2;
     public static final int _ID_ext_Teleservice = 3;

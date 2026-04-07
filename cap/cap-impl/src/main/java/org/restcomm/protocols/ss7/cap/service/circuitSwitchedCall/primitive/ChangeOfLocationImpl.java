@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -23,12 +21,15 @@ import org.restcomm.protocols.ss7.map.api.primitives.LAIFixedLength;
 import org.restcomm.protocols.ss7.map.primitives.CellGlobalIdOrServiceAreaIdFixedLengthImpl;
 import org.restcomm.protocols.ss7.map.primitives.LAIFixedLengthImpl;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class ChangeOfLocationImpl implements ChangeOfLocation, CAPAsnPrimitive {
+@XStreamAlias("changeOfLocation")
+ implements ChangeOfLocation, CAPAsnPrimitive {
 
     private static final String CELL_GLOBAL_ID = "cellGlobalId";
     private static final String SERVICE_AREA_ID = "serviceAreaId";

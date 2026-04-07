@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.gap;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -20,11 +18,14 @@ import org.restcomm.protocols.ss7.cap.isup.CauseCapImpl;
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive.InformationToSendImpl;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
-public class GapTreatmentImpl implements GapTreatment, CAPAsnPrimitive {
+@XStreamAlias("gapTreatment")
+ implements GapTreatment, CAPAsnPrimitive {
 
     public static final int _ID_InformationToSend = 0;
     public static final int _ID_CauseCap = 1;
@@ -170,24 +171,7 @@ public class GapTreatmentImpl implements GapTreatment, CAPAsnPrimitive {
         }
     }
 
-    protected static final XMLFormat<GapTreatmentImpl> A_CH_CHARGING_ADDRESS_XML = new XMLFormat<GapTreatmentImpl>(GapTreatmentImpl.class) {
 
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, GapTreatmentImpl gapTreatment) throws XMLStreamException {
-            gapTreatment.informationToSend = xml.get(INFORMATION_TO_SEND, InformationToSendImpl.class);
-            gapTreatment.releaseCause = xml.get(CAUSE_CAP, CauseCapImpl.class);
-        }
-
-        @Override
-        public void write(GapTreatmentImpl gapTreatment, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (gapTreatment.informationToSend != null) {
-                xml.add((InformationToSendImpl) gapTreatment.informationToSend, INFORMATION_TO_SEND, InformationToSendImpl.class);
-            }
-            if (gapTreatment.releaseCause != null) {
-                xml.add((CauseCapImpl) gapTreatment.releaseCause, CAUSE_CAP, CauseCapImpl.class);
-            }
-        }
-    };
 
     @Override
     public String toString() {

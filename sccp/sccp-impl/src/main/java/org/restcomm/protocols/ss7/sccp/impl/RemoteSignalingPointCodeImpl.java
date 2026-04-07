@@ -1,9 +1,4 @@
-
 package org.restcomm.protocols.ss7.sccp.impl;
-
-import javolution.xml.XMLFormat;
-import javolution.xml.XMLSerializable;
-import javolution.xml.stream.XMLStreamException;
 
 import org.restcomm.protocols.ss7.sccp.RemoteSignalingPointCode;
 
@@ -12,11 +7,7 @@ import org.restcomm.protocols.ss7.sccp.RemoteSignalingPointCode;
  * @author sergey vetyutnev
  *
  */
-public class RemoteSignalingPointCodeImpl implements XMLSerializable, RemoteSignalingPointCode {
-
-    private static final String REMOTE_SPC = "remoteSpc";
-    private static final String REMOTE_SPC_FLAG = "remoteSpcFlag";
-    private static final String MASK = "mask";
+public class RemoteSignalingPointCodeImpl implements RemoteSignalingPointCode {
 
     private int remoteSpc;
     private int remoteSpcFlag;
@@ -145,22 +136,4 @@ public class RemoteSignalingPointCodeImpl implements XMLSerializable, RemoteSign
                 .append(this.remoteSccpProhibited).append(" rl=").append(rl).append(" rsl=").append(rsl);
         return sb.toString();
     }
-
-    protected static final XMLFormat<RemoteSignalingPointCodeImpl> XML = new XMLFormat<RemoteSignalingPointCodeImpl>(
-            RemoteSignalingPointCodeImpl.class) {
-
-        public void write(RemoteSignalingPointCodeImpl ai, OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(REMOTE_SPC, ai.remoteSpc);
-            xml.setAttribute(REMOTE_SPC_FLAG, ai.remoteSpcFlag);
-            xml.setAttribute(MASK, ai.mask);
-
-        }
-
-        public void read(InputElement xml, RemoteSignalingPointCodeImpl ai) throws XMLStreamException {
-            ai.remoteSpc = xml.getAttribute(REMOTE_SPC).toInt();
-            ai.remoteSpcFlag = xml.getAttribute(REMOTE_SPC_FLAG).toInt();
-            ai.mask = xml.getAttribute(MASK).toInt();
-        }
-    };
-
 }

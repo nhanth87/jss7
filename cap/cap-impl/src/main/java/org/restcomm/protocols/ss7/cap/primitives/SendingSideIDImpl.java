@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.primitives;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -17,13 +15,16 @@ import org.restcomm.protocols.ss7.cap.api.primitives.SendingSideID;
 import org.restcomm.protocols.ss7.inap.api.primitives.LegType;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  * @author Amit Bhayani
  *
  */
-public class SendingSideIDImpl implements SendingSideID, CAPAsnPrimitive {
+@XStreamAlias("sendingSideID")
+ implements SendingSideID, CAPAsnPrimitive {
 
     private static final String SENDING_SIDE_ID = "sendingSideID";
 
@@ -158,22 +159,4 @@ public class SendingSideIDImpl implements SendingSideID, CAPAsnPrimitive {
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<SendingSideIDImpl> SENDING_SIDE_ID_XML = new XMLFormat<SendingSideIDImpl>(
-            SendingSideIDImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, SendingSideIDImpl sendingSideID) throws XMLStreamException {
-            sendingSideID.sendingSideID = LegType.getInstance(xml.get(SENDING_SIDE_ID, Integer.class));
-        }
-
-        @Override
-        public void write(SendingSideIDImpl sendingSideID, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            xml.add(sendingSideID.sendingSideID.getCode(), SENDING_SIDE_ID, Integer.class);
-        }
-    };
 }

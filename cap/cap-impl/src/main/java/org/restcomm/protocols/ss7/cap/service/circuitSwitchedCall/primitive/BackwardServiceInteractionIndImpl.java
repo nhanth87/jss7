@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -20,12 +18,15 @@ import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class BackwardServiceInteractionIndImpl extends SequenceBase implements BackwardServiceInteractionInd {
+@XStreamAlias("backwardServiceInteractionInd")
+ extends SequenceBase implements BackwardServiceInteractionInd {
 
     public static final int _ID_conferenceTreatmentIndicator = 1;
     public static final int _ID_callCompletionTreatmentIndicator = 2;
@@ -125,33 +126,7 @@ public class BackwardServiceInteractionIndImpl extends SequenceBase implements B
             throw new CAPException("AsnException when encoding " + _PrimitiveName + ": " + e.getMessage(), e);
         }
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<BackwardServiceInteractionIndImpl> BACKWARD_SERVICE_INTERACTION_IND_XML = new XMLFormat<BackwardServiceInteractionIndImpl>(
-            BackwardServiceInteractionIndImpl.class) {
-
-        public void read(javolution.xml.XMLFormat.InputElement xml, BackwardServiceInteractionIndImpl backwardServiceInteractionInd) throws XMLStreamException {
-
-            String str = xml.get(CONFERENCE_TREATMENT_INDICATOR, String.class);
-            if (str != null)
-                backwardServiceInteractionInd.conferenceTreatmentIndicator = Enum.valueOf(ConferenceTreatmentIndicator.class, str);
-            str = xml.get(CALL_COMPLETION_TREATMENT_INDICATOR, String.class);
-            if (str != null)
-                backwardServiceInteractionInd.callCompletionTreatmentIndicator = Enum.valueOf(CallCompletionTreatmentIndicator.class, str);
-        }
-
-        public void write(BackwardServiceInteractionIndImpl backwardServiceInteractionInd, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (backwardServiceInteractionInd.conferenceTreatmentIndicator != null)
-                xml.add(backwardServiceInteractionInd.conferenceTreatmentIndicator.toString(), CONFERENCE_TREATMENT_INDICATOR, String.class);
-            if (backwardServiceInteractionInd.callCompletionTreatmentIndicator != null)
-                xml.add(backwardServiceInteractionInd.callCompletionTreatmentIndicator.toString(), CALL_COMPLETION_TREATMENT_INDICATOR, String.class);
-        }
-    };
-
-    @Override
+@Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();

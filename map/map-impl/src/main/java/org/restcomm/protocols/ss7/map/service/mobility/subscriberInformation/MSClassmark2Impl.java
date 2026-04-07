@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import jakarta.xml.bind.DatatypeConverter;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberInformation.MSClassmark2;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
 
@@ -14,12 +13,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("mSClassmark2Impl")
 public class MSClassmark2Impl extends OctetStringBase implements MSClassmark2 {
-
-    private static final String DATA = "data";
-
-    private static final String DEFAULT_VALUE = null;
-
     public MSClassmark2Impl() {
         super(3, 3, "MSClassmark2");
     }

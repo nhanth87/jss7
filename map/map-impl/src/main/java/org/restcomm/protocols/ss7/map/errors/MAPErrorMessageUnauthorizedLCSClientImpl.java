@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.errors;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -24,10 +23,8 @@ import org.restcomm.protocols.ss7.map.primitives.MAPExtensionContainerImpl;
  * @author sergey vetyutnev
  * @author amit bhayani
  */
+@XStreamAlias("mAPErrorMessageUnauthorizedLCSClientImpl")
 public class MAPErrorMessageUnauthorizedLCSClientImpl extends MAPErrorMessageImpl implements MAPErrorMessageUnauthorizedLCSClient {
-
-    private static final String UNAUTHORIZED_LCS_CLIENT_DIAGNOSTIC = "unauthorizedLCSClientDiagnostic";
-    private static final String MAP_EXTENSION_CONTAINER = "mapExtensionContainer";
 
     public static final int UnauthorizedLCSClientDiagnostic_TAG = 0;
     public static final int ExtensionContainer_TAG = 1;

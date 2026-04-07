@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.supplementary;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -26,6 +25,7 @@ import org.restcomm.protocols.ss7.map.primitives.USSDStringImpl;
  * @author amit bhayani
  *
  */
+@XStreamAlias("unstructuredSSResponseImpl")
 public class UnstructuredSSResponseImpl extends SupplementaryMessageImpl implements UnstructuredSSResponse {
 
     public UnstructuredSSResponseImpl() {

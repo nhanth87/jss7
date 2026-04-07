@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.supplementary;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -30,10 +29,8 @@ import org.restcomm.protocols.ss7.map.primitives.USSDStringImpl;
  * @author amit bhayani
  *
  */
+@XStreamAlias("unstructuredSSRequestImpl")
 public class UnstructuredSSRequestImpl extends SupplementaryMessageImpl implements UnstructuredSSRequest {
-
-    private static final String MSISDN = "msisdn";
-    private static final String ALERTING_PATTERN = "alertingPattern";
 
     private static final int _TAG_MSISDN = 0;
 

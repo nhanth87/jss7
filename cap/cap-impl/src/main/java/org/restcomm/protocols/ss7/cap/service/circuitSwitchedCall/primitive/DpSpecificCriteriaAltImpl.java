@@ -4,8 +4,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -21,12 +19,15 @@ import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.primitives.ArrayListSerializingBase;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class DpSpecificCriteriaAltImpl extends SequenceBase implements DpSpecificCriteriaAlt {
+@XStreamAlias("dpSpecificCriteriaAlt")
+ extends SequenceBase implements DpSpecificCriteriaAlt {
 
     private static final String CHANGE_OF_POSITION_CONTROL_INFO = "changeOfPositionControlInfo";
     private static final String CHANGE_OF_POSITION_CONTROL_INFO_LIST = "changeOfPositionControlInfoList";
@@ -170,36 +171,7 @@ public class DpSpecificCriteriaAltImpl extends SequenceBase implements DpSpecifi
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<DpSpecificCriteriaAltImpl> DP_SPECIFIC_CRITERIA_ALT_XML = new XMLFormat<DpSpecificCriteriaAltImpl>(
-            DpSpecificCriteriaAltImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, DpSpecificCriteriaAltImpl dpSpecificCriteriaAlt) throws XMLStreamException {
-            DpSpecificCriteriaAlt_ChangeOfLocation al = xml.get(CHANGE_OF_POSITION_CONTROL_INFO_LIST, DpSpecificCriteriaAlt_ChangeOfLocation.class);
-            if (al != null) {
-                dpSpecificCriteriaAlt.changeOfPositionControlInfo = al.getData();
-            }
-
-            dpSpecificCriteriaAlt.numberOfDigits = xml.get(NUMBER_OF_DIGITS, Integer.class);
-        }
-
-        @Override
-        public void write(DpSpecificCriteriaAltImpl dpSpecificCriteriaAlt, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (dpSpecificCriteriaAlt.changeOfPositionControlInfo != null) {
-                DpSpecificCriteriaAlt_ChangeOfLocation al = new DpSpecificCriteriaAlt_ChangeOfLocation(dpSpecificCriteriaAlt.changeOfPositionControlInfo);
-                xml.add(al, CHANGE_OF_POSITION_CONTROL_INFO_LIST, DpSpecificCriteriaAlt_ChangeOfLocation.class);
-            }
-
-            if (dpSpecificCriteriaAlt.numberOfDigits != null)
-                xml.add((Integer) dpSpecificCriteriaAlt.numberOfDigits, NUMBER_OF_DIGITS, Integer.class);
-        }
-    };
-
-    public static class DpSpecificCriteriaAlt_ChangeOfLocation extends ArrayListSerializingBase<ChangeOfLocation> {
+public static class DpSpecificCriteriaAlt_ChangeOfLocation extends ArrayListSerializingBase<ChangeOfLocation> {
 
         public DpSpecificCriteriaAlt_ChangeOfLocation() {
             super(CHANGE_OF_POSITION_CONTROL_INFO, ChangeOfLocationImpl.class);

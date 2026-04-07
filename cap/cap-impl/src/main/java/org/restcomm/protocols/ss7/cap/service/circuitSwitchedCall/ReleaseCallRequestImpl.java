@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -20,12 +18,15 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.ReleaseCal
 import org.restcomm.protocols.ss7.cap.isup.CauseCapImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class ReleaseCallRequestImpl extends CircuitSwitchedCallMessageImpl implements ReleaseCallRequest {
+@XStreamAlias("releaseCallRequest")
+ extends CircuitSwitchedCallMessageImpl implements ReleaseCallRequest {
 
     public static final String _PrimitiveName = "ReleaseCallRequestIndication";
 
@@ -156,28 +157,4 @@ public class ReleaseCallRequestImpl extends CircuitSwitchedCallMessageImpl imple
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ReleaseCallRequestImpl> RELEASE_CALL_REQUEST_XML = new XMLFormat<ReleaseCallRequestImpl>(
-            ReleaseCallRequestImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ReleaseCallRequestImpl releaseCallRequest)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.read(xml, releaseCallRequest);
-
-            releaseCallRequest.cause = xml.get(CAUSE, CauseCapImpl.class);
-        }
-
-        @Override
-        public void write(ReleaseCallRequestImpl releaseCallRequest, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.write(releaseCallRequest, xml);
-
-            if (releaseCallRequest.getCause() != null)
-                xml.add((CauseCapImpl) releaseCallRequest.getCause(), CAUSE, CauseCapImpl.class);
-        }
-    };
 }

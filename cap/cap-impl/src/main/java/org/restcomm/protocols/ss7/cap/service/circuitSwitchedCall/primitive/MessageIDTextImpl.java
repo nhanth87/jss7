@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -17,12 +15,15 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.ByteArrayContainer;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class MessageIDTextImpl extends SequenceBase implements MessageIDText {
+@XStreamAlias("messageIDText")
+ extends SequenceBase implements MessageIDText {
 
     public static final int _ID_messageContent = 0;
     public static final int _ID_attributes = 1;
@@ -151,33 +152,4 @@ public class MessageIDTextImpl extends SequenceBase implements MessageIDText {
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MessageIDTextImpl> MESSAGE_ID_TEXT_XML = new XMLFormat<MessageIDTextImpl>(
-            MessageIDTextImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, MessageIDTextImpl messageIDText) throws XMLStreamException {
-            messageIDText.messageContent = xml.getAttribute(MESSAGE_CONTENT, "");
-
-            ByteArrayContainer bc = xml.get(ATTRIBUTES, ByteArrayContainer.class);
-            if (bc != null) {
-                messageIDText.attributes = bc.getData();
-            }
-        }
-
-        @Override
-        public void write(MessageIDTextImpl messageIDText, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (messageIDText.messageContent != null)
-                xml.setAttribute(MESSAGE_CONTENT, messageIDText.messageContent);
-
-            if (messageIDText.attributes != null) {
-                ByteArrayContainer bac = new ByteArrayContainer(messageIDText.attributes);
-                xml.add(bac, ATTRIBUTES, ByteArrayContainer.class);
-            }
-        }
-    };
 }

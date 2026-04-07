@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -19,13 +17,16 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  *
  * @author sergey vetyutnev
  *
  */
-public class DpSpecificCriteriaImpl implements DpSpecificCriteria, CAPAsnPrimitive {
+@XStreamAlias("dpSpecificCriteria")
+ implements DpSpecificCriteria, CAPAsnPrimitive {
 
     public static final int _ID_applicationTimer = 1;
     public static final int _ID_midCallControlInfo = 2;
@@ -236,32 +237,4 @@ public class DpSpecificCriteriaImpl implements DpSpecificCriteria, CAPAsnPrimiti
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<DpSpecificCriteriaImpl> DP_SPECIFIC_CRITERIA_XML = new XMLFormat<DpSpecificCriteriaImpl>(
-            DpSpecificCriteriaImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, DpSpecificCriteriaImpl dpSpecificCriteria)
-                throws XMLStreamException {
-            dpSpecificCriteria.applicationTimer = xml.get(APPLICATION_TIMER, Integer.class);
-
-            dpSpecificCriteria.midCallControlInfo = xml.get(MID_CALL_CONTROL_INFO, MidCallControlInfoImpl.class);
-            dpSpecificCriteria.dpSpecificCriteriaAlt = xml.get(DP_SPECIFIC_CRITERIA_ALT, DpSpecificCriteriaAltImpl.class);
-        }
-
-        @Override
-        public void write(DpSpecificCriteriaImpl dpSpecificCriteria, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (dpSpecificCriteria.getApplicationTimer() != null)
-                xml.add((Integer) dpSpecificCriteria.getApplicationTimer(), APPLICATION_TIMER, Integer.class);
-
-            if (dpSpecificCriteria.getMidCallControlInfo() != null)
-                xml.add((MidCallControlInfoImpl) dpSpecificCriteria.getMidCallControlInfo(), MID_CALL_CONTROL_INFO, MidCallControlInfoImpl.class);
-            if (dpSpecificCriteria.getDpSpecificCriteriaAlt() != null)
-                xml.add((DpSpecificCriteriaAltImpl) dpSpecificCriteria.getDpSpecificCriteriaAlt(), DP_SPECIFIC_CRITERIA_ALT, DpSpecificCriteriaAltImpl.class);
-        }
-    };
 }

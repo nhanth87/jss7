@@ -1,9 +1,8 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.callhandling;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.ByteArrayContainer;
 import org.restcomm.protocols.ss7.map.api.service.callhandling.CallReferenceNumber;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
@@ -13,10 +12,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("callReferenceNumberImpl")
 public class CallReferenceNumberImpl extends OctetStringBase implements CallReferenceNumber {
-
-    private static final String DATA_XML = "data";
-
     public CallReferenceNumberImpl() {
         super(1, 8, "CallReferenceNumber");
     }

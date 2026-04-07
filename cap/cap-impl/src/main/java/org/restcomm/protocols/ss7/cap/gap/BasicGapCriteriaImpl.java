@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.gap;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -21,11 +19,14 @@ import org.restcomm.protocols.ss7.cap.api.isup.Digits;
 import org.restcomm.protocols.ss7.cap.isup.DigitsImpl;
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
-public class BasicGapCriteriaImpl implements BasicGapCriteria, CAPAsnPrimitive {
+@XStreamAlias("basicGapCriteria")
+public class BasicGapCriteriaImpl implements BasicGapCriteria, CAPAsnPrimitive {
 
     public static final int _ID_calledAddressValue = 0;
     public static final int _ID_gapOnService = 2;
@@ -222,32 +223,7 @@ public class BasicGapCriteriaImpl implements BasicGapCriteria, CAPAsnPrimitive {
         }
     }
 
-    protected static final XMLFormat<BasicGapCriteriaImpl> BASIC_GAP_CRITERIA_XML = new XMLFormat<BasicGapCriteriaImpl>(BasicGapCriteriaImpl.class) {
 
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, BasicGapCriteriaImpl basicGapCriteria) throws XMLStreamException {
-            basicGapCriteria.calledAddressValue = xml.get(CALLED_ADDRESS_VALUE, DigitsImpl.class);
-            basicGapCriteria.gapOnService = xml.get(GAP_ON_SERVICE, GapOnServiceImpl.class);
-            basicGapCriteria.calledAddressAndService = xml.get(CALLED_ADDRESS_AND_SERVICE, CalledAddressAndServiceImpl.class);
-            basicGapCriteria.callingAddressAndService = xml.get(CALLING_ADDRESS_AND_SERVICE, CallingAddressAndServiceImpl.class);
-        }
-
-        @Override
-        public void write(BasicGapCriteriaImpl basicGapCriteria, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (basicGapCriteria.calledAddressValue != null) {
-                xml.add((DigitsImpl) basicGapCriteria.calledAddressValue, CALLED_ADDRESS_VALUE, DigitsImpl.class);
-            }
-            if (basicGapCriteria.gapOnService != null) {
-                xml.add((GapOnServiceImpl) basicGapCriteria.gapOnService, GAP_ON_SERVICE, GapOnServiceImpl.class);
-            }
-            if (basicGapCriteria.calledAddressAndService != null) {
-                xml.add((CalledAddressAndServiceImpl) basicGapCriteria.calledAddressAndService, CALLED_ADDRESS_AND_SERVICE, CalledAddressAndServiceImpl.class);
-            }
-            if (basicGapCriteria.callingAddressAndService != null) {
-                xml.add((CallingAddressAndServiceImpl) basicGapCriteria.callingAddressAndService, CALLING_ADDRESS_AND_SERVICE, CallingAddressAndServiceImpl.class);
-            }
-        }
-    };
 
     @Override
     public String toString() {

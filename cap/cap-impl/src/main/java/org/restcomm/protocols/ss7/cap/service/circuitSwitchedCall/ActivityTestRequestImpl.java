@@ -1,8 +1,6 @@
 
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -13,12 +11,15 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentException;
 import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.ActivityTestRequest;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class ActivityTestRequestImpl extends CircuitSwitchedCallMessageImpl implements ActivityTestRequest {
+@XStreamAlias("activityTestRequest")
+ extends CircuitSwitchedCallMessageImpl implements ActivityTestRequest {
 
     public static final String _PrimitiveName = "ActivityTestRequest";
 
@@ -73,27 +74,7 @@ public class ActivityTestRequestImpl extends CircuitSwitchedCallMessageImpl impl
     public void encodeData(AsnOutputStream asnOutputStream) throws CAPException {
         throw new CAPException("Parameter " + _PrimitiveName + ": does not support encoding");
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ActivityTestRequestImpl> ACTIVITY_TEST_REQUEST_XML = new XMLFormat<ActivityTestRequestImpl>(
-            ActivityTestRequestImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ActivityTestRequestImpl activityTestRequest)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.read(xml, activityTestRequest);
-        }
-
-        @Override
-        public void write(ActivityTestRequestImpl activityTestRequest, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.write(activityTestRequest, xml);
-        }
-    };
-
-    @Override
+@Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();

@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -25,13 +23,16 @@ import org.restcomm.protocols.ss7.cap.primitives.CAPExtensionsImpl;
 import org.restcomm.protocols.ss7.cap.primitives.SendingSideIDImpl;
 import org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive.CAMELAChBillingChargingCharacteristicsImpl;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  * @author Amit Bhayani
  *
  */
-public class ApplyChargingRequestImpl extends CircuitSwitchedCallMessageImpl implements ApplyChargingRequest {
+@XStreamAlias("applyChargingRequest")
+ extends CircuitSwitchedCallMessageImpl implements ApplyChargingRequest {
 
     private static final String A_CH_BILLING_CHARGING_CHARACTERISTICS = "aChBillingChargingCharacteristics";
     private static final String PARTY_TO_CHARGE = "partyToCharge";
@@ -267,47 +268,4 @@ public class ApplyChargingRequestImpl extends CircuitSwitchedCallMessageImpl imp
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ApplyChargingRequestImpl> APPLY_CHARGING_REQUEST_XML = new XMLFormat<ApplyChargingRequestImpl>(
-            ApplyChargingRequestImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ApplyChargingRequestImpl applyChargingRequest)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.read(xml, applyChargingRequest);
-            applyChargingRequest.aChBillingChargingCharacteristics = xml.get(A_CH_BILLING_CHARGING_CHARACTERISTICS,
-                    CAMELAChBillingChargingCharacteristicsImpl.class);
-            applyChargingRequest.partyToCharge = xml.get(PARTY_TO_CHARGE, SendingSideIDImpl.class);
-
-            applyChargingRequest.aChChargingAddress = xml.get(A_CH_CHARGING_ADDRESS, AChChargingAddressImpl.class);
-
-            applyChargingRequest.extensions = xml.get(EXTENSIONS, CAPExtensionsImpl.class);
-        }
-
-        @Override
-        public void write(ApplyChargingRequestImpl applyChargingRequest, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.write(applyChargingRequest, xml);
-
-            if (applyChargingRequest.aChBillingChargingCharacteristics != null)
-                xml.add((CAMELAChBillingChargingCharacteristicsImpl) applyChargingRequest.aChBillingChargingCharacteristics,
-                        A_CH_BILLING_CHARGING_CHARACTERISTICS, CAMELAChBillingChargingCharacteristicsImpl.class);
-
-            if (applyChargingRequest.partyToCharge != null)
-                xml.add((SendingSideIDImpl) applyChargingRequest.partyToCharge, PARTY_TO_CHARGE, SendingSideIDImpl.class);
-
-            if (applyChargingRequest.aChChargingAddress != null) {
-                xml.add((AChChargingAddressImpl) applyChargingRequest.aChChargingAddress, A_CH_CHARGING_ADDRESS, AChChargingAddressImpl.class);
-            }
-
-            if (applyChargingRequest.extensions != null) {
-                xml.add((CAPExtensionsImpl) applyChargingRequest.extensions, EXTENSIONS, CAPExtensionsImpl.class);
-            }
-
-        }
-    };
 }

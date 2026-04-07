@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -24,12 +22,15 @@ import org.restcomm.protocols.ss7.inap.api.primitives.LegID;
 import org.restcomm.protocols.ss7.inap.primitives.LegIDImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author Povilas Jurna
  *
  */
-public class MoveLegRequestImpl extends CircuitSwitchedCallMessageImpl implements MoveLegRequest {
+@XStreamAlias("moveLegRequest")
+ extends CircuitSwitchedCallMessageImpl implements MoveLegRequest {
 
     public static final int _ID_legIDToMove = 0;
     public static final int _ID_extensions = 2;
@@ -214,31 +215,4 @@ public class MoveLegRequestImpl extends CircuitSwitchedCallMessageImpl implement
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<MoveLegRequestImpl> CONNECT_REQUEST_XML = new XMLFormat<MoveLegRequestImpl>(
-            MoveLegRequestImpl.class) {
-
-        public void read(javolution.xml.XMLFormat.InputElement xml, MoveLegRequestImpl moveLegRequest)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.read(xml, moveLegRequest);
-
-            moveLegRequest.legIDToMove = xml.get(LEG_ID_TO_MOVE, LegIDImpl.class);
-            moveLegRequest.extensions = xml.get(EXTENSIONS, CAPExtensionsImpl.class);
-
-        }
-
-        public void write(MoveLegRequestImpl moveLegRequest, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.write(moveLegRequest, xml);
-
-            if (moveLegRequest.getLegIDToMove() != null)
-                xml.add((LegIDImpl) moveLegRequest.getLegIDToMove(), LEG_ID_TO_MOVE, LegIDImpl.class);
-            if (moveLegRequest.getExtensions() != null)
-                xml.add((CAPExtensionsImpl) moveLegRequest.getExtensions(), EXTENSIONS, CAPExtensionsImpl.class);
-        }
-    };
-
 }

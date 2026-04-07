@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -17,13 +15,16 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  * @author Amit Bhayani
  *
  */
-public class TimeIfTariffSwitchImpl extends SequenceBase implements TimeIfTariffSwitch {
+@XStreamAlias("timeIfTariffSwitch")
+ extends SequenceBase implements TimeIfTariffSwitch {
 
     private static final String TIME_SINCE_TARIFF_SWITCH = "timeSinceTariffSwitch";
     private static final String TARIFF_SWITCH_INTERVAL = "tariffSwitchInterval";
@@ -132,31 +133,4 @@ public class TimeIfTariffSwitchImpl extends SequenceBase implements TimeIfTariff
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<TimeIfTariffSwitchImpl> TIME_IF_TARIFF_SWITCH_XML = new XMLFormat<TimeIfTariffSwitchImpl>(
-            TimeIfTariffSwitchImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, TimeIfTariffSwitchImpl timeIfTariffSwitch)
-                throws XMLStreamException {
-            Integer ival = xml.get(TIME_SINCE_TARIFF_SWITCH, Integer.class);
-            if (ival != null)
-                timeIfTariffSwitch.timeSinceTariffSwitch = ival;
-
-            timeIfTariffSwitch.tariffSwitchInterval = xml.get(TARIFF_SWITCH_INTERVAL, Integer.class);
-        }
-
-        @Override
-        public void write(TimeIfTariffSwitchImpl timeIfTariffSwitch, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            xml.add(timeIfTariffSwitch.timeSinceTariffSwitch, TIME_SINCE_TARIFF_SWITCH, Integer.class);
-
-            if (timeIfTariffSwitch.tariffSwitchInterval != null) {
-                xml.add(timeIfTariffSwitch.tariffSwitchInterval, TARIFF_SWITCH_INTERVAL, Integer.class);
-            }
-        }
-    };
 }

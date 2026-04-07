@@ -3,9 +3,6 @@ package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -27,14 +24,10 @@ import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.ExtB
  * @author sergey vetyutnev
  *
  */
-public class OAnswerSpecificInfoImpl extends SequenceBase implements OAnswerSpecificInfo {
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-    private static final String DESTINATION_ADDRESS = "destinationAddress";
-    private static final String OR_CALL = "orCall";
-    private static final String FORWARDED_CALL = "forwardedCall";
-    private static final String CHARGE_INDICATOR = "chargeIndicator";
-    private static final String EXT_BASIC_SERVICE_CODE = "extBasicServiceCode";
-    private static final String EXT_BASIC_SERVICE_CODE2 = "extBasicServiceCode2";
+@XStreamAlias("oAnswerSpecificInfo")
+public class OAnswerSpecificInfoImpl extends SequenceBase implements OAnswerSpecificInfo {
 
     public static final int _ID_destinationAddress = 50;
     public static final int _ID_orCall = 51;
@@ -43,11 +36,17 @@ public class OAnswerSpecificInfoImpl extends SequenceBase implements OAnswerSpec
     public static final int _ID_extBasicServiceCode = 54;
     public static final int _ID_extBasicServiceCode2 = 55;
 
+    @XStreamAlias("destinationAddress")
     private CalledPartyNumberCap destinationAddress;
+    @XStreamAlias("orCall")
     private boolean orCall;
+    @XStreamAlias("forwardedCall")
     private boolean forwardedCall;
+    @XStreamAlias("chargeIndicator")
     private ChargeIndicator chargeIndicator;
+    @XStreamAlias("extBasicServiceCode")
     private ExtBasicServiceCode extBasicServiceCode;
+    @XStreamAlias("extBasicServiceCode2")
     private ExtBasicServiceCode extBasicServiceCode2;
 
     public OAnswerSpecificInfoImpl() {
@@ -229,57 +228,4 @@ public class OAnswerSpecificInfoImpl extends SequenceBase implements OAnswerSpec
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<OAnswerSpecificInfoImpl> O_ANSWER_SPECIFIC_INFO_XML = new XMLFormat<OAnswerSpecificInfoImpl>(
-            OAnswerSpecificInfoImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, OAnswerSpecificInfoImpl oAnswerSpecificInfo)
-                throws XMLStreamException {
-            oAnswerSpecificInfo.destinationAddress = xml.get(DESTINATION_ADDRESS, CalledPartyNumberCapImpl.class);
-
-            Boolean bval = xml.get(OR_CALL, Boolean.class);
-            if (bval != null)
-                oAnswerSpecificInfo.orCall = bval;
-            bval = xml.get(FORWARDED_CALL, Boolean.class);
-            if (bval != null)
-                oAnswerSpecificInfo.forwardedCall = bval;
-
-            oAnswerSpecificInfo.chargeIndicator = xml.get(CHARGE_INDICATOR, ChargeIndicatorImpl.class);
-
-            oAnswerSpecificInfo.extBasicServiceCode = xml.get(EXT_BASIC_SERVICE_CODE, ExtBasicServiceCodeImpl.class);
-            oAnswerSpecificInfo.extBasicServiceCode2 = xml.get(EXT_BASIC_SERVICE_CODE2, ExtBasicServiceCodeImpl.class);
-        }
-
-        @Override
-        public void write(OAnswerSpecificInfoImpl oAnswerSpecificInfo, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-
-            if (oAnswerSpecificInfo.destinationAddress != null) {
-                xml.add(((CalledPartyNumberCapImpl) oAnswerSpecificInfo.destinationAddress), DESTINATION_ADDRESS,
-                        CalledPartyNumberCapImpl.class);
-            }
-
-            if (oAnswerSpecificInfo.orCall)
-                xml.add(oAnswerSpecificInfo.orCall, OR_CALL, Boolean.class);
-            if (oAnswerSpecificInfo.forwardedCall)
-                xml.add(oAnswerSpecificInfo.forwardedCall, FORWARDED_CALL, Boolean.class);
-
-            if (oAnswerSpecificInfo.chargeIndicator != null) {
-                xml.add(((ChargeIndicatorImpl) oAnswerSpecificInfo.chargeIndicator), CHARGE_INDICATOR, ChargeIndicatorImpl.class);
-            }
-
-            if (oAnswerSpecificInfo.extBasicServiceCode != null) {
-                xml.add(((ExtBasicServiceCodeImpl) oAnswerSpecificInfo.extBasicServiceCode), EXT_BASIC_SERVICE_CODE,
-                        ExtBasicServiceCodeImpl.class);
-            }
-
-            if (oAnswerSpecificInfo.extBasicServiceCode2 != null) {
-                xml.add(((ExtBasicServiceCodeImpl) oAnswerSpecificInfo.extBasicServiceCode2), EXT_BASIC_SERVICE_CODE2,
-                        ExtBasicServiceCodeImpl.class);
-            }
-        }
-    };
 }

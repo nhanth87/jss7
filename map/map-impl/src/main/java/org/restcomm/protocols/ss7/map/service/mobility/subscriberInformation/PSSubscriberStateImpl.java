@@ -1,12 +1,11 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -26,6 +25,7 @@ import org.restcomm.protocols.ss7.map.primitives.MAPAsnPrimitive;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("pSSubscriberStateImpl")
 public class PSSubscriberStateImpl implements PSSubscriberState, MAPAsnPrimitive {
 
     public static final int _ID_notProvidedFromSGSNorMME = 0;
@@ -36,15 +36,6 @@ public class PSSubscriberStateImpl implements PSSubscriberState, MAPAsnPrimitive
     public static final int _ID_ps_PDP_ActiveReachableForPaging = 5;
 
     public static final String _PrimitiveName = "PSSubscriberState";
-
-    private static final String DEFAULT_STRING_VALUE = null;
-
-    private static final String PDP_CONTEXT_INFO = "pdpContextInfo";
-
-    private static final String CHOICE = "choice";
-    private static final String NET_DET_NOT_REACHABLE = "netDetNotReachable";
-    private static final String PDP_CONTEXT_INFO_LIST = "pdpContextInfoList";
-
     private PSSubscriberStateChoice choice;
     private NotReachableReason netDetNotReachable;
     private ArrayList<PDPContextInfo> pdpContextInfoList;

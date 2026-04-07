@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -51,12 +49,15 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class EventSpecificInformationBCSMImpl implements EventSpecificInformationBCSM, CAPAsnPrimitive {
+@XStreamAlias("eventSpecificInformationBCSM")
+public class EventSpecificInformationBCSMImpl implements EventSpecificInformationBCSM, CAPAsnPrimitive {
 
     private static final String ROUTE_SELECT_FAILURE_SPECIFIC_INFO = "routeSelectFailureSpecificInfo";
     private static final String O_CALLED_PARTY_BUSY_SPECIFIC_INFO = "oCalledPartyBusySpecificInfo";

@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.errors;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -27,11 +26,8 @@ import org.restcomm.protocols.ss7.map.service.supplementary.SSStatusImpl;
  * @author sergey vetyutnev
  * @author amit bhayani
  */
+@XStreamAlias("mAPErrorMessageSsIncompatibilityImpl")
 public class MAPErrorMessageSsIncompatibilityImpl extends MAPErrorMessageImpl implements MAPErrorMessageSsIncompatibility {
-
-    private static final String SS_CODE = "ssCode";
-    private static final String BASIC_SERVICE = "basicService";
-    private static final String SS_STATUS = "ssStatus";
 
     public static final int _tag_ss_Code = 1;
     public static final int _tag_ss_Status = 4;

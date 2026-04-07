@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.primitives;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -20,12 +18,15 @@ import org.restcomm.protocols.ss7.inap.api.primitives.LegID;
 import org.restcomm.protocols.ss7.inap.primitives.LegIDImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class AChChargingAddressImpl implements AChChargingAddress, CAPAsnPrimitive {
+@XStreamAlias("aChChargingAddress")
+public class AChChargingAddressImpl implements AChChargingAddress, CAPAsnPrimitive {
 
     private static final String LEG_ID = "legID";
     private static final String SRF_CONNECTION = "srfConnection";

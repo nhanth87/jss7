@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -19,12 +17,15 @@ import org.restcomm.protocols.ss7.cap.primitives.BurstListImpl;
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class AudibleIndicatorImpl implements AudibleIndicator, CAPAsnPrimitive {
+@XStreamAlias("audibleIndicator")
+ implements AudibleIndicator, CAPAsnPrimitive {
 
     private static final String TONE = "tone";
     private static final String BURST_LIST = "burstList";

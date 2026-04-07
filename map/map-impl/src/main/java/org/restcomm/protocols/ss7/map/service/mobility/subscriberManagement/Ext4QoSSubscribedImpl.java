@@ -1,9 +1,8 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.Ext4QoSSubscribed;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringLength1Base;
 
@@ -12,12 +11,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringLength1Base;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("ext4QoSSubscribedImpl")
 public class Ext4QoSSubscribedImpl extends OctetStringLength1Base implements Ext4QoSSubscribed {
-
-    private static final String PRIORITY_LEVEL = "priorityLevel";
-
-    private static final int DEFAULT_INT_VALUE = 0;
-
     public Ext4QoSSubscribedImpl() {
         super("Ext4QoSSubscribed");
     }

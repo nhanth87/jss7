@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -25,19 +24,12 @@ import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.CSGI
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("userCSGInformationImpl")
 public class UserCSGInformationImpl implements UserCSGInformation, MAPAsnPrimitive {
-
-    private static final String _PrimitiveName = "UserCSGInformation";
-
     public static final int _ID_csgId = 0;
     public static final int _ID_extensionContainer = 1;
     public static final int _ID_accessMode = 2;
     public static final int _ID_cmi = 3;
-
-    private static final String CSG_ID = "csgId";
-    private static final String EXTENSION_CONTAINER = "extensionContainer";
-    private static final String ACCESS_MODE = "accessMode";
-    private static final String CMI = "cmi";
 
     private CSGId csgId;
     private MAPExtensionContainer extensionContainer;

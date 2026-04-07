@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.primitives;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -24,12 +22,15 @@ import org.restcomm.protocols.ss7.inap.api.primitives.LegID;
 import org.restcomm.protocols.ss7.inap.primitives.LegIDImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class BCSMEventImpl extends SequenceBase implements BCSMEvent {
+@XStreamAlias("bCSMEvent")
+ extends SequenceBase implements BCSMEvent {
 
     public static final int _ID_eventTypeBCSM = 0;
     public static final int _ID_monitorMode = 1;
@@ -214,40 +215,4 @@ public class BCSMEventImpl extends SequenceBase implements BCSMEvent {
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<BCSMEventImpl> BCSM_EVENT_XML = new XMLFormat<BCSMEventImpl>(BCSMEventImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, BCSMEventImpl bcsmEvent) throws XMLStreamException {
-            String str = xml.get(EVENT_TYPE_BCSM, String.class);
-            if (str != null)
-                bcsmEvent.eventTypeBCSM = Enum.valueOf(EventTypeBCSM.class, str);
-            str = xml.get(MONITOR_MODE, String.class);
-            if (str != null)
-                bcsmEvent.monitorMode = Enum.valueOf(MonitorMode.class, str);
-            bcsmEvent.legID = xml.get(LEG_ID, LegIDImpl.class);
-            bcsmEvent.dpSpecificCriteria = xml.get(DP_SPECIFIC_CRITERIA, DpSpecificCriteriaImpl.class);
-            Boolean bval = xml.get(AUTOMATIC_REARM, Boolean.class);
-            if (bval != null)
-                bcsmEvent.automaticRearm = bval;
-        }
-
-        @Override
-        public void write(BCSMEventImpl bcsmEvent, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (bcsmEvent.getEventTypeBCSM() != null)
-                xml.add((String) bcsmEvent.getEventTypeBCSM().toString(), EVENT_TYPE_BCSM, String.class);
-            if (bcsmEvent.getMonitorMode() != null)
-                xml.add((String) bcsmEvent.getMonitorMode().toString(), MONITOR_MODE, String.class);
-            if (bcsmEvent.getLegID() != null)
-                xml.add((LegIDImpl) bcsmEvent.getLegID(), LEG_ID, LegIDImpl.class);
-            if (bcsmEvent.getDpSpecificCriteria() != null)
-                xml.add((DpSpecificCriteriaImpl) bcsmEvent.getDpSpecificCriteria(), DP_SPECIFIC_CRITERIA,
-                        DpSpecificCriteriaImpl.class);
-            if (bcsmEvent.getAutomaticRearm())
-                xml.add((Boolean) bcsmEvent.getAutomaticRearm(), AUTOMATIC_REARM, Boolean.class);
-        }
-    };
 }

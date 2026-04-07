@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -23,17 +22,12 @@ import org.restcomm.protocols.ss7.map.primitives.MAPAsnPrimitive;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("subscriberStateImpl")
 public class SubscriberStateImpl implements SubscriberState, MAPAsnPrimitive {
 
     public static final int _ID_assumedIdle = 0;
     public static final int _ID_camelBusy = 1;
     public static final int _ID_notProvidedFromVLR = 2;
-
-    private static final String SUBSCRIBER_STATE_CHOICE = "subscriberStateChoice";
-    private static final String NOT_REACHABLE_REASON = "notReachableReason";
-
-    private static final String DEFAULT_STRING_VALUE = null;
-
     public static final String _PrimitiveName = "SubscriberState";
 
     private SubscriberStateChoice subscriberStateChoice;

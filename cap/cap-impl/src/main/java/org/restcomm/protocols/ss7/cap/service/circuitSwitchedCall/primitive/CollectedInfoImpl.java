@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -17,12 +15,15 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.CollectedInfo;
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class CollectedInfoImpl implements CollectedInfo, CAPAsnPrimitive {
+@XStreamAlias("collectedInfo")
+ implements CollectedInfo, CAPAsnPrimitive {
 
     public static final int _ID_collectedDigits = 0;
 
@@ -160,31 +161,4 @@ public class CollectedInfoImpl implements CollectedInfo, CAPAsnPrimitive {
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<CollectedInfoImpl> COLLECTED_INFO_XML = new XMLFormat<CollectedInfoImpl>(
-            CollectedInfoImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, CollectedInfoImpl collectedInfo) throws XMLStreamException {
-            collectedInfo.collectedDigits = xml.get(COLLECTED_DIGITS, CollectedDigitsImpl.class);
-
-            int choiceCount = 0;
-            if (collectedInfo.collectedDigits != null)
-                choiceCount++;
-
-            if (choiceCount != 1)
-                throw new XMLStreamException("CollectedInfo decoding error: there must be one choice selected, found: "
-                        + choiceCount);
-        }
-
-        @Override
-        public void write(CollectedInfoImpl collectedInfo, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (collectedInfo.collectedDigits != null)
-                xml.add((CollectedDigitsImpl) collectedInfo.collectedDigits, COLLECTED_DIGITS, CollectedDigitsImpl.class);
-        }
-    };
 }

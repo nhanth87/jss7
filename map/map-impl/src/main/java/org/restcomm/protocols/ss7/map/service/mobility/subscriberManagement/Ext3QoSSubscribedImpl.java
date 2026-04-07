@@ -1,9 +1,8 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.Ext3QoSSubscribed;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.ExtQoSSubscribed_BitRateExtended;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
@@ -13,13 +12,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("ext3QoSSubscribedImpl")
 public class Ext3QoSSubscribedImpl extends OctetStringBase implements Ext3QoSSubscribed {
-
-    private static final String MAX_BIT_RATE_FOR_UPLINK_EXT = "maximumBitRateForUplinkExtended";
-    private static final String GUARANTEED_BIT_RATE_FOR_UPLINK_EXT = "guaranteedBitRateForUplinkExtended";
-
-    private static final int DEFAULT_INT_VALUE = 0;
-
     public Ext3QoSSubscribedImpl() {
         super(1, 2, "Ext3QoSSubscribed");
     }

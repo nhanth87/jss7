@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -21,6 +20,7 @@ import org.restcomm.protocols.ss7.map.primitives.MAPAsnPrimitive;
 * @author sergey vetyutnev
 *
 */
+@XStreamAlias("cUGIndexImpl")
 public class CUGIndexImpl implements MAPAsnPrimitive, CUGIndex {
 
     protected String _PrimitiveName = "CUGIndex";
@@ -33,7 +33,6 @@ public class CUGIndexImpl implements MAPAsnPrimitive, CUGIndex {
     public CUGIndexImpl(int data) {
         this.data = data;
     }
-
 
     @Override
     public int getData() {

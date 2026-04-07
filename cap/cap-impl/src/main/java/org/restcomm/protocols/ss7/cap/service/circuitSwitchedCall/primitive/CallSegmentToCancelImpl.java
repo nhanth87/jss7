@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -16,13 +14,16 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.CallSegmentToCancel;
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  * @author Amit Bhayani
  *
  */
-public class CallSegmentToCancelImpl implements CallSegmentToCancel, CAPAsnPrimitive {
+@XStreamAlias("callSegmentToCancel")
+ implements CallSegmentToCancel, CAPAsnPrimitive {
 
     private static final String INVOKE_ID = "invokeID";
     private static final String CALL_SEGMENT_ID = "callSegmentID";
@@ -183,33 +184,4 @@ public class CallSegmentToCancelImpl implements CallSegmentToCancel, CAPAsnPrimi
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<CallSegmentToCancelImpl> CALL_SEGMENT_TO_CANCEL_XML = new XMLFormat<CallSegmentToCancelImpl>(
-            CallSegmentToCancelImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, CallSegmentToCancelImpl callSegmentToCancel)
-                throws XMLStreamException {
-
-            callSegmentToCancel.invokeID = xml.get(INVOKE_ID, Integer.class);
-            callSegmentToCancel.callSegmentID = xml.get(CALL_SEGMENT_ID, Integer.class);
-        }
-
-        @Override
-        public void write(CallSegmentToCancelImpl callSegmentToCancel, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-
-            if (callSegmentToCancel.invokeID != null) {
-                xml.add(((Integer) callSegmentToCancel.invokeID), INVOKE_ID, Integer.class);
-            }
-
-            if (callSegmentToCancel.callSegmentID != null) {
-                xml.add(((Integer) callSegmentToCancel.callSegmentID), CALL_SEGMENT_ID, Integer.class);
-            }
-
-        }
-    };
 }

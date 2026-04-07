@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -19,13 +17,16 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.ApplyCharg
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.TimeDurationChargingResult;
 import org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive.TimeDurationChargingResultImpl;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  * @author Amit Bhayani
  *
  */
-public class ApplyChargingReportRequestImpl extends CircuitSwitchedCallMessageImpl implements ApplyChargingReportRequest {
+@XStreamAlias("applyChargingReportRequest")
+ extends CircuitSwitchedCallMessageImpl implements ApplyChargingReportRequest {
 
     private static final String TIME_DURATION_CHARGING_RESULT = "timeDurationChargingResult";
 
@@ -172,30 +173,4 @@ public class ApplyChargingReportRequestImpl extends CircuitSwitchedCallMessageIm
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ApplyChargingReportRequestImpl> APPLY_CHARGING_REPORT_REQUEST_XML = new XMLFormat<ApplyChargingReportRequestImpl>(
-            ApplyChargingReportRequestImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ApplyChargingReportRequestImpl applyChargingReportRequest)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.read(xml, applyChargingReportRequest);
-            applyChargingReportRequest.timeDurationChargingResult = xml.get(TIME_DURATION_CHARGING_RESULT,
-                    TimeDurationChargingResultImpl.class);
-        }
-
-        @Override
-        public void write(ApplyChargingReportRequestImpl applyChargingReportRequest, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.write(applyChargingReportRequest, xml);
-
-            xml.add((TimeDurationChargingResultImpl) applyChargingReportRequest.timeDurationChargingResult,
-                    TIME_DURATION_CHARGING_RESULT, TimeDurationChargingResultImpl.class);
-        }
-    };
-
 }

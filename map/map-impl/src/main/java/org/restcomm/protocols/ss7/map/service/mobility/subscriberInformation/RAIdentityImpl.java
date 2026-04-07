@@ -1,9 +1,8 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.map.api.MAPException;
@@ -17,15 +16,8 @@ import java.io.IOException;
 /**
  * @author <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
  */
+@XStreamAlias("rAIdentityImpl")
 public class RAIdentityImpl extends OctetStringBase implements RAIdentity {
-
-    private static final String MCC = "mcc";
-    private static final String MNC = "mnc";
-    private static final String LAC = "lac";
-    private static final String RAC = "rac";
-
-    private static final int DEFAULT_INT_VALUE = 0;
-
     public RAIdentityImpl() {
         super(6, 6, "RAIdentity");
     }

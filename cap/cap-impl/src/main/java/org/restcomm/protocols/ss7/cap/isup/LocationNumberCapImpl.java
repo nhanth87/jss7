@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.isup;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -19,13 +17,16 @@ import org.restcomm.protocols.ss7.isup.ParameterException;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.LocationNumberImpl;
 import org.restcomm.protocols.ss7.isup.message.parameter.LocationNumber;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  *
  * @author sergey vetyutnev
  *
  */
-public class LocationNumberCapImpl implements LocationNumberCap, CAPAsnPrimitive {
+@XStreamAlias("locationNumberCap")
+ implements LocationNumberCap, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "LocationNumberCap";
 
@@ -191,32 +192,4 @@ public class LocationNumberCapImpl implements LocationNumberCap, CAPAsnPrimitive
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<LocationNumberCapImpl> LOCATION_NUMBER_CAP_XML = new XMLFormat<LocationNumberCapImpl>(
-            LocationNumberCapImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, LocationNumberCapImpl locationNumberCap)
-                throws XMLStreamException {
-            try {
-                locationNumberCap.setLocationNumber(xml.get(ISUP_LOCATION_NUMBER, LocationNumberImpl.class));
-            } catch (CAPException e) {
-                throw new XMLStreamException(e);
-            }
-        }
-
-        @Override
-        public void write(LocationNumberCapImpl locationNumberCap, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            try {
-                xml.add(((LocationNumberImpl) locationNumberCap.getLocationNumber()), ISUP_LOCATION_NUMBER,
-                        LocationNumberImpl.class);
-            } catch (CAPException e) {
-                throw new XMLStreamException(e);
-            }
-        }
-    };
 }

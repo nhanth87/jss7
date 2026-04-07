@@ -1,21 +1,18 @@
 package org.restcomm.protocols.ss7.cap;
 
-import javolution.text.TextBuilder;
-import javolution.xml.XMLBinding;
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-import javolution.xml.stream.XMLStreamException;
+import com.thoughtworks.xstream.XStream;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 
 public class CAPStackConfigurationManagement {
     private static final String PERSIST_FILE_NAME = "management.xml";
     private static final String CAP_MANAGEMENT_PERSIST_DIR_KEY = "capmanagement.persist.dir";
     private static final String USER_DIR_KEY = "user.dir";
-    private static final String TAB_INDENT = "\t";
     private static final String DEFAULT_CONFIG_FILE_NAME = "CapStack";
 
     private static final String TIMER_CIRCUIT_SWITCHED_CALL_CONTROL_SHORT = "timercircuitswitchedcallcontrolshort";
@@ -24,10 +21,9 @@ public class CAPStackConfigurationManagement {
     private static final String TIMER_SMS_SHORT = "timersmsshort";
     private static final String TIMER_GPRS_SHORT = "timergprsshort";
 
-    private static final XMLBinding binding = new XMLBinding();
     private static CAPStackConfigurationManagement instance = new CAPStackConfigurationManagement();
 
-    private final TextBuilder persistFile = TextBuilder.newInstance();
+    private StringBuilder persistFile = new StringBuilder();
     private String configFileName = DEFAULT_CONFIG_FILE_NAME;
     private String persistDir = null;
 
@@ -50,7 +46,7 @@ public class CAPStackConfigurationManagement {
     }
 
     private void setPersistFile() {
-        this.persistFile.clear();
+        this.persistFile.setLength(0);
 
         if (persistDir != null) {
             this.persistFile.append(persistDir).append(File.separator).append(this.configFileName).append("_").append(PERSIST_FILE_NAME);
@@ -64,22 +60,10 @@ public class CAPStackConfigurationManagement {
      * Persist
      */
     public void store() {
-        // TODO : Should we keep reference to Objects rather than recreating
-        // everytime?
-        try {
-            XMLObjectWriter writer = XMLObjectWriter.newInstance(new FileOutputStream(persistFile.toString()));
-
-            writer.setBinding(binding);
-            writer.setIndentation(TAB_INDENT);
-
-            writer.write(this._Timer_CircuitSwitchedCallControl_Short, TIMER_CIRCUIT_SWITCHED_CALL_CONTROL_SHORT, Integer.class);
-            writer.write(this._Timer_CircuitSwitchedCallControl_Medium, TIMER_CIRCUIT_SWITCHED_CALL_CONTROL_MEDIUM, Integer.class);
-            writer.write(this._Timer_CircuitSwitchedCallControl_Long, TIMER_CIRCUIT_SWITCHED_CALL_CONTROL_LONG, Integer.class);
-            writer.write(this._Timer_Sms_Short, TIMER_SMS_SHORT, Integer.class);
-            writer.write(this._Timer_Gprs_Short, TIMER_GPRS_SHORT, Integer.class);
-
-            writer.close();
-        } catch (Exception e) {
+        XStream xstream = CAPXStreamHelper.getXStream();
+        try (Writer writer = new FileWriter(persistFile.toString())) {
+            xstream.toXML(this, writer);
+        } catch (IOException e) {
             System.err.println(String.format("Error while persisting the CAP Resource state in file=%s", persistFile.toString()));
             e.printStackTrace();
         }
@@ -93,37 +77,24 @@ public class CAPStackConfigurationManagement {
     public void load() {
         try {
             setPersistFile();
-            XMLObjectReader reader = XMLObjectReader.newInstance(new FileInputStream(persistFile.toString()));
-            reader.setBinding(binding);
-            load(reader);
-        } catch (XMLStreamException | FileNotFoundException e) {
+            File file = new File(persistFile.toString());
+            if (!file.exists()) {
+                return;
+            }
+            XStream xstream = CAPXStreamHelper.getXStream();
+            try (Reader reader = new FileReader(file)) {
+                CAPStackConfigurationManagement loaded = (CAPStackConfigurationManagement) xstream.fromXML(reader);
+                // Copy loaded values to this instance
+                this._Timer_CircuitSwitchedCallControl_Short = loaded._Timer_CircuitSwitchedCallControl_Short;
+                this._Timer_CircuitSwitchedCallControl_Medium = loaded._Timer_CircuitSwitchedCallControl_Medium;
+                this._Timer_CircuitSwitchedCallControl_Long = loaded._Timer_CircuitSwitchedCallControl_Long;
+                this._Timer_Sms_Short = loaded._Timer_Sms_Short;
+                this._Timer_Gprs_Short = loaded._Timer_Gprs_Short;
+            }
+        } catch (Exception e) {
             System.err.println(String.format("Error while load the CAP Resource state from file=%s", persistFile.toString()));
             e.printStackTrace();
         }
-    }
-
-    private void load(XMLObjectReader reader) throws XMLStreamException {
-        Integer val = reader.read(TIMER_CIRCUIT_SWITCHED_CALL_CONTROL_SHORT, Integer.class);
-        if (val != null)
-            this._Timer_CircuitSwitchedCallControl_Short = val;
-
-        val = reader.read(TIMER_CIRCUIT_SWITCHED_CALL_CONTROL_MEDIUM, Integer.class);
-        if (val != null)
-            this._Timer_CircuitSwitchedCallControl_Medium = val;
-
-        val = reader.read(TIMER_CIRCUIT_SWITCHED_CALL_CONTROL_LONG, Integer.class);
-        if (val != null)
-            this._Timer_CircuitSwitchedCallControl_Long = val;
-
-        val = reader.read(TIMER_SMS_SHORT, Integer.class);
-        if (val != null)
-            this._Timer_Sms_Short = val;
-
-        val = reader.read(TIMER_GPRS_SHORT, Integer.class);
-        if (val != null)
-            this._Timer_Gprs_Short = val;
-
-        reader.close();
     }
 
     public void setConfigFileName(String configFileName) {

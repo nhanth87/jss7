@@ -1,9 +1,8 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberInformation.GeodeticInformation;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberInformation.TypeOfShape;
@@ -14,19 +13,9 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("geodeticInformationImpl")
 public class GeodeticInformationImpl extends OctetStringBase implements GeodeticInformation {
-
-    private static final String SCREENING_AND_PRESENTATION_INDICATORS = "screeningAndPresentationIndicators";
-    private static final String TYPE_OF_SHAPE = "typeOfShape";
-    private static final String LATITUDE = "latitude";
-    private static final String LONGITUDE = "longitude";
-    private static final String UNCERTAINTY = "uncertainty";
-    private static final String CONFIDENCE = "confidence";
-
-    private static final String DEFAULT_STRING_VALUE = null;
     private static final double DEFAULT_DOUBLE_VALUE = 0;
-    private static final int DEFAULT_INT_VALUE = 0;
-
     public GeodeticInformationImpl() {
         super(10, 10, "GeodeticInformation");
     }

@@ -1,10 +1,9 @@
-package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
+﻿package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -31,6 +30,7 @@ import org.restcomm.protocols.ss7.map.primitives.MAPExtensionContainerImpl;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("subscriberInfoImpl")
 public class SubscriberInfoImpl implements SubscriberInfo, MAPAsnPrimitive {
 
     public static final String _PrimitiveName = "SubscriberInfo";
@@ -44,16 +44,6 @@ public class SubscriberInfoImpl implements SubscriberInfo, MAPAsnPrimitive {
     public static final int _ID_msclassmark2 = 6;
     public static final int _ID_gprsMSClass = 7;
     public static final int _ID_mnpInfoRes = 8;
-
-    private static final String LOCATION_INFORMATION = "locationInformation";
-    private static final String SUBSCRIBER_STATE = "subscriberState";
-    private static final String EXTENSION_CONTAINER = "extensionContainer";
-    private static final String LOCATION_INFORMATION_GPRS = "locationInformationGRPS";
-    private static final String PS_SUBSCRIBER_STATE = "psSubscriberState";
-    private static final String IMEI = "imei";
-    private static final String MS_CLASSMARK_2 = "msClassmark2";
-    private static final String GPRS_MS_CLASS = "gprsMSClass";
-    private static final String MNP_INFO_RES = "mnpInfoRes";
 
     private LocationInformation locationInformation = null;
     private SubscriberState subscriberState = null;

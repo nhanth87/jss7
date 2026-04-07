@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.errors;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -29,12 +28,8 @@ import org.restcomm.protocols.ss7.map.smstpdu.SmsTpduImpl;
  * @author sergey vetyutnev
  * @author amit bhayani
  */
+@XStreamAlias("mAPErrorMessageSMDeliveryFailureImpl")
 public class MAPErrorMessageSMDeliveryFailureImpl extends MAPErrorMessageImpl implements MAPErrorMessageSMDeliveryFailure {
-
-    private static final String MAP_PROTOCOL_VERSION = "mapProtocolVersion";
-    private static final String SM_ENUMERATE_DEL_FAIL_CAUSE = "sMEnumeratedDeliveryFailureCause";
-    private static final String SIGNAL_INFO = "signalInfo";
-    private static final String MAP_EXTENSION_CONTAINER = "mapExtensionContainer";
 
     private long mapProtocolVersion;
     private SMEnumeratedDeliveryFailureCause smEnumeratedDeliveryFailureCause;
@@ -272,7 +267,6 @@ public class MAPErrorMessageSMDeliveryFailureImpl extends MAPErrorMessageImpl im
     public void setSmsDeliverReportTpdu(SmsDeliverReportTpdu smsDeliverReportTpdu) throws MAPException {
         this.signalInfo = smsDeliverReportTpdu.encodeData();
     }
-
 
     @Override
     public String toString() {

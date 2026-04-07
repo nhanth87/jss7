@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -24,13 +22,16 @@ import org.restcomm.protocols.ss7.cap.primitives.ReceivingSideIDImpl;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  * @author Amit Bhayani
  *
  */
-public class TimeDurationChargingResultImpl extends SequenceBase implements TimeDurationChargingResult {
+@XStreamAlias("timeDurationChargingResult")
+ extends SequenceBase implements TimeDurationChargingResult {
 
     private static final String PARTY_TO_CHARGE = "partyToCharge";
     private static final String TIME_INFORMATION = "timeInformation";
@@ -237,55 +238,4 @@ public class TimeDurationChargingResultImpl extends SequenceBase implements Time
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<TimeDurationChargingResultImpl> TIME_DURATION_CHARGING_RESULT_XML = new XMLFormat<TimeDurationChargingResultImpl>(
-            TimeDurationChargingResultImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, TimeDurationChargingResultImpl timeDurationChargingResult)
-                throws XMLStreamException {
-            timeDurationChargingResult.partyToCharge = xml.get(PARTY_TO_CHARGE, ReceivingSideIDImpl.class);
-            timeDurationChargingResult.timeInformation = xml.get(TIME_INFORMATION, TimeInformationImpl.class);
-
-            Boolean bval = xml.get(LEG_ACTIVE, Boolean.class);
-            if (bval != null)
-                timeDurationChargingResult.legActive = bval;
-            bval = xml.get(CALL_LEG_RELEASED_AT_TCP_EXPIRY, Boolean.class);
-            if (bval != null)
-                timeDurationChargingResult.callLegReleasedAtTcpExpiry = bval;
-
-            timeDurationChargingResult.aChChargingAddress = xml.get(A_CH_CHARGING_ADDRESS, AChChargingAddressImpl.class);
-
-            timeDurationChargingResult.extensions = xml.get(EXTENSIONS, CAPExtensionsImpl.class);
-
-        }
-
-        @Override
-        public void write(TimeDurationChargingResultImpl timeDurationChargingResult, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-
-            if (timeDurationChargingResult.partyToCharge != null)
-                xml.add((ReceivingSideIDImpl) timeDurationChargingResult.partyToCharge, PARTY_TO_CHARGE,
-                        ReceivingSideIDImpl.class);
-
-            if (timeDurationChargingResult.timeInformation != null)
-                xml.add((TimeInformationImpl) timeDurationChargingResult.timeInformation, TIME_INFORMATION,
-                        TimeInformationImpl.class);
-
-            if (timeDurationChargingResult.legActive)
-                xml.add(timeDurationChargingResult.legActive, LEG_ACTIVE, Boolean.class);
-            if (timeDurationChargingResult.callLegReleasedAtTcpExpiry)
-                xml.add(timeDurationChargingResult.callLegReleasedAtTcpExpiry, CALL_LEG_RELEASED_AT_TCP_EXPIRY, Boolean.class);
-
-            if (timeDurationChargingResult.aChChargingAddress != null)
-                xml.add((AChChargingAddressImpl) timeDurationChargingResult.aChChargingAddress, A_CH_CHARGING_ADDRESS, AChChargingAddressImpl.class);
-
-            if (timeDurationChargingResult.extensions != null)
-                xml.add((CAPExtensionsImpl) timeDurationChargingResult.extensions, EXTENSIONS, CAPExtensionsImpl.class);
-
-        }
-    };
 }

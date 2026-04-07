@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
@@ -20,9 +22,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javolution.text.TextBuilder;
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.api.Association;
@@ -83,9 +82,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
     private static final String USER_DIR_KEY = "user.dir";
     private static final String PERSIST_FILE_NAME = "m3ua1.xml";
 
-    protected static final M3UAXMLBinding binding = new M3UAXMLBinding();
     private static final String TAB_INDENT = "\t";
-    private static final String CLASS_ATTRIBUTE = "type";
 
     protected static final int MAX_SEQUENCE_NUMBER = 256;
 
@@ -131,10 +128,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
     public M3UAManagementImpl(String name, String productName, Ss7ExtInterface ss7ExtInterface) {
         super(productName, ss7ExtInterface);
         this.name = name;
-        binding.setClassAttribute(CLASS_ATTRIBUTE);
-        binding.setAlias(AspFactoryImpl.class, "aspFactory");
-        binding.setAlias(AsImpl.class, "as");
-        binding.setAlias(AspImpl.class, "asp");
+
 
         this.routeManagement = new M3UARouteManagement(this);
         this.m3uaCounterProvider = new M3UACounterProviderImpl(this);
@@ -953,33 +947,41 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
      * Persist
      */
     public void store() {
-
-        // TODO : Should we keep reference to Objects rather than recreating everytime?
         try {
             this.preparePersistFile();
-            XMLObjectWriter writer = XMLObjectWriter.newInstance(new FileOutputStream(persistFile.toString()));
-            writer.setBinding(binding);
-            // Enables cross-references.
-            // writer.setReferenceResolver(new XMLReferenceResolver());
-            writer.setIndentation(TAB_INDENT);
+            M3UAConfig config = new M3UAConfig();
+            config.timeBetweenHeartbeat = this.timeBetweenHeartbeat;
+            config.statisticsEnabled = this.statisticsEnabled;
+            config.statisticsTaskDelay = this.statisticsTaskDelay;
+            config.statisticsTaskPeriod = this.statisticsTaskPeriod;
+            config.routingKeyManagementEnabled = this.routingKeyManagementEnabled;
+            config.useLsbForLinksetSelection = this.isUseLsbForLinksetSelection();
+            config.aspFactories = this.aspFactories;
+            config.appServers = this.appServers;
+            config.route = this.routeManagement.route;
 
-            writer.write(this.timeBetweenHeartbeat, HEART_BEAT_TIME_PROP, Integer.class);
-
-            writer.write(this.statisticsEnabled, STATISTICS_ENABLED, Boolean.class);
-            writer.write(this.statisticsTaskDelay, STATISTICS_TASK_DELAY, Long.class);
-            writer.write(this.statisticsTaskPeriod, STATISTICS_TASK_PERIOD, Long.class);
-
-            writer.write(this.routingKeyManagementEnabled, ROUTING_KEY_MANAGEMENT_ENABLED, Boolean.class);
-            writer.write(this.isUseLsbForLinksetSelection(), USE_LSB_FOR_LINKSET_SELECTION, Boolean.class);
-
-            writer.write(aspFactories, ASP_FACTORY_LIST, CopyOnWriteArrayList.class);
-            writer.write(appServers, AS_LIST, CopyOnWriteArrayList.class);
-            writer.write(this.routeManagement.route, DPC_VS_AS_LIST, RouteMap.class);
-
-            writer.close();
+            String xml = M3UAXStreamHelper.toXML(config);
+            try (FileWriter writer = new FileWriter(persistFile.toString())) {
+                writer.write(xml);
+            }
         } catch (Exception e) {
             logger.error("Error while persisting the Rule state in file", e);
         }
+    }
+
+    /**
+     * Configuration class for M3UA persistence
+     */
+    public static class M3UAConfig {
+        public int timeBetweenHeartbeat;
+        public boolean statisticsEnabled;
+        public long statisticsTaskDelay;
+        public long statisticsTaskPeriod;
+        public boolean routingKeyManagementEnabled;
+        public boolean useLsbForLinksetSelection;
+        public CopyOnWriteArrayList<AspFactory> aspFactories;
+        public CopyOnWriteArrayList<As> appServers;
+        public RouteMap route;
     }
 
     /**
@@ -988,8 +990,6 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
      * @throws Exception
      */
     public void load() throws FileNotFoundException {
-
-        XMLObjectReader reader = null;
         try {
             this.preparePersistFile();
 
@@ -1009,8 +1009,6 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
                 file.delete();
             }
             M3UAErrorManagementState.getInstance().loadConfig(persistFile.toString());
-        } catch (XMLStreamException ex) {
-            logger.error(String.format("Failed to load the M3UA configuration file. \n%s", ex.getMessage()));
         } catch (FileNotFoundException e) {
             logger.warn(String.format("Failed to load the M3UA configuration file. \n%s", e.getMessage()));
         } catch (IOException e) {
@@ -1018,58 +1016,48 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         }
     }
 
-    private void validateStatisticsVariable(XMLObjectReader reader) {
+    private void validateStatisticsVariable(M3UAConfig config) {
         try {
-            this.statisticsEnabled = reader.read(STATISTICS_ENABLED, Boolean.class);
+            this.statisticsEnabled = config.statisticsEnabled;
         } catch (Exception e) {
             this.statisticsEnabled = false;
             logger.warn("Setting the default value for " + STATISTICS_ENABLED + " in  false");
         }
 
         try {
-            this.statisticsTaskDelay = reader.read(STATISTICS_TASK_DELAY, Long.class);
+            this.statisticsTaskDelay = config.statisticsTaskDelay;
         } catch (Exception e) {
             this.statisticsTaskDelay = 5000;
             logger.warn("Setting the default value for " + STATISTICS_TASK_DELAY + " in  5000");
         }
 
         try {
-            this.statisticsTaskPeriod = reader.read(STATISTICS_TASK_PERIOD, Long.class);
+            this.statisticsTaskPeriod = config.statisticsTaskPeriod;
         } catch (Exception e) {
             this.statisticsTaskPeriod = 5000;
             logger.warn("Setting the default value for " + STATISTICS_TASK_PERIOD + " in  5000");
         }
     }
 
-    protected void loadActualData(XMLObjectReader reader) throws XMLStreamException, IOException{
+    protected void loadActualData(M3UAConfig config) throws IOException {
         try {
-            Integer maxSeqNumPropValue = reader.read(MAX_SEQUENCE_NUMBER_PROP, Integer.class);
-            maxSeqNumPropValue = reader.read(MAX_AS_FOR_ROUTE_PROP, Integer.class);
-
-            this.timeBetweenHeartbeat = reader.read(HEART_BEAT_TIME_PROP, Integer.class);
-
-            validateStatisticsVariable(reader);
-
-            this.routingKeyManagementEnabled = reader.read(ROUTING_KEY_MANAGEMENT_ENABLED, Boolean.class);
-
+            this.timeBetweenHeartbeat = config.timeBetweenHeartbeat;
+            validateStatisticsVariable(config);
+            this.routingKeyManagementEnabled = config.routingKeyManagementEnabled;
         } catch (java.lang.Exception e) {
             // ignore.
             // For backward compatibility we can ignore if these values are not defined
             logger.error("Error while reading attribute", e);
         }
 
-        String routingLabelFormatValue = reader.read(ROUTING_LABEL_FORMAT, String.class); // we do not store it - for backup compatibility
-        Boolean useLsbForLinkSetSelectionBoolean = reader.read(USE_LSB_FOR_LINKSET_SELECTION, Boolean.class);
-        if (useLsbForLinkSetSelectionBoolean != null) {
-            try {
-                super.setUseLsbForLinksetSelection(useLsbForLinkSetSelectionBoolean);
-            } catch (Exception e) {
-            }
+        try {
+            super.setUseLsbForLinksetSelection(config.useLsbForLinksetSelection);
+        } catch (Exception e) {
         }
 
-        aspFactories = reader.read(ASP_FACTORY_LIST, CopyOnWriteArrayList.class);
-        appServers = reader.read(AS_LIST, CopyOnWriteArrayList.class);
-        this.routeManagement.route = reader.read(DPC_VS_AS_LIST, RouteMap.class);
+        aspFactories = config.aspFactories;
+        appServers = config.appServers;
+        this.routeManagement.route = config.route;
 
         this.routeManagement.reset();
 
@@ -1125,32 +1113,16 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         }
     }
 
-    private void loadVer1(String fn) throws XMLStreamException, IOException{
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fn)));
-        StringBuilder sb = new StringBuilder();
-        while (true) {
-            String s1 = br.readLine();
-            if (s1 == null)
-                break;
-            sb.append(s1);
-            sb.append("\n");
-        }
-        br.close();
-        String s2 = sb.toString();
-        s2 = s2.replace("<value value=", "<routeAs trafficModeType=\"2\"  as=");
-        logger.error("new XML \n"+ s2);
-        StringReader sr = new StringReader(s2);
-        XMLObjectReader reader = XMLObjectReader.newInstance(sr);
-        reader.setBinding(binding);
-        this.loadActualData(reader);
-        reader.close();
+    private void loadVer1(String fn) throws IOException {
+        // Legacy format not supported with XStream - will use defaults
+        logger.warn("Legacy M3UA config format (v1) not supported, using defaults");
     }
 
-    protected void loadVer2(String fn) throws XMLStreamException, IOException{
-        XMLObjectReader reader = XMLObjectWriter.newInstance(new FileInputStream(fn));
-        reader.setBinding(binding);
-        this.loadActualData(reader);
-        reader.close();
+    protected void loadVer2(String fn) throws IOException {
+        try (FileReader reader = new FileReader(fn)) {
+            M3UAConfig config = (M3UAConfig) M3UAXStreamHelper.fromXML(reader);
+            this.loadActualData(config);
+        }
     }
 
     @Override

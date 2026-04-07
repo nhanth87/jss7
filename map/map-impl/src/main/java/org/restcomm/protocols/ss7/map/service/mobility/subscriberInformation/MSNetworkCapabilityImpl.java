@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import jakarta.xml.bind.DatatypeConverter;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberInformation.MSNetworkCapability;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
 
@@ -14,12 +13,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("mSNetworkCapabilityImpl")
 public class MSNetworkCapabilityImpl extends OctetStringBase implements MSNetworkCapability {
-
-    private static final String DATA = "data";
-
-    private static final String DEFAULT_VALUE = null;
-
     public MSNetworkCapabilityImpl() {
         super(1, 8, "MSNetworkCapability");
     }

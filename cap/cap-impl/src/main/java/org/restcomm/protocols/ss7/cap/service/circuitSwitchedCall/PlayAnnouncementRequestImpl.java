@@ -2,8 +2,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -20,13 +18,16 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.CAPExtensionsImpl;
 import org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive.InformationToSendImpl;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  * @author kiss.balazs@alerant.hu
  *
  */
-public class PlayAnnouncementRequestImpl extends CircuitSwitchedCallMessageImpl implements PlayAnnouncementRequest {
+@XStreamAlias("playAnnouncementRequest")
+ extends CircuitSwitchedCallMessageImpl implements PlayAnnouncementRequest {
 
     private static final String INFORMATION_TO_SEND = "informationToSend";
     private static final String DISCONNECT_FROM_IP_FORBIDDEN = "disconnectFromIPForbidden";
@@ -295,59 +296,4 @@ public class PlayAnnouncementRequestImpl extends CircuitSwitchedCallMessageImpl 
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<PlayAnnouncementRequestImpl> PLAY_ANNOUNCEMENT_REQUEST_XML = new XMLFormat<PlayAnnouncementRequestImpl>(
-            PlayAnnouncementRequestImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, PlayAnnouncementRequestImpl playAnnouncementRequest)
-                throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.read(xml, playAnnouncementRequest);
-
-            playAnnouncementRequest.informationToSend = xml.get(INFORMATION_TO_SEND, InformationToSendImpl.class);
-            playAnnouncementRequest.disconnectFromIPForbidden = xml.get(DISCONNECT_FROM_IP_FORBIDDEN, Boolean.class);
-            playAnnouncementRequest.requestAnnouncementCompleteNotification = xml.get(REQUEST_ANNOUNCEMENT_COMPLETE_NOTIFICATION,
-                    Boolean.class);
-
-            playAnnouncementRequest.extensions = xml.get(EXTENSIONS, CAPExtensionsImpl.class);
-            playAnnouncementRequest.callSegmentID = xml.get(CALL_SEGMENT_ID, Integer.class);
-
-            playAnnouncementRequest.requestAnnouncementStartedNotification = xml.get(REQUEST_ANNOUNCEMENT_STARTED_NOTIFICATION, Boolean.class);
-        }
-
-        @Override
-        public void write(PlayAnnouncementRequestImpl playAnnoucnementRequest, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.write(playAnnoucnementRequest, xml);
-            xml.add((InformationToSendImpl) playAnnoucnementRequest.getInformationToSend(), INFORMATION_TO_SEND,
-                    InformationToSendImpl.class);
-
-            if (playAnnoucnementRequest.getDisconnectFromIPForbidden() != null) {
-                xml.add(playAnnoucnementRequest.getDisconnectFromIPForbidden(), DISCONNECT_FROM_IP_FORBIDDEN, Boolean.class);
-            }
-
-            if (playAnnoucnementRequest.getRequestAnnouncementCompleteNotification() != null) {
-                xml.add(playAnnoucnementRequest.getRequestAnnouncementCompleteNotification(),
-                        REQUEST_ANNOUNCEMENT_COMPLETE_NOTIFICATION, Boolean.class);
-            }
-
-            if (playAnnoucnementRequest.getExtensions() != null) {
-                xml.add((CAPExtensionsImpl) playAnnoucnementRequest.getExtensions(), EXTENSIONS, CAPExtensionsImpl.class);
-            }
-            if (playAnnoucnementRequest.getCallSegmentID() != null) {
-                xml.add(playAnnoucnementRequest.getCallSegmentID(), CALL_SEGMENT_ID, Integer.class);
-            }
-
-            if (playAnnoucnementRequest.getRequestAnnouncementStartedNotification() != null) {
-                xml.add(playAnnoucnementRequest.getRequestAnnouncementStartedNotification(),
-                        REQUEST_ANNOUNCEMENT_STARTED_NOTIFICATION, Boolean.class);
-            }
-        }
-
-    };
-
 }

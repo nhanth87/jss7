@@ -1,10 +1,9 @@
-package org.restcomm.protocols.ss7.map.errors;
+﻿package org.restcomm.protocols.ss7.map.errors;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -22,11 +21,8 @@ import org.restcomm.protocols.ss7.map.primitives.MAPExtensionContainerImpl;
  * @author sergey vetyutnev
  * @author amit bhayani
  */
+@XStreamAlias("mAPErrorMessageFacilityNotSupImpl")
 public class MAPErrorMessageFacilityNotSupImpl extends MAPErrorMessageImpl implements MAPErrorMessageFacilityNotSup {
-
-    private static final String SHAPE_OF_LOCATION_ESTIMATE_NOT_SUPPORTED = "shapeOfLocationEstimateNotSupported";
-    private static final String NEEDED_LCS_CAPABILITY_NOT_SUPPORTED = "neededLcsCapabilityNotSupportedInServingNode";
-    private static final String MAP_EXTENSION_CONTAINER = "mapExtensionContainer";
 
     public static final int shapeOfLocationEstimateNotSupported_TAG = 0;
     public static final int neededLcsCapabilityNotSupportedInServingNode_TAG = 1;

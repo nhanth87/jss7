@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -34,6 +33,7 @@ import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.LSAI
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("locationInformationGPRSImpl")
 public class LocationInformationGPRSImpl extends SequenceBase implements LocationInformationGPRS {
 
     public static final int _ID_cellGlobalIdOrServiceAreaIdOrLAI = 0;
@@ -46,17 +46,6 @@ public class LocationInformationGPRSImpl extends SequenceBase implements Locatio
     private static final int _ID_geodeticInformation = 7;
     private static final int _ID_currentLocationRetrieved = 8;
     private static final int _ID_ageOfLocationInformation = 9;
-
-    private static final String CELL_GLOBAL_ID_OR_SERVICE_AREA_ID_OR_LAI = "cellGlobalIdOrServiceAreaIdOrLAI";
-    private static final String ROUTEING_AREA_ID = "routeingAreaIdentity";
-    private static final String GEOGRAPHICAL_INFORMATION = "geographicalInformation";
-    private static final String SGSN_NUMBER = "sgsnNumber";
-    private static final String SELECTED_LSA_ID = "selectedLSAIdentity";
-    private static final String EXTENSION_CONTAINER = "extensionContainer";
-    private static final String SAI_PRESENT = "saiPresent";
-    private static final String GEODETIC_INFORMATION = "geodeticInformation";
-    private static final String CURRENT_LOCATION_RETRIEVED = "currentLocationRetrieved";
-    private static final String AGE_OF_LOCATION_INFORMATION = "ageOfLocationInformation";
 
     private CellGlobalIdOrServiceAreaIdOrLAI cellGlobalIdOrServiceAreaIdOrLAI = null;
     private RAIdentity routeingAreaIdentity = null;

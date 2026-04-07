@@ -2,8 +2,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -17,13 +15,16 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.SpecializedResourceReportRequest;
 import org.restcomm.protocols.ss7.tcap.asn.comp.Invoke;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  * @author kiss.balazs@alerant.hu
  *
  */
-public class SpecializedResourceReportRequestImpl extends CircuitSwitchedCallMessageImpl implements SpecializedResourceReportRequest {
+@XStreamAlias("specializedResourceReportRequest")
+ extends CircuitSwitchedCallMessageImpl implements SpecializedResourceReportRequest {
 
     private static final String ALL_ANNOUNCEMENTS_COMPLETE = "allAnnouncementsComplete";
     private static final String FIRST_ANNOUNCEMENT_STARTED = "firstAnnouncementStarted";

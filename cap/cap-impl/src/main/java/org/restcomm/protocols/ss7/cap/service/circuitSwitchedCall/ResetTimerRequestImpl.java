@@ -2,8 +2,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -19,12 +17,15 @@ import org.restcomm.protocols.ss7.cap.api.primitives.TimerID;
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.ResetTimerRequest;
 import org.restcomm.protocols.ss7.cap.primitives.CAPExtensionsImpl;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  * @author alerant appngin
  */
-public class ResetTimerRequestImpl extends CircuitSwitchedCallMessageImpl implements ResetTimerRequest {
+@XStreamAlias("resetTimerRequest")
+ extends CircuitSwitchedCallMessageImpl implements ResetTimerRequest {
 
     private static final String TIMER_ID = "timerID";
     private static final String TIMER_VALUE = "timerValue";

@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.gap;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -16,11 +14,14 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.cap.api.gap.GapOnService;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
-public class GapOnServiceImpl extends SequenceBase implements GapOnService {
+@XStreamAlias("gapOnService")
+ extends SequenceBase implements GapOnService {
 
     public static final int _ID_serviceKey = 0;
 
@@ -90,26 +91,7 @@ public class GapOnServiceImpl extends SequenceBase implements GapOnService {
             throw new CAPException("AsnException when encoding " + _PrimitiveName + ": " + e.getMessage(), e);
         }
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<GapOnServiceImpl> GAP_ON_SERVICE_XML = new XMLFormat<GapOnServiceImpl>(GapOnServiceImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, GapOnServiceImpl gapOnServiceImpl) throws XMLStreamException {
-
-            gapOnServiceImpl.serviceKey = xml.get(SERVICE_KEY, Integer.class);
-        }
-
-        @Override
-        public void write(GapOnServiceImpl gapOnServiceImpl, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-
-            xml.add((Integer) gapOnServiceImpl.getServiceKey(), SERVICE_KEY, Integer.class);
-        }
-    };
-
-    @Override
+@Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(_PrimitiveName);

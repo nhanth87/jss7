@@ -1,16 +1,16 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.primitives;
 
 import java.util.ArrayList;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 /**
  *
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("arrayListSerializingBase")
 public class ArrayListSerializingBase<T> {
 
     private ArrayList<T> data = new ArrayList<T>();

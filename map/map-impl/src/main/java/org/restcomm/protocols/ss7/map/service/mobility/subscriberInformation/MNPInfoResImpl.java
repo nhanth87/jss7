@@ -1,10 +1,9 @@
-package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
+﻿package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -28,6 +27,7 @@ import org.restcomm.protocols.ss7.map.primitives.MAPExtensionContainerImpl;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("mNPInfoResImpl")
 public class MNPInfoResImpl implements MNPInfoRes, MAPAsnPrimitive {
 
     public static final String _PrimitiveName = "MNPInfoRes";
@@ -37,12 +37,6 @@ public class MNPInfoResImpl implements MNPInfoRes, MAPAsnPrimitive {
     private static final int _ID_msisdn = 2;
     private static final int _ID_numberPortabilityStatus = 3;
     private static final int _ID_extensionContainer = 4;
-
-    private static final String ROUTEING_NUMBER = "routeingNumber";
-    private static final String IMSI = "imsi";
-    private static final String MSISDN = "msisdn";
-    private static final String NUMBER_PORTABILITY_STATUS = "numberPortabilityStatus";
-    private static final String EXTENSION_CONTAINER = "extensionContainer";
 
     private RouteingNumber routeingNumber;
     private IMSI imsi;

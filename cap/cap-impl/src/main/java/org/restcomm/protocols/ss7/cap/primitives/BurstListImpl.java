@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.primitives;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -18,12 +16,15 @@ import org.restcomm.protocols.ss7.cap.api.primitives.BurstList;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
 *
 * @author sergey vetyutnev
 *
 */
-public class BurstListImpl extends SequenceBase implements BurstList {
+@XStreamAlias("burstList")
+ extends SequenceBase implements BurstList {
 
     public static final int _ID_warningPeriod = 0;
     public static final int _ID_bursts = 1;
@@ -135,25 +136,4 @@ public class BurstListImpl extends SequenceBase implements BurstList {
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<BurstListImpl> BURST_LIST_XML = new XMLFormat<BurstListImpl>(BurstListImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, BurstListImpl burstList) throws XMLStreamException {
-            burstList.warningPeriod = xml.get(WARNING_PERIOD, Integer.class);
-            burstList.bursts = xml.get(BURSTS, BurstImpl.class);
-        }
-
-        @Override
-        public void write(BurstListImpl burstList, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (burstList.warningPeriod != null)
-                xml.add(burstList.warningPeriod, WARNING_PERIOD, Integer.class);
-            if (burstList.bursts != null)
-                xml.add((BurstImpl) burstList.bursts, BURSTS, BurstImpl.class);
-        }
-    };
-
 }

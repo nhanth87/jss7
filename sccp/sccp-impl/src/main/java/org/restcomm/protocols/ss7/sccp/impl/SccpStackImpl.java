@@ -4,10 +4,6 @@ package org.restcomm.protocols.ss7.sccp.impl;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import javolution.text.TextBuilder;
 import org.jctools.maps.NonBlockingHashMap;
-import javolution.xml.XMLBinding;
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -60,6 +56,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
@@ -125,7 +123,7 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
     private static final int STATUS_MSG_LOGGING_INTERVAL_MILLISEC_CONG = 10000;
     private static final int STATUS_MSG_LOGGING_INTERVAL_MILLISEC_UNAVAILABLE = 100;
 
-    protected static final XMLBinding binding = new XMLBinding();
+
 
     // If the XUDT message data length greater this value, segmentation is needed
     protected int zMarginXudtMessage = 240;
@@ -262,7 +260,7 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
         }
         ss7ExtSccpDetailedInterface.init(this);
 
-        binding.setClassAttribute(CLASS_ATTRIBUTE);
+
 
         this.name = name;
         this.logger = Logger.getLogger(SccpStackImpl.class.getCanonicalName() + "-" + this.name);
@@ -1582,54 +1580,73 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
      * Persist
      */
     public void store() {
-
-        // TODO : Should we keep reference to Objects rather than recreating
-        // everytime?
         try {
-            XMLObjectWriter writer = XMLObjectWriter.newInstance(new FileOutputStream(persistFile.toString()));
-            writer.setBinding(binding);
-            // Enables cross-references.
-            // writer.setReferenceResolver(new XMLReferenceResolver());
-            writer.setIndentation(TAB_INDENT);
+            SccpConfig config = new SccpConfig();
+            config.zMarginXudtMessage = this.zMarginXudtMessage;
+            config.connEstTimerDelay = this.connEstTimerDelay;
+            config.iasTimerDelay = this.iasTimerDelay;
+            config.iarTimerDelay = this.iarTimerDelay;
+            config.relTimerDelay = this.relTimerDelay;
+            config.repeatRelTimerDelay = this.repeatRelTimerDelay;
+            config.intTimerDelay = this.intTimerDelay;
+            config.guardTimerDelay = this.guardTimerDelay;
+            config.resetTimerDelay = this.resetTimerDelay;
+            config.reassemblyTimerDelay = this.reassemblyTimerDelay;
+            config.maxDataMessage = this.maxDataMessage;
+            config.periodOfLogging = this.periodOfLogging;
+            config.removeSpc = this.removeSpc;
+            config.respectPc = this.respectPc;
+            config.canRelay = this.canRelay;
+            config.timerExecutorsThreadCount = this.timerExecutorsThreadCount;
+            config.previewMode = this.previewMode;
+            config.sccpProtocolVersion = this.sccpProtocolVersion != null ? this.sccpProtocolVersion.toString() : null;
+            config.congControl_TIMER_A = this.congControl_TIMER_A;
+            config.congControl_TIMER_D = this.congControl_TIMER_D;
+            config.congControl_Algo = this.congControl_Algo != null ? this.congControl_Algo.toString() : null;
+            config.congControl_blockingOutgoingSccpMessages = this.congControl_blockingOutgoingSccpMessages;
+            config.sstTimerDuration_Min = this.sstTimerDuration_Min;
+            config.sstTimerDuration_Max = this.sstTimerDuration_Max;
+            config.sstTimerDuration_IncreaseFactor = this.sstTimerDuration_IncreaseFactor;
 
-            writer.write(this.zMarginXudtMessage, Z_MARGIN_UDT_MSG, Integer.class);
-
-            writer.write(this.connEstTimerDelay, CONN_EST_TIMER_DELAY, Integer.class);
-            writer.write(this.iasTimerDelay, IAS_TIMER_DELAY, Integer.class);
-            writer.write(this.iarTimerDelay, IAR_TIMER_DELAY, Integer.class);
-            writer.write(this.relTimerDelay, REL_TIMER_DELAY, Integer.class);
-            writer.write(this.repeatRelTimerDelay, REPEAT_REL_TIMER_DELAY, Integer.class);
-            writer.write(this.intTimerDelay, INT_TIMER_DELAY, Integer.class);
-            writer.write(this.guardTimerDelay, GUARD_TIMER_DELAY, Integer.class);
-            writer.write(this.resetTimerDelay, RESET_TIMER_DELAY, Integer.class);
-            writer.write(this.reassemblyTimerDelay, REASSEMBLY_TIMER_DELAY, Integer.class);
-
-            writer.write(this.maxDataMessage, MAX_DATA_MSG, Integer.class);
-            writer.write(this.periodOfLogging, PERIOD_OF_LOG, Integer.class);
-            writer.write(this.removeSpc, REMOVE_SPC, Boolean.class);
-            writer.write(this.respectPc, RESPECT_PC, Boolean.class);
-            writer.write(this.canRelay, CAN_RELAY, Boolean.class);
-            writer.write(this.timerExecutorsThreadCount, TIMER_EXECUTORS_THREAD_COUNT, Integer.class);
-            writer.write(this.previewMode, PREVIEW_MODE, Boolean.class);
-            if (this.sccpProtocolVersion != null)
-                writer.write(this.sccpProtocolVersion.toString(), SCCP_PROTOCOL_VERSION, String.class);
-
-            writer.write(this.congControl_TIMER_A, CONG_CONTROL_TIMER_A, Integer.class);
-            writer.write(this.congControl_TIMER_D, CONG_CONTROL_TIMER_D, Integer.class);
-            if (this.congControl_Algo != null)
-                writer.write(this.congControl_Algo.toString(), CONG_CONTROL_ALGO, String.class);
-            writer.write(this.congControl_blockingOutgoingSccpMessages, CONG_CONTROL_BLOCKING_OUTGOING_SCCP_MESSAGES,
-                    Boolean.class);
-
-            writer.write(this.sstTimerDuration_Min, SST_TIMER_DURATION_MIN, Integer.class);
-            writer.write(this.sstTimerDuration_Max, SST_TIMER_DURATION_MAX, Integer.class);
-            writer.write(this.sstTimerDuration_IncreaseFactor, SST_TIMER_DURATION_INCREASE_FACTOR, Double.class);
-
-            writer.close();
+            String xml = SCCPXStreamHelper.toXML(config);
+            try (FileWriter writer = new FileWriter(persistFile.toString())) {
+                writer.write(xml);
+            }
         } catch (Exception e) {
             this.logger.error(
                     String.format("Error while persisting the Sccp Resource state in file=%s", persistFile.toString()), e);
         }
+    }
+
+    /**
+     * Configuration class for SCCP persistence
+     */
+    public static class SccpConfig {
+        public int zMarginXudtMessage;
+        public int connEstTimerDelay;
+        public int iasTimerDelay;
+        public int iarTimerDelay;
+        public int relTimerDelay;
+        public int repeatRelTimerDelay;
+        public int intTimerDelay;
+        public int guardTimerDelay;
+        public int resetTimerDelay;
+        public int reassemblyTimerDelay;
+        public int maxDataMessage;
+        public int periodOfLogging;
+        public boolean removeSpc;
+        public boolean respectPc;
+        public boolean canRelay;
+        public int timerExecutorsThreadCount;
+        public boolean previewMode;
+        public String sccpProtocolVersion;
+        public int congControl_TIMER_A;
+        public int congControl_TIMER_D;
+        public String congControl_Algo;
+        public boolean congControl_blockingOutgoingSccpMessages;
+        public int sstTimerDuration_Min;
+        public int sstTimerDuration_Max;
+        public double sstTimerDuration_IncreaseFactor;
     }
 
     /**
@@ -1638,108 +1655,50 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
      * @throws Exception
      */
     protected void load() throws FileNotFoundException {
-        XMLObjectReader reader = null;
         try {
-            reader = XMLObjectReader.newInstance(new FileInputStream(persistFile.toString()));
-
-            reader.setBinding(binding);
-            load(reader);
-        } catch (XMLStreamException ex) {
+            File f = new File(persistFile.toString());
+            if (!f.exists()) {
+                return;
+            }
+            try (FileReader reader = new FileReader(persistFile.toString())) {
+                SccpConfig config = (SccpConfig) SCCPXStreamHelper.fromXML(reader);
+                if (config != null) {
+                    load(config);
+                }
+            }
+        } catch (Exception ex) {
             // this.logger.info(
             // "Error while re-creating Linksets from persisted file", ex);
         }
     }
 
-    protected void load(XMLObjectReader reader) throws XMLStreamException {
-
-       Integer vali = reader.read(Z_MARGIN_UDT_MSG, Integer.class);
-            if (vali != null)
-                this.zMarginXudtMessage = vali;
-
-            vali = reader.read(CONN_EST_TIMER_DELAY, Integer.class);
-            if (vali != null)
-                this.connEstTimerDelay = vali;
-            vali = reader.read(IAS_TIMER_DELAY, Integer.class);
-            if (vali != null)
-                this.iasTimerDelay = vali;
-            vali = reader.read(IAR_TIMER_DELAY, Integer.class);
-            if (vali != null)
-                this.iarTimerDelay = vali;
-            vali = reader.read(REL_TIMER_DELAY, Integer.class);
-            if (vali != null)
-                this.relTimerDelay = vali;
-            vali = reader.read(REPEAT_REL_TIMER_DELAY, Integer.class);
-            if (vali != null)
-                this.repeatRelTimerDelay = vali;
-            vali = reader.read(INT_TIMER_DELAY, Integer.class);
-            if (vali != null)
-                this.intTimerDelay = vali;
-            vali = reader.read(GUARD_TIMER_DELAY, Integer.class);
-            if (vali != null)
-                this.guardTimerDelay = vali;
-            vali = reader.read(RESET_TIMER_DELAY, Integer.class);
-            if (vali != null)
-                this.resetTimerDelay = vali;
-            vali = reader.read(REASSEMBLY_TIMER_DELAY, Integer.class);
-            if (vali != null)
-                this.reassemblyTimerDelay = vali;
-
-            vali = reader.read(MAX_DATA_MSG, Integer.class);
-            if (vali != null)
-                this.maxDataMessage = vali;
-            vali = reader.read(PERIOD_OF_LOG, Integer.class);
-            if (vali != null)
-                this.periodOfLogging = vali;
-
-            Boolean volb = reader.read(REMOVE_SPC, Boolean.class);
-            if (volb != null)
-                this.removeSpc = volb;
-
-            volb = reader.read(RESPECT_PC, Boolean.class);
-            if (volb != null)
-                this.respectPc = volb;
-
-            volb = reader.read(CAN_RELAY, Boolean.class);
-            if (volb != null)
-                this.canRelay = volb;
-
-            vali = reader.read(TIMER_EXECUTORS_THREAD_COUNT, Integer.class);
-            if (vali != null)
-                this.timerExecutorsThreadCount = vali;
-
-            volb = reader.read(PREVIEW_MODE, Boolean.class);
-            if (volb != null)
-                this.previewMode = volb;
-            volb = reader.read(RESERVED_FOR_NATIONAL_USE_VALUE_ADDRESS_INDICATOR, Boolean.class);
-
-            String s1 = reader.read(SCCP_PROTOCOL_VERSION, String.class);
-            if (s1 != null)
-                this.sccpProtocolVersion = Enum.valueOf(SccpProtocolVersion.class, s1);
-
-            vali = reader.read(CONG_CONTROL_TIMER_A, Integer.class);
-            if (vali != null)
-                this.congControl_TIMER_A = vali;
-            vali = reader.read(CONG_CONTROL_TIMER_D, Integer.class);
-            if (vali != null)
-                this.congControl_TIMER_D = vali;
-            s1 = reader.read(CONG_CONTROL_ALGO, String.class);
-            if (s1 != null)
-                this.congControl_Algo = Enum.valueOf(SccpCongestionControlAlgo.class, s1);
-            volb = reader.read(CONG_CONTROL_BLOCKING_OUTGOING_SCCP_MESSAGES, Boolean.class);
-            if (volb != null)
-                this.congControl_blockingOutgoingSccpMessages = volb;
-
-            vali = reader.read(SST_TIMER_DURATION_MIN, Integer.class);
-            if (vali != null)
-                this.sstTimerDuration_Min = vali;
-            vali = reader.read(SST_TIMER_DURATION_MAX, Integer.class);
-            if (vali != null)
-                this.sstTimerDuration_Max = vali;
-            Double vald = reader.read(SST_TIMER_DURATION_INCREASE_FACTOR, Double.class);
-            if (vald != null)
-                this.sstTimerDuration_IncreaseFactor = vald;
-
-            reader.close();
-
+    protected void load(SccpConfig config) {
+        this.zMarginXudtMessage = config.zMarginXudtMessage;
+        this.connEstTimerDelay = config.connEstTimerDelay;
+        this.iasTimerDelay = config.iasTimerDelay;
+        this.iarTimerDelay = config.iarTimerDelay;
+        this.relTimerDelay = config.relTimerDelay;
+        this.repeatRelTimerDelay = config.repeatRelTimerDelay;
+        this.intTimerDelay = config.intTimerDelay;
+        this.guardTimerDelay = config.guardTimerDelay;
+        this.resetTimerDelay = config.resetTimerDelay;
+        this.reassemblyTimerDelay = config.reassemblyTimerDelay;
+        this.maxDataMessage = config.maxDataMessage;
+        this.periodOfLogging = config.periodOfLogging;
+        this.removeSpc = config.removeSpc;
+        this.respectPc = config.respectPc;
+        this.canRelay = config.canRelay;
+        this.timerExecutorsThreadCount = config.timerExecutorsThreadCount;
+        this.previewMode = config.previewMode;
+        if (config.sccpProtocolVersion != null)
+            this.sccpProtocolVersion = Enum.valueOf(SccpProtocolVersion.class, config.sccpProtocolVersion);
+        this.congControl_TIMER_A = config.congControl_TIMER_A;
+        this.congControl_TIMER_D = config.congControl_TIMER_D;
+        if (config.congControl_Algo != null)
+            this.congControl_Algo = Enum.valueOf(SccpCongestionControlAlgo.class, config.congControl_Algo);
+        this.congControl_blockingOutgoingSccpMessages = config.congControl_blockingOutgoingSccpMessages;
+        this.sstTimerDuration_Min = config.sstTimerDuration_Min;
+        this.sstTimerDuration_Max = config.sstTimerDuration_Max;
+        this.sstTimerDuration_IncreaseFactor = config.sstTimerDuration_IncreaseFactor;
     }
 }

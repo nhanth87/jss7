@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -23,15 +22,13 @@ import org.restcomm.protocols.ss7.map.primitives.MAPAsnPrimitive;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("gPRSMSClassImpl")
 public class GPRSMSClassImpl implements GPRSMSClass, MAPAsnPrimitive {
 
     public static final String _PrimitiveName = "GPRSMSClass";
 
     private static final int _ID_mSNetworkCapability = 0;
     private static final int _ID_mSRadioAccessCapability = 1;
-
-    private static final String MS_NETWORK_CAPABILITY = "mSNetworkCapability";
-    private static final String MS_RADIO_ACCESS_CAPABILITY = "mSRadioAccessCapability";
 
     private MSNetworkCapability mSNetworkCapability;
     private MSRadioAccessCapability mSRadioAccessCapability;

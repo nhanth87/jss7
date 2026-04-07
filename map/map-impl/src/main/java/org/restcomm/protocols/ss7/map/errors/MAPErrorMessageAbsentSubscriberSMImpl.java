@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.errors;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -24,11 +23,8 @@ import org.restcomm.protocols.ss7.map.primitives.MAPExtensionContainerImpl;
  * @author sergey vetyutnev
  * @author amit bhayani
  */
+@XStreamAlias("mAPErrorMessageAbsentSubscriberSMImpl")
 public class MAPErrorMessageAbsentSubscriberSMImpl extends MAPErrorMessageImpl implements MAPErrorMessageAbsentSubscriberSM {
-
-    private static final String ABSENT_SUBSCRIBER_DIAGNOSTIC_SM = "absentSubscriberDiagnosticSM";
-    private static final String ADDITIONAL_ABSENT_SUBSCRIBER_DIAGNOSTIC_SM = "additionalAbsentSubscriberDiagnosticSM";
-    private static final String MAP_EXTENSION_CONTAINER = "mapExtensionContainer";
 
     public static final int additionalAbsentSubscriberDiagnosticSM_TAG = 0x00;
 

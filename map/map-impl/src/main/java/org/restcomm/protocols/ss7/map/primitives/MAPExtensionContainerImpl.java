@@ -1,13 +1,12 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.primitives;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -23,14 +22,11 @@ import org.restcomm.protocols.ss7.map.api.primitives.MAPPrivateExtension;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("mAPExtensionContainerImpl")
 public class MAPExtensionContainerImpl extends SequenceBase implements MAPExtensionContainer {
 
     protected static final int PRIVATE_EXTENSION_LIST_REF_TAG = 0x00;
     protected static final int PSC_EXTENSIONS_REF_TAG = 0x01;
-
-    private static final String PRIVATE_EXTENSION = "privateExtension";
-    private static final String PRIVATE_EXTENSION_LIST = "privateExtensionList";
-    private static final String PCS_EXTENSIONS = "pcsExtensions";
 
     private ArrayList<MAPPrivateExtension> privateExtensionList;
     private byte[] pcsExtensions;

@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.sms;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -20,13 +18,16 @@ import org.restcomm.protocols.ss7.cap.api.service.sms.primitive.FCIBCCCAMELseque
 import org.restcomm.protocols.ss7.cap.service.sms.primitive.FCIBCCCAMELsequence1SMSImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author Lasith Waruna Perera
  * @author alerant appngin
  *
  */
-public class FurnishChargingInformationSMSRequestImpl extends SmsMessageImpl implements FurnishChargingInformationSMSRequest {
+@XStreamAlias("furnishChargingInformationSMSRequest")
+ extends SmsMessageImpl implements FurnishChargingInformationSMSRequest {
 
     private static final String FCI_BCC_CAMEL_SEQUENCE1 = "fCIBCCCAMELsequence1";
 
@@ -197,30 +198,4 @@ public class FurnishChargingInformationSMSRequestImpl extends SmsMessageImpl imp
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<FurnishChargingInformationSMSRequestImpl> FURNISH_CHARGING_INFORMATION_SMS_REQUEST_XML = new XMLFormat<FurnishChargingInformationSMSRequestImpl>(
-            FurnishChargingInformationSMSRequestImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, FurnishChargingInformationSMSRequestImpl fciSmsRequest)
-                throws XMLStreamException {
-            CAP_MESSAGE_XML.read(xml, fciSmsRequest);
-
-            fciSmsRequest.FCIBCCCAMELsequence1 = xml.get(FCI_BCC_CAMEL_SEQUENCE1, FCIBCCCAMELsequence1SMSImpl.class);
-        }
-
-        @Override
-        public void write(FurnishChargingInformationSMSRequestImpl fciSmsRequest, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-
-            CAP_MESSAGE_XML.write(fciSmsRequest, xml);
-
-            if (fciSmsRequest.FCIBCCCAMELsequence1 != null)
-                xml.add((FCIBCCCAMELsequence1SMSImpl) fciSmsRequest.FCIBCCCAMELsequence1, FCI_BCC_CAMEL_SEQUENCE1,
-                        FCIBCCCAMELsequence1SMSImpl.class);
-        }
-    };
 }

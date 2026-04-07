@@ -1,9 +1,8 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.supplementary;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.map.MessageImpl;
 import org.restcomm.protocols.ss7.map.api.MAPException;
@@ -19,16 +18,12 @@ import org.restcomm.protocols.ss7.map.primitives.USSDStringImpl;
  * @author amit bhayani
  *
  */
+@XStreamAlias("supplementaryMessageImpl")
 public abstract class SupplementaryMessageImpl extends MessageImpl implements SupplementaryMessage, MAPAsnPrimitive {
 
     private static final Logger logger = Logger.getLogger(SupplementaryMessageImpl.class);
 
-    private static final String DATA_CODING_SCHEME = "dataCodingScheme";
-    private static final String STRING = "string";
-
     private static final byte DEFAULT_DATA_CODING_SCHEME = 0x0f;
-    private static final String DEFAULT_USSD_STRING = "";
-
     protected CBSDataCodingScheme ussdDataCodingSch;
     protected USSDString ussdString;
 

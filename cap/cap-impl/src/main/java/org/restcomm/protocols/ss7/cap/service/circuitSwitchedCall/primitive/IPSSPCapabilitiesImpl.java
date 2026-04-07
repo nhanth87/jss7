@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -17,12 +15,15 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.ByteArrayContainer;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class IPSSPCapabilitiesImpl implements IPSSPCapabilities, CAPAsnPrimitive {
+@XStreamAlias("iPSSPCapabilities")
+ implements IPSSPCapabilities, CAPAsnPrimitive {
 
     public static int _Mask_IPRoutingAddress = 0x01;
     public static int _Mask_VoiceBack = 0x02;
@@ -250,57 +251,4 @@ public class IPSSPCapabilitiesImpl implements IPSSPCapabilities, CAPAsnPrimitive
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<IPSSPCapabilitiesImpl> IPSSP_CAPABILITIES_XML = new XMLFormat<IPSSPCapabilitiesImpl>(
-            IPSSPCapabilitiesImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, IPSSPCapabilitiesImpl ipsspCapabilities)
-                throws XMLStreamException {
-            boolean IPRoutingAddressSupported = xml.getAttribute(IP_ROUTING_ADDRESS_SUPPORTED, false);
-            boolean voiceBackSupported = xml.getAttribute(VOICE_BACK_SUPPORTED, false);
-            boolean voiceInformationSupportedViaSpeechRecognition = xml.getAttribute(
-                    VOICE_INFORMATION_SUPPORTED_VIA_SPEECH_RECOGNITION, false);
-            boolean voiceInformationSupportedViaVoiceRecognition = xml.getAttribute(
-                    VOICE_INFORMATION_SUPPORTED_VIA_VOICE_RECOGNITION, false);
-            boolean generationOfVoiceAnnouncementsFromTextSupported = xml.getAttribute(
-                    GENERATION_OF_VOICE_ANNOUNCEMENTS_FROM_TEXT_SUPPORTED, false);
-
-            ByteArrayContainer bc = xml.get(EXTRA_DATA, ByteArrayContainer.class);
-            byte[] extraData = null;
-            if (bc != null) {
-                extraData = bc.getData();
-            }
-
-            ipsspCapabilities.setData(IPRoutingAddressSupported, voiceBackSupported,
-                    voiceInformationSupportedViaSpeechRecognition, voiceInformationSupportedViaVoiceRecognition,
-                    generationOfVoiceAnnouncementsFromTextSupported, extraData);
-        }
-
-        @Override
-        public void write(IPSSPCapabilitiesImpl ipsspCapabilities, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (ipsspCapabilities.getIPRoutingAddressSupported())
-                xml.setAttribute(IP_ROUTING_ADDRESS_SUPPORTED, ipsspCapabilities.getIPRoutingAddressSupported());
-            if (ipsspCapabilities.getVoiceBackSupported())
-                xml.setAttribute(VOICE_BACK_SUPPORTED, ipsspCapabilities.getVoiceBackSupported());
-            if (ipsspCapabilities.getVoiceInformationSupportedViaSpeechRecognition())
-                xml.setAttribute(VOICE_INFORMATION_SUPPORTED_VIA_SPEECH_RECOGNITION,
-                        ipsspCapabilities.getVoiceInformationSupportedViaSpeechRecognition());
-            if (ipsspCapabilities.getVoiceInformationSupportedViaVoiceRecognition())
-                xml.setAttribute(VOICE_INFORMATION_SUPPORTED_VIA_VOICE_RECOGNITION,
-                        ipsspCapabilities.getVoiceInformationSupportedViaVoiceRecognition());
-            if (ipsspCapabilities.getGenerationOfVoiceAnnouncementsFromTextSupported())
-                xml.setAttribute(GENERATION_OF_VOICE_ANNOUNCEMENTS_FROM_TEXT_SUPPORTED,
-                        ipsspCapabilities.getGenerationOfVoiceAnnouncementsFromTextSupported());
-
-            if (ipsspCapabilities.getExtraData() != null && ipsspCapabilities.getExtraData().length > 0) {
-                ByteArrayContainer bac = new ByteArrayContainer(ipsspCapabilities.getExtraData());
-                xml.add(bac, EXTRA_DATA, ByteArrayContainer.class);
-            }
-        }
-    };
 }

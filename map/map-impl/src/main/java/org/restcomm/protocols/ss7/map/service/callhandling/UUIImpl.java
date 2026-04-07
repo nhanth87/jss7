@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.callhandling;
 
 import jakarta.xml.bind.DatatypeConverter;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.callhandling.UUI;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
 
@@ -14,12 +13,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
 * @author sergey vetyutnev
 *
 */
+@XStreamAlias("uUIImpl")
 public class UUIImpl extends OctetStringBase implements UUI {
-
-    private static final String DATA = "data";
-
-    private static final String DEFAULT_VALUE = null;
-
     public UUIImpl() {
         super(1, 131, "UUI");
     }

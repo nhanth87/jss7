@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.gap;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -18,11 +16,14 @@ import org.restcomm.protocols.ss7.cap.api.isup.Digits;
 import org.restcomm.protocols.ss7.cap.isup.DigitsImpl;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
-public class CallingAddressAndServiceImpl extends SequenceBase implements CallingAddressAndService {
+@XStreamAlias("callingAddressAndService")
+ extends SequenceBase implements CallingAddressAndService {
 
     public static final int _ID_callingAddressValue = 0;
     public static final int _ID_serviceKey = 1;
@@ -120,28 +121,7 @@ public class CallingAddressAndServiceImpl extends SequenceBase implements Callin
             throw new CAPException("AsnException when encoding " + _PrimitiveName + ": " + e.getMessage(), e);
         }
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<CallingAddressAndServiceImpl> CALLING_ADDRESS_AND_SERVICE_XML = new XMLFormat<CallingAddressAndServiceImpl>(CallingAddressAndServiceImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, CallingAddressAndServiceImpl callingAddressAndServiceImpl) throws XMLStreamException {
-
-            callingAddressAndServiceImpl.callingAddressValue = xml.get(CALLING_ADDRESS_VALUE, DigitsImpl.class);
-            callingAddressAndServiceImpl.serviceKey = xml.get(SERVICE_KEY, Integer.class);
-        }
-
-        @Override
-        public void write(CallingAddressAndServiceImpl callingAddressAndServiceImpl, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-
-            xml.add((DigitsImpl) callingAddressAndServiceImpl.getCallingAddressValue(), CALLING_ADDRESS_VALUE, DigitsImpl.class);
-            xml.add((Integer) callingAddressAndServiceImpl.getServiceKey(), SERVICE_KEY, Integer.class);
-        }
-    };
-
-    @Override
+@Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(_PrimitiveName);

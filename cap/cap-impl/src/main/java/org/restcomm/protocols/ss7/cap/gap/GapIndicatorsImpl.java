@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.gap;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -16,11 +14,14 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.cap.api.gap.GapIndicators;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
-public class GapIndicatorsImpl extends SequenceBase implements GapIndicators {
+@XStreamAlias("gapIndicators")
+ extends SequenceBase implements GapIndicators {
 
     private static final String DURATION = "duration";
     private static final String GAP_INTERVAL = "gapInterval";
@@ -129,21 +130,7 @@ public class GapIndicatorsImpl extends SequenceBase implements GapIndicators {
         }
     }
 
-    protected static final XMLFormat<GapIndicatorsImpl> GAP_INDICATORS_XML = new XMLFormat<GapIndicatorsImpl>(GapIndicatorsImpl.class) {
 
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, GapIndicatorsImpl gapIndicators) throws XMLStreamException {
-            gapIndicators.duration = xml.getAttribute(DURATION, DEFAULT_VALUE);
-            gapIndicators.gapInterval = xml.getAttribute(GAP_INTERVAL, DEFAULT_VALUE);
-        }
-
-        @Override
-        public void write(GapIndicatorsImpl gapIndicators, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            xml.setAttribute(DURATION, gapIndicators.duration);
-            xml.setAttribute(GAP_INTERVAL, gapIndicators.gapInterval);
-        }
-    };
 
     @Override
     public String toString() {

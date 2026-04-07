@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.primitives;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -18,12 +16,15 @@ import org.restcomm.protocols.ss7.cap.api.primitives.ExtensionField;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.ByteArrayContainer;
 import org.restcomm.protocols.ss7.map.primitives.OidContainer;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  *
  */
-public class ExtensionFieldImpl implements ExtensionField, CAPAsnPrimitive {
+@XStreamAlias("extensionField")
+ implements ExtensionField, CAPAsnPrimitive {
 
     public static final int _ID_value = 1;
 
@@ -327,59 +328,4 @@ public class ExtensionFieldImpl implements ExtensionField, CAPAsnPrimitive {
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ExtensionFieldImpl> EXTENSION_FIELD_XML = new XMLFormat<ExtensionFieldImpl>(
-            ExtensionFieldImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, ExtensionFieldImpl extensionField)
-                throws XMLStreamException {
-            long localCode = xml.getAttribute(LOCAL_CODE, Long.MIN_VALUE);
-            if (localCode != Long.MIN_VALUE)
-                extensionField.localCode = (int) localCode;
-
-            String globalCode = xml.getAttribute(GLOBAL_CODE, DEFAULT_STRING);
-            if (globalCode != null) {
-                OidContainer oid = new OidContainer();
-                try {
-                    oid.parseSerializedData(globalCode);
-                } catch (NumberFormatException e) {
-                    throw new XMLStreamException("NumberFormatException when parsing globalCode in extensionField", e);
-                }
-                extensionField.globalCode = oid.getData();
-            }
-
-            String criticalityType = xml.getAttribute(CRITICALITY_TYPE, DEFAULT_STRING);
-            if (criticalityType != null) {
-                extensionField.setCriticalityType(Enum.valueOf(CriticalityType.class, criticalityType));
-            }
-
-            ByteArrayContainer bc = xml.get(DATA, ByteArrayContainer.class);
-            if (bc != null) {
-                extensionField.data = bc.getData();
-            }
-        }
-
-        @Override
-        public void write(ExtensionFieldImpl extensionField, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (extensionField.localCode != null)
-                xml.setAttribute(LOCAL_CODE, extensionField.localCode);
-            if (extensionField.globalCode != null) {
-                OidContainer oid = new OidContainer(extensionField.globalCode);
-                xml.setAttribute(GLOBAL_CODE, oid.getSerializedData());
-            }
-            if (extensionField.criticalityType != null) {
-                xml.setAttribute(CRITICALITY_TYPE, extensionField.criticalityType.toString());
-            }
-
-            if (extensionField.data != null) {
-                ByteArrayContainer bac = new ByteArrayContainer(extensionField.data);
-                xml.add(bac, DATA, ByteArrayContainer.class);
-            }
-        }
-    };
 }

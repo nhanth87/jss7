@@ -1,11 +1,10 @@
-
+﻿
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import jakarta.xml.bind.DatatypeConverter;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
-
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberInformation.TEID;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
 
@@ -14,12 +13,8 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("tEIDImpl")
 public class TEIDImpl extends OctetStringBase implements TEID {
-
-    private static final String DATA = "data";
-
-    private static final String DEFAULT_VALUE = null;
-
     public TEIDImpl() {
         super(4, 4, "TEID");
     }

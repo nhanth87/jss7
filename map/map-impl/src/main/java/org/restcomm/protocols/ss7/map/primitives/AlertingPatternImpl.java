@@ -1,8 +1,7 @@
 
 package org.restcomm.protocols.ss7.map.primitives;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import org.restcomm.protocols.ss7.map.api.primitives.AlertingCategory;
 import org.restcomm.protocols.ss7.map.api.primitives.AlertingLevel;
@@ -14,12 +13,8 @@ import org.restcomm.protocols.ss7.map.api.primitives.AlertingPattern;
  * @author sergey vetyutnev
  *
  */
+@XStreamAlias("alertingPattern")
 public class AlertingPatternImpl extends OctetStringLength1Base implements AlertingPattern {
-
-    private static final String ALERTING_LEVEL = "alertingLevel";
-    private static final String ALERTING_CATEGORY = "alertingCategory";
-
-    private static final String DEVAULT_STRING_VALUE = null;
 
     public AlertingPatternImpl() {
         super("AlertingPattern");
@@ -80,37 +75,5 @@ public class AlertingPatternImpl extends OctetStringLength1Base implements Alert
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<AlertingPatternImpl> ALERTING_PATTERN_XML = new XMLFormat<AlertingPatternImpl>(
-            AlertingPatternImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, AlertingPatternImpl alertingPattern)
-                throws XMLStreamException {
-            String str = xml.getAttribute(ALERTING_LEVEL, DEVAULT_STRING_VALUE);
-            if (str != null) {
-                AlertingLevel al = Enum.valueOf(AlertingLevel.class, str);
-                alertingPattern.data = al.getLevel();
-            }
-
-            str = xml.getAttribute(ALERTING_CATEGORY, DEVAULT_STRING_VALUE);
-            if (str != null) {
-                AlertingCategory cap = Enum.valueOf(AlertingCategory.class, str);
-                alertingPattern.data = cap.getCategory();
-            }
-        }
-
-        @Override
-        public void write(AlertingPatternImpl alertingPattern, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (alertingPattern.getAlertingLevel() != null)
-                xml.setAttribute(ALERTING_LEVEL, alertingPattern.getAlertingLevel().toString());
-            if (alertingPattern.getAlertingCategory() != null)
-                xml.setAttribute(ALERTING_CATEGORY, alertingPattern.getAlertingCategory().toString());
-        }
-    };
 
 }

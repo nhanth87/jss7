@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -39,13 +37,16 @@ import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.ExtB
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.OfferedCamel4FunctionalitiesImpl;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.SupportedCamelPhasesImpl;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author sergey vetyutnev
  * @author alerant appngin
  *
  */
-public class InitialDPArgExtensionImpl extends SequenceBase implements InitialDPArgExtension {
+@XStreamAlias("initialDPArgExtension")
+ extends SequenceBase implements InitialDPArgExtension {
 
     public static final int _ID_gmscAddress = 0;
     public static final int _ID_forwardingDestinationNumber = 1;
@@ -401,89 +402,7 @@ public class InitialDPArgExtensionImpl extends SequenceBase implements InitialDP
             throw new CAPException("INAPException when encoding " + _PrimitiveName + ": " + e.getMessage(), e);
         }
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<InitialDPArgExtensionImpl> INITIAL_DP_ARG_EXTENSION_XML = new XMLFormat<InitialDPArgExtensionImpl>(
-            InitialDPArgExtensionImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, InitialDPArgExtensionImpl initialDPArgExtension)
-                throws XMLStreamException {
-            initialDPArgExtension.isCAPVersion3orLater = xml.getAttribute(IS_CAP_VERSION_3_OR_LATER, false);
-
-            initialDPArgExtension.gmscAddress = xml.get(GMSC_ADDRESS, ISDNAddressStringImpl.class);
-            initialDPArgExtension.forwardingDestinationNumber = xml.get(FORWARDING_DESTINATION_NUMBER,
-                    CalledPartyNumberCapImpl.class);
-
-            initialDPArgExtension.msClassmark2 = xml.get(MS_CLASSMARK2, MSClassmark2Impl.class);
-            initialDPArgExtension.imei = xml.get(IMEI, IMEIImpl.class);
-            initialDPArgExtension.supportedCamelPhases = xml.get(SUPPORTED_CAMEL_PHASES, SupportedCamelPhasesImpl.class);
-            initialDPArgExtension.offeredCamel4Functionalities = xml.get(OFFERED_CAMEL4_FUNCTIONALITIES, OfferedCamel4FunctionalitiesImpl.class);
-            initialDPArgExtension.bearerCapability2 = xml.get(BEARER_CAPABILITY2, BearerCapabilityImpl.class);
-            initialDPArgExtension.extBasicServiceCode2 = xml.get(EXT_BASIC_SERVICE_CODE2, ExtBasicServiceCodeImpl.class);
-            initialDPArgExtension.highLayerCompatibility2 = xml.get(HIGH_LAYER_COMPATIBILITY2, HighLayerCompatibilityInapImpl.class);
-            initialDPArgExtension.lowLayerCompatibility = xml.get(LOW_LAYER_COMPATIBILITY, LowLayerCompatibilityImpl.class);
-            initialDPArgExtension.lowLayerCompatibility2 = xml.get(LOW_LAYER_COMPATIBILITY2, LowLayerCompatibilityImpl.class);
-            Boolean bval = xml.get(ENHANCED_DIALLED_SERVICES_ALLOWED, Boolean.class);
-            if (bval != null)
-                initialDPArgExtension.enhancedDialledServicesAllowed = bval;
-            initialDPArgExtension.uuData = xml.get(UU_DATA, UUDataImpl.class);
-            bval = xml.get(COLLECT_INFORMATION_ALLOWED, Boolean.class);
-            if (bval != null) {
-                initialDPArgExtension.collectInformationAllowed = bval;
-            }
-            bval = xml.get(RELEASE_CALL_ARG_EXTENSION_ALLOWED, Boolean.class);
-            if (bval != null) {
-                initialDPArgExtension.releaseCallArgExtensionAllowed = bval;
-            }
-        }
-
-        @Override
-        public void write(InitialDPArgExtensionImpl initialDPArgExtension, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            xml.setAttribute(IS_CAP_VERSION_3_OR_LATER, initialDPArgExtension.isCAPVersion3orLater);
-
-            if (initialDPArgExtension.getGmscAddress() != null)
-                xml.add((ISDNAddressStringImpl) initialDPArgExtension.getGmscAddress(), GMSC_ADDRESS,
-                        ISDNAddressStringImpl.class);
-            if (initialDPArgExtension.getForwardingDestinationNumber() != null)
-                xml.add((CalledPartyNumberCapImpl) initialDPArgExtension.getForwardingDestinationNumber(),
-                        FORWARDING_DESTINATION_NUMBER, CalledPartyNumberCapImpl.class);
-
-            if (initialDPArgExtension.msClassmark2 != null)
-                xml.add((MSClassmark2Impl) initialDPArgExtension.msClassmark2, MS_CLASSMARK2, MSClassmark2Impl.class);
-            if (initialDPArgExtension.imei != null)
-                xml.add((IMEIImpl) initialDPArgExtension.imei, IMEI, IMEIImpl.class);
-            if (initialDPArgExtension.supportedCamelPhases != null)
-                xml.add((SupportedCamelPhasesImpl) initialDPArgExtension.supportedCamelPhases, SUPPORTED_CAMEL_PHASES, SupportedCamelPhasesImpl.class);
-            if (initialDPArgExtension.offeredCamel4Functionalities != null)
-                xml.add((OfferedCamel4FunctionalitiesImpl) initialDPArgExtension.offeredCamel4Functionalities, OFFERED_CAMEL4_FUNCTIONALITIES,
-                        OfferedCamel4FunctionalitiesImpl.class);
-            if (initialDPArgExtension.bearerCapability2 != null)
-                xml.add((BearerCapabilityImpl) initialDPArgExtension.bearerCapability2, BEARER_CAPABILITY2, BearerCapabilityImpl.class);
-            if (initialDPArgExtension.extBasicServiceCode2 != null)
-                xml.add((ExtBasicServiceCodeImpl) initialDPArgExtension.extBasicServiceCode2, EXT_BASIC_SERVICE_CODE2, ExtBasicServiceCodeImpl.class);
-            if (initialDPArgExtension.highLayerCompatibility2 != null)
-                xml.add((HighLayerCompatibilityInapImpl) initialDPArgExtension.highLayerCompatibility2, HIGH_LAYER_COMPATIBILITY2,
-                        HighLayerCompatibilityInapImpl.class);
-            if (initialDPArgExtension.lowLayerCompatibility != null)
-                xml.add((LowLayerCompatibilityImpl) initialDPArgExtension.lowLayerCompatibility, LOW_LAYER_COMPATIBILITY, LowLayerCompatibilityImpl.class);
-            if (initialDPArgExtension.lowLayerCompatibility2 != null)
-                xml.add((LowLayerCompatibilityImpl) initialDPArgExtension.lowLayerCompatibility2, LOW_LAYER_COMPATIBILITY2, LowLayerCompatibilityImpl.class);
-            if (initialDPArgExtension.enhancedDialledServicesAllowed)
-                xml.add(initialDPArgExtension.enhancedDialledServicesAllowed, ENHANCED_DIALLED_SERVICES_ALLOWED, Boolean.class);
-            if (initialDPArgExtension.uuData != null)
-                xml.add((UUDataImpl) initialDPArgExtension.uuData, UU_DATA, UUDataImpl.class);
-            if (initialDPArgExtension.collectInformationAllowed)
-                xml.add(initialDPArgExtension.collectInformationAllowed, COLLECT_INFORMATION_ALLOWED, Boolean.class);
-            if (initialDPArgExtension.releaseCallArgExtensionAllowed)
-                xml.add(initialDPArgExtension.releaseCallArgExtensionAllowed, RELEASE_CALL_ARG_EXTENSION_ALLOWED, Boolean.class);
-        }
-    };
-
-    @Override
+@Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder();

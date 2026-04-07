@@ -4,8 +4,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -43,12 +41,15 @@ import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.
 import org.restcomm.protocols.ss7.map.primitives.ArrayListSerializingBase;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.CUGInterlockImpl;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 /**
  *
  * @author Povilas Jurna
  *
  */
-public class ContinueWithArgumentRequestImpl extends CircuitSwitchedCallMessageImpl implements
+@XStreamAlias("continueWithArgumentRequest")
+ extends CircuitSwitchedCallMessageImpl implements
         ContinueWithArgumentRequest {
 
     private static final int _ID_alertingPattern = 1;
@@ -456,109 +457,7 @@ public class ContinueWithArgumentRequestImpl extends CircuitSwitchedCallMessageI
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<ContinueWithArgumentRequestImpl> CONNECT_REQUEST_XML = new XMLFormat<ContinueWithArgumentRequestImpl>(
-            ContinueWithArgumentRequestImpl.class) {
-
-        public void read(javolution.xml.XMLFormat.InputElement xml,
-                ContinueWithArgumentRequestImpl continueWithArgumentRequest) throws XMLStreamException {
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.read(xml, continueWithArgumentRequest);
-
-            continueWithArgumentRequest.alertingPattern = xml.get(ALERTING_PATTERN, AlertingPatternCapImpl.class);
-            continueWithArgumentRequest.extensions = xml.get(EXTENSIONS, CAPExtensionsImpl.class);
-            continueWithArgumentRequest.serviceInteractionIndicatorsTwo = xml.get(SERVICE_INTERACTION_INDICATORS_TWO,
-                    ServiceInteractionIndicatorsTwoImpl.class);
-            continueWithArgumentRequest.callingPartysCategory = xml.get(CALLING_PARTYS_CATEGORY,
-                    CallingPartysCategoryInapImpl.class);
-            ContinueWithArgument_GenericNumbers al = xml.get(GENERIC_NUMBER_LIST,
-                    ContinueWithArgument_GenericNumbers.class);
-            if (al != null) {
-                continueWithArgumentRequest.genericNumbers = al.getData();
-            }
-            continueWithArgumentRequest.cugInterlock = xml.get(CUG_INTER_LOCK, CUGInterlockImpl.class);
-            Boolean bval = xml.get(CUG_OUTGOING_ACCESS, Boolean.class);
-            if (bval != null)
-                continueWithArgumentRequest.cugOutgoingAccess = bval;
-            continueWithArgumentRequest.chargeNumber = xml.get(CHARGE_NUMBER, LocationNumberCapImpl.class);
-            bval = continueWithArgumentRequest.suppressionOfAnnouncement = xml.get(SUPPRESSION_OF_ANNOUNCEMENT,
-                    Boolean.class);
-            if (bval != null)
-                continueWithArgumentRequest.naOliInfo = xml.get(NA_OLI_INFO, NAOliInfoImpl.class);
-            bval = xml.get(BOR_INTERROGATION_REQUESTED, Boolean.class);
-            if (bval != null)
-                continueWithArgumentRequest.borInterrogationRequested = bval;
-            bval = xml.get(SUPPRESS_OCSI, Boolean.class);
-            if (bval != null)
-                continueWithArgumentRequest.suppressOCsi = bval;
-            continueWithArgumentRequest.continueWithArgumentArgExtension = xml.get(CONTINUE_WITH_ARGUMENT_ARG_EXTENSION,
-                    ContinueWithArgumentArgExtensionImpl.class);
-        }
-
-        public void write(ContinueWithArgumentRequestImpl continueWithArgumentRequest,
-                javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-
-            CIRCUIT_SWITCHED_CALL_MESSAGE_XML.write(continueWithArgumentRequest, xml);
-
-            if (continueWithArgumentRequest.getAlertingPattern() != null)
-                xml.add((AlertingPatternCapImpl) continueWithArgumentRequest.getAlertingPattern(), ALERTING_PATTERN,
-                        AlertingPatternCapImpl.class);
-
-            if (continueWithArgumentRequest.getExtensions() != null)
-                xml.add((CAPExtensionsImpl) continueWithArgumentRequest.getExtensions(), EXTENSIONS,
-                        CAPExtensionsImpl.class);
-
-            if (continueWithArgumentRequest.getServiceInteractionIndicatorsTwo() != null)
-                xml.add((ServiceInteractionIndicatorsTwoImpl) continueWithArgumentRequest
-                        .getServiceInteractionIndicatorsTwo(), SERVICE_INTERACTION_INDICATORS_TWO,
-                        ServiceInteractionIndicatorsTwoImpl.class);
-
-            if (continueWithArgumentRequest.getCallingPartysCategory() != null)
-                xml.add((CallingPartysCategoryInapImpl) continueWithArgumentRequest.getCallingPartysCategory(),
-                        CALLING_PARTYS_CATEGORY, CallingPartysCategoryInapImpl.class);
-
-            if (continueWithArgumentRequest.getGenericNumbers() != null) {
-                ContinueWithArgument_GenericNumbers al = new ContinueWithArgument_GenericNumbers(
-                        continueWithArgumentRequest.getGenericNumbers());
-                xml.add(al, GENERIC_NUMBER_LIST, ContinueWithArgument_GenericNumbers.class);
-            }
-
-            if (continueWithArgumentRequest.getCugInterlock() != null)
-                xml.add((CUGInterlockImpl) continueWithArgumentRequest.getCugInterlock(), CUG_INTER_LOCK,
-                        CUGInterlockImpl.class);
-
-            if (continueWithArgumentRequest.getCugOutgoingAccess())
-                xml.add((Boolean) continueWithArgumentRequest.getCugOutgoingAccess(), CUG_OUTGOING_ACCESS,
-                        Boolean.class);
-
-            if (continueWithArgumentRequest.getChargeNumber() != null)
-                xml.add((LocationNumberCapImpl) continueWithArgumentRequest.getChargeNumber(), CHARGE_NUMBER,
-                        LocationNumberCapImpl.class);
-
-            if (continueWithArgumentRequest.getSuppressionOfAnnouncement())
-                xml.add((Boolean) continueWithArgumentRequest.getSuppressionOfAnnouncement(),
-                        SUPPRESSION_OF_ANNOUNCEMENT, Boolean.class);
-
-            if (continueWithArgumentRequest.getNaOliInfo() != null)
-                xml.add((NAOliInfoImpl) continueWithArgumentRequest.getNaOliInfo(), NA_OLI_INFO, NAOliInfoImpl.class);
-
-            if (continueWithArgumentRequest.getBorInterrogationRequested())
-                xml.add((Boolean) continueWithArgumentRequest.getBorInterrogationRequested(),
-                        BOR_INTERROGATION_REQUESTED, Boolean.class);
-
-            if (continueWithArgumentRequest.getSuppressOCsi())
-                xml.add((Boolean) continueWithArgumentRequest.getSuppressOCsi(), SUPPRESS_OCSI, Boolean.class);
-
-            if (continueWithArgumentRequest.getContinueWithArgumentArgExtension() != null)
-                xml.add((ContinueWithArgumentArgExtensionImpl) continueWithArgumentRequest
-                        .getContinueWithArgumentArgExtension(), CONTINUE_WITH_ARGUMENT_ARG_EXTENSION,
-                        ContinueWithArgumentArgExtensionImpl.class);
-        }
-    };
-
-    public static class ContinueWithArgument_GenericNumbers extends ArrayListSerializingBase<GenericNumberCap> {
+public static class ContinueWithArgument_GenericNumbers extends ArrayListSerializingBase<GenericNumberCap> {
 
         public ContinueWithArgument_GenericNumbers() {
             super(GENERIC_NUMBER, GenericNumberCapImpl.class);

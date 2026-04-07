@@ -1,14 +1,9 @@
-
 package org.restcomm.protocols.ss7.sccp.impl.router;
 
-import javolution.text.TextBuilder;
 import java.util.Map;
-import javolution.xml.XMLBinding;
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
+import org.restcomm.protocols.ss7.sccp.impl.SCCPXStreamHelper;
 import org.restcomm.protocols.ss7.sccp.LongMessageRule;
 import org.restcomm.protocols.ss7.sccp.LongMessageRuleType;
 import org.restcomm.protocols.ss7.sccp.Mtp3ServiceAccessPoint;
@@ -21,6 +16,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
@@ -156,16 +153,14 @@ public class RouterImpl implements Router {
 
     private static final String SCCP_ROUTER_PERSIST_DIR_KEY = "sccprouter.persist.dir";
     private static final String USER_DIR_KEY = "user.dir";
-    private static final String PERSIST_FILE_NAME = "sccprouter3.xml";
+    private static final String PERSIST_FILE_NAME = "sccprouter4.xml";
 
     private static final String LONG_MESSAGE_RULE = "longMessageRule";
     private static final String MTP3_SERVICE_ACCESS_POINT = "sap";
 
-    private final TextBuilder persistFile = TextBuilder.newInstance();
+    private String persistFile;
 
-    protected static final SccpRouterXMLBinding binding = new SccpRouterXMLBinding();
     private static final String TAB_INDENT = "\t";
-    private static final String CLASS_ATTRIBUTE = "type";
 
     private String persistDir = null;
 
@@ -179,8 +174,7 @@ public class RouterImpl implements Router {
         this.name = name;
         this.sccpStack = sccpStack;
 
-        binding.setClassAttribute(CLASS_ATTRIBUTE);
-        binding.setAlias(Mtp3DestinationMap.class, "mtp3DestinationMap");
+
     }
 
     public String getName() {
@@ -196,16 +190,14 @@ public class RouterImpl implements Router {
     }
 
     public void start() {
-        this.persistFile.clear();
-
         if (persistDir != null) {
-            this.persistFile.append(persistDir).append(File.separator).append(this.name).append("_").append(PERSIST_FILE_NAME);
+            this.persistFile = persistDir + File.separator + this.name + "_" + PERSIST_FILE_NAME;
         } else {
-            persistFile.append(System.getProperty(SCCP_ROUTER_PERSIST_DIR_KEY, System.getProperty(USER_DIR_KEY)))
-                    .append(File.separator).append(this.name).append("_").append(PERSIST_FILE_NAME);
+            this.persistFile = System.getProperty(SCCP_ROUTER_PERSIST_DIR_KEY, System.getProperty(USER_DIR_KEY))
+                    + File.separator + this.name + "_" + PERSIST_FILE_NAME;
         }
 
-        logger.info(String.format("SCCP Router configuration file path %s", persistFile));
+        logger.info(String.format("SCCP Router configuration file path %s", this.persistFile));
 
         this.load();
 
@@ -422,32 +414,6 @@ public class RouterImpl implements Router {
         this.store();
     }
 
-    /*public void modifyMtp3Destination(int sapId, int destId, Integer firstDpc, Integer lastDpc, Integer firstSls, Integer lastSls, Integer slsMask)
-            throws Exception {
-        Mtp3ServiceAccessPoint sap = this.getMtp3ServiceAccessPoint(sapId);
-        if (sap == null)
-            throw new Exception(String.format(SccpOAMMessage.SAP_DOESNT_EXIST, name));
-
-        Mtp3DestinationImpl dest = (Mtp3DestinationImpl) sap.getMtp3Destination(destId);
-
-        if(dest == null)
-            throw new Exception(String.format(SccpOAMMessage.DEST_DOESNT_EXIST, name));
-
-        if(firstDpc == null)
-            firstDpc = dest.getFirstDpc();
-        if(lastDpc == null)
-            lastDpc = dest.getLastDpc();
-        if(firstSls == null)
-            firstSls = dest.getFirstSls();
-        if(lastSls == null)
-            lastSls = dest.getLastSls();
-        if(slsMask == null)
-            slsMask = dest.getSlsMask();
-
-        sap.modifyMtp3Destination(destId, firstDpc, lastDpc, firstSls, lastSls, slsMask);
-        this.store();
-    }*/
-
     public void removeMtp3Destination(int sapId, int destId) throws Exception {
         Mtp3ServiceAccessPoint sap = this.getMtp3ServiceAccessPoint(sapId);
 
@@ -586,76 +552,57 @@ public class RouterImpl implements Router {
      * Persist
      */
     public void store() {
-
-        // TODO : Should we keep reference to Objects rather than recreating
-        // everytime?
         try {
-            XMLObjectWriter writer = XMLObjectWriter.newInstance(new FileOutputStream(persistFile.toString()));
-            writer.setBinding(binding);
-            writer.setIndentation(TAB_INDENT);
+            RouterConfig config = new RouterConfig();
+            config.longMessageRules = this.longMessageRules;
+            config.saps = this.saps;
 
-            writer.write(longMessageRules, LONG_MESSAGE_RULE, LongMessageRuleMap.class);
-            writer.write(saps, MTP3_SERVICE_ACCESS_POINT, Mtp3ServiceAccessPointMap.class);
-
-            writer.close();
+            String xml = SCCPXStreamHelper.toXML(config);
+            try (FileWriter writer = new FileWriter(this.persistFile)) {
+                writer.write(xml);
+            }
         } catch (Exception e) {
             logger.error("Error while persisting the Rule state in file", e);
         }
     }
 
     /**
+     * Configuration class for Router persistence
+     */
+    public static class RouterConfig {
+        public LongMessageRuleMap<Integer, LongMessageRule> longMessageRules;
+        public Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> saps;
+    }
+
+    /**
      * Load and create LinkSets and Link from persisted file
      */
     public void load() {
-
         try {
-            File f = new File(persistFile.toString());
+            File f = new File(this.persistFile);
             if (f.exists()) {
-                // we have V4 config
-                loadVer4(persistFile.toString());
+                // we have V4 config (XStream format)
+                loadVer4(this.persistFile);
             } else {
-                String s1 = persistFile.toString().replace("3.xml", "2.xml");
+                // Try legacy formats
+                String s1 = this.persistFile.replace("4.xml", "3.xml");
                 f = new File(s1);
-
                 if (f.exists()) {
-                    loadVer3(s1);
-                    this.store();
-                    f.delete();
+                    logger.warn("Legacy SCCP Router config format (v3) not supported, using defaults");
                 } else {
-                    s1 = persistFile.toString().replace("3.xml", ".xml");
+                    s1 = this.persistFile.replace("4.xml", "2.xml");
                     f = new File(s1);
-
                     if (f.exists()) {
-                        if (!loadVer1(s1)) {
-                            loadVer2(s1);
+                        logger.warn("Legacy SCCP Router config format (v2) not supported, using defaults");
+                    } else {
+                        s1 = this.persistFile.replace("4.xml", ".xml");
+                        f = new File(s1);
+                        if (f.exists()) {
+                            logger.warn("Legacy SCCP Router config format (v1) not supported, using defaults");
                         }
                     }
-
-                    this.store();
-                    f.delete();
                 }
             }
-
-//            File f = new File(persistFile.toString());
-//            if (f.exists()) {
-//                // we have V3 config
-//                loadVer3(persistFile.toString());
-//            } else {
-//                String s1 = persistFile.toString().replace("2.xml", ".xml");
-//                f = new File(s1);
-//
-//                if (f.exists()) {
-//                    if (!loadVer1(s1)) {
-//                        loadVer2(s1);
-//                    }
-//                }
-//
-//                this.store();
-//                f.delete();
-//            }
-        } catch (XMLStreamException ex) {
-            ex.printStackTrace();
-            logger.error(String.format("Failed to load the SS7 configuration file. \n%s", ex.getMessage()));
         } catch (FileNotFoundException e) {
             logger.warn(String.format("Failed to load the SS7 configuration file. \n%s", e.getMessage()));
         } catch (IOException e) {
@@ -663,154 +610,22 @@ public class RouterImpl implements Router {
         }
     }
 
-    private boolean loadVer1(String fn) throws XMLStreamException, IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fn)));
-        StringBuilder sb = new StringBuilder();
-        while (true) {
-            String s1 = br.readLine();
-            if (s1 == null)
-                break;
-            sb.append(s1);
-            sb.append("\n");
+    protected void loadVer4(String fn) throws FileNotFoundException {
+        try (FileReader reader = new FileReader(fn)) {
+            loadVer4(reader);
         }
-        br.close();
-        String s2 = sb.toString();
-        s2 = s2.replace("type=\"org.restcomm.protocols.ss7.sccp.parameter.NoGlobalTitle\"", "type=\"NoGlobalTitle\"");
-
-        s2 = s2.replace("type=\"rule\"", "");
-        s2 = s2.replace("pattern type=\"org.restcomm.protocols.ss7.sccp.parameter.SccpAddress\"", "patternSccpAddress");
-        s2 = s2.replace("ai type=\"org.restcomm.protocols.ss7.indicator.AddressIndicator\" ai=", "ai value=");
-        s2 = s2.replace("gt type=\"org.restcomm.protocols.ss7.sccp.parameter.", "gt type=\"");
-        s2 = s2.replace("Key type=\"java.lang.Integer\"", "id");
-        s2 = s2.replace("Value", "value");
-        s2 = s2.replace("/pattern", "/patternSccpAddress");
-        s2 = s2.replace("value type=\"org.restcomm.protocols.ss7.sccp.parameter.SccpAddress\"", "sccpAddress");
-        s2 = s2.replace("</value>\r\n</primaryAddress>", "</sccpAddress>\r\n</primaryAddress>");
-        s2 = s2.replace("</value>\n</primaryAddress>", "</sccpAddress>\n</primaryAddress>");
-        s2 = s2.replace("</value>\r\n</backupAddress>", "</sccpAddress>\r\n</backupAddress>");
-        s2 = s2.replace("</value>\n</backupAddress>", "</sccpAddress>\n</backupAddress>");
-        s2 = s2.replace("type=\"org.restcomm.protocols.ss7.sccp.parameter.", "type=\"");
-        s2 = s2.replace("type=\"org.restcomm.protocols.ss7.sccp.impl.router.Mtp3ServiceAccessPoint\"", "");
-        s2 = s2.replace("javolution.util.FastMap", "mtp3DestinationMap");
-        s2 = s2.replace("type=\"org.restcomm.protocols.ss7.sccp.impl.router.Mtp3Destination\"", "");
-
-        StringReader sr = new StringReader(s2);
-        XMLObjectReader reader = XMLObjectReader.newInstance(sr);
-
-        reader.setBinding(binding);
-
-        XMLBinding binding2 = new XMLBinding();
-        binding2.setClassAttribute(CLASS_ATTRIBUTE);
-
-        String BACKUP_ADDRESS_V2 = "backupAddress";
-        String ROUTING_ADDRESS_V2 = "primaryAddress";
-
-//        try {
-//            rulesMap = reader.read(RULE, RuleMap.class);
-//        } catch (XMLStreamException e) {
-//            return false;
-//        }
-//        routingAddresses = reader.read(ROUTING_ADDRESS_V2, SccpAddressMap.class);
-//        SccpAddressMap<Integer, SccpAddress> backupAddresses = reader.read(BACKUP_ADDRESS_V2, SccpAddressMap.class);
-
-        longMessageRules = reader.read(LONG_MESSAGE_RULE, LongMessageRuleMap.class);
-        saps = reader.read(MTP3_SERVICE_ACCESS_POINT, Mtp3ServiceAccessPointMap.class);
-
-        for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
-            Mtp3ServiceAccessPoint sap = e.getValue();
-            ((Mtp3ServiceAccessPointImpl)sap).setStackName(name);
-        }
-
-        reader.close();
-
-//        moveBackupToRoutingAddress(backupAddresses);
-
-        return true;
     }
 
-    private void loadVer2(String fn) throws XMLStreamException, IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fn)));
-        StringBuilder sb = new StringBuilder();
-        while (true) {
-            String s1 = br.readLine();
-            if (s1 == null)
-                break;
-            sb.append(s1);
-            sb.append("\n");
+    protected void loadVer4(FileReader reader) throws FileNotFoundException {
+        RouterConfig config = (RouterConfig) SCCPXStreamHelper.fromXML(reader);
+        if (config != null) {
+            longMessageRules = config.longMessageRules;
+            saps = config.saps;
+
+            for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
+                Mtp3ServiceAccessPoint sap = e.getValue();
+                ((Mtp3ServiceAccessPointImpl)sap).setStackName(name);
+            }
         }
-        br.close();
-        String s2 = sb.toString();
-        s2 = s2.replace("type=\"org.restcomm.protocols.ss7.sccp.parameter.NoGlobalTitle\"", "type=\"NoGlobalTitle\"");
-
-        StringReader sr = new StringReader(s2);
-        XMLObjectReader reader = XMLObjectReader.newInstance(sr);
-
-        String ROUTING_ADDRESS_V2 = "primaryAddress";
-        String BACKUP_ADDRESS_V2 = "backupAddress";
-
-        reader.setBinding(binding);
-//        rulesMap = reader.read(RULE, RuleMap.class);
-//        routingAddresses = reader.read(ROUTING_ADDRESS_V2, SccpAddressMap.class);
-//        SccpAddressMap<Integer, SccpAddress> backupAddresses = reader.read(BACKUP_ADDRESS_V2, SccpAddressMap.class);
-
-        longMessageRules = reader.read(LONG_MESSAGE_RULE, LongMessageRuleMap.class);
-        saps = reader.read(MTP3_SERVICE_ACCESS_POINT, Mtp3ServiceAccessPointMap.class);
-
-        for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
-            Mtp3ServiceAccessPoint sap = e.getValue();
-            ((Mtp3ServiceAccessPointImpl)sap).setStackName(name);
-        }
-
-        reader.close();
-
-//        moveBackupToRoutingAddress(backupAddresses);
-    }
-
-    protected void loadVer3(String fn) throws XMLStreamException, IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fn)));
-        StringBuilder sb = new StringBuilder();
-        while (true) {
-            String s1 = br.readLine();
-            if (s1 == null)
-                break;
-            sb.append(s1);
-            sb.append("\n");
-        }
-        br.close();
-        String s2 = sb.toString();
-        int i1 = s2.indexOf("<rule");
-        int i2 = s2.indexOf("<routingAddress/>");
-        if (i2 < 0)
-            i2 = s2.indexOf("</routingAddress>");
-        if(i1<=0 || i2<=0 || i1>=i2)
-            // bad format
-            return;
-
-        String s3 = s2.substring(0, i1) + s2.substring(i2 + 17);
-
-        StringReader sr = new StringReader(s3);
-        XMLObjectReader reader = XMLObjectReader.newInstance(sr);
-
-        reader.setBinding(binding);
-        loadVer4(reader);
-    }
-
-    protected void loadVer4(String fn) throws XMLStreamException, FileNotFoundException {
-        XMLObjectReader reader = XMLObjectReader.newInstance(new FileInputStream(fn));
-
-        reader.setBinding(binding);
-        loadVer4(reader);
-    }
-
-    protected void loadVer4(XMLObjectReader reader) throws XMLStreamException{
-        longMessageRules = reader.read(LONG_MESSAGE_RULE, LongMessageRuleMap.class);
-        saps = reader.read(MTP3_SERVICE_ACCESS_POINT, Mtp3ServiceAccessPointMap.class);
-
-        for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
-            Mtp3ServiceAccessPoint sap = e.getValue();
-            ((Mtp3ServiceAccessPointImpl)sap).setStackName(name);
-        }
-
-        reader.close();
     }
 }
