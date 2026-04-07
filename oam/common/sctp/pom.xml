@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
 		<artifactId>restcomm-ss7-oam-common</artifactId>
-		<version>9.0.0-318</version>
+		<version>9.2.0</version>
 	</parent>
 
 	<artifactId>sctp-oam</artifactId>
@@ -62,11 +62,7 @@
 			<artifactId>testng</artifactId>
 			<version>${testng.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>javolution</groupId>
-			<artifactId>javolution</artifactId>
-			<version>${javolution.version}</version>
-		</dependency>
+
 	</dependencies>
 
 

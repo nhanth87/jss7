@@ -16,12 +16,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import javolution.text.TextBuilder;
+
 
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.api.Association;
@@ -86,13 +88,16 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
 
     protected static final int MAX_SEQUENCE_NUMBER = 256;
 
-    protected final CopyOnWriteArrayList<As> appServers = new CopyOnWriteArrayList<As>();
-    protected final CopyOnWriteArrayList<AspFactory> aspFactories = new CopyOnWriteArrayList<AspFactory>();
+    protected CopyOnWriteArrayList<As> appServers = new CopyOnWriteArrayList<As>();
+    protected CopyOnWriteArrayList<AspFactory> aspFactories = new CopyOnWriteArrayList<AspFactory>();
+    
+    // Congestion tracking per DPC
+    private ConcurrentHashMap<Integer, AtomicInteger> congDpcList = new ConcurrentHashMap<Integer, AtomicInteger>();
 
     protected M3UAScheduler m3uaScheduler = new M3UAScheduler();
     protected M3UACounterProviderImpl m3uaCounterProvider;
 
-    private final TextBuilder persistFile = TextBuilder.newInstance();
+    private final StringBuilder persistFile = new StringBuilder();
 
     private final String name;
 
@@ -167,7 +172,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
 
     public void setPersistDir(String persistDir) {
         this.persistDir = persistDir;
-        this.persistFile.clear();
+        this.persistFile.setLength(0);
     }
 
     public int getMaxAsForRoute() {
@@ -264,7 +269,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         this.preparePersistFile();
         logger.info(String.format("M3UA configuration file path %s", persistFile.toString()));
 
-        binding.setM3uaManagement(this);
+        // XStream handles circular references differently; no binding needed
 
         try {
             this.load();
@@ -345,6 +350,10 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         Map<String, RouteAs> routeTmp = new HashMap<String, RouteAs>();
         routeTmp.putAll(this.routeManagement.route);
         return routeTmp;
+    }
+    
+    public ConcurrentHashMap<Integer, AtomicInteger> getCongDpcList() {
+        return congDpcList;
     }
 
     protected As getAs(String asName) {

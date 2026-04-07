@@ -4,6 +4,7 @@ package org.restcomm.protocols.ss7.sccp;
 import java.io.IOException;
 import java.io.Serializable;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -92,7 +93,7 @@ public interface SccpProvider extends Serializable {
      *
      * @return The collection of pairs: networkId value - NetworkIdState (prohibited / congested state)
      */
-    ConcurrentHashMap<Integer, NetworkIdState> getNetworkIdStateList();
+    Map<Integer, NetworkIdState> getNetworkIdStateList();
 
     /**
      * @return ExecutorCongestionMonitor list that are responsible for measuring of congestion of the thread Executor that

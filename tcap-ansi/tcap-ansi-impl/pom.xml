@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>tcap-ansi-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7.tcapAnsi</groupId>
-		<version>9.0.0-318</version>
+		<version>9.2.0</version>
 	</parent>
 
 	<artifactId>tcap-ansi-impl</artifactId>
@@ -57,6 +57,10 @@
 		<dependency>
 			<groupId>org.restcomm.protocols.ss7.sccp</groupId>
 			<artifactId>sccp-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
 		</dependency>
 	</dependencies>
 

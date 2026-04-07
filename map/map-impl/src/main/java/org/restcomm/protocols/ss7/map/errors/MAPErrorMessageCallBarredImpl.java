@@ -1,4 +1,4 @@
-﻿package org.restcomm.protocols.ss7.map.errors;
+package org.restcomm.protocols.ss7.map.errors;
 
 import java.io.IOException;
 

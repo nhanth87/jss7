@@ -5,6 +5,7 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -111,7 +112,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 
 //    protected transient FastMap<PrevewDialogDataKey, PreviewDialogData> dialogPreviewList = new FastMap<PrevewDialogDataKey, PrevewDialogData>();
     protected transient ConcurrentHashMap<PreviewDialogDataKey, PreviewDialogData> dialogPreviewList = new ConcurrentHashMap<>();
-    private transient NonBlockingHashMap<Integer, NetworkIdState> networkIdStateList = new NonBlockingHashMap<Integer, NetworkIdState>();
+    private transient Map<Integer, NetworkIdState> networkIdStateList = new NonBlockingHashMap<Integer, NetworkIdState>();
     private NetworkIdStateListUpdater currentNetworkIdStateListUpdater;
 
     private AtomicInteger seqControl = new AtomicInteger(1);
@@ -1309,7 +1310,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     }
 
     @Override
-    public NonBlockingHashMap<Integer, NetworkIdState> getNetworkIdStateList() {
+    public Map<Integer, NetworkIdState> getNetworkIdStateList() {
         return networkIdStateList;
     }
 

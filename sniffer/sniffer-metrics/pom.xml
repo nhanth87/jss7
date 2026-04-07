@@ -4,7 +4,7 @@
   <parent>
     <artifactId>sniffer-parent</artifactId>
     <groupId>org.restcomm.protocols.ss7.sniffer</groupId>
-    <version>9.0.0-318</version>
+    <version>9.2.0</version>
   </parent>
 
   <artifactId>sniffer-gui</artifactId>

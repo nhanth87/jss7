@@ -613,6 +613,8 @@ public class RouterImpl implements Router {
     protected void loadVer4(String fn) throws FileNotFoundException {
         try (FileReader reader = new FileReader(fn)) {
             loadVer4(reader);
+        } catch (IOException e) {
+            logger.error(String.format("Failed to close FileReader for %s", fn), e);
         }
     }
 

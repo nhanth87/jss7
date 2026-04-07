@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>ss7-trace-parser-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7.tools.traceparser</groupId>
-		<version>9.0.0-318</version>
+		<version>9.2.0</version>
 	</parent>
 
 	<artifactId>ss7-trace-parser-bootstrap</artifactId>
@@ -23,10 +23,7 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>javolution</groupId>
-			<artifactId>javolution</artifactId>
-		</dependency>
+
 		<dependency>
 			<groupId>org.mobicents.protocols.asn</groupId>
 			<artifactId>asn</artifactId>

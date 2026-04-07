@@ -8,8 +8,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
-
-import javolution.util.FastSet;
+import java.util.Set;
 
 import org.restcomm.ss7.management.transceiver.ChannelProvider;
 import org.restcomm.ss7.management.transceiver.ChannelSelectionKey;
@@ -167,10 +166,9 @@ public class ShellTransceiverTest {
             int i = 0;
             while (started) {
                 try {
-                    FastSet<ChannelSelectionKey> keys = selector.selectNow();
+                    Set<ChannelSelectionKey> keys = selector.selectNow();
 
-                    for (FastSet.Record record = keys.head(), end = keys.tail(); (record = record.getNext()) != end;) {
-                        ChannelSelectionKey key = (ChannelSelectionKey) keys.valueOf(record);
+                    for (ChannelSelectionKey key : keys) {
                         ShellChannel chan = (ShellChannel) key.channel();
                         if (key.isReadable()) {
                             Message msg = (Message) chan.receive();
@@ -241,10 +239,9 @@ public class ShellTransceiverTest {
             int i = 0;
             while (started) {
                 try {
-                    FastSet<ChannelSelectionKey> keys = selector.selectNow();
+                    Set<ChannelSelectionKey> keys = selector.selectNow();
 
-                    for (FastSet.Record record = keys.head(), end = keys.tail(); (record = record.getNext()) != end;) {
-                        ChannelSelectionKey key = (ChannelSelectionKey) keys.valueOf(record);
+                    for (ChannelSelectionKey key : keys) {
 
                         if (key.isAcceptable()) {
                             ShellServerChannel chan = (ShellServerChannel) key.channel();

@@ -838,8 +838,8 @@ public class RouterExtImpl implements RouterExt {
                     break;
                 i1++;
             }
-            routingAddresses.putEntry(i1, (SccpAddressImpl) addr);
-            lstChange.putEntry(bId, i1);
+            routingAddresses.put(i1, (SccpAddressImpl) addr);
+            lstChange.put(bId, i1);
         }
 
         for (Rule rule : rulesMap.values()) {

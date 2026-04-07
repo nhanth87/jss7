@@ -409,6 +409,8 @@ public class SccpResourceImpl implements SccpResource {
                 if (config != null) {
                     return new ResourcesSet(config.remoteSpcs, config.remoteSsns, config.concernedSpcs);
                 }
+            } catch (IOException e) {
+                logger.error(String.format("Failed to close FileReader for %s", fn), e);
             }
             return null;
         }

@@ -4,8 +4,8 @@ package org.restcomm.protocols.ss7.sccp.impl;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.jctools.maps.NonBlockingHashMap;
 
@@ -182,7 +182,7 @@ public class SccpProviderImpl implements SccpProvider, Serializable {
     }
 
     @Override
-    public ConcurrentHashMap<Integer, NetworkIdState> getNetworkIdStateList() {
+    public Map<Integer, NetworkIdState> getNetworkIdStateList() {
         return this.stack.ss7ExtSccpDetailedInterface.getNetworkIdList(-1);
     }
 

@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>map-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7.map</groupId>
-		<version>9.0.0-318</version>
+		<version>9.2.0</version>
 	</parent>
 
 	<artifactId>map-load</artifactId>
@@ -136,11 +136,7 @@
 			<artifactId>log4j</artifactId>
 			<version>${log4j.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>javolution</groupId>
-			<artifactId>javolution</artifactId>
-			<version>${javolution.version}</version>
-		</dependency>
+
 		
 		
 		<dependency>
@@ -492,18 +488,6 @@
 											</destFileName>
 										</artifactItem>
 
-										<artifactItem>
-											<groupId>javolution</groupId>
-											<artifactId>javolution</artifactId>
-											<type>jar</type>
-											<overWrite>true</overWrite>
-											<outputDirectory>
-												${assemble.dir}
-											</outputDirectory>
-											<destFileName>
-												javolution.jar
-											</destFileName>
-										</artifactItem>
 
 										<artifactItem>
 											<groupId>io.netty</groupId>
