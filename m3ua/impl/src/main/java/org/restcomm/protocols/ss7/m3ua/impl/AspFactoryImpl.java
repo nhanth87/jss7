@@ -30,7 +30,9 @@ import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSM;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.UnknownTransitionException;
 import org.restcomm.protocols.ss7.m3ua.impl.message.M3UAMessageImpl;
 import org.restcomm.protocols.ss7.m3ua.impl.message.MessageFactoryImpl;
+import org.restcomm.protocols.ss7.m3ua.impl.message.transfer.PayloadDataImpl;
 import org.restcomm.protocols.ss7.m3ua.impl.oam.M3UAOAMMessages;
+import org.restcomm.protocols.ss7.m3ua.impl.pool.PayloadDataPool;
 import org.restcomm.protocols.ss7.m3ua.impl.parameter.ParameterFactoryImpl;
 import org.restcomm.protocols.ss7.m3ua.message.M3UAMessage;
 import org.restcomm.protocols.ss7.m3ua.message.MessageClass;
@@ -345,6 +347,12 @@ public class AspFactoryImpl implements AssociationListener, XMLSerializable, Asp
 
                         PayloadData payload = (PayloadData) message;
                         this.transferMessageHandler.handlePayload(payload);
+                        
+                        // Return PayloadData to pool for reuse
+                        PayloadDataPool pool = ((MessageFactoryImpl)this.messageFactory).getPayloadDataPool();
+                        if (pool != null && payload instanceof PayloadDataImpl) {
+                            pool.release((PayloadDataImpl) payload);
+                        }
                         break;
                     default:
                         logger.error(String.format("Rx : Transfer message with invalid MessageType=%d message=%s",

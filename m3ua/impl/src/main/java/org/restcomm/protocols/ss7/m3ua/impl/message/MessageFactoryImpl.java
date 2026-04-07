@@ -26,6 +26,7 @@ import org.restcomm.protocols.ss7.m3ua.impl.message.ssnm.DestinationUPUnavailabl
 import org.restcomm.protocols.ss7.m3ua.impl.message.ssnm.DestinationUnavailableImpl;
 import org.restcomm.protocols.ss7.m3ua.impl.message.ssnm.SignallingCongestionImpl;
 import org.restcomm.protocols.ss7.m3ua.impl.message.transfer.PayloadDataImpl;
+import org.restcomm.protocols.ss7.m3ua.impl.pool.PayloadDataPool;
 import org.restcomm.protocols.ss7.m3ua.message.MessageClass;
 import org.restcomm.protocols.ss7.m3ua.message.MessageFactory;
 import org.restcomm.protocols.ss7.m3ua.message.MessageType;
@@ -37,13 +38,32 @@ import org.restcomm.protocols.ss7.m3ua.message.MessageType;
  */
 public class MessageFactoryImpl implements MessageFactory {
 
-public M3UAMessageImpl createMessage(int messageClass, int messageType) {
+    private final PayloadDataPool payloadDataPool;
+    
+    public MessageFactoryImpl() {
+        this.payloadDataPool = new PayloadDataPool();
+    }
+    
+    public MessageFactoryImpl(int payloadDataPoolCapacity) {
+        this.payloadDataPool = new PayloadDataPool(payloadDataPoolCapacity);
+    }
+    
+    /**
+     * Get the PayloadDataPool instance
+     * 
+     * @return the PayloadDataPool
+     */
+    public PayloadDataPool getPayloadDataPool() {
+        return payloadDataPool;
+    }
+
+    public M3UAMessageImpl createMessage(int messageClass, int messageType) {
 
         switch (messageClass) {
             case MessageClass.TRANSFER_MESSAGES:
                 switch (messageType) {
                     case MessageType.PAYLOAD:
-                        return new PayloadDataImpl();
+                        return payloadDataPool.borrow();
                 }
                 break;
             case MessageClass.SIGNALING_NETWORK_MANAGEMENT:

@@ -83,4 +83,19 @@ public class PayloadDataImpl extends M3UAMessageImpl implements PayloadData {
             ((ParameterImpl) parameters.get(Parameter.Correlation_ID)).write(byteBuf);
         }
     }
+
+    /**
+     * Reset this object for reuse from pool.
+     * Clears all parameters.
+     */
+    public void reset() {
+        this.parameters.clear();
+    }
+
+    /**
+     * Clear all parameters - alias for reset()
+     */
+    public void clearParameters() {
+        this.parameters.clear();
+    }
 }
