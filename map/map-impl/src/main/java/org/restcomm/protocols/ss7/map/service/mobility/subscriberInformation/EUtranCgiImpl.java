@@ -1,8 +1,6 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
-import jakarta.xml.bind.DatatypeConverter;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -240,25 +238,4 @@ public class EUtranCgiImpl extends OctetStringBase implements EUtranCgi {
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<EUtranCgiImpl> E_UTRAN_CGI_XML = new XMLFormat<EUtranCgiImpl>(EUtranCgiImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, EUtranCgiImpl eUtranCgi) throws XMLStreamException {
-            String s = xml.getAttribute(DATA, DEFAULT_VALUE);
-            if (s != null) {
-                eUtranCgi.data = DatatypeConverter.parseHexBinary(s);
-            }
-        }
-
-        @Override
-        public void write(EUtranCgiImpl eUtranCgi, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (eUtranCgi.data != null) {
-                xml.setAttribute(DATA, DatatypeConverter.printHexBinary(eUtranCgi.data));
-            }
-        }
-    };
 }
-

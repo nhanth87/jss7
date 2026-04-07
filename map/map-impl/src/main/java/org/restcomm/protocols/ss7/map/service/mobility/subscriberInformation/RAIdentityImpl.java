@@ -184,38 +184,4 @@ public class RAIdentityImpl extends OctetStringBase implements RAIdentity {
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<RAIdentityImpl> ROUTING_AREA_ID_XML = new XMLFormat<RAIdentityImpl>(
-        RAIdentityImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml,
-                         RAIdentityImpl routingAreaId) throws XMLStreamException {
-            int mcc = xml.getAttribute(MCC, DEFAULT_INT_VALUE);
-            int mnc = xml.getAttribute(MNC, DEFAULT_INT_VALUE);
-            int lac = xml.getAttribute(LAC, DEFAULT_INT_VALUE);
-            int cellId = xml.getAttribute(RAC, DEFAULT_INT_VALUE);
-
-            try {
-                routingAreaId.setData(mcc, mnc, lac, cellId);
-            } catch (MAPException e) {
-                throw new XMLStreamException("MAPException when deserializing RouteingAreaIdImpl", e);
-            }
-        }
-
-        @Override
-        public void write(RAIdentityImpl routingAreaId,
-                          javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            try {
-                xml.setAttribute(MCC, routingAreaId.getMCC());
-                xml.setAttribute(MNC, routingAreaId.getMNC());
-                xml.setAttribute(LAC, routingAreaId.getLAC());
-                xml.setAttribute(RAC, routingAreaId.getRAC());
-            } catch (MAPException e) {
-                throw new XMLStreamException("MAPException when serializing RouteingAreaIdImpl", e);
-            }
-        }
-    };
 }

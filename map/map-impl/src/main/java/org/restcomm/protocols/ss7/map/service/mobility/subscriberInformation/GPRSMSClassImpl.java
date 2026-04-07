@@ -231,29 +231,4 @@ public class GPRSMSClassImpl implements GPRSMSClass, MAPAsnPrimitive {
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<GPRSMSClassImpl> GPRS_MS_CLASS_XML = new XMLFormat<GPRSMSClassImpl>(
-            GPRSMSClassImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, GPRSMSClassImpl gPRSMsClass)
-                throws XMLStreamException {
-            gPRSMsClass.mSNetworkCapability = xml.get(MS_NETWORK_CAPABILITY, MSNetworkCapabilityImpl.class);
-            gPRSMsClass.mSRadioAccessCapability = xml.get(MS_RADIO_ACCESS_CAPABILITY, MSRadioAccessCapabilityImpl.class);
-        }
-
-        @Override
-        public void write(GPRSMSClassImpl gPRSMsClass, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (gPRSMsClass.mSNetworkCapability != null) {
-                xml.add((MSNetworkCapabilityImpl) gPRSMsClass.mSNetworkCapability, MS_NETWORK_CAPABILITY, MSNetworkCapabilityImpl.class);
-            }
-            if (gPRSMsClass.mSRadioAccessCapability != null) {
-                xml.add((MSRadioAccessCapabilityImpl) gPRSMsClass.mSRadioAccessCapability, MS_RADIO_ACCESS_CAPABILITY, MSRadioAccessCapabilityImpl.class);
-            }
-        }
-    };
-
 }
