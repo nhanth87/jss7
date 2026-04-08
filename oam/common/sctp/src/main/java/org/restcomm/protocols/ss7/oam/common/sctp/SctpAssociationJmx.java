@@ -48,6 +48,16 @@ public class SctpAssociationJmx implements SctpAssociationJmxMBean {
     }
 
     @Override
+    public String[] getExtraPeerHostAddresses() {
+        return this.wrappedAssociation.getExtraPeerHostAddresses();
+    }
+
+    @Override
+    public void setExtraPeerHostAddresses(String[] extraPeerHostAddresses) {
+        this.wrappedAssociation.setExtraPeerHostAddresses(extraPeerHostAddresses);
+    }
+
+    @Override
     public String getHostAddress() {
         return this.wrappedAssociation.getHostAddress();
     }

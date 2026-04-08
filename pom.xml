@@ -9,7 +9,7 @@
 
 	<artifactId>ss7-parent</artifactId>
 	<groupId>org.restcomm.protocols.ss7</groupId>
-	<version>9.0.0-318</version>
+	<version>9.2.2</version>
 
 	<packaging>pom</packaging>
 
@@ -39,7 +39,7 @@
 		<!-- restcomm but not strictly ss7 -->
 		<asn.version>2.2.0-143</asn.version>
 		<stream.version>1.0.0.CR1</stream.version>
-		<sctp.version>2.0.4</sctp.version>
+		<sctp.version>2.0.6</sctp.version>
 		<commons.version>1.0.0.CR1</commons.version>
 		<netty.version>4.0.36.Final</netty.version>
 		<ss7.restcomm.version>8.2.6-SNAPSHOT</ss7.restcomm.version>
