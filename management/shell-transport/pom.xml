@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.restcomm.protocols.ss7.management</groupId>
 		<artifactId>management</artifactId>
-		<version>9.0.0-318</version>
+		<version>9.2.4</version>
 	</parent>
 
 	<artifactId>shell-transport</artifactId>
