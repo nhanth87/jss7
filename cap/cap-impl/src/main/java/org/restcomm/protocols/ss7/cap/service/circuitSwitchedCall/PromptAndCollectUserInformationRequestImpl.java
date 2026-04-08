@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -29,7 +28,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("promptAndCollectUserInformationRequest")
- extends CircuitSwitchedCallMessageImpl implements PromptAndCollectUserInformationRequest {
+public class PromptAndCollectUserInformationRequestImpl extends CircuitSwitchedCallMessageImpl implements PromptAndCollectUserInformationRequest {
 
     public static final int _ID_collectedInfo = 0;
     public static final int _ID_disconnectFromIPForbidden = 1;

@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -30,7 +29,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("requestReportBCSMEventRequest")
- extends CircuitSwitchedCallMessageImpl implements RequestReportBCSMEventRequest {
+public class RequestReportBCSMEventRequestImpl extends CircuitSwitchedCallMessageImpl implements RequestReportBCSMEventRequest {
 
     public static final int _ID_bcsmEvents = 0;
     public static final int _ID_extensions = 2;

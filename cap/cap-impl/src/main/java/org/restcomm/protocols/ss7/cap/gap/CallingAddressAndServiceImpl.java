@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.gap;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
 @XStreamAlias("callingAddressAndService")
- extends SequenceBase implements CallingAddressAndService {
+public class CallingAddressAndServiceImpl extends SequenceBase implements CallingAddressAndService {
 
     public static final int _ID_callingAddressValue = 0;
     public static final int _ID_serviceKey = 1;

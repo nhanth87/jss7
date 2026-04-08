@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -32,7 +31,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("initiateCallAttemptResponse")
- extends CircuitSwitchedCallMessageImpl implements InitiateCallAttemptResponse {
+public class InitiateCallAttemptResponseImpl extends CircuitSwitchedCallMessageImpl implements InitiateCallAttemptResponse {
 
     public static final int _ID_supportedCamelPhases = 0;
     public static final int _ID_offeredCamel4Functionalities = 1;

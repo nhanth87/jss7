@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.gap;
 
 import java.io.IOException;
@@ -21,7 +20,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
 @XStreamAlias("gapIndicators")
- extends SequenceBase implements GapIndicators {
+public class GapIndicatorsImpl extends SequenceBase implements GapIndicators {
 
     private static final String DURATION = "duration";
     private static final String GAP_INTERVAL = "gapInterval";

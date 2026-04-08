@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -28,7 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("splitLegRequest")
- extends CircuitSwitchedCallMessageImpl implements SplitLegRequest {
+public class SplitLegRequestImpl extends CircuitSwitchedCallMessageImpl implements SplitLegRequest {
     private static final long serialVersionUID = 1L;
 
     public static final int _ID_legToBeSplit = 0;

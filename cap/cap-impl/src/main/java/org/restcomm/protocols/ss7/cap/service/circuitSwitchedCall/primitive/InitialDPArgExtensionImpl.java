@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -46,7 +45,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("initialDPArgExtension")
- extends SequenceBase implements InitialDPArgExtension {
+public class InitialDPArgExtensionImpl extends SequenceBase implements InitialDPArgExtension {
 
     public static final int _ID_gmscAddress = 0;
     public static final int _ID_forwardingDestinationNumber = 1;

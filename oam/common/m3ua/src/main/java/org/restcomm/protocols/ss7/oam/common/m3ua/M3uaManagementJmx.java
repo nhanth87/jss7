@@ -185,7 +185,7 @@ public class M3uaManagementJmx implements M3uaManagementJmxMBean, M3UAManagement
      */
     @Override
     public List<As> getAppServers() {
-        return this.appServers.unmodifiable();
+        return java.util.Collections.unmodifiableList(this.appServers);
     }
 
     /*
@@ -195,7 +195,7 @@ public class M3uaManagementJmx implements M3uaManagementJmxMBean, M3UAManagement
      */
     @Override
     public List<AspFactory> getAspfactories() {
-        return this.aspFactories.unmodifiable();
+        return java.util.Collections.unmodifiableList(this.aspFactories);
     }
 
     /*

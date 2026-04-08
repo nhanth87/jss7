@@ -1,10 +1,8 @@
 package org.restcomm.protocols.ss7.tools.traceparser;
 
 import java.io.IOException;
-
-import org.jctools.maps.NonBlockingHashMap;
-
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.restcomm.protocols.ss7.sccp.MaxConnectionCountReached;
@@ -94,7 +92,7 @@ public class SccpProviderWrapper implements SccpProvider {
     }
 
     @Override
-    public NonBlockingHashMap<Integer, NetworkIdState> getNetworkIdStateList() {
+    public java.util.Map<Integer, NetworkIdState> getNetworkIdStateList() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -112,7 +110,7 @@ public class SccpProviderWrapper implements SccpProvider {
     }
 
     @Override
-    public NonBlockingHashMap<LocalReference, SccpConnection> getConnections() {
+    public ConcurrentHashMap<LocalReference, SccpConnection> getConnections() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -135,7 +133,7 @@ public class SccpProviderWrapper implements SccpProvider {
     }
 
     @Override
-    public List<SccpManagementEventListener> getManagementEventListeners() {
+    public CopyOnWriteArrayList<SccpManagementEventListener> getManagementEventListeners() {
         return null;
     }
 

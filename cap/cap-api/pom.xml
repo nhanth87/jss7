@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>cap-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7.cap</groupId>
-		<version>9.2.0</version>
+		<version>9.0.0-318</version>
 	</parent>
 
 	<artifactId>cap-api</artifactId>

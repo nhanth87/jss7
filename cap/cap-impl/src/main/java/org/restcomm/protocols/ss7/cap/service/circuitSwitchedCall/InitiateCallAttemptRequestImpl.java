@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -39,7 +38,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("initiateCallAttemptRequest")
- extends CircuitSwitchedCallMessageImpl implements InitiateCallAttemptRequest {
+public class InitiateCallAttemptRequestImpl extends CircuitSwitchedCallMessageImpl implements InitiateCallAttemptRequest {
 
     public static final int _ID_destinationRoutingAddress = 0;
     public static final int _ID_extensions = 4;

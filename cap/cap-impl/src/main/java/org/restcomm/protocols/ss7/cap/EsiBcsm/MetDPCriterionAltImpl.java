@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("metDPCriterionAlt")
- extends SequenceBase implements MetDPCriterionAlt {
+public class MetDPCriterionAltImpl extends SequenceBase implements MetDPCriterionAlt {
 
     public MetDPCriterionAltImpl() {
         super("MetDPCriterionAlt");

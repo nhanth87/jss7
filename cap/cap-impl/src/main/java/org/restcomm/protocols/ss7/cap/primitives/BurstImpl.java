@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.primitives;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("burst")
- extends SequenceBase implements Burst {
+public class BurstImpl extends SequenceBase implements Burst {
 
     public static final int _ID_numberOfBursts = 0;
     public static final int _ID_burstInterval = 1;

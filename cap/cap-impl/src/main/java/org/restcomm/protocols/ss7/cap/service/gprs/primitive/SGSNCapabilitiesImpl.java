@@ -20,7 +20,7 @@ public class SGSNCapabilitiesImpl extends OctetStringLength1Base implements SGSN
     }
 
     public SGSNCapabilitiesImpl(boolean aoCSupportedBySGSN) {
-        super("SGSNCapabilities", (aoCSupportedBySGSN ? 0x01 : 0x00));
+        super("SGSNCapabilities", (aoCSupportedBySGSN ? 0 : 0x00));
     }
 
     @Override
@@ -30,7 +30,7 @@ public class SGSNCapabilitiesImpl extends OctetStringLength1Base implements SGSN
 
     @Override
     public boolean getAoCSupportedBySGSN() {
-        return ((data & 0x01) == 0x01);
+        return ((data & 0) == 0);
     }
 
     @Override

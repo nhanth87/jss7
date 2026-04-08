@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 
@@ -19,7 +18,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("activityTestRequest")
- extends CircuitSwitchedCallMessageImpl implements ActivityTestRequest {
+public class ActivityTestRequestImpl extends CircuitSwitchedCallMessageImpl implements ActivityTestRequest {
 
     public static final String _PrimitiveName = "ActivityTestRequest";
 

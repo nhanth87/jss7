@@ -1,8 +1,6 @@
-
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
-
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -14,23 +12,21 @@ import org.restcomm.protocols.ss7.cap.api.EsiBcsm.CollectedInfoSpecificInfo;
 import org.restcomm.protocols.ss7.cap.api.isup.CalledPartyNumberCap;
 import org.restcomm.protocols.ss7.cap.isup.CalledPartyNumberCapImpl;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
-import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
-*
-* @author sergey vetyutnev
-*
-*/
+ *
+ * @author sergey vetyutnev
+ *
+ */
 @XStreamAlias("collectedInfoSpecificInfo")
- extends SequenceBase implements CollectedInfoSpecificInfo {
-
-    private static final String CALLED_PARTY_NUMBER = "calledPartyNumber";
+public class CollectedInfoSpecificInfoImpl extends SequenceBase implements CollectedInfoSpecificInfo {
 
     public static final int _ID_calledPartyNumber = 0;
 
+    @XStreamAlias("calledPartyNumber")
     private CalledPartyNumberCap calledPartyNumber;
 
     public CollectedInfoSpecificInfoImpl() {
@@ -47,9 +43,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
         return calledPartyNumber;
     }
 
-    @Override
-    protected void _decode(AsnInputStream asnInputStream, int length) throws CAPParsingComponentException, IOException, AsnException, MAPParsingComponentException,
-            INAPParsingComponentException {
+    protected void _decode(AsnInputStream asnInputStream, int length) throws CAPParsingComponentException,
+            MAPParsingComponentException, IOException, AsnException {
 
         this.calledPartyNumber = null;
 
@@ -63,8 +58,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
             if (ais.getTagClass() == Tag.CLASS_CONTEXT_SPECIFIC) {
                 switch (tag) {
                     case _ID_calledPartyNumber:
-                    this.calledPartyNumber = new CalledPartyNumberCapImpl();
-                    ((CalledPartyNumberCapImpl) this.calledPartyNumber).decodeAll(ais);
+                        this.calledPartyNumber = new CalledPartyNumberCapImpl();
+                        ((CalledPartyNumberCapImpl) this.calledPartyNumber).decodeAll(ais);
                         break;
 
                     default:
@@ -79,6 +74,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
     @Override
     public void encodeData(AsnOutputStream asnOutputStream) throws CAPException {
+
         if (this.calledPartyNumber != null) {
             ((CalledPartyNumberCapImpl) this.calledPartyNumber).encodeAll(asnOutputStream, Tag.CLASS_CONTEXT_SPECIFIC, _ID_calledPartyNumber);
         }
@@ -90,11 +86,12 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
         StringBuilder sb = new StringBuilder();
         sb.append(_PrimitiveName);
         sb.append(" [");
+
         if (this.calledPartyNumber != null) {
-            sb.append("calledPartyNumber= [");
-            sb.append(calledPartyNumber);
-            sb.append("]");
+            sb.append("calledPartyNumber=");
+            sb.append(calledPartyNumber.toString());
         }
+
         sb.append("]");
 
         return sb.toString();

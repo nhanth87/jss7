@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("messageIDText")
- extends SequenceBase implements MessageIDText {
+public class MessageIDTextImpl extends SequenceBase implements MessageIDText {
 
     public static final int _ID_messageContent = 0;
     public static final int _ID_attributes = 1;

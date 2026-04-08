@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -25,7 +24,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("furnishChargingInformationRequest")
- extends CircuitSwitchedCallMessageImpl implements
+public class FurnishChargingInformationRequestImpl extends CircuitSwitchedCallMessageImpl implements
         FurnishChargingInformationRequest {
 
     public static final int _ID_fCIBCCCAMELsequence1 = 0;

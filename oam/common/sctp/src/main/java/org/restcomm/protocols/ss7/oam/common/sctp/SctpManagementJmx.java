@@ -258,7 +258,7 @@ public class SctpManagementJmx implements SctpManagementJmxMBean, ManagementEven
 
     @Override
     public List<Server> getServers() {
-        return this.lstServers.unmodifiable();
+        return java.util.Collections.unmodifiableList(this.lstServers);
     }
 
     @Override

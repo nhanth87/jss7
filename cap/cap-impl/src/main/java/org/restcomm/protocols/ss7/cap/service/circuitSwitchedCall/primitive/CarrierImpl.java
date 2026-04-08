@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import jakarta.xml.bind.DatatypeConverter;
@@ -15,7 +14,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("carrier")
- extends OctetStringBase implements Carrier {
+public class CarrierImpl extends OctetStringBase implements Carrier {
 
     private static final String DATA = "data";
 

@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("midCallControlInfo")
- extends SequenceBase implements MidCallControlInfo {
+public class MidCallControlInfoImpl extends SequenceBase implements MidCallControlInfo {
 
     private static final String MINIMUM_NUMBER_OF_DIGITS = "minimumNumberOfDigits";
     private static final String MAXIMUM_NUMBER_OF_DIGITS = "maximumNumberOfDigits";

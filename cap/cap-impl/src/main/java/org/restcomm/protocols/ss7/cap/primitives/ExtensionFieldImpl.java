@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.primitives;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("extensionField")
- implements ExtensionField, CAPAsnPrimitive {
+public class ExtensionFieldImpl implements ExtensionField, CAPAsnPrimitive {
 
     public static final int _ID_value = 1;
 

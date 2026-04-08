@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.gap;
 
 import java.io.IOException;
@@ -21,7 +20,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
 @XStreamAlias("gapOnService")
- extends SequenceBase implements GapOnService {
+public class GapOnServiceImpl extends SequenceBase implements GapOnService {
 
     public static final int _ID_serviceKey = 0;
 

@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.primitives;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("sendingSideID")
- implements SendingSideID, CAPAsnPrimitive {
+public class SendingSideIDImpl implements SendingSideID, CAPAsnPrimitive {
 
     private static final String SENDING_SIDE_ID = "sendingSideID";
 

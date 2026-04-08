@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 
@@ -13,7 +12,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("variablePartTime")
- extends OctetStringBase implements VariablePartTime {
+public class VariablePartTimeImpl extends OctetStringBase implements VariablePartTime {
 
     private static final String HOUR = "hour";
     private static final String MINUTE = "minute";

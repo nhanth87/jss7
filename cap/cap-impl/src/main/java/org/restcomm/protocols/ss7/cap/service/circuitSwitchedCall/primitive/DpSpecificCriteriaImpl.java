@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("dpSpecificCriteria")
- implements DpSpecificCriteria, CAPAsnPrimitive {
+public class DpSpecificCriteriaImpl implements DpSpecificCriteria, CAPAsnPrimitive {
 
     public static final int _ID_applicationTimer = 1;
     public static final int _ID_midCallControlInfo = 2;

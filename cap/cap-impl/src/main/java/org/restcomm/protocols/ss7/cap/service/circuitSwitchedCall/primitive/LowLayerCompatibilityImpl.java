@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import jakarta.xml.bind.DatatypeConverter;
@@ -15,7 +14,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("lowLayerCompatibility")
- extends OctetStringBase implements LowLayerCompatibility {
+public class LowLayerCompatibilityImpl extends OctetStringBase implements LowLayerCompatibility {
 
     private static final String DATA = "data";
 

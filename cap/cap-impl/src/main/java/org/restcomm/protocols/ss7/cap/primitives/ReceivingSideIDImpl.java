@@ -22,7 +22,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("receivingSideID")
- implements ReceivingSideID, CAPAsnPrimitive {
+public class ReceivingSideIDImpl implements ReceivingSideID, CAPAsnPrimitive {
 
     private static final String RECEIVING_SIDE_ID = "receivingSideID";
 

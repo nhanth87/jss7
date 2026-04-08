@@ -219,15 +219,15 @@ public class EUtranCgiImpl extends OctetStringBase implements EUtranCgi {
         sb.append(this._PrimitiveName);
         sb.append(" [");
         if (correctData) {
-            sb.append(MCC+"=");
+            sb.append("MCC=");
             sb.append(mcc);
-            sb.append(", "+MNC+"=");
+            sb.append(", MNC=");
             sb.append(mnc);
-            sb.append(", "+ECI+"=");
+            sb.append(", ECI=");
             sb.append(eci);
-            sb.append(", "+ENB+"=");
+            sb.append(", ENB=");
             sb.append(enb);
-            sb.append(", "+CI+"=");
+            sb.append(", CI=");
             sb.append(ci);
         } else {
             sb.append("Data=");

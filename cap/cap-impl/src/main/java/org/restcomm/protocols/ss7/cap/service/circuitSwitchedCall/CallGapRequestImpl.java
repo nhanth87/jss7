@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -31,7 +30,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
 @XStreamAlias("callGapRequest")
- extends CircuitSwitchedCallMessageImpl implements CallGapRequest {
+public class CallGapRequestImpl extends CircuitSwitchedCallMessageImpl implements CallGapRequest {
 
     public static final int _ID_gapCriteria = 0;
     public static final int _ID_gapIndicators = 1;

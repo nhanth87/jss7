@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -29,7 +28,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("connectToResourceRequest")
- extends CircuitSwitchedCallMessageImpl implements ConnectToResourceRequest {
+public class ConnectToResourceRequestImpl extends CircuitSwitchedCallMessageImpl implements ConnectToResourceRequest {
 
     public static final int _ID_resourceAddress_ipRoutingAddress = 0;
     public static final int _ID_resourceAddress_none = 3;

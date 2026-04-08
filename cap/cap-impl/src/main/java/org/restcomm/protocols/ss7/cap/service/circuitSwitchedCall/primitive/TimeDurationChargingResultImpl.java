@@ -3,7 +3,6 @@ package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 
-
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -31,14 +30,14 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("timeDurationChargingResult")
- extends SequenceBase implements TimeDurationChargingResult {
+public class TimeDurationChargingResultImpl extends SequenceBase implements TimeDurationChargingResult {
 
     private static final String PARTY_TO_CHARGE = "partyToCharge";
     private static final String TIME_INFORMATION = "timeInformation";
     private static final String LEG_ACTIVE = "legActive";
     private static final String CALL_LEG_RELEASED_AT_TCP_EXPIRY = "callLegReleasedAtTcpExpiry";
     private static final String EXTENSIONS = "extensions";
-    private static final String A_CH_CHARGING_ADDRESS = "aChChargingAddress";
+    private static final String ACH_CHARGING_ADDRESS = "aChChargingAddress";
 
     public static final int _ID_partyToCharge = 0;
     public static final int _ID_timeInformation = 1;
@@ -58,8 +57,9 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
         super("TimeDurationChargingResult");
     }
 
-    public TimeDurationChargingResultImpl(ReceivingSideID partyToCharge, TimeInformation timeInformation, boolean legActive,
-            boolean callLegReleasedAtTcpExpiry, CAPExtensions extensions, AChChargingAddress aChChargingAddress) {
+    public TimeDurationChargingResultImpl(ReceivingSideID partyToCharge, TimeInformation timeInformation,
+            boolean legActive, boolean callLegReleasedAtTcpExpiry, CAPExtensions extensions,
+            AChChargingAddress aChChargingAddress) {
         super("TimeDurationChargingResult");
         this.partyToCharge = partyToCharge;
         this.timeInformation = timeInformation;
@@ -99,16 +99,15 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
         return aChChargingAddress;
     }
 
-    protected void _decode(AsnInputStream asnInputStream, int length) throws CAPParsingComponentException, MAPParsingComponentException,
-            IOException, AsnException {
+    protected void _decode(AsnInputStream asnInputStream, int length) throws CAPParsingComponentException,
+            MAPParsingComponentException, IOException, AsnException {
 
         this.partyToCharge = null;
         this.timeInformation = null;
         this.legActive = true;
         this.callLegReleasedAtTcpExpiry = false;
         this.extensions = null;
-        this.aChChargingAddress = null; // TODO: DEFAULT
-                                        // legID:receivingSideID:leg1
+        this.aChChargingAddress = null;
 
         AsnInputStream ais = asnInputStream.readSequenceStreamData(length);
         while (true) {
@@ -120,16 +119,12 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
             if (ais.getTagClass() == Tag.CLASS_CONTEXT_SPECIFIC) {
                 switch (tag) {
                     case _ID_partyToCharge:
-                        AsnInputStream ais2 = ais.readSequenceStream();
-                        ais2.readTag();
                         this.partyToCharge = new ReceivingSideIDImpl();
-                        ((ReceivingSideIDImpl) this.partyToCharge).decodeAll(ais2);
+                        ((ReceivingSideIDImpl) this.partyToCharge).decodeAll(ais);
                         break;
                     case _ID_timeInformation:
-                        ais2 = ais.readSequenceStream();
-                        ais2.readTag();
                         this.timeInformation = new TimeInformationImpl();
-                        ((TimeInformationImpl) this.timeInformation).decodeAll(ais2);
+                        ((TimeInformationImpl) this.timeInformation).decodeAll(ais);
                         break;
                     case _ID_legActive:
                         this.legActive = ais.readBoolean();
@@ -143,10 +138,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
                         ((CAPExtensionsImpl) this.extensions).decodeAll(ais);
                         break;
                     case _ID_aChChargingAddress:
-                        ais2 = ais.readSequenceStream();
-                        ais2.readTag();
                         this.aChChargingAddress = new AChChargingAddressImpl();
-                        ((AChChargingAddressImpl) this.aChChargingAddress).decodeAll(ais2);
+                        ((AChChargingAddressImpl) this.aChChargingAddress).decodeAll(ais);
                         break;
 
                     default:
@@ -158,45 +151,46 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
             }
         }
 
-        if (this.partyToCharge == null || this.timeInformation == null)
+        if (this.partyToCharge == null)
             throw new CAPParsingComponentException("Error while decoding " + _PrimitiveName
-                    + ": partyToCharge and timeInformation are mandatory but not found",
+                    + ": partyToCharge is mandatory but not found",
+                    CAPParsingComponentExceptionReason.MistypedParameter);
+
+        if (this.timeInformation == null)
+            throw new CAPParsingComponentException("Error while decoding " + _PrimitiveName
+                    + ": timeInformation is mandatory but not found",
                     CAPParsingComponentExceptionReason.MistypedParameter);
     }
 
     @Override
     public void encodeData(AsnOutputStream asnOutputStream) throws CAPException {
 
-        if (this.partyToCharge == null || this.timeInformation == null)
-            throw new CAPException("Error while encoding " + _PrimitiveName
-                    + ": partyToCharge and timeInformation must not be null");
+        if (this.partyToCharge == null)
+            throw new CAPException("Error while encoding " + _PrimitiveName + ": partyToCharge must not be null");
+        if (this.timeInformation == null)
+            throw new CAPException("Error while encoding " + _PrimitiveName + ": timeInformation must not be null");
 
         try {
-            asnOutputStream.writeTag(Tag.CLASS_CONTEXT_SPECIFIC, false, _ID_partyToCharge);
-            int pos = asnOutputStream.StartContentDefiniteLength();
-            ((ReceivingSideIDImpl) this.partyToCharge).encodeAll(asnOutputStream);
-            asnOutputStream.FinalizeContent(pos);
+            ((ReceivingSideIDImpl) this.partyToCharge).encodeAll(asnOutputStream, Tag.CLASS_CONTEXT_SPECIFIC,
+                    _ID_partyToCharge);
 
-            asnOutputStream.writeTag(Tag.CLASS_CONTEXT_SPECIFIC, false, _ID_timeInformation);
-            pos = asnOutputStream.StartContentDefiniteLength();
-            ((TimeInformationImpl) this.timeInformation).encodeAll(asnOutputStream);
-            asnOutputStream.FinalizeContent(pos);
+            ((TimeInformationImpl) this.timeInformation).encodeAll(asnOutputStream, Tag.CLASS_CONTEXT_SPECIFIC,
+                    _ID_timeInformation);
 
-            if (this.legActive == false)
-                asnOutputStream.writeBoolean(Tag.CLASS_CONTEXT_SPECIFIC, _ID_legActive, this.legActive);
+            if (!this.legActive)
+                asnOutputStream.writeBoolean(Tag.CLASS_CONTEXT_SPECIFIC, _ID_legActive, false);
 
             if (this.callLegReleasedAtTcpExpiry)
                 asnOutputStream.writeNull(Tag.CLASS_CONTEXT_SPECIFIC, _ID_callLegReleasedAtTcpExpiry);
 
             if (this.extensions != null)
-                ((CAPExtensionsImpl) this.extensions).encodeAll(asnOutputStream, Tag.CLASS_CONTEXT_SPECIFIC, _ID_extensions);
+                ((CAPExtensionsImpl) this.extensions).encodeAll(asnOutputStream, Tag.CLASS_CONTEXT_SPECIFIC,
+                        _ID_extensions);
 
-            if (this.aChChargingAddress != null) {
-                asnOutputStream.writeTag(Tag.CLASS_CONTEXT_SPECIFIC, false, _ID_aChChargingAddress);
-                pos = asnOutputStream.StartContentDefiniteLength();
-                ((AChChargingAddressImpl) this.aChChargingAddress).encodeAll(asnOutputStream);
-                asnOutputStream.FinalizeContent(pos);
-            }
+            if (this.aChChargingAddress != null)
+                ((AChChargingAddressImpl) this.aChChargingAddress).encodeAll(asnOutputStream, Tag.CLASS_CONTEXT_SPECIFIC,
+                        _ID_aChChargingAddress);
+
         } catch (IOException e) {
             throw new CAPException("IOException when encoding " + _PrimitiveName + ": " + e.getMessage(), e);
         } catch (AsnException e) {
@@ -219,9 +213,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
             sb.append(", timeInformation=");
             sb.append(timeInformation.toString());
         }
-        if (this.legActive) {
-            sb.append(", legActive");
-        }
+        sb.append(", legActive=");
+        sb.append(legActive);
         if (this.callLegReleasedAtTcpExpiry) {
             sb.append(", callLegReleasedAtTcpExpiry");
         }

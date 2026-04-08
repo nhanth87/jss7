@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("legOrCallSegment")
- implements LegOrCallSegment, CAPAsnPrimitive {
+public class LegOrCallSegmentImpl implements LegOrCallSegment, CAPAsnPrimitive {
 
     private static final String CALL_SEGMENT_ID = "callSegmentID";
     private static final String LEG_ID = "legID";

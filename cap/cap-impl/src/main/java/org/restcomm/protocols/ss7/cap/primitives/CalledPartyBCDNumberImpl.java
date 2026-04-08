@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.primitives;
 
 import java.io.ByteArrayInputStream;
@@ -30,7 +29,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("calledPartyBCDNumber")
- extends OctetStringBase implements CalledPartyBCDNumber {
+public class CalledPartyBCDNumberImpl extends OctetStringBase implements CalledPartyBCDNumber {
 
     private static final String NAI = "nai";
     private static final String NPI = "npi";

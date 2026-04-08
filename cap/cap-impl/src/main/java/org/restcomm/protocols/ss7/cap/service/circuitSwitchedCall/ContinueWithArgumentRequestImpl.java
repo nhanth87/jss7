@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -49,7 +48,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("continueWithArgumentRequest")
- extends CircuitSwitchedCallMessageImpl implements
+public class ContinueWithArgumentRequestImpl extends CircuitSwitchedCallMessageImpl implements
         ContinueWithArgumentRequest {
 
     private static final int _ID_alertingPattern = 1;

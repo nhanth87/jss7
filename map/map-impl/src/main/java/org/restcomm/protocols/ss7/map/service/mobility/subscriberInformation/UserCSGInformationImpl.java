@@ -119,10 +119,10 @@ public class UserCSGInformationImpl implements UserCSGInformation, MAPAsnPrimiti
             int length = asnInputStream.readLength();
             this._decode(asnInputStream, length);
         } catch (IOException e) {
-            throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
+            throw new MAPParsingComponentException("IOException when decoding " + "UserCSGInformation" + ": " + e.getMessage(), e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
         } catch (AsnException e) {
-            throw new MAPParsingComponentException("AsnException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
+            throw new MAPParsingComponentException("AsnException when decoding " + "UserCSGInformation" + ": " + e.getMessage(), e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
         }
 
@@ -138,10 +138,10 @@ public class UserCSGInformationImpl implements UserCSGInformation, MAPAsnPrimiti
         try {
             this._decode(asnInputStream, length);
         } catch (IOException e) {
-            throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
+            throw new MAPParsingComponentException("IOException when decoding " + "UserCSGInformation" + ": " + e.getMessage(), e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
         } catch (AsnException e) {
-            throw new MAPParsingComponentException("AsnException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
+            throw new MAPParsingComponentException("AsnException when decoding " + "UserCSGInformation" + ": " + e.getMessage(), e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
         }
     }
@@ -164,7 +164,7 @@ public class UserCSGInformationImpl implements UserCSGInformation, MAPAsnPrimiti
                 switch (tag) {
                     case _ID_csgId:
                         if (!ais.isTagPrimitive())
-                            throw new MAPParsingComponentException("Error while decoding " + _PrimitiveName
+                            throw new MAPParsingComponentException("Error while decoding " + "UserCSGInformation"
                                     + " csgId: Parameter is not primitive",
                                     MAPParsingComponentExceptionReason.MistypedParameter);
                         this.csgId = new CSGIdImpl();
@@ -172,7 +172,7 @@ public class UserCSGInformationImpl implements UserCSGInformation, MAPAsnPrimiti
                         break;
                     case _ID_extensionContainer:
                         if (ais.isTagPrimitive())
-                            throw new MAPParsingComponentException("Error while decoding " + _PrimitiveName
+                            throw new MAPParsingComponentException("Error while decoding " + "UserCSGInformation"
                                     + " extensionContainer: Parameter is primitive",
                                     MAPParsingComponentExceptionReason.MistypedParameter);
                         this.extensionContainer = new MAPExtensionContainerImpl();
@@ -180,23 +180,23 @@ public class UserCSGInformationImpl implements UserCSGInformation, MAPAsnPrimiti
                         break;
                     case _ID_accessMode:
                         if (!ais.isTagPrimitive())
-                            throw new MAPParsingComponentException("Error while decoding " + _PrimitiveName
+                            throw new MAPParsingComponentException("Error while decoding " + "UserCSGInformation"
                                     + " accessMode: Parameter is not primitive",
                                     MAPParsingComponentExceptionReason.MistypedParameter);
                         byte[] buf = ais.readOctetString();
                         if (buf.length != 1)
-                            throw new MAPParsingComponentException("Error while decoding " + _PrimitiveName
+                            throw new MAPParsingComponentException("Error while decoding " + "UserCSGInformation"
                                     + " accessMode: Parameter length must be 1, found: " + buf.length,
                                     MAPParsingComponentExceptionReason.MistypedParameter);
                         this.accessMode = (int) buf[0];
                         break;
                     case _ID_cmi:
                         if (!ais.isTagPrimitive())
-                            throw new MAPParsingComponentException("Error while decoding " + _PrimitiveName
+                            throw new MAPParsingComponentException("Error while decoding " + "UserCSGInformation"
                                     + " cmi: Parameter is not primitive", MAPParsingComponentExceptionReason.MistypedParameter);
                         buf = ais.readOctetString();
                         if (buf.length != 1)
-                            throw new MAPParsingComponentException("Error while decoding " + _PrimitiveName
+                            throw new MAPParsingComponentException("Error while decoding " + "UserCSGInformation"
                                     + " cmi: Parameter length must be 1, found: " + buf.length,
                                     MAPParsingComponentExceptionReason.MistypedParameter);
                         this.cmi = (int) buf[0];
@@ -212,7 +212,7 @@ public class UserCSGInformationImpl implements UserCSGInformation, MAPAsnPrimiti
         }
 
         if (this.csgId == null) {
-            throw new MAPParsingComponentException("Error when decoding " + _PrimitiveName
+            throw new MAPParsingComponentException("Error when decoding " + "UserCSGInformation"
                     + ": csgId is mandatory but not found", MAPParsingComponentExceptionReason.MistypedParameter);
         }
     }
@@ -239,7 +239,7 @@ public class UserCSGInformationImpl implements UserCSGInformation, MAPAsnPrimiti
             this.encodeData(asnOutputStream);
             asnOutputStream.FinalizeContent(pos);
         } catch (AsnException e) {
-            throw new MAPException("AsnException when encoding " + _PrimitiveName + ": " + e.getMessage(), e);
+            throw new MAPException("AsnException when encoding " + "UserCSGInformation" + ": " + e.getMessage(), e);
         }
     }
 
@@ -271,9 +271,9 @@ public class UserCSGInformationImpl implements UserCSGInformation, MAPAsnPrimiti
                 asnOutputStream.writeOctetString(Tag.CLASS_CONTEXT_SPECIFIC, _ID_cmi, buf);
             }
         } catch (IOException e) {
-            throw new MAPException("IOException when encoding " + _PrimitiveName + ": " + e.getMessage(), e);
+            throw new MAPException("IOException when encoding " + "UserCSGInformation" + ": " + e.getMessage(), e);
         } catch (AsnException e) {
-            throw new MAPException("AsnException when encoding " + _PrimitiveName + ": " + e.getMessage(), e);
+            throw new MAPException("AsnException when encoding " + "UserCSGInformation" + ": " + e.getMessage(), e);
         }
     }
 
@@ -303,39 +303,5 @@ public class UserCSGInformationImpl implements UserCSGInformation, MAPAsnPrimiti
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<UserCSGInformationImpl> USER_CSG_INFORMATION_XML = new XMLFormat<UserCSGInformationImpl>(
-            UserCSGInformationImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, UserCSGInformationImpl userCSGInformation)
-                throws XMLStreamException {
-            userCSGInformation.csgId = xml.get(CSG_ID, CSGIdImpl.class);
-            userCSGInformation.extensionContainer = xml.get(EXTENSION_CONTAINER, MAPExtensionContainerImpl.class);
-            userCSGInformation.accessMode = xml.get(ACCESS_MODE, Integer.class);
-            userCSGInformation.cmi = xml.get(CMI, Integer.class);
-        }
-
-        @Override
-        public void write(UserCSGInformationImpl userCSGInformation, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (userCSGInformation.csgId != null) {
-                xml.add((CSGIdImpl) userCSGInformation.csgId, CSG_ID, CSGIdImpl.class);
-            }
-            if (userCSGInformation.extensionContainer != null) {
-                xml.add((MAPExtensionContainerImpl) userCSGInformation.extensionContainer, EXTENSION_CONTAINER,
-                        MAPExtensionContainerImpl.class);
-            }
-            if (userCSGInformation.accessMode != null) {
-                xml.add((Integer) userCSGInformation.accessMode, ACCESS_MODE, Integer.class);
-            }
-            if (userCSGInformation.cmi != null) {
-                xml.add((Integer) userCSGInformation.cmi, CMI, Integer.class);
-            }
-        }
-    };
 
 }

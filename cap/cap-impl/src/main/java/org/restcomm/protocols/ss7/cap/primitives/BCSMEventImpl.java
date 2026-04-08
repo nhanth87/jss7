@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.primitives;
 
 import java.io.IOException;
@@ -30,7 +29,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("bCSMEvent")
- extends SequenceBase implements BCSMEvent {
+public class BCSMEventImpl extends SequenceBase implements BCSMEvent {
 
     public static final int _ID_eventTypeBCSM = 0;
     public static final int _ID_monitorMode = 1;

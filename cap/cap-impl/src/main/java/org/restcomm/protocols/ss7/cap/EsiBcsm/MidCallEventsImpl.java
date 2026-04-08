@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
@@ -25,7 +24,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("midCallEvents")
-public class MidCallEventsImpl implements MidCallEvents, CAPAsnPrimitive {
+public class MidCallEventsImpl implements MidCallEvents, CAPAsnPrimitive {
     private static final String DTMF_DIGITS_COMPLETED = "dtmfDigitsCompleted";
     private static final String DTMF_DIGITS_TIME_OUT = "dtmfDigitsTimeOut";
 

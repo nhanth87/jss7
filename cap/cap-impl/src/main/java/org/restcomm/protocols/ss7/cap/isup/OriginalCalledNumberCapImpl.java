@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.isup;
 
 
@@ -18,7 +17,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("originalCalledNumberCap")
- extends OctetStringBase implements OriginalCalledNumberCap {
+public class OriginalCalledNumberCapImpl extends OctetStringBase implements OriginalCalledNumberCap {
 
     private static final String ISUP_ORIGINAL_CALLED_NUMBER_XML = "isupOriginalCalledNumber";
 

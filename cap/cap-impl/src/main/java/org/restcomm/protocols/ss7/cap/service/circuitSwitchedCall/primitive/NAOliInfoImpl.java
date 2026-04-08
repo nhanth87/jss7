@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 
@@ -13,7 +12,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("nAOliInfo")
- extends OctetStringLength1Base implements NAOliInfo {
+public class NAOliInfoImpl extends OctetStringLength1Base implements NAOliInfo {
 
     private static final String VALUE = "value";
 

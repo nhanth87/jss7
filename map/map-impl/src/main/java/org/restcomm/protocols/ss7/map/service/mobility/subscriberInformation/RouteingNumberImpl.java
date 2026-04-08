@@ -23,20 +23,4 @@ public class RouteingNumberImpl extends TbcdString implements RouteingNumber {
     public String getRouteingNumber() {
         return data;
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<RouteingNumberImpl> ROUTEING_NUMBER_XML = new XMLFormat<RouteingNumberImpl>(RouteingNumberImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, RouteingNumberImpl routeingNumber) throws XMLStreamException {
-            routeingNumber.data = xml.getAttribute(NUMBER, "");
-        }
-
-        @Override
-        public void write(RouteingNumberImpl routeingNumber, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(NUMBER, routeingNumber.data);
-        }
-    };
 }

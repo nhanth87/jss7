@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.isup;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("callingPartyNumberCap")
- implements CallingPartyNumberCap, CAPAsnPrimitive {
+public class CallingPartyNumberCapImpl implements CallingPartyNumberCap, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "CallingPartyNumberCap";
 

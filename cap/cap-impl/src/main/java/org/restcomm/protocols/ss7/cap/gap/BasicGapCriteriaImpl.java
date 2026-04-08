@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.gap;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
 @XStreamAlias("basicGapCriteria")
-public class BasicGapCriteriaImpl implements BasicGapCriteria, CAPAsnPrimitive {
+public class BasicGapCriteriaImpl implements BasicGapCriteria, CAPAsnPrimitive {
 
     public static final int _ID_calledAddressValue = 0;
     public static final int _ID_gapOnService = 2;

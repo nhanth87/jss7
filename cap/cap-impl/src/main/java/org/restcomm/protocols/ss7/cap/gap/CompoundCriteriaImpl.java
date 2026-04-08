@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.gap;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
 @XStreamAlias("compoundCriteria")
-public class CompoundCriteriaImpl extends SequenceBase implements CompoundCriteria {
+public class CompoundCriteriaImpl extends SequenceBase implements CompoundCriteria {
 
     private static final int _ID_basicGapCriteria = 0;
     private static final int _ID_scfId = 1;

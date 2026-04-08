@@ -10,13 +10,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
-import javolution.text.TextBuilder;
-import javolution.xml.XMLBinding;
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-import javolution.xml.stream.XMLStreamException;
-
 import org.jctools.maps.NonBlockingHashMap;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.oam.common.jmx.MBeanHost;
@@ -44,17 +41,12 @@ public class CounterProviderManagement implements CounterProviderManagementMBean
     protected static final String COUNTER_PROVIDER_PERSIST_DIR_KEY = "counterprovider.persist.dir";
     protected static final String USER_DIR_KEY = "user.dir";
     protected static final String PERSIST_FILE_NAME = "CounterProvider.xml";
-    private static final String CLASS_ATTRIBUTE = "type";
-    private static final String TAB_INDENT = "\t";
     private static final String COUNTER_CAMPAIGNS = "counterCampaigns";
-    private static final String COUNTER_CAMPAIGN = "counterCampaign";
-
-    private static final XMLBinding binding = new XMLBinding();
 
     private final MBeanHost beanHost;
 
     private String name = "CounterHost";
-    protected final TextBuilder persistFile = TextBuilder.newInstance();
+    protected final StringBuilder persistFile = new StringBuilder();
     protected String persistDir = null;
 
     private boolean isStarted;
@@ -75,10 +67,6 @@ public class CounterProviderManagement implements CounterProviderManagementMBean
 
     public CounterProviderManagement(MBeanHost beanHost) {
         this.beanHost = beanHost;
-
-        binding.setClassAttribute(CLASS_ATTRIBUTE);
-        binding.setAlias(CounterCampaignImpl.class, COUNTER_CAMPAIGN);
-        binding.setAlias(String.class, "String");
 
         this.logger = Logger.getLogger(CounterProviderManagement.class.getCanonicalName() + "-" + this.name);
 
@@ -106,7 +94,7 @@ public class CounterProviderManagement implements CounterProviderManagementMBean
     public void start() {
         logger.info("Starting ...");
 
-        this.persistFile.clear();
+        this.persistFile.setLength(0);
 
         if (persistDir != null) {
             this.persistFile.append(persistDir).append(File.separator).append(this.name).append("_").append(PERSIST_FILE_NAME);
@@ -445,15 +433,14 @@ public class CounterProviderManagement implements CounterProviderManagementMBean
      * Persist
      */
     public void store() {
-
         try {
-            XMLObjectWriter writer = XMLObjectWriter.newInstance(new FileOutputStream(persistFile.toString()));
-            writer.setBinding(binding);
-            writer.setIndentation(TAB_INDENT);
-
-            writer.write(this.lstCounterCampaign, COUNTER_CAMPAIGNS, CounterCampaignMap.class);
-
-            writer.close();
+            XStream xstream = new XStream(new DomDriver());
+            xstream.alias(COUNTER_CAMPAIGNS, CounterCampaignMap.class);
+            xstream.alias("counterCampaign", CounterCampaignImpl.class);
+            String xml = xstream.toXML(this.lstCounterCampaign);
+            FileOutputStream fos = new FileOutputStream(persistFile.toString());
+            fos.write(xml.getBytes());
+            fos.close();
         } catch (Exception e) {
             logger.error("Error while persisting the CounterProvider state in file", e);
         }
@@ -468,15 +455,13 @@ public class CounterProviderManagement implements CounterProviderManagementMBean
         try {
             File f = new File(persistFile.toString());
             if (f.exists()) {
-                XMLObjectReader reader = XMLObjectReader.newInstance(new FileInputStream(persistFile.toString()));
-
-                reader.setBinding(binding);
-                this.lstCounterCampaign = reader.read(COUNTER_CAMPAIGNS, CounterCampaignMap.class);
-
-                reader.close();
+                XStream xstream = new XStream(new DomDriver());
+                xstream.alias(COUNTER_CAMPAIGNS, CounterCampaignMap.class);
+                xstream.alias("counterCampaign", CounterCampaignImpl.class);
+                FileInputStream fis = new FileInputStream(persistFile.toString());
+                this.lstCounterCampaign = (CounterCampaignMap<String, CounterCampaignImpl>) xstream.fromXML(fis);
+                fis.close();
             }
-        } catch (XMLStreamException ex) {
-            logger.error(String.format("Failed to load the CounterProvider configuration file. \n%s", ex.getMessage()));
         } catch (FileNotFoundException e) {
             logger.warn(String.format("Failed to load the CounterProvider configuration file. \n%s", e.getMessage()));
         } catch (IOException e) {

@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -25,7 +24,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("audibleIndicator")
- implements AudibleIndicator, CAPAsnPrimitive {
+public class AudibleIndicatorImpl implements AudibleIndicator, CAPAsnPrimitive {
 
     public static final int _ID_burstList = 1;
 

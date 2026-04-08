@@ -167,13 +167,13 @@ public class RAIdentityImpl extends OctetStringBase implements RAIdentity {
         StringBuilder sb = new StringBuilder();
         sb.append("RAI [");
         if (correctData) {
-            sb.append(MCC+"=");
+            sb.append("MCC=");
             sb.append(mcc);
-            sb.append(", "+MNC+"=");
+            sb.append(", MNC=");
             sb.append(mnc);
-            sb.append(", "+LAC+"=");
+            sb.append(", LAC=");
             sb.append(lac);
-            sb.append(", "+RAC+"");
+            sb.append(", RAC=");
             sb.append(rac);
         } else {
             sb.append("Data=");

@@ -24,7 +24,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("specializedResourceReportRequest")
- extends CircuitSwitchedCallMessageImpl implements SpecializedResourceReportRequest {
+public class SpecializedResourceReportRequestImpl extends CircuitSwitchedCallMessageImpl implements SpecializedResourceReportRequest {
 
     public static final int _ID_allAnnouncementsComplete = 50;
     public static final int _ID_firstAnnouncementStarted = 51;

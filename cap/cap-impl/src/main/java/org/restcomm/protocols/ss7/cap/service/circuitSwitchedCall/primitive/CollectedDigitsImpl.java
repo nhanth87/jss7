@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("collectedDigits")
- extends SequenceBase implements CollectedDigits {
+public class CollectedDigitsImpl extends SequenceBase implements CollectedDigits {
 
     public static final int _ID_minimumNumberOfDigits = 0;
     public static final int _ID_maximumNumberOfDigits = 1;

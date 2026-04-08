@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.primitives;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("cAPExtensions")
- implements CAPExtensions, CAPAsnPrimitive {
+public class CAPExtensionsImpl implements CAPExtensions, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "CAPExtensions";
 

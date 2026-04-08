@@ -31,7 +31,7 @@ public class AspFactoryJmx implements AspFactoryJmxMBean {
      */
     @Override
     public List<Asp> getAspList() {
-        return this.appServerProcs.unmodifiable();
+        return java.util.Collections.unmodifiableList(this.appServerProcs);
     }
 
     /*

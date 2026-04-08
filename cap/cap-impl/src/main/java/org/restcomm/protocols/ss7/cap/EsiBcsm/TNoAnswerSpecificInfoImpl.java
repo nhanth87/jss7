@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("tNoAnswerSpecificInfo")
- extends SequenceBase implements TNoAnswerSpecificInfo {
+public class TNoAnswerSpecificInfoImpl extends SequenceBase implements TNoAnswerSpecificInfo {
 
     private static final String CALL_FORWARDED = "callForwarded";
     private static final String FORWARDING_DESTINATION_NUMBER = "forwardingDestinationNumber";

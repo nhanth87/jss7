@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("continueWithArgumentArgExtension")
- extends SequenceBase implements ContinueWithArgumentArgExtension {
+public class ContinueWithArgumentArgExtensionImpl extends SequenceBase implements ContinueWithArgumentArgExtension {
 
     private static final String SUPPRESS_D_CSI = "suppressDCSI";
     private static final String SUPPRESS_N_CSI = "suppressNCSI";

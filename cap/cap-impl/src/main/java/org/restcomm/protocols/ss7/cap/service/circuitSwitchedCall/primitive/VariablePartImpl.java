@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("variablePart")
- implements VariablePart, CAPAsnPrimitive {
+public class VariablePartImpl implements VariablePart, CAPAsnPrimitive {
 
     public static final int _ID_integer = 0;
     public static final int _ID_number = 1;

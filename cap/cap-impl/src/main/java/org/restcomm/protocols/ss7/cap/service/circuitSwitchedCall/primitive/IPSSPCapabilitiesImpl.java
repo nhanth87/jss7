@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -23,9 +22,9 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("iPSSPCapabilities")
- implements IPSSPCapabilities, CAPAsnPrimitive {
+public class IPSSPCapabilitiesImpl implements IPSSPCapabilities, CAPAsnPrimitive {
 
-    public static int _Mask_IPRoutingAddress = 0x01;
+    public static int _Mask_IPRoutingAddress = 0;
     public static int _Mask_VoiceBack = 0x02;
     public static int _Mask_VoiceInformation_SpeechRecognition = 0x04;
     public static int _Mask_VoiceInformation_VoiceRecognition = 0x08;

@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("routeSelectFailureSpecificInfo")
- extends SequenceBase implements RouteSelectFailureSpecificInfo {
+public class RouteSelectFailureSpecificInfoImpl extends SequenceBase implements RouteSelectFailureSpecificInfo {
 
     private static final String CAUSE_CAP = "causeCap";
 

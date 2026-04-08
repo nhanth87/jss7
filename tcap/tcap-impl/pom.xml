@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>tcap-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7.tcap</groupId>
-		<version>9.2.0</version>
+		<version>9.0.0-318</version>
 	</parent>
 
 	<artifactId>tcap-impl</artifactId>

@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.sms;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("furnishChargingInformationSMSRequest")
- extends SmsMessageImpl implements FurnishChargingInformationSMSRequest {
+public class FurnishChargingInformationSMSRequestImpl extends SmsMessageImpl implements FurnishChargingInformationSMSRequest {
 
     private static final String FCI_BCC_CAMEL_SEQUENCE1 = "fCIBCCCAMELsequence1";
 
