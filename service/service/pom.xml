@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>restcomm-service-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7</groupId>
-		<version>9.0.0-318</version>
+		<version>9.2.4</version>
 	</parent>
 
 	<artifactId>restcomm-ss7-service</artifactId>
