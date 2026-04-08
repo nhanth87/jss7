@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("applyChargingReportRequest")
- extends CircuitSwitchedCallMessageImpl implements ApplyChargingReportRequest {
+public class ApplyChargingReportRequestImpl extends CircuitSwitchedCallMessageImpl implements ApplyChargingReportRequest {
 
     private static final String TIME_DURATION_CHARGING_RESULT = "timeDurationChargingResult";
 

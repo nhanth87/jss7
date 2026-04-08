@@ -27,7 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("playAnnouncementRequest")
- extends CircuitSwitchedCallMessageImpl implements PlayAnnouncementRequest {
+public class PlayAnnouncementRequestImpl extends CircuitSwitchedCallMessageImpl implements PlayAnnouncementRequest {
 
     private static final String INFORMATION_TO_SEND = "informationToSend";
     private static final String DISCONNECT_FROM_IP_FORBIDDEN = "disconnectFromIPForbidden";

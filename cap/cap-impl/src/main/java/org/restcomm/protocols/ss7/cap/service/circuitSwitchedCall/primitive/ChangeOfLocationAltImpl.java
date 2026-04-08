@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("changeOfLocationAlt")
- extends SequenceBase implements ChangeOfLocationAlt {
+public class ChangeOfLocationAltImpl extends SequenceBase implements ChangeOfLocationAlt {
 
 //    private static final String O_SERVICE_CHANGE_SPECIFIC_INFO = "oServiceChangeSpecificInfo";
 //

@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -57,7 +56,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author tamas gyorgyey
  */
 @XStreamAlias("connectRequest")
- extends CircuitSwitchedCallMessageImpl implements ConnectRequest {
+public class ConnectRequestImpl extends CircuitSwitchedCallMessageImpl implements ConnectRequest {
 
     public static final int _ID_destinationRoutingAddress = 0;
     public static final int _ID_alertingPattern = 1;

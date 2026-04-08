@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("dpSpecificInfoAlt")
- extends SequenceBase implements DpSpecificInfoAlt {
+public class DpSpecificInfoAltImpl extends SequenceBase implements DpSpecificInfoAlt {
 
     private static final String O_SERVICE_CHANGE_SPECIFIC_INFO = "oServiceChangeSpecificInfo";
     private static final String COLLECTED_INFO_SPECIFIC_INFO = "collectedInfoSpecificInfo";

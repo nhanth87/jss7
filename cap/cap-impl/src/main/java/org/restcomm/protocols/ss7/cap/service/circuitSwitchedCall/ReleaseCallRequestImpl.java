@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("releaseCallRequest")
- extends CircuitSwitchedCallMessageImpl implements ReleaseCallRequest {
+public class ReleaseCallRequestImpl extends CircuitSwitchedCallMessageImpl implements ReleaseCallRequest {
 
     public static final String _PrimitiveName = "ReleaseCallRequestIndication";
 

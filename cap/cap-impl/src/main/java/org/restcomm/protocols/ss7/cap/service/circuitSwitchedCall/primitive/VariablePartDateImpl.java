@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 
@@ -13,7 +12,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("variablePartDate")
- extends OctetStringBase implements VariablePartDate {
+public class VariablePartDateImpl extends OctetStringBase implements VariablePartDate {
 
     private static final String YEAR = "year";
     private static final String MONTH = "month";

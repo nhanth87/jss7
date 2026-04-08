@@ -25,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author alerant appngin
  */
 @XStreamAlias("resetTimerRequest")
- extends CircuitSwitchedCallMessageImpl implements ResetTimerRequest {
+public class ResetTimerRequestImpl extends CircuitSwitchedCallMessageImpl implements ResetTimerRequest {
 
     public static final int _ID_timerID = 0;
     public static final int _ID_timerValue = 1;

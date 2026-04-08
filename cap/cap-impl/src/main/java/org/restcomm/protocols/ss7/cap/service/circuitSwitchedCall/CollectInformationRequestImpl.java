@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 
@@ -19,7 +18,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("collectInformationRequest")
- extends CircuitSwitchedCallMessageImpl implements CollectInformationRequest {
+public class CollectInformationRequestImpl extends CircuitSwitchedCallMessageImpl implements CollectInformationRequest {
 
     public static final String _PrimitiveName = "CollectInformationRequest";
 

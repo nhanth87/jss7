@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.sms.primitive;
 
 
@@ -15,7 +14,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("freeFormatDataSMS")
- extends OctetStringBase implements FreeFormatDataSMS {
+public class FreeFormatDataSMSImpl extends OctetStringBase implements FreeFormatDataSMS {
 
     private static final String DATA = "data";
 

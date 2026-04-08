@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
@@ -29,7 +28,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("metDPCriterion")
-public class MetDPCriterionImpl implements MetDPCriterion, CAPAsnPrimitive {
+public class MetDPCriterionImpl implements MetDPCriterion, CAPAsnPrimitive {
 
     private static final String ENTERING_CELL_GLOBAL_ID = "enteringCellGlobalId";
     private static final String LEAVING_CELL_GLOBAL_ID = "leavingCellGlobalId";

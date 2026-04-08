@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 
@@ -13,7 +12,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("variablePartPrice")
- extends OctetStringBase implements VariablePartPrice {
+public class VariablePartPriceImpl extends OctetStringBase implements VariablePartPrice {
 
     private static final String PRICE_INTEGER_PART = "priceIntegerPart";
     private static final String PRICE_HUNDREDTH_PART = "priceHundredthPart";

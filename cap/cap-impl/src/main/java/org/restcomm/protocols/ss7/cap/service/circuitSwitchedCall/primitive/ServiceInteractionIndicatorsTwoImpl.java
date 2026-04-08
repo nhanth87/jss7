@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -29,7 +28,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("serviceInteractionIndicatorsTwo")
- extends SequenceBase implements ServiceInteractionIndicatorsTwo {
+public class ServiceInteractionIndicatorsTwoImpl extends SequenceBase implements ServiceInteractionIndicatorsTwo {
 
     public static final int _ID_forwardServiceInteractionInd = 0;
     public static final int _ID_backwardServiceInteractionInd = 1;

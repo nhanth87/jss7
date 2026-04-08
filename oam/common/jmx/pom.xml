@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
 		<artifactId>restcomm-ss7-oam-common</artifactId>
-		<version>9.2.0</version>
+		<version>9.0.0-318</version>
 	</parent>
 
 	<artifactId>jmx</artifactId>
@@ -37,7 +37,13 @@
 			<version>${testng.version}</version>
 		</dependency>
 
-	</dependencies>
+	    <dependency>
+        <groupId>com.thoughtworks.xstream</groupId>
+        <artifactId>xstream</artifactId>
+        <version>${xstream.version}</version>
+    </dependency>
+
+    </dependencies>
 
 
 	<build>

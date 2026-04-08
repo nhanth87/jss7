@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap;
 
 import java.io.IOException;

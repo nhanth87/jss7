@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -29,7 +28,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("changeOfLocation")
- implements ChangeOfLocation, CAPAsnPrimitive {
+public class ChangeOfLocationImpl implements ChangeOfLocation, CAPAsnPrimitive {
 
     private static final String CELL_GLOBAL_ID = "cellGlobalId";
     private static final String SERVICE_AREA_ID = "serviceAreaId";

@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("oTermSeizedSpecificInfo")
- extends SequenceBase implements OTermSeizedSpecificInfo {
+public class OTermSeizedSpecificInfoImpl extends SequenceBase implements OTermSeizedSpecificInfo {
 
     public static final String LOCATION_INFORMATION = "locationInformation";
 

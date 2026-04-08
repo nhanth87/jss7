@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.gap;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
 @XStreamAlias("gapCriteria")
-public class GapCriteriaImpl implements GapCriteria, CAPAsnPrimitive {
+public class GapCriteriaImpl implements GapCriteria, CAPAsnPrimitive {
 
     private static final String BASIC_GAP_CRITERIA = "basicGapCriteria";
     private static final String COMPOUND_CRITERIA = "compoundCriteria";

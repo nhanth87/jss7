@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
@@ -25,7 +24,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("oCalledPartyBusySpecificInfo")
- extends SequenceBase implements OCalledPartyBusySpecificInfo {
+public class OCalledPartyBusySpecificInfoImpl extends SequenceBase implements OCalledPartyBusySpecificInfo {
 
     private static final String BUSY_CAUSE = "busyCause";
 

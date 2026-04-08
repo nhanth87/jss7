@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 
@@ -16,7 +15,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("circuitSwitchedCallMessage")
- extends MessageImpl implements CircuitSwitchedCallMessage, CAPAsnPrimitive {
+public abstract class CircuitSwitchedCallMessageImpl extends MessageImpl implements CircuitSwitchedCallMessage, CAPAsnPrimitive {
 
     public CAPDialogCircuitSwitchedCall getCAPDialog() {
         return (CAPDialogCircuitSwitchedCall) super.getCAPDialog();

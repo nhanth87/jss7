@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("oServiceChangeSpecificInfo")
- extends SequenceBase implements OServiceChangeSpecificInfo {
+public class OServiceChangeSpecificInfoImpl extends SequenceBase implements OServiceChangeSpecificInfo {
 
     public static final String EXT_BASIC_SERVICE_CODE = "extBasicServiceCode";
 

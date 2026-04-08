@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
@@ -29,7 +28,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("oChangeOfPositionSpecificInfo")
- extends SequenceBase implements OChangeOfPositionSpecificInfo {
+public class OChangeOfPositionSpecificInfoImpl extends SequenceBase implements OChangeOfPositionSpecificInfo {
 
     private static final String LOCATION_INFORMATION = "locationInformation";
     private static final String MET_DP_CRITERIA_LIST = "metDPCriteriaList";

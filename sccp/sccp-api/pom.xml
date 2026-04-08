@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>sccp-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7.sccp</groupId>
-		<version>9.2.0</version>
+		<version>9.0.0-318</version>
 	</parent>
 
 	<artifactId>sccp-api</artifactId>

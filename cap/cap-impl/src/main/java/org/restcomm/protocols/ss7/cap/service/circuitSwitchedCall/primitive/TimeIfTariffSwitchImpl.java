@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("timeIfTariffSwitch")
- extends SequenceBase implements TimeIfTariffSwitch {
+public class TimeIfTariffSwitchImpl extends SequenceBase implements TimeIfTariffSwitch {
 
     private static final String TIME_SINCE_TARIFF_SWITCH = "timeSinceTariffSwitch";
     private static final String TARIFF_SWITCH_INTERVAL = "tariffSwitchInterval";

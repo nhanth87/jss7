@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -25,7 +24,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("timeInformation")
- implements TimeInformation, CAPAsnPrimitive {
+public class TimeInformationImpl implements TimeInformation, CAPAsnPrimitive {
 
     private static final String TIME_IF_NO_TARIFF_SWITCH = "timeIfNoTariffSwitch";
     private static final String TIME_IF_TARIFF_SWITCH = "timeIfTariffSwitch";

@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("destinationRoutingAddress")
- extends SequenceBase implements DestinationRoutingAddress {
+public class DestinationRoutingAddressImpl extends SequenceBase implements DestinationRoutingAddress {
 
     private static final String CALLED_PARTY_NUMBER = "calledPartyNumber";
     private static final String CALLED_PARTY_NUMBER_LIST = "calledPartyNumberList";

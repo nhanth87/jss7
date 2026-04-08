@@ -1,9 +1,7 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -15,7 +13,6 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.VariableMessage;
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.VariablePart;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
-import org.restcomm.protocols.ss7.map.primitives.ArrayListSerializingBase;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -25,14 +22,15 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("variableMessage")
- extends SequenceBase implements VariableMessage {
+public class VariableMessageImpl extends SequenceBase implements VariableMessage {
 
     public static final int _ID_elementaryMessageID = 0;
     public static final int _ID_variableParts = 1;
 
+    public static final String _PrimitiveName = "VariableMessage";
+
     private static final String ELEMENTARY_MESSAGE_ID = "elementaryMessageID";
     private static final String VARIABLE_PARTS = "variableParts";
-    private static final String VARIABLE_PART = "variablePart";
 
     private int elementaryMessageID;
     private ArrayList<VariablePart> variableParts;
@@ -43,6 +41,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
     public VariableMessageImpl(int elementaryMessageID, ArrayList<VariablePart> variableParts) {
         super("VariableMessage");
+
         this.elementaryMessageID = elementaryMessageID;
         this.variableParts = variableParts;
     }
@@ -57,11 +56,11 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
         return variableParts;
     }
 
-    @Override
     protected void _decode(AsnInputStream asnInputStream, int length) throws CAPParsingComponentException, IOException, AsnException {
+
         this.elementaryMessageID = 0;
         this.variableParts = null;
-        boolean elementaryMessageIDFound = false;
+        boolean elementaryMessageIDReceived = false;
 
         AsnInputStream ais = asnInputStream.readSequenceStreamData(length);
         while (true) {
@@ -74,7 +73,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
                 switch (tag) {
                     case _ID_elementaryMessageID:
                         this.elementaryMessageID = (int) ais.readInteger();
-                        elementaryMessageIDFound = true;
+                        elementaryMessageIDReceived = true;
                         break;
                     case _ID_variableParts:
                         this.variableParts = new ArrayList<VariablePart>();
@@ -84,10 +83,15 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
                             if (ais2.available() == 0)
                                 break;
 
-                            ais2.readTag();
-                            VariablePartImpl val = new VariablePartImpl();
-                            val.decodeAll(ais2);
-                            this.variableParts.add(val);
+                            int tag2 = ais2.readTag();
+                            if (ais2.getTagClass() != Tag.CLASS_CONTEXT_SPECIFIC || !ais2.isTagPrimitive())
+                                throw new CAPParsingComponentException("Error while decoding " + _PrimitiveName
+                                        + ": bad tagClass or tag or is not primitive when decoding a variableParts SEQUENCE",
+                                        CAPParsingComponentExceptionReason.MistypedParameter);
+
+                            VariablePartImpl vp = new VariablePartImpl();
+                            ((VariablePartImpl) vp).decodeData(ais2, ais2.readLength());
+                            this.variableParts.add(vp);
                         }
                         break;
 
@@ -100,10 +104,13 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
             }
         }
 
-        if (this.variableParts == null || !elementaryMessageIDFound)
+        if (elementaryMessageIDReceived == false)
             throw new CAPParsingComponentException("Error while decoding " + _PrimitiveName
-                    + ": elementaryMessageID and variableParts are mandatory but not found",
-                    CAPParsingComponentExceptionReason.MistypedParameter);
+                    + ": elementaryMessageID is mandatory but not found", CAPParsingComponentExceptionReason.MistypedParameter);
+
+        if (this.variableParts == null)
+            throw new CAPParsingComponentException("Error while decoding " + _PrimitiveName
+                    + ": variableParts is mandatory but not found", CAPParsingComponentExceptionReason.MistypedParameter);
     }
 
     @Override
@@ -111,20 +118,18 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
         if (this.variableParts == null)
             throw new CAPException("Error while encoding " + _PrimitiveName + ": variableParts must not be null");
+
         if (this.variableParts.size() < 1 || this.variableParts.size() > 5)
             throw new CAPException("Error while encoding " + _PrimitiveName
-                    + ": variableParts size must not be from 1 to 5, found: " + this.variableParts.size());
+                    + ": variableParts count must be from 1 to 5, found: " + this.variableParts.size());
 
         try {
             asnOutputStream.writeInteger(Tag.CLASS_CONTEXT_SPECIFIC, _ID_elementaryMessageID, this.elementaryMessageID);
 
             asnOutputStream.writeTag(Tag.CLASS_CONTEXT_SPECIFIC, false, _ID_variableParts);
             int pos = asnOutputStream.StartContentDefiniteLength();
-            for (VariablePart val : this.variableParts) {
-                if (val == null)
-                    throw new CAPException("Error while encoding " + _PrimitiveName
-                            + ": the variableParts array has null values");
-                ((VariablePartImpl) val).encodeAll(asnOutputStream);
+            for (VariablePart vp : this.variableParts) {
+                ((VariablePartImpl) vp).encodeAll(asnOutputStream);
             }
             asnOutputStream.FinalizeContent(pos);
 
@@ -143,14 +148,14 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
         sb.append(" [");
 
         sb.append("elementaryMessageID=");
-        sb.append(elementaryMessageID);
+        sb.append(this.elementaryMessageID);
+
         if (this.variableParts != null) {
             sb.append(", variableParts=[");
-            for (VariablePart val : this.variableParts) {
-                if (val != null) {
-                    sb.append("variablePart=[");
-                    sb.append(val.toString());
-                    sb.append("], ");
+            for (VariablePart vp : this.variableParts) {
+                if (vp != null) {
+                    sb.append(vp.toString());
+                    sb.append(", ");
                 }
             }
             sb.append("]");
@@ -160,16 +165,4 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
         return sb.toString();
     }
-public static class VariableMessage_VariableParts extends ArrayListSerializingBase<VariablePart> {
-
-        public VariableMessage_VariableParts() {
-            super(VARIABLE_PART, VariablePartImpl.class);
-        }
-
-        public VariableMessage_VariableParts(ArrayList<VariablePart> data) {
-            super(VARIABLE_PART, VariablePartImpl.class, data);
-        }
-
-    }
-
 }

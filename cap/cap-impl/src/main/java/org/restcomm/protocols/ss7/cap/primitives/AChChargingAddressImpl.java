@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.primitives;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("aChChargingAddress")
-public class AChChargingAddressImpl implements AChChargingAddress, CAPAsnPrimitive {
+public class AChChargingAddressImpl implements AChChargingAddress, CAPAsnPrimitive {
 
     public static final int _ID_legID = 2;
     public static final int _ID_srfConnection = 50;

@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("dpSpecificCriteriaAlt")
- extends SequenceBase implements DpSpecificCriteriaAlt {
+public class DpSpecificCriteriaAltImpl extends SequenceBase implements DpSpecificCriteriaAlt {
 
     private static final String CHANGE_OF_POSITION_CONTROL_INFO = "changeOfPositionControlInfo";
     private static final String CHANGE_OF_POSITION_CONTROL_INFO_LIST = "changeOfPositionControlInfoList";

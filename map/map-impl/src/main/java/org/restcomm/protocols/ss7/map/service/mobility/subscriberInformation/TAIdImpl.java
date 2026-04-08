@@ -1,8 +1,6 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
-import jakarta.xml.bind.DatatypeConverter;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -152,11 +150,11 @@ public class TAIdImpl extends OctetStringBase implements TAId {
         sb.append(this._PrimitiveName);
         sb.append(" [");
         if (correctData) {
-            sb.append(MCC+"=");
+            sb.append("mcc=");
             sb.append(mcc);
-            sb.append(", "+MNC+"=");
+            sb.append(", mnc=");
             sb.append(mnc);
-            sb.append(", "+TAC+"=");
+            sb.append(", tac=");
             sb.append(tac);
         } else {
             sb.append("Data=");
@@ -166,26 +164,5 @@ public class TAIdImpl extends OctetStringBase implements TAId {
 
         return sb.toString();
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<TAIdImpl> TA_ID_XML = new XMLFormat<TAIdImpl>(TAIdImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, TAIdImpl taId) throws XMLStreamException {
-            String s = xml.getAttribute(DATA, DEFAULT_VALUE);
-            if (s != null) {
-                taId.data = DatatypeConverter.parseHexBinary(s);
-            }
-        }
-
-        @Override
-        public void write(TAIdImpl taId, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            if (taId.data != null) {
-                xml.setAttribute(DATA, DatatypeConverter.printHexBinary(taId.data));
-            }
-        }
-    };
 
 }

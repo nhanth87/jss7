@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 
@@ -16,11 +15,10 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 /**
  *
  * @author sergey vetyutnev
- * @author Amit Bhayani
  *
  */
 @XStreamAlias("continueRequest")
- extends CircuitSwitchedCallMessageImpl implements ContinueRequest {
+public class ContinueRequestImpl extends CircuitSwitchedCallMessageImpl implements ContinueRequest {
 
     public static final String _PrimitiveName = "ContinueRequest";
 

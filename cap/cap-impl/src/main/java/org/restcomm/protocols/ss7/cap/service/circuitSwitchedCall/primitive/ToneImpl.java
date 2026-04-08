@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -22,7 +21,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("tone")
- extends SequenceBase implements Tone {
+public class ToneImpl extends SequenceBase implements Tone {
 
     public static final int _ID_toneID = 0;
     public static final int _ID_duration = 1;

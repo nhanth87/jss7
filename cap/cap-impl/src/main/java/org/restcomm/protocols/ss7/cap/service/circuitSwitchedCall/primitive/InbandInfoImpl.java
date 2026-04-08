@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("inbandInfo")
- extends SequenceBase implements InbandInfo {
+public class InbandInfoImpl extends SequenceBase implements InbandInfo {
 
     public static final int _ID_messageID = 0;
     public static final int _ID_numberOfRepetitions = 1;

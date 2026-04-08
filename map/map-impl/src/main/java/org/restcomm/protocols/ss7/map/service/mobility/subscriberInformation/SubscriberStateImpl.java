@@ -201,36 +201,4 @@ public class SubscriberStateImpl implements SubscriberState, MAPAsnPrimitive {
         return sb.toString();
     }
 
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<SubscriberStateImpl> SUBSCRIBER_STATE_XML = new XMLFormat<SubscriberStateImpl>(
-            SubscriberStateImpl.class) {
-
-        @Override
-        public void read(javolution.xml.XMLFormat.InputElement xml, SubscriberStateImpl subscriberState)
-                throws XMLStreamException {
-            String choice = xml.getAttribute(SUBSCRIBER_STATE_CHOICE, DEFAULT_STRING_VALUE);
-            SubscriberStateChoice subscriberStateChoice = null;
-            if (choice != null) {
-                subscriberStateChoice = Enum.valueOf(SubscriberStateChoice.class, choice);
-            }
-            String nrr = xml.get(NOT_REACHABLE_REASON, String.class);
-            NotReachableReason notReachableReason = null;
-            if (nrr != null) {
-                notReachableReason = Enum.valueOf(NotReachableReason.class, nrr);
-            }
-
-            subscriberState.setData(subscriberStateChoice, notReachableReason);
-        }
-
-        @Override
-        public void write(SubscriberStateImpl subscriberState, javolution.xml.XMLFormat.OutputElement xml)
-                throws XMLStreamException {
-            if (subscriberState.subscriberStateChoice != null)
-                xml.setAttribute(SUBSCRIBER_STATE_CHOICE, subscriberState.subscriberStateChoice.toString());
-            if (subscriberState.notReachableReason != null)
-                xml.add(subscriberState.notReachableReason.toString(), NOT_REACHABLE_REASON, String.class);
-        }
-    };
 }

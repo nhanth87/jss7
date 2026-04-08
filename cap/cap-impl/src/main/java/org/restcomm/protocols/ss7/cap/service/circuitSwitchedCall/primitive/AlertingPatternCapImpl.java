@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 
@@ -15,7 +14,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("alertingPatternCap")
- extends OctetStringBase implements AlertingPatternCap {
+public class AlertingPatternCapImpl extends OctetStringBase implements AlertingPatternCap {
 
     private static final String ALERTING_PATTERN = "alertingPattern";
 

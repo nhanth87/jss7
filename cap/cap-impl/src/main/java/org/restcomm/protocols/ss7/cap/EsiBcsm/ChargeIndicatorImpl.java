@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import org.restcomm.protocols.ss7.cap.api.EsiBcsm.ChargeIndicator;
@@ -43,7 +42,6 @@ public class ChargeIndicatorImpl extends OctetStringLength1Base implements Charg
         return ChargeIndicatorValue.getInstance(data);
     }
 
-    @XStreamAsAttribute
     public String getValue() {
         ChargeIndicatorValue value = getChargeIndicatorValue();
         return value != null ? value.toString() : DEFAULT_VALUE;

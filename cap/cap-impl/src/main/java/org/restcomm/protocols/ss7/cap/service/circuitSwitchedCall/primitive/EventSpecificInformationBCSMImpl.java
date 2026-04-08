@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -57,7 +56,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("eventSpecificInformationBCSM")
-public class EventSpecificInformationBCSMImpl implements EventSpecificInformationBCSM, CAPAsnPrimitive {
+public class EventSpecificInformationBCSMImpl implements EventSpecificInformationBCSM, CAPAsnPrimitive {
 
     private static final String ROUTE_SELECT_FAILURE_SPECIFIC_INFO = "routeSelectFailureSpecificInfo";
     private static final String O_CALLED_PARTY_BUSY_SPECIFIC_INFO = "oCalledPartyBusySpecificInfo";

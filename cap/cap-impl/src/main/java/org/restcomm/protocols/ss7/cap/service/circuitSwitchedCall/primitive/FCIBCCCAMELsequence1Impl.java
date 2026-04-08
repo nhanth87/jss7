@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("fCIBCCCAMELsequence1")
- implements FCIBCCCAMELsequence1, CAPAsnPrimitive {
+public class FCIBCCCAMELsequence1Impl implements FCIBCCCAMELsequence1, CAPAsnPrimitive {
 
     public static final int _ID_freeFormatData = 0;
     public static final int _ID_partyToCharge = 1;

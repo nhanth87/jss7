@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -25,7 +24,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("bearerCapability")
- implements BearerCapability, CAPAsnPrimitive {
+public class BearerCapabilityImpl implements BearerCapability, CAPAsnPrimitive {
 
     public static final int _ID_bearerCap = 0;
 

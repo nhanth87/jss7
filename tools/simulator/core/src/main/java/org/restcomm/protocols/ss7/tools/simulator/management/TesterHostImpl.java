@@ -58,6 +58,8 @@ import org.restcomm.protocols.ss7.tools.simulator.tests.ussd.TestUssdClientMan;
 import org.restcomm.protocols.ss7.tools.simulator.tests.ussd.TestUssdServerConfigurationData_OldFormat;
 import org.restcomm.protocols.ss7.tools.simulator.tests.ussd.TestUssdServerMan;
 
+import com.thoughtworks.xstream.XStream;
+
 /**
  *
  * @author sergey vetyutnev
@@ -883,216 +885,18 @@ public class TesterHostImpl extends NotificationBroadcasterSupport implements Te
     }
 
     private boolean loadOld(File fn) {
-
-        XMLObjectReader reader = null;
         try {
             if (!fn.exists()) {
-                // this.sendNotif(SOURCE_NAME, "Error while reading the Host state from file: file not found: " + persistFile,
-                // "", Level.WARN);
                 return false;
             }
 
-            reader = XMLObjectReader.newInstance(new FileInputStream(fn));
-
-            reader.setBinding(binding);
-            this.configurationData.setInstance_L1(Instance_L1.createInstance(reader.read(ConfigurationData.INSTANCE_L1,
-                    String.class)));
-            this.configurationData.setInstance_L2(Instance_L2.createInstance(reader.read(ConfigurationData.INSTANCE_L2,
-                    String.class)));
-            this.configurationData.setInstance_L3(Instance_L3.createInstance(reader.read(ConfigurationData.INSTANCE_L3,
-                    String.class)));
-            this.configurationData.setInstance_TestTask(Instance_TestTask.createInstance(reader.read(
-                    ConfigurationData.INSTANCE_TESTTASK, String.class)));
-
-            M3uaConfigurationData_OldFormat _m3ua = reader.read(ConfigurationData.M3UA, M3uaConfigurationData_OldFormat.class);
-            this.m3ua.setSctpLocalHost(_m3ua.getLocalHost());
-            this.m3ua.setSctpLocalPort(_m3ua.getLocalPort());
-            this.m3ua.setSctpRemoteHost(_m3ua.getRemoteHost());
-            this.m3ua.setSctpRemotePort(_m3ua.getRemotePort());
-            this.configurationData.getM3uaConfigurationData().setIpChannelType(_m3ua.getIpChannelType());
-            this.m3ua.setSctpIsServer(_m3ua.getIsSctpServer());
-            this.m3ua.doSetExtraHostAddresses(_m3ua.getSctpExtraHostAddresses());
-            this.configurationData.getM3uaConfigurationData().setM3uaFunctionality(_m3ua.getM3uaFunctionality());
-            this.configurationData.getM3uaConfigurationData().setM3uaIPSPType(_m3ua.getM3uaIPSPType());
-            this.configurationData.getM3uaConfigurationData().setM3uaExchangeType(_m3ua.getM3uaExchangeType());
-            this.m3ua.setM3uaDpc(_m3ua.getDpc());
-            this.m3ua.setM3uaOpc(_m3ua.getOpc());
-            this.m3ua.setM3uaSi(_m3ua.getSi());
-
-            DialogicConfigurationData_OldFormat _dial = reader.read(ConfigurationData.DIALOGIC,
-                    DialogicConfigurationData_OldFormat.class);
-            this.dialogic.setSourceModuleId(_dial.getSourceModuleId());
-            this.dialogic.setDestinationModuleId(_dial.getDestinationModuleId());
-
-            SccpConfigurationData_OldFormat _sccp = reader.read(ConfigurationData.SCCP, SccpConfigurationData_OldFormat.class);
-            this.sccp.setRouteOnGtMode(_sccp.isRouteOnGtMode());
-            this.sccp.setRemoteSpc(_sccp.getRemoteSpc());
-            this.sccp.setLocalSpc(_sccp.getLocalSpc());
-            this.sccp.setNi(_sccp.getNi());
-            this.sccp.setRemoteSsn(_sccp.getRemoteSsn());
-            this.sccp.setLocalSsn(_sccp.getLocalSsn());
-            this.sccp.setGlobalTitleType(_sccp.getGlobalTitleType());
-            this.sccp.setNatureOfAddress(new NatureOfAddressType(_sccp.getNatureOfAddress().getValue()));
-            this.sccp.setNumberingPlan(new NumberingPlanSccpType(_sccp.getNumberingPlan().getValue()));
-            this.sccp.setTranslationType(_sccp.getTranslationType());
-            this.sccp.setCallingPartyAddressDigits(_sccp.getCallingPartyAddressDigits());
-            // this.sccp.setExtraLocalAddressDigits(_sccp.getExtraLocalAddressDigits());
-
-            MapConfigurationData_OldFormat _map = reader.read(ConfigurationData.MAP, MapConfigurationData_OldFormat.class);
-            // this.map.setLocalSsn(_map.getLocalSsn());
-            // this.map.setRemoteSsn(_map.getRemoteSsn());
-            this.map.setRemoteAddressDigits(_map.getRemoteAddressDigits());
-            this.map.setOrigReference(_map.getOrigReference());
-            this.map.setOrigReferenceAddressNature(new AddressNatureType(_map.getOrigReferenceAddressNature().getIndicator()));
-            this.map.setOrigReferenceNumberingPlan(new NumberingPlanMapType(_map.getOrigReferenceNumberingPlan().getIndicator()));
-            this.map.setDestReference(_map.getDestReference());
-            this.map.setDestReferenceAddressNature(new AddressNatureType(_map.getDestReferenceAddressNature().getIndicator()));
-            this.map.setDestReferenceNumberingPlan(new NumberingPlanMapType(_map.getDestReferenceNumberingPlan().getIndicator()));
-
-            TestUssdClientConfigurationData_OldFormat _TestUssdClientMan = reader.read(ConfigurationData.TEST_USSD_CLIENT,
-                    TestUssdClientConfigurationData_OldFormat.class);
-            this.testUssdClientMan.setMsisdnAddress(_TestUssdClientMan.getMsisdnAddress());
-            this.testUssdClientMan.setMsisdnAddressNature(new AddressNatureType(_TestUssdClientMan.getMsisdnAddressNature()
-                    .getIndicator()));
-            this.testUssdClientMan.setMsisdnNumberingPlan(new NumberingPlanMapType(_TestUssdClientMan.getMsisdnNumberingPlan()
-                    .getIndicator()));
-            this.testUssdClientMan.setDataCodingScheme(_TestUssdClientMan.getDataCodingScheme());
-            this.testUssdClientMan.setAlertingPattern(_TestUssdClientMan.getAlertingPattern());
-            this.testUssdClientMan.setUssdClientAction(_TestUssdClientMan.getUssdClientAction());
-            this.testUssdClientMan.setAutoRequestString(_TestUssdClientMan.getAutoRequestString());
-            this.testUssdClientMan.setAutoResponseString(_TestUssdClientMan.getAutoResponseString());
-            this.testUssdClientMan.setMaxConcurrentDialogs(_TestUssdClientMan.getMaxConcurrentDialogs());
-            this.testUssdClientMan.setOneNotificationFor100Dialogs(_TestUssdClientMan.isOneNotificationFor100Dialogs());
-            this.testUssdClientMan.setAutoResponseOnUnstructuredSSRequests(_TestUssdClientMan.isAutoResponseOnUnstructuredSSRequests());
-
-            TestUssdServerConfigurationData_OldFormat _TestUssdServerMan = reader.read(ConfigurationData.TEST_USSD_SERVER,
-                    TestUssdServerConfigurationData_OldFormat.class);
-            this.testUssdServerMan.setMsisdnAddress(_TestUssdServerMan.getMsisdnAddress());
-            this.testUssdServerMan.setMsisdnAddressNature(new AddressNatureType(_TestUssdServerMan.getMsisdnAddressNature()
-                    .getIndicator()));
-            this.testUssdServerMan.setMsisdnNumberingPlan(new NumberingPlanMapType(_TestUssdServerMan.getMsisdnNumberingPlan()
-                    .getIndicator()));
-            this.testUssdServerMan.setDataCodingScheme(_TestUssdServerMan.getDataCodingScheme());
-            this.testUssdServerMan.setAlertingPattern(_TestUssdServerMan.getAlertingPattern());
-            this.testUssdServerMan.setProcessSsRequestAction(_TestUssdServerMan.getProcessSsRequestAction());
-            this.testUssdServerMan.setAutoResponseString(_TestUssdServerMan.getAutoResponseString());
-            this.testUssdServerMan.setAutoUnstructured_SS_RequestString(_TestUssdServerMan
-                    .getAutoUnstructured_SS_RequestString());
-            this.testUssdServerMan.setOneNotificationFor100Dialogs(_TestUssdServerMan.isOneNotificationFor100Dialogs());
-
-            TestSmsClientConfigurationData_OldFormat _TestSmsClientMan = reader.read(ConfigurationData.TEST_SMS_CLIENT,
-                    TestSmsClientConfigurationData_OldFormat.class);
-            this.testSmsClientMan.setAddressNature(new AddressNatureType(_TestSmsClientMan.getAddressNature().getIndicator()));
-            this.testSmsClientMan
-                    .setNumberingPlan(new NumberingPlanMapType(_TestSmsClientMan.getNumberingPlan().getIndicator()));
-            this.testSmsClientMan.setServiceCenterAddress(_TestSmsClientMan.getServiceCenterAddress());
-            this.testSmsClientMan.setMapProtocolVersion(_TestSmsClientMan.getMapProtocolVersion());
-            this.testSmsClientMan.setSRIResponseImsi(_TestSmsClientMan.getSriResponseImsi());
-            this.testSmsClientMan.setSRIResponseVlr(_TestSmsClientMan.getSriResponseVlr());
-            this.testSmsClientMan.setSmscSsn(_TestSmsClientMan.getSmscSsn());
-            this.testSmsClientMan.setTypeOfNumber(new TypeOfNumberType(_TestSmsClientMan.getTypeOfNumber().getCode()));
-            this.testSmsClientMan.setNumberingPlanIdentification(new NumberingPlanIdentificationType(_TestSmsClientMan
-                    .getNumberingPlanIdentification().getCode()));
-            this.testSmsClientMan.setSmsCodingType(_TestSmsClientMan.getSmsCodingType());
-
-            TestSmsServerConfigurationData_OldFormat _TestSmsServerMan = reader.read(ConfigurationData.TEST_SMS_SERVER,
-                    TestSmsServerConfigurationData_OldFormat.class);
-            this.testSmsServerMan.setAddressNature(new AddressNatureType(_TestSmsServerMan.getAddressNature().getIndicator()));
-            this.testSmsServerMan
-                    .setNumberingPlan(new NumberingPlanMapType(_TestSmsServerMan.getNumberingPlan().getIndicator()));
-            this.testSmsServerMan.setServiceCenterAddress(_TestSmsServerMan.getServiceCenterAddress());
-            this.testSmsServerMan.setMapProtocolVersion(_TestSmsServerMan.getMapProtocolVersion());
-            this.testSmsServerMan.setHlrSsn(_TestSmsServerMan.getHlrSsn());
-            this.testSmsServerMan.setVlrSsn(_TestSmsServerMan.getVlrSsn());
-            this.testSmsServerMan.setTypeOfNumber(new TypeOfNumberType(_TestSmsServerMan.getTypeOfNumber().getCode()));
-            this.testSmsServerMan.setNumberingPlanIdentification(new NumberingPlanIdentificationType(_TestSmsServerMan
-                    .getNumberingPlanIdentification().getCode()));
-            this.testSmsServerMan.setSmsCodingType(_TestSmsServerMan.getSmsCodingType());
-
-
-            TestCheckImeiClientConfigurationData _TestCheckImeiClientMan = reader.read(ConfigurationData.TEST_CHECK_IMEI_CLIENT,
-                    TestCheckImeiClientConfigurationData.class);
-            this.testCheckImeiClientMan.setImei(_TestCheckImeiClientMan.getImei());
-            this.testCheckImeiClientMan.setCheckImeiClientAction(_TestCheckImeiClientMan.getCheckImeiClientAction());
-            this.testCheckImeiClientMan.setMapProtocolVersion(_TestCheckImeiClientMan.getMapProtocolVersion());
-            this.testCheckImeiClientMan.setMaxConcurrentDialogs(_TestCheckImeiClientMan.getMaxConcurrentDialogs());
-            this.testCheckImeiClientMan.setOneNotificationFor100Dialogs(_TestCheckImeiClientMan.isOneNotificationFor100Dialogs());
-
-            // FIMXME mnowa: add loading of CheckIMEI data from XML for server
-            /* TestCheckImeiServerConfigurationData _TestCheckImeiServerMan = reader.read(ConfigurationData.TEST_CHECK_IMEI_SERVER,
-                    TestCheckImeiServerConfigurationData.class);
-             */
-
-            TestLcsServerConfigurationData _TestLcsClientMan = reader.read(ConfigurationData.TEST_MAP_LCS_SERVER,
-                    TestLcsServerConfigurationData.class);
-            this.testLcsServerMan.setAddressNature(new AddressNatureType(_TestLcsClientMan.getAddressNature().getIndicator()));
-            this.testLcsServerMan.setNumberingPlanType(new NumberingPlanMapType(_TestLcsClientMan.getNumberingPlanType().getIndicator()));
-            this.testLcsServerMan.setNumberingPlan(_TestLcsClientMan.getNumberingPlan());
-            this.testLcsServerMan.setMlcNumber(_TestLcsClientMan.getMlcNumber());
-            this.testLcsServerMan.setMSISDN(_TestLcsClientMan.getMSISDN());
-            this.testLcsServerMan.setIMSI(_TestLcsClientMan.getIMSI());
-            this.testLcsServerMan.setLMSI(_TestLcsClientMan.getLMSI());
-            this.testLcsServerMan.setHGMLCAddress(_TestLcsClientMan.getHGMLCAddress());
-            this.testLcsServerMan.setNetworkNodeNumber(_TestLcsClientMan.getNetworkNodeNumber());
-            this.testLcsServerMan.setLocationEstimateLatitude(_TestLcsClientMan.getLatitude());
-            this.testLcsServerMan.setLocationEstimateLongitude(_TestLcsClientMan.getLongitude());
-            this.testLcsServerMan.setAgeOfLocationEstimate(_TestLcsClientMan.getAgeOfLocationEstimate());
-            this.testLcsServerMan.setIMEI(_TestLcsClientMan.getIMEI());
-            this.testLcsServerMan.setLCSReferenceNumber(_TestLcsClientMan.getLcsReferenceNumber());
-            this.testLcsServerMan.setLcsServiceTypeID(_TestLcsClientMan.getLcsServiceTypeID());
-            this.testLcsServerMan.setMCC(_TestLcsClientMan.getMCC());
-            this.testLcsServerMan.setMNC(_TestLcsClientMan.getMNC());
-            this.testLcsServerMan.setLAC(_TestLcsClientMan.getLAC());
-            this.testLcsServerMan.setCellId(_TestLcsClientMan.getCellId());
-            this.testLcsServerMan.setReportingInterval(_TestLcsClientMan.getReportingInterval());
-            this.testLcsServerMan.setDataCodingScheme(_TestLcsClientMan.getDataCodingScheme());
-            this.testLcsServerMan.setNaESRDAddress(_TestLcsClientMan.getNaESRDAddress());
-
-            TestLcsClientConfigurationData _TestLcsServerMan = reader.read(ConfigurationData.TEST_MAP_LCS_SERVER,
-                    TestLcsClientConfigurationData.class);
-            this.testLcsClientMan.setAddressNature(new AddressNatureType(_TestLcsServerMan.getAddressNature().getIndicator()));
-            this.testLcsClientMan.setNumberingPlanType(new NumberingPlanMapType(_TestLcsServerMan.getNumberingPlanType().getIndicator()));
-            this.testLcsClientMan.setMSISDN(_TestLcsServerMan.getMSISDN());
-            this.testLcsClientMan.setIMSI(_TestLcsServerMan.getIMSI());
-            this.testLcsClientMan.setNetworkNodeNumber(_TestLcsServerMan.getNetworkNodeNumberAddress());
-            this.testLcsClientMan.setAgeOfLocationEstimate(_TestLcsServerMan.getAgeOfLocationEstimate());
-            this.testLcsClientMan.setMCC(_TestLcsServerMan.getMCC());
-            this.testLcsClientMan.setMNC(_TestLcsServerMan.getMNC());
-            this.testLcsClientMan.setLAC(_TestLcsServerMan.getLAC());
-            this.testLcsClientMan.setCellId(_TestLcsServerMan.getCellId());
-            this.testLcsClientMan.setLCSReferenceNumber(_TestLcsServerMan.getLCSReferenceNumber());
-            this.testLcsClientMan.setHGMLCAddress(_TestLcsServerMan.getHGMLCAddress());
-            this.testLcsClientMan.setIMEI(_TestLcsServerMan.getIMEI());
-            this.testLcsClientMan.setNaESRDAddress(_TestLcsServerMan.getNaESRDAddress());
-
-            TestPsiServerConfigurationData _TestPsiServerMan = reader.read(ConfigurationData.TEST_MAP_PSI_SERVER,
-                TestPsiServerConfigurationData.class);
-            this.testPsiServerMan.setAddressNature(new AddressNatureType(_TestPsiServerMan.getAddressNature().getIndicator()));
-            this.testPsiServerMan.setNumberingPlanType(new NumberingPlanMapType(_TestPsiServerMan.getNumberingPlanType().getIndicator()));
-            this.testPsiServerMan.setNumberingPlan(_TestPsiServerMan.getNumberingPlan());
-            this.testPsiServerMan.setImsi(_TestPsiServerMan.getIMSI());
-            this.testPsiServerMan.setLmsi(_TestPsiServerMan.getLMSI());
-            this.testPsiServerMan.setImei(_TestPsiServerMan.getIMEI());
-            this.testPsiServerMan.setMcc(_TestPsiServerMan.getMcc());
-            this.testPsiServerMan.setMnc(_TestPsiServerMan.getMnc());
-            this.testPsiServerMan.setLac(_TestPsiServerMan.getLac());
-            this.testPsiServerMan.setCi(_TestPsiServerMan.getCi());
-            this.testPsiServerMan.setAol(_TestPsiServerMan.getAol());
-            this.testPsiServerMan.setNetworkNodeNumber(_TestPsiServerMan.getNetworkNodeNumber());
-            this.testPsiServerMan.setGeographicalLatitude(_TestPsiServerMan.getGeographicalLatitude());
-            this.testPsiServerMan.setGeographicalLongitude(_TestPsiServerMan.getGeographicalLongitude());
-            this.testPsiServerMan.setGeographicalUncertainty(_TestPsiServerMan.getGeographicalUncertainty());
-            this.testPsiServerMan.setGeodeticLatitude(_TestPsiServerMan.getGeodeticLatitude());
-            this.testPsiServerMan.setGeodeticLongitude(_TestPsiServerMan.getGeodeticLongitude());
-            this.testPsiServerMan.setGeodeticUncertainty(_TestPsiServerMan.getGeodeticUncertainty());
-            this.testPsiServerMan.setGeodeticConfidence(_TestPsiServerMan.getGeodeticConfidence());
-            this.testPsiServerMan.setScreeningAndPresentationIndicators(_TestPsiServerMan.getScreeningAndPresentationIndicators());
-            this.testPsiServerMan.setSaiPresent(_TestPsiServerMan.isSaiPresent());
-            this.testPsiServerMan.setCurrentLocationRetrieved(_TestPsiServerMan.isCurrentLocationRetrieved());
-
-            reader.close();
-
-            return true;
+            // Legacy Javolution XMLFormat is incompatible with XStream
+            // The old format used XMLObjectReader with custom XMLFormat classes
+            // which cannot be directly parsed by XStream without custom converters.
+            // Users should use the new format (simulator2.xml) instead.
+            this.sendNotif(SOURCE_NAME, "Old format file " + fn.getName() + " cannot be loaded. " +
+                    "Please use the new configuration format.", (Throwable) null, Level.WARN);
+            return false;
 
         } catch (Exception ex) {
             this.sendNotif(SOURCE_NAME, "Error while reading the Host state from file", ex, Level.WARN);

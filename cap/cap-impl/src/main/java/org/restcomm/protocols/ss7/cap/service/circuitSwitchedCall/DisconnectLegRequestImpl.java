@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -32,7 +31,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("disconnectLegRequest")
- extends CircuitSwitchedCallMessageImpl implements DisconnectLegRequest {
+public class DisconnectLegRequestImpl extends CircuitSwitchedCallMessageImpl implements DisconnectLegRequest {
 
     public static final int _ID_legToBeReleased = 0;
     public static final int _ID_releaseCause = 1;

@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -23,7 +22,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("callSegmentToCancel")
- implements CallSegmentToCancel, CAPAsnPrimitive {
+public class CallSegmentToCancelImpl implements CallSegmentToCancel, CAPAsnPrimitive {
 
     private static final String INVOKE_ID = "invokeID";
     private static final String CALL_SEGMENT_ID = "callSegmentID";

@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("oDisconnectSpecificInfo")
- extends SequenceBase implements ODisconnectSpecificInfo {
+public class ODisconnectSpecificInfoImpl extends SequenceBase implements ODisconnectSpecificInfo {
 
     private static final String RELEASE_CAUSE = "releaseCause";
 

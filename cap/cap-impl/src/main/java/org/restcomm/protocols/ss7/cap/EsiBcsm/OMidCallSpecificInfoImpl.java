@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
 import java.io.IOException;
@@ -24,7 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("oMidCallSpecificInfo")
- extends SequenceBase implements OMidCallSpecificInfo {
+public class OMidCallSpecificInfoImpl extends SequenceBase implements OMidCallSpecificInfo {
 
     public static final String MID_CALL_EVENTS = "midCallEvents";
 

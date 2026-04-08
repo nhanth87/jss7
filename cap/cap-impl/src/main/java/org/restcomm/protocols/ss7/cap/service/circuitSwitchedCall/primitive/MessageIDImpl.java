@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -26,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("messageID")
- implements MessageID, CAPAsnPrimitive {
+public class MessageIDImpl implements MessageID, CAPAsnPrimitive {
 
     public static final int _ID_elementaryMessageID = 0;
     public static final int _ID_text = 1;

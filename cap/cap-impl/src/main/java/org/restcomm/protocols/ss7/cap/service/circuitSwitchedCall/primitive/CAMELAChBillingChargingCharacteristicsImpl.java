@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("cAMELAChBillingChargingCharacteristics")
- implements CAMELAChBillingChargingCharacteristics, CAPAsnPrimitive {
+public class CAMELAChBillingChargingCharacteristicsImpl implements CAMELAChBillingChargingCharacteristics, CAPAsnPrimitive {
 
     private static final String MAX_CALL_PERIOD_DURATION = "maxCallPeriodDuration";
     private static final String RELEASED_IF_DURATION_EXCEEDED = "releaseIfDurationExceeded";

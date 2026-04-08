@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("cancelRequest")
- extends CircuitSwitchedCallMessageImpl implements CancelRequest {
+public class CancelRequestImpl extends CircuitSwitchedCallMessageImpl implements CancelRequest {
 
     private static final String INVOKE_ID = "invokeID";
     private static final String ALL_REQUESTS = "allRequests";

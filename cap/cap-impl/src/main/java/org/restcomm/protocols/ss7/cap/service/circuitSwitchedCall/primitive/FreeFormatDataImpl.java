@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
 
@@ -15,7 +14,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 *
 */
 @XStreamAlias("freeFormatData")
- extends OctetStringBase implements FreeFormatData {
+public class FreeFormatDataImpl extends OctetStringBase implements FreeFormatData {
 
     private static final String DATA = "data";
 

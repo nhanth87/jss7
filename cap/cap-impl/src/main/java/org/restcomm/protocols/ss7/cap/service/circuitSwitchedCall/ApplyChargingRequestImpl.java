@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -32,7 +31,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("applyChargingRequest")
- extends CircuitSwitchedCallMessageImpl implements ApplyChargingRequest {
+public class ApplyChargingRequestImpl extends CircuitSwitchedCallMessageImpl implements ApplyChargingRequest {
 
     private static final String A_CH_BILLING_CHARGING_CHARACTERISTICS = "aChBillingChargingCharacteristics";
     private static final String PARTY_TO_CHARGE = "partyToCharge";

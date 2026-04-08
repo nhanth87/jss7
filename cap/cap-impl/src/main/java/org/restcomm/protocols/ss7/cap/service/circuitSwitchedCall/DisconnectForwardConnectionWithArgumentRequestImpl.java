@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("disconnectForwardConnectionWithArgumentRequest")
- extends CircuitSwitchedCallMessageImpl implements DisconnectForwardConnectionWithArgumentRequest {
+public class DisconnectForwardConnectionWithArgumentRequestImpl extends CircuitSwitchedCallMessageImpl implements DisconnectForwardConnectionWithArgumentRequest {
 
     public static final int _ID_callSegmentID = 1;
     public static final int _ID_extensions = 2;

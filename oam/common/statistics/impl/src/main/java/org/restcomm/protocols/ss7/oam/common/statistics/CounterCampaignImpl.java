@@ -10,8 +10,8 @@ import org.restcomm.protocols.ss7.oam.common.statistics.api.CounterOutputFormat;
 import org.restcomm.protocols.ss7.oam.common.statistics.api.CounterValueSet;
 import org.restcomm.protocols.ss7.oam.common.statistics.api.SourceValueSet;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
 *
@@ -21,17 +21,17 @@ import javolution.xml.stream.XMLStreamException;
 public class CounterCampaignImpl implements CounterCampaign {
 
     private static final long serialVersionUID = -185667602668518572L;
-    private static final String NAME = "name";
-    private static final String COUNTER_SET_NAME = "counterSetName";
-    private static final String DURATION = "duration";
-    private static final String OUTPUT_FORMAT = "outputFormat";
-    private static final String SHORT_CAMPAIGN = "shortCampaign";
 
+    @XStreamAsAttribute
     private String name;
     private CounterDefSet counterSet;
+    @XStreamAsAttribute
     private String counterSetName;
+    @XStreamAsAttribute
     private int duration;
+    @XStreamAsAttribute
     private CounterOutputFormat outputFormat = CounterOutputFormat.VERBOSE;
+    @XStreamAsAttribute
     private boolean shortCampaign;
 
     private Date startTime;
@@ -125,33 +125,5 @@ public class CounterCampaignImpl implements CounterCampaign {
     public void setLastSourceValueSet(SourceValueSet lastSourceValueSet) {
         this.lastSourceValueSet = lastSourceValueSet;
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<CounterCampaignImpl> COUNTER_CAMPAIGN_XML = new XMLFormat<CounterCampaignImpl>(CounterCampaignImpl.class) {
-
-        public void read(javolution.xml.XMLFormat.InputElement xml, CounterCampaignImpl counterCampaign) throws XMLStreamException {
-            counterCampaign.name = xml.getAttribute(NAME, "");
-            counterCampaign.counterSetName = xml.getAttribute(COUNTER_SET_NAME, "");
-            counterCampaign.shortCampaign = xml.getAttribute(SHORT_CAMPAIGN, false);
-            counterCampaign.duration = xml.getAttribute(DURATION, 60);
-
-            String val = xml.getAttribute(OUTPUT_FORMAT, "VERBOSE");
-            try {
-                counterCampaign.outputFormat = Enum.valueOf(CounterOutputFormat.class, val);
-            } catch (Exception e) {
-                counterCampaign.outputFormat = CounterOutputFormat.VERBOSE;
-            }
-        }
-
-        public void write(CounterCampaignImpl counterCampaign, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(NAME, counterCampaign.getName());
-            xml.setAttribute(COUNTER_SET_NAME, counterCampaign.getCounterSetName());
-            xml.setAttribute(SHORT_CAMPAIGN, counterCampaign.isShortCampaign());
-            xml.setAttribute(DURATION, counterCampaign.getDuration());
-            xml.setAttribute(OUTPUT_FORMAT, counterCampaign.getOutputFormat().toString());
-        }
-    };
 
 }

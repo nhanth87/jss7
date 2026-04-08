@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.cap.service.sms.primitive;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("fCIBCCCAMELsequence1SMS")
- extends SequenceBase implements FCIBCCCAMELsequence1SMS {
+public class FCIBCCCAMELsequence1SMSImpl extends SequenceBase implements FCIBCCCAMELsequence1SMS {
 
     private static final String FREE_FORMAT_DATA = "freeFormatData";
     private static final String APPEND_FREE_FORMAT_DATA = "appendFreeFormatData";
