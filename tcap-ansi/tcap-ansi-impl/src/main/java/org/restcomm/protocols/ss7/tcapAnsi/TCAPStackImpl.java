@@ -8,7 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import javolution.text.TextBuilder;
+
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
@@ -72,7 +72,7 @@ public class TCAPStackImpl implements TCAPStack {
 
     private final String name;
 
-    protected final TextBuilder persistFile = TextBuilder.newInstance();
+    protected final StringBuilder persistFile = new StringBuilder();
 
     protected String persistDir = null;
 
@@ -160,7 +160,7 @@ public class TCAPStackImpl implements TCAPStack {
     }
 
     private void setPersistFile() {
-        this.persistFile.clear();
+        this.persistFile.setLength(0);
 
         if (persistDir != null) {
             this.persistFile.append(persistDir).append(File.separator).append(this.name).append("_").append(PERSIST_FILE_NAME);

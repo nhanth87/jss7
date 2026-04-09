@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import javolution.text.TextBuilder;
+
 import org.jctools.maps.NonBlockingHashMap;
 import javolution.xml.XMLBinding;
 import javolution.xml.XMLObjectReader;
@@ -65,7 +65,7 @@ public class RouterExtImpl implements RouterExt {
     private static final String RULE = "rule";
     private static final String ROUTING_ADDRESS = "routingAddress";
 
-    private final TextBuilder persistFile = TextBuilder.newInstance();
+    private final StringBuilder persistFile = new StringBuilder();
 
     protected static final SccpRouterXMLBindingExt binding = new SccpRouterXMLBindingExt();
     private static final String TAB_INDENT = "\t";
@@ -111,7 +111,7 @@ public class RouterExtImpl implements RouterExt {
     }
 
     public void start() {
-        this.persistFile.clear();
+        this.persistFile.setLength(0);
 
         if (persistDir != null) {
             this.persistFile.append(persistDir).append(File.separator).append(this.name).append("_").append(PERSIST_FILE_NAME);
@@ -968,7 +968,7 @@ public class RouterExtImpl implements RouterExt {
     }
 
     public static void makeOldConfigCopy(String persistDir, String name) {
-        TextBuilder persistFile = new TextBuilder();
+        StringBuilder persistFile = new StringBuilder();
 
         if (persistDir != null) {
             persistFile.append(persistDir).append(File.separator).append(name).append("_").append(PERSIST_FILE_NAME);
