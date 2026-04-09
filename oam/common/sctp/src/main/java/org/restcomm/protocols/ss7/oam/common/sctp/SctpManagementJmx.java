@@ -14,6 +14,7 @@ import org.mobicents.protocols.api.CongestionListener;
 import org.mobicents.protocols.api.IpChannelType;
 import org.mobicents.protocols.api.Management;
 import org.mobicents.protocols.api.ManagementEventListener;
+import org.mobicents.protocols.api.PayloadDataPool;
 import org.mobicents.protocols.api.Server;
 import org.mobicents.protocols.api.ServerListener;
 import org.restcomm.protocols.ss7.oam.common.alarm.AlarmListener;
@@ -822,6 +823,31 @@ public class SctpManagementJmx implements SctpManagementJmxMBean, ManagementEven
     @Override
     public void onAssociationModified(Association association) {
         // TODO Auto-generated method stub
+    }
+
+    @Override
+    public PayloadDataPool getPayloadDataPool() {
+        return this.wrappedSctpManagement.getPayloadDataPool();
+    }
+
+    @Override
+    public void setPayloadDataPool(PayloadDataPool pool) {
+        this.wrappedSctpManagement.setPayloadDataPool(pool);
+    }
+
+    @Override
+    public PayloadDataPool.PoolStatistics getPoolStatistics() {
+        return this.wrappedSctpManagement.getPoolStatistics();
+    }
+
+    @Override
+    public int getTargetThroughput() {
+        return this.wrappedSctpManagement.getTargetThroughput();
+    }
+
+    @Override
+    public void setTargetThroughput(int targetThroughput) throws Exception {
+        this.wrappedSctpManagement.setTargetThroughput(targetThroughput);
     }
 
 }
