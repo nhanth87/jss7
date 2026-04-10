@@ -84,4 +84,10 @@ public interface ProvideSubscriberLocationResponse extends LsmMessage {
 
     ServingNodeAddress getTargetServingNodeForHandover();
 
+    UtranAdditionalPositioningData getUtranAdditionalPositioningData();
+
+    UtranBaroPressureMeas getUtranBaroPressureMeas();
+
+    UtranCivicAddress getUtranCivicAddress();
+
 }

@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>tcap-ansi-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7.tcapAnsi</groupId>
-		<version>9.2.5</version>
+		<version>9.2.7</version>
 	</parent>
 
 	<artifactId>tcap-ansi-api</artifactId>

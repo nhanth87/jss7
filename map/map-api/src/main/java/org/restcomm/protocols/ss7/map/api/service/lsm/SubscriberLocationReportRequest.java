@@ -168,4 +168,10 @@ public interface SubscriberLocationReportRequest extends LsmMessage {
 
     ReportingPLMNList getReportingPLMNList();
 
+    UtranAdditionalPositioningData getUtranAdditionalPositioningData();
+
+    UtranBaroPressureMeas getUtranBaroPressureMeas();
+
+    UtranCivicAddress getUtranCivicAddress();
+
 }
