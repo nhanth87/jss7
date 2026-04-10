@@ -1354,4 +1354,19 @@ public class SubscriberLocationReportRequestImpl extends LsmMessageImpl implemen
 
         return sb.toString();
     }
+
+    @Override
+    public org.restcomm.protocols.ss7.map.api.service.lsm.UtranAdditionalPositioningData getUtranAdditionalPositioningData() {
+        return null;
+    }
+
+    @Override
+    public org.restcomm.protocols.ss7.map.api.service.lsm.UtranCivicAddress getUtranCivicAddress() {
+        return null;
+    }
+
+    @Override
+    public org.restcomm.protocols.ss7.map.api.service.lsm.UtranBaroPressureMeas getUtranBaroPressureMeas() {
+        return null;
+    }
 }

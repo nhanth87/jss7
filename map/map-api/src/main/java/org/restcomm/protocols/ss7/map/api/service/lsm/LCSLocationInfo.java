@@ -53,4 +53,8 @@ public interface LCSLocationInfo extends Serializable {
 
     DiameterIdentity getAaaServerName();
 
+    ISDNAddressString getSgsnName();
+
+    ISDNAddressString getSgsnRealm();
+
 }

@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>ss7-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7</groupId>
-		<version>9.2.5</version>
+		<version>9.2.7</version>
 	</parent>
 
 	<groupId>org.restcomm.protocols.ss7.congestion</groupId>
@@ -53,3 +53,4 @@
 	</build>
 
 </project>
+

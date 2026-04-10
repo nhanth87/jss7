@@ -2,7 +2,7 @@
 	<parent>
 		<artifactId>simulator-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7.tools.simulator</groupId>
-		<version>9.2.5</version>
+		<version>9.2.7</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -100,13 +100,13 @@
 		<dependency>
 			<groupId>org.restcomm.protocols.ss7.sccp</groupId>
 			<artifactId>sccp-api-ext</artifactId>
-			<version>9.2.5</version>
+			<version>9.2.7</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.restcomm.protocols.ss7.sccp</groupId>
 			<artifactId>sccp-impl-ext</artifactId>
-			<version>9.2.5</version>
+			<version>9.2.7</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>

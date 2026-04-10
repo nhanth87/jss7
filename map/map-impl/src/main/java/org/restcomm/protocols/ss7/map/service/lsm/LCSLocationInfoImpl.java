@@ -473,4 +473,14 @@ public class LCSLocationInfoImpl extends SequenceBase implements LCSLocationInfo
 
         return sb.toString();
     }
+
+    @Override
+    public org.restcomm.protocols.ss7.map.api.primitives.ISDNAddressString getSgsnRealm() {
+        return null;
+    }
+
+    @Override
+    public org.restcomm.protocols.ss7.map.api.primitives.ISDNAddressString getSgsnName() {
+        return null;
+    }
 }
