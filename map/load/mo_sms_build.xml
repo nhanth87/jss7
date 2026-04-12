@@ -1,8 +1,6 @@
 <project basedir="." default="assemble">
     <property environment="sys" />
-    <condition property="mvn.executable" value="${sys.M2_HOME}\bin\mvn.bat" else="mvn">
-        <os family="windows" />
-    </condition>
+    <property name="mvn.executable" value="C:\ProgramData\chocolatey\lib\maven\apache-maven-3.9.12\bin\mvn.cmd" />
 
     <property name="packageprefix" value="org.restcomm.protocols.ss7.map.load.sms.mo" />
 
@@ -106,6 +104,9 @@
                         <contains string="${java.version}" substring="1.7" casesensitive="false" />
                         <contains string="${java.version}" substring="1.8" casesensitive="false" />
                         <matches string="${java.version}" pattern="^11\." />
+                        <matches string="${java.version}" pattern="^17\." />
+                        <matches string="${java.version}" pattern="^21\." />
+                        <matches string="${java.version}" pattern="^25\." />
                     </or>
                 </not>
             </condition>
