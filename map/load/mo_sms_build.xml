@@ -7,7 +7,7 @@
     <property name="javac.source" value="1.8" />
     <property name="srcroot" value="${root}/src" />
 
-    <property name="assemble.dir" value="${ant.file.restcomm.release}/../target/load" />
+    <property name="assemble.dir" value="${basedir}/../target/load" />
 
     <property name="test.server.channelType" value="sctp" />
     <property name="test.server.hostIp" value="127.0.0.1" />
@@ -89,6 +89,10 @@
         <pathelement location="${assemble.dir}/concurrent.jar" />
         <pathelement location="${assemble.dir}/guava.jar" />
         <pathelement location="${assemble.dir}/netty-all.jar" />
+        <pathelement location="${assemble.dir}/jctools-core.jar" />
+        <pathelement location="${assemble.dir}/xstream.jar" />
+        <pathelement location="${assemble.dir}/mxparser.jar" />
+        <pathelement location="${assemble.dir}/xmlpull.jar" />
         <pathelement location="src/main/resources" />
     </path>
 
@@ -112,11 +116,11 @@
             </condition>
         </fail>
 
-        <exec executable="${mvn.executable}" dir="${ant.file.restcomm.release}/../">
+        <exec executable="${mvn.executable}" dir="${basedir}/../">
             <arg line="install" />
         </exec>
 
-        <exec executable="${mvn.executable}" dir="${ant.file.restcomm.release}/../">
+        <exec executable="${mvn.executable}" dir="${basedir}/../">
             <arg line="install -Passemble" />
         </exec>
     </target>
@@ -132,8 +136,8 @@
             <jvmarg value="-Xms2048m"/>
             <jvmarg value="-Xmx2048m"/>
             <jvmarg value="-Xmn128m"/>
-            <jvmarg value="-XX:PermSize=256m"/>
-            <jvmarg value="-XX:MaxPermSize=256m"/>
+            <jvmarg value="-XX:MetaspaceSize=256m"/>
+            <jvmarg value="-XX:MaxMetaspaceSize=256m"/>
             <jvmarg value="-XX:+HeapDumpOnOutOfMemoryError"/>
             <!--
             <jvmarg value="-XX:CMSInitiatingOccupancyFraction=80"/>
@@ -147,7 +151,7 @@
             <jvmarg value="-Djava.net.preferIPv4Stack=true"/>
             <jvmarg value="-Dio.netty.leakDetection.level=advanced"/>
             -->
-            <jvmarg value="-XX:+UseParallelOldGC"/>
+            <jvmarg value="-XX:+UseParallelGC"/>
             <!--
             <jvmarg value="-XX:+PrintGCDetails" />
             <jvmarg value="-XX:+PrintGCTimeStamps" />
@@ -181,8 +185,8 @@
             <jvmarg value="-Xms2048m"/>
             <jvmarg value="-Xmx2048m"/>
             <jvmarg value="-Xmn128m"/>
-            <jvmarg value="-XX:PermSize=256m"/>
-            <jvmarg value="-XX:MaxPermSize=256m"/>
+            <jvmarg value="-XX:MetaspaceSize=256m"/>
+            <jvmarg value="-XX:MaxMetaspaceSize=256m"/>
             <jvmarg value="-XX:+HeapDumpOnOutOfMemoryError"/>
             <!--
             <jvmarg value="-XX:CMSInitiatingOccupancyFraction=80"/>
@@ -196,7 +200,7 @@
             <jvmarg value="-Djava.net.preferIPv4Stack=true"/>
             <jvmarg value="-Dio.netty.leakDetection.level=advanced"/>
             -->
-            <jvmarg value="-XX:+UseParallelOldGC"/>
+            <jvmarg value="-XX:+UseParallelGC"/>
             <arg value="${test.client.numOfDialogs}" />
             <arg value="${test.client.concurrentDialog}" />
             <arg value="${test.client.channelType}" />
