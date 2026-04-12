@@ -1,32 +1,37 @@
-# Dockerfile for jSS7 MAP Load Test (MO SMS)
-# Build context: jss7/map/load directory
+# Multi-stage build for jSS7 MAP Load Test
+FROM eclipse-temurin:17-jdk-alpine as builder
+
+# Install Ant manually
+RUN apk add --no-cache wget && \
+    wget -q https://downloads.apache.org/ant/binaries/apache-ant-1.10.14-bin.tar.gz && \
+    tar -xzf apache-ant-1.10.14-bin.tar.gz -C /opt && \
+    ln -s /opt/apache-ant-1.10.14/bin/ant /usr/local/bin/ant && \
+    rm apache-ant-1.10.14-bin.tar.gz && \
+    apk del wget
 
 FROM eclipse-temurin:17-jdk-alpine
 
-# Install Ant
-RUN apk add --no-cache ant
+# Install tcpdump only (runtime)
+RUN apk add --no-cache tcpdump libpcap
+
+# Copy Ant from builder
+COPY --from=builder /opt/apache-ant-1.10.14 /opt/ant
+RUN ln -s /opt/ant/bin/ant /usr/local/bin/ant
 
 # Set working directory
 WORKDIR /opt/jss7-load-test
 
-# Create necessary directories
+# Create directories
 RUN mkdir -p server client target/load
 
-# Copy ant build file
+# Copy files
 COPY mo_sms_build.xml .
-
-# Copy all required JARs from target/load
-# These should be built beforehand using: mvn install -Passemble
 COPY target/load/*.jar target/load/
-
-# Copy resources if any
 COPY src/main/resources src/main/resources
-
-# Copy default log4j config
 COPY src/main/resources/log4j.properties .
 
-# Environment variables for test configuration
-ENV TEST_SERVER_CHANNEL_TYPE=sctp
+# Environment variables
+ENV TEST_SERVER_CHANNEL_TYPE=tcp
 ENV TEST_SERVER_HOST_IP=0.0.0.0
 ENV TEST_SERVER_HOST_PORT=8011
 ENV TEST_SERVER_EXTRA_HOST_ADDRESS=-1
@@ -42,9 +47,9 @@ ENV TEST_SERVER_NI=2
 ENV TEST_SERVER_SSN=8
 ENV TEST_SERVER_REMOTE_SSN=8
 
-ENV TEST_CLIENT_NUM_OF_DIALOGS=1440000
-ENV TEST_CLIENT_CONCURRENT_DIALOG=400
-ENV TEST_CLIENT_CHANNEL_TYPE=sctp
+ENV TEST_CLIENT_NUM_OF_DIALOGS=60000
+ENV TEST_CLIENT_CONCURRENT_DIALOG=1000
+ENV TEST_CLIENT_CHANNEL_TYPE=tcp
 ENV TEST_CLIENT_HOST_IP=127.0.0.1
 ENV TEST_CLIENT_HOST_PORT=8011
 ENV TEST_CLIENT_EXTRA_HOST_ADDRESS=-1
@@ -62,13 +67,10 @@ ENV TEST_CLIENT_REMOTE_SSN=8
 ENV TEST_CLIENT_CLIENT_ADDRESS=1111112
 ENV TEST_CLIENT_SERVER_ADDRESS=9960639999
 
-# JVM Options
 ENV JVM_OPTS="-Xms2048m -Xmx2048m -Xmn128m -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=256m -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError"
 
-# Expose potential ports
 EXPOSE 8011 8012
 
-# Entry point script
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
