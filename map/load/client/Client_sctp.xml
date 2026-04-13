@@ -1,0 +1,52 @@
+<map>
+  <entry>
+    <string>associations</string>
+    <associationMap serialization="custom">
+      <unserializable-parents/>
+      <org.jctools.maps.NonBlockingHashMap>
+        <default/>
+        <string>clientAssociation</string>
+        <association hostAddress="127.0.0.1" hostPort="2345" peerAddress="127.0.0.1" peerPort="3434" name="clientAssociation" ipChannelType="SCTP" type="CLIENT"/>
+        <null/>
+        <null/>
+      </org.jctools.maps.NonBlockingHashMap>
+    </associationMap>
+  </entry>
+  <entry>
+    <string>servers</string>
+    <java.util.concurrent.CopyOnWriteArrayList serialization="custom">
+      <java.util.concurrent.CopyOnWriteArrayList>
+        <default/>
+        <int>0</int>
+      </java.util.concurrent.CopyOnWriteArrayList>
+    </java.util.concurrent.CopyOnWriteArrayList>
+  </entry>
+  <entry>
+    <string>congControl_DelayThreshold_1</string>
+    <double>2.5</double>
+  </entry>
+  <entry>
+    <string>congControl_DelayThreshold_2</string>
+    <double>8.0</double>
+  </entry>
+  <entry>
+    <string>congControl_DelayThreshold_3</string>
+    <double>14.0</double>
+  </entry>
+  <entry>
+    <string>congControl_BackToNormalDelayThreshold_3</string>
+    <double>10.0</double>
+  </entry>
+  <entry>
+    <string>connectdelay</string>
+    <int>10000</int>
+  </entry>
+  <entry>
+    <string>congControl_BackToNormalDelayThreshold_2</string>
+    <double>5.5</double>
+  </entry>
+  <entry>
+    <string>congControl_BackToNormalDelayThreshold_1</string>
+    <double>1.5</double>
+  </entry>
+</map>

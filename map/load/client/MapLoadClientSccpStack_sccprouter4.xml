@@ -1,0 +1,42 @@
+<routerConfig>
+  <longMessageRules serialization="custom">
+    <unserializable-parents/>
+    <org.jctools.maps.NonBlockingHashMap>
+      <default/>
+      <null/>
+      <null/>
+    </org.jctools.maps.NonBlockingHashMap>
+  </longMessageRules>
+  <saps serialization="custom">
+    <unserializable-parents/>
+    <org.jctools.maps.NonBlockingHashMap>
+      <default/>
+      <int>1</int>
+      <org.restcomm.protocols.ss7.sccp.impl.router.Mtp3ServiceAccessPointImpl>
+        <mtp3Id>1</mtp3Id>
+        <opc>1</opc>
+        <ni>2</ni>
+        <stackName>MapLoadClientSccpStack</stackName>
+        <networkId>0</networkId>
+        <dpcList serialization="custom">
+          <unserializable-parents/>
+          <org.jctools.maps.NonBlockingHashMap>
+            <default/>
+            <int>1</int>
+            <org.restcomm.protocols.ss7.sccp.impl.router.Mtp3DestinationImpl>
+              <firstDpc>2</firstDpc>
+              <lastDpc>2</lastDpc>
+              <firstSls>0</firstSls>
+              <lastSls>255</lastSls>
+              <slsMask>255</slsMask>
+            </org.restcomm.protocols.ss7.sccp.impl.router.Mtp3DestinationImpl>
+            <null/>
+            <null/>
+          </org.jctools.maps.NonBlockingHashMap>
+        </dpcList>
+      </org.restcomm.protocols.ss7.sccp.impl.router.Mtp3ServiceAccessPointImpl>
+      <null/>
+      <null/>
+    </org.jctools.maps.NonBlockingHashMap>
+  </saps>
+</routerConfig>
