@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.primitives;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -15,14 +18,13 @@ import org.restcomm.protocols.ss7.cap.api.primitives.ExtensionField;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.ByteArrayContainer;
 import org.restcomm.protocols.ss7.map.primitives.OidContainer;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("extensionField")
+@JacksonXmlRootElement(localName = "extensionField")
 public class ExtensionFieldImpl implements ExtensionField, CAPAsnPrimitive {
 
     public static final int _ID_value = 1;
@@ -328,3 +330,4 @@ public class ExtensionFieldImpl implements ExtensionField, CAPAsnPrimitive {
         return sb.toString();
     }
 }
+

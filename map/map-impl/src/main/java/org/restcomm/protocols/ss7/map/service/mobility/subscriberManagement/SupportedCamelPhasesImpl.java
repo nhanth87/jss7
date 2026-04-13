@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.SupportedCamelPhases;
 import org.restcomm.protocols.ss7.map.primitives.BitStringBase;
 
@@ -11,7 +11,7 @@ import org.restcomm.protocols.ss7.map.primitives.BitStringBase;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("supportedCamelPhasesImpl")
+@JacksonXmlRootElement(localName = "supportedCamelPhasesImpl")
 public class SupportedCamelPhasesImpl extends BitStringBase implements SupportedCamelPhases {
 
     private static final int _INDEX_Phase1 = 0;

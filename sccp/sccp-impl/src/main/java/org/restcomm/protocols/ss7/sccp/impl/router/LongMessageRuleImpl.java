@@ -3,17 +3,23 @@ package org.restcomm.protocols.ss7.sccp.impl.router;
 import org.restcomm.protocols.ss7.sccp.LongMessageRule;
 import org.restcomm.protocols.ss7.sccp.LongMessageRuleType;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 /**
  *
  * @author sergey vetyutnev
  * @author Amit Bhayani
  *
  */
+@JacksonXmlRootElement(localName = "longMessageRule")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LongMessageRuleImpl implements LongMessageRule {
 
-    private int firstSpc;
-    private int lastSpc;
-    private LongMessageRuleType ruleType;
+    @JacksonXmlProperty private int firstSpc;
+    @JacksonXmlProperty private int lastSpc;
+    @JacksonXmlProperty private LongMessageRuleType ruleType;
 
     public LongMessageRuleImpl() {
     }

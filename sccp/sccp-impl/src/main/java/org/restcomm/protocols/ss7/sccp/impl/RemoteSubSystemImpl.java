@@ -2,19 +2,25 @@ package org.restcomm.protocols.ss7.sccp.impl;
 
 import org.restcomm.protocols.ss7.sccp.RemoteSubSystem;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 /**
  *
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "remoteSubSystem")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RemoteSubSystemImpl implements RemoteSubSystem {
 
-    private int remoteSpc;
-    private int remoteSsn;
-    private int remoteSsnFlag;
-    private boolean markProhibitedWhenSpcResuming;
+    @JacksonXmlProperty private int remoteSpc;
+    @JacksonXmlProperty private int remoteSsn;
+    @JacksonXmlProperty private int remoteSsnFlag;
+    @JacksonXmlProperty private boolean markProhibitedWhenSpcResuming;
 
-    private boolean remoteSsnProhibited;
+    @JacksonXmlProperty private boolean remoteSsnProhibited;
 
     public RemoteSubSystemImpl() {
 

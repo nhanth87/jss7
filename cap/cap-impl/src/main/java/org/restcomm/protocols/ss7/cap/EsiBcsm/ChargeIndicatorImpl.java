@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import org.restcomm.protocols.ss7.cap.api.EsiBcsm.ChargeIndicator;
 import org.restcomm.protocols.ss7.cap.api.EsiBcsm.ChargeIndicatorValue;
 import org.restcomm.protocols.ss7.cap.primitives.OctetStringLength1Base;
@@ -9,10 +12,8 @@ import org.restcomm.protocols.ss7.cap.primitives.OctetStringLength1Base;
 * @author sergey vetyutnev
 *
 */
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-@XStreamAlias("chargeIndicator")
+@JacksonXmlRootElement(localName = "chargeIndicator")
 public class ChargeIndicatorImpl extends OctetStringLength1Base implements ChargeIndicator {
 
     private static final String DEFAULT_VALUE = "";
@@ -66,3 +67,4 @@ public class ChargeIndicatorImpl extends OctetStringLength1Base implements Charg
     }
 
 }
+

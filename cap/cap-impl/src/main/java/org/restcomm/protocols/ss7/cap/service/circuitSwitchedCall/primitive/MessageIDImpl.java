@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -17,14 +20,13 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.map.primitives.ArrayListSerializingBase;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("messageID")
+@JacksonXmlRootElement(localName = "messageID")
 public class MessageIDImpl implements MessageID, CAPAsnPrimitive {
 
     public static final int _ID_elementaryMessageID = 0;
@@ -295,3 +297,4 @@ public static class MessageID_ElementaryMessageIDs extends ArrayListSerializingB
 
     }
 }
+

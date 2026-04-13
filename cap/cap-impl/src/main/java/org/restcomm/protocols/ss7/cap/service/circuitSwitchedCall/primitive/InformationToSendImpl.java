@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -15,14 +18,13 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.Tone;
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("informationToSend")
+@JacksonXmlRootElement(localName = "informationToSend")
 public class InformationToSendImpl implements InformationToSend, CAPAsnPrimitive {
 
     public static final int _ID_inbandInfo = 0;
@@ -190,3 +192,4 @@ public class InformationToSendImpl implements InformationToSend, CAPAsnPrimitive
         return sb.toString();
     }
 }
+

@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -23,13 +26,12 @@ import org.restcomm.protocols.ss7.cap.gap.GapIndicatorsImpl;
 import org.restcomm.protocols.ss7.cap.gap.GapTreatmentImpl;
 import org.restcomm.protocols.ss7.cap.primitives.CAPExtensionsImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
-@XStreamAlias("callGapRequest")
+@JacksonXmlRootElement(localName = "callGapRequest")
 public class CallGapRequestImpl extends CircuitSwitchedCallMessageImpl implements CallGapRequest {
 
     public static final int _ID_gapCriteria = 0;
@@ -300,3 +302,4 @@ public class CallGapRequestImpl extends CircuitSwitchedCallMessageImpl implement
     }
 
 }
+

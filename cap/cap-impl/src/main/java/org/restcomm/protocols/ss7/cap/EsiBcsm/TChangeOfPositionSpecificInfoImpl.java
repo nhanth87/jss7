@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -20,14 +23,13 @@ import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberInformation.LocationInformation;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation.LocationInformationImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("tChangeOfPositionSpecificInfo")
+@JacksonXmlRootElement(localName = "tChangeOfPositionSpecificInfo")
 public class TChangeOfPositionSpecificInfoImpl extends SequenceBase implements TChangeOfPositionSpecificInfo {
 
     private static final String LOCATION_INFORMATION = "locationInformation";
@@ -164,3 +166,4 @@ public class TChangeOfPositionSpecificInfoImpl extends SequenceBase implements T
         return sb.toString();
     }
 }
+

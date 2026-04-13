@@ -1,17 +1,19 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.VariablePartPrice;
 import org.restcomm.protocols.ss7.cap.primitives.OctetStringBase;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("variablePartPrice")
+@JacksonXmlRootElement(localName = "variablePartPrice")
 public class VariablePartPriceImpl extends OctetStringBase implements VariablePartPrice {
 
     private static final String PRICE_INTEGER_PART = "priceIntegerPart";
@@ -128,3 +130,4 @@ public class VariablePartPriceImpl extends OctetStringBase implements VariablePa
         return sb.toString();
     }
 }
+

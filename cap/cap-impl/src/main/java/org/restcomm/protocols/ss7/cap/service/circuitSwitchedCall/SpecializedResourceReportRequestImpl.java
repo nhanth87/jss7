@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -15,7 +18,6 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.SpecializedResourceReportRequest;
 import org.restcomm.protocols.ss7.tcap.asn.comp.Invoke;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -23,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author kiss.balazs@alerant.hu
  *
  */
-@XStreamAlias("specializedResourceReportRequest")
+@JacksonXmlRootElement(localName = "specializedResourceReportRequest")
 public class SpecializedResourceReportRequestImpl extends CircuitSwitchedCallMessageImpl implements SpecializedResourceReportRequest {
 
     public static final int _ID_allAnnouncementsComplete = 50;
@@ -231,3 +233,4 @@ public class SpecializedResourceReportRequestImpl extends CircuitSwitchedCallMes
         return sb.toString();
     }
 }
+

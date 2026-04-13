@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import org.restcomm.protocols.ss7.m3ua.parameter.CongestedIndication;
 import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
 
@@ -8,8 +11,10 @@ import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "congestedIndication")
 public class CongestedIndicationImpl extends ParameterImpl implements CongestedIndication {
 
+    @JsonProperty("level")
     private CongestionLevel level;
 
     protected CongestedIndicationImpl(CongestionLevel level) {

@@ -1,61 +1,25 @@
-<map>
-  <entry>
-    <string>associations</string>
-    <associationMap serialization="custom">
-      <unserializable-parents/>
-      <org.jctools.maps.NonBlockingHashMap>
-        <default/>
-        <string>serverAssociation</string>
-        <association hostPort="0" peerAddress="127.0.0.1" peerPort="3434" serverName="testserver" name="serverAssociation" ipChannelType="SCTP" type="SERVER"/>
-        <null/>
-        <null/>
-      </org.jctools.maps.NonBlockingHashMap>
-    </associationMap>
-  </entry>
-  <entry>
-    <string>servers</string>
-    <java.util.concurrent.CopyOnWriteArrayList serialization="custom">
-      <java.util.concurrent.CopyOnWriteArrayList>
-        <default/>
-        <int>1</int>
-        <server name="testserver" hostAddress="127.0.0.1" hostport="2345" started="false" ipChannelType="SCTP" acceptAnonymousConnections="false" maxConcurrentConnectionsCount="0">
-          <associations serialization="custom">
-            <java.util.concurrent.CopyOnWriteArrayList>
-              <default/>
-              <int>1</int>
-              <string>serverAssociation</string>
-            </java.util.concurrent.CopyOnWriteArrayList>
-          </associations>
-        </server>
-      </java.util.concurrent.CopyOnWriteArrayList>
-    </java.util.concurrent.CopyOnWriteArrayList>
-  </entry>
-  <entry>
-    <string>congControl_DelayThreshold_1</string>
-    <double>2.5</double>
-  </entry>
-  <entry>
-    <string>congControl_DelayThreshold_2</string>
-    <double>8.0</double>
-  </entry>
-  <entry>
-    <string>congControl_DelayThreshold_3</string>
-    <double>14.0</double>
-  </entry>
-  <entry>
-    <string>congControl_BackToNormalDelayThreshold_3</string>
-    <double>10.0</double>
-  </entry>
-  <entry>
-    <string>connectdelay</string>
-    <int>10000</int>
-  </entry>
-  <entry>
-    <string>congControl_BackToNormalDelayThreshold_2</string>
-    <double>5.5</double>
-  </entry>
-  <entry>
-    <string>congControl_BackToNormalDelayThreshold_1</string>
-    <double>1.5</double>
-  </entry>
-</map>
+<?xml version='1.0' encoding='UTF-8'?>
+<sctp>
+  <connectdelay>10000</connectdelay>
+  <congControl_DelayThreshold_1>2.5</congControl_DelayThreshold_1>
+  <congControl_DelayThreshold_2>8.0</congControl_DelayThreshold_2>
+  <congControl_DelayThreshold_3>14.0</congControl_DelayThreshold_3>
+  <congControl_BackToNormalDelayThreshold_1>1.5</congControl_BackToNormalDelayThreshold_1>
+  <congControl_BackToNormalDelayThreshold_2>5.5</congControl_BackToNormalDelayThreshold_2>
+  <congControl_BackToNormalDelayThreshold_3>10.0</congControl_BackToNormalDelayThreshold_3>
+  <servers>
+    <server name="testserver" hostAddress="127.0.0.1" hostport="2345" started="true" ipChannelType="SCTP" acceptAnonymousConnections="false" maxConcurrentConnectionsCount="0">
+      <associations>
+        <associations>serverAssociation</associations>
+      </associations>
+    </server>
+  </servers>
+  <association>
+    <serverAssociation hostPort="0" peerAddress="127.0.0.1" peerPort="3434" serverName="testserver" name="serverAssociation" ipChannelType="SCTP" type="SERVER">
+      <congestionLevel>0</congestionLevel>
+      <associationType>SERVER</associationType>
+      <connected>false</connected>
+      <byteBufAllocator/>
+    </serverAssociation>
+  </association>
+</sctp>

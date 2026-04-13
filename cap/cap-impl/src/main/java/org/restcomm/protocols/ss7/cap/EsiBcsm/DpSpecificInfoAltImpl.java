@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -17,14 +20,13 @@ import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("dpSpecificInfoAlt")
+@JacksonXmlRootElement(localName = "dpSpecificInfoAlt")
 public class DpSpecificInfoAltImpl extends SequenceBase implements DpSpecificInfoAlt {
 
     private static final String O_SERVICE_CHANGE_SPECIFIC_INFO = "oServiceChangeSpecificInfo";
@@ -147,3 +149,4 @@ public class DpSpecificInfoAltImpl extends SequenceBase implements DpSpecificInf
         return sb.toString();
     }
 }
+

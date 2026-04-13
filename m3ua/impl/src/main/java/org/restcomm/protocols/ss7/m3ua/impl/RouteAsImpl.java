@@ -1,7 +1,8 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl;
 
-
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.restcomm.protocols.ss7.m3ua.As;
 import org.restcomm.protocols.ss7.m3ua.ExchangeType;
@@ -16,16 +17,22 @@ import org.restcomm.protocols.ss7.m3ua.parameter.TrafficModeType;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "routeAs")
 public class RouteAsImpl implements RouteAs {
 
     private static final String TRAFFIC_MODE_TYPE = "trafficModeType";
     private static final String AS_ARRAY = "as";
 
-    private M3UAManagementImpl m3uaManagement;
+    private transient M3UAManagementImpl m3uaManagement;
+
+    @JsonProperty("asArray")
     private As[] asArray = null;
+
+    @JsonProperty("trafficModeType")
     private TrafficModeType trafficModeType = new TrafficModeTypeImpl(TrafficModeType.Loadshare);
 
     // After reading comma separated value from xml file, its stored here. And them M3USManagement will do the necessary setup.
+    @JsonProperty("asArraytemp")
     private String asArraytemp = null;
 
     public RouteAsImpl() {

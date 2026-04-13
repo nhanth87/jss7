@@ -1,6 +1,9 @@
 
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 import org.mobicents.protocols.asn.AsnException;
@@ -21,7 +24,6 @@ import org.restcomm.protocols.ss7.cap.primitives.ReceivingSideIDImpl;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -29,7 +31,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author Amit Bhayani
  *
  */
-@XStreamAlias("timeDurationChargingResult")
+@JacksonXmlRootElement(localName = "timeDurationChargingResult")
 public class TimeDurationChargingResultImpl extends SequenceBase implements TimeDurationChargingResult {
 
     private static final String PARTY_TO_CHARGE = "partyToCharge";
@@ -232,3 +234,4 @@ public class TimeDurationChargingResultImpl extends SequenceBase implements Time
         return sb.toString();
     }
 }
+

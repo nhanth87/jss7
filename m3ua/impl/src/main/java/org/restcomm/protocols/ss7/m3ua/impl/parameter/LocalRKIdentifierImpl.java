@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 
 
 import org.restcomm.protocols.ss7.m3ua.parameter.LocalRKIdentifier;
@@ -10,11 +13,14 @@ import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "localRKIdentifier")
 public class LocalRKIdentifierImpl extends ParameterImpl implements LocalRKIdentifier {
 
     private static final String ID = "id";
 
     private byte[] value;
+
+    @JsonProperty("id")
     private long id;
 
     public LocalRKIdentifierImpl() {

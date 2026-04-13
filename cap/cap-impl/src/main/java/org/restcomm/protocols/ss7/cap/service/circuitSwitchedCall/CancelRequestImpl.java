@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -16,7 +19,6 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.CancelRequ
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.CallSegmentToCancel;
 import org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive.CallSegmentToCancelImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -25,7 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author Amit Bhayani
  *
  */
-@XStreamAlias("cancelRequest")
+@JacksonXmlRootElement(localName = "cancelRequest")
 public class CancelRequestImpl extends CircuitSwitchedCallMessageImpl implements CancelRequest {
 
     private static final String INVOKE_ID = "invokeID";
@@ -236,3 +238,4 @@ public class CancelRequestImpl extends CircuitSwitchedCallMessageImpl implements
         return sb.toString();
     }
 }
+

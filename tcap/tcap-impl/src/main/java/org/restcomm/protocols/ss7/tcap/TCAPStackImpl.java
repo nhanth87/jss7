@@ -5,11 +5,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 
 
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.sccp.SccpProvider;
@@ -722,23 +724,44 @@ public class TCAPStackImpl implements TCAPStack {
     /**
      * Configuration class for TCAP persistence
      */
+    @JsonRootName("TCAPConfig")
     public static class TCAPConfig {
+        @JsonProperty("dialogTimeout")
         public long dialogTimeout;
+        @JsonProperty("invokeTimeout")
         public long invokeTimeout;
+        @JsonProperty("maxDialogs")
         public int maxDialogs;
+        @JsonProperty("dialogIdRangeStart")
         public long dialogIdRangeStart;
+        @JsonProperty("dialogIdRangeEnd")
         public long dialogIdRangeEnd;
+        @JsonProperty("ssn")
         public int ssn;
+        @JsonProperty("previewMode")
         public boolean previewMode;
+        @JsonProperty("doNotSendProtocolVersion")
         public boolean doNotSendProtocolVersion;
+        @JsonProperty("congControl_blockingIncomingTcapMessages")
         public boolean congControl_blockingIncomingTcapMessages;
+        @JsonProperty("congControl_ExecutorDelayThreshold")
         public double[] congControl_ExecutorDelayThreshold;
+        @JsonProperty("congControl_ExecutorBackToNormalDelayThreshold")
         public double[] congControl_ExecutorBackToNormalDelayThreshold;
+        @JsonProperty("congControl_MemoryThreshold")
         public double[] congControl_MemoryThreshold;
+        @JsonProperty("congControl_BackToNormalMemoryThreshold")
         public double[] congControl_BackToNormalMemoryThreshold;
+        @JsonProperty("statisticsEnabled")
         public boolean statisticsEnabled;
+        @JsonProperty("slsRange")
         public String slsRange;
+        @JsonProperty("isSwapTcapIdBytes")
         public boolean isSwapTcapIdBytes;
+
+        // Default constructor required by Jackson
+        public TCAPConfig() {
+        }
     }
 
     /**

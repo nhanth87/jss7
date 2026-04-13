@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
 import org.restcomm.protocols.ss7.m3ua.parameter.Status;
 
@@ -8,9 +11,12 @@ import org.restcomm.protocols.ss7.m3ua.parameter.Status;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "status")
 public class StatusImpl extends ParameterImpl implements Status {
 
+    @JsonProperty("type")
     private int type;
+    @JsonProperty("info")
     private int info;
 
     public StatusImpl(int type, int info) {

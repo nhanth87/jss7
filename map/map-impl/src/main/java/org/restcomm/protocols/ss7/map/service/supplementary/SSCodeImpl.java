@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.supplementary;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.restcomm.protocols.ss7.map.api.service.supplementary.SSCode;
 import org.restcomm.protocols.ss7.map.api.service.supplementary.SupplementaryCodeValue;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringLength1Base;
@@ -13,7 +13,7 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringLength1Base;
  * @author amit bhayani
  *
  */
-@XStreamAlias("sSCodeImpl")
+@JacksonXmlRootElement(localName = "sSCodeImpl")
 public class SSCodeImpl extends OctetStringLength1Base implements SSCode {
 
     public SSCodeImpl() {

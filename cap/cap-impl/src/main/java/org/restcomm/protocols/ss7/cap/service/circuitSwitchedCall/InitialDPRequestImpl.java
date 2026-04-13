@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -72,14 +75,13 @@ import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.CUGI
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.CUGInterlockImpl;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.ExtBasicServiceCodeImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("initialDPRequest")
+@JacksonXmlRootElement(localName = "initialDPRequest")
 public class InitialDPRequestImpl extends CircuitSwitchedCallMessageImpl implements InitialDPRequest {
 
     public static final int _ID_serviceKey = 0;
@@ -941,4 +943,5 @@ public class InitialDPRequestImpl extends CircuitSwitchedCallMessageImpl impleme
 // cugIndex
 // cugInterlock
 // cugOutgoingAccess
+
 

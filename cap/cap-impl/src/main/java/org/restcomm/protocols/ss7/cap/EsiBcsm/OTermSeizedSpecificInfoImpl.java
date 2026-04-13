@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -17,14 +20,13 @@ import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberInformation.LocationInformation;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation.LocationInformationImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("oTermSeizedSpecificInfo")
+@JacksonXmlRootElement(localName = "oTermSeizedSpecificInfo")
 public class OTermSeizedSpecificInfoImpl extends SequenceBase implements OTermSeizedSpecificInfo {
 
     public static final String LOCATION_INFORMATION = "locationInformation";
@@ -108,3 +110,4 @@ public class OTermSeizedSpecificInfoImpl extends SequenceBase implements OTermSe
         return sb.toString();
     }
 }
+

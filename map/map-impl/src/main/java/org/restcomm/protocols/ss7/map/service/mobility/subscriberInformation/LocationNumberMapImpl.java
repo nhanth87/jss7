@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.restcomm.protocols.ss7.isup.ParameterException;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.LocationNumberImpl;
 import org.restcomm.protocols.ss7.isup.message.parameter.LocationNumber;
@@ -15,7 +15,7 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("locationNumberMapImpl")
+@JacksonXmlRootElement(localName = "locationNumberMapImpl")
 public class LocationNumberMapImpl extends OctetStringBase implements LocationNumberMap {
     public LocationNumberMapImpl() {
         super(2, 10, "LocationNumberMap");

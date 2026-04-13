@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.errors;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.cap.api.CAPException;
@@ -7,7 +10,6 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentException;
 import org.restcomm.protocols.ss7.cap.api.errors.CAPErrorCode;
 import org.restcomm.protocols.ss7.cap.api.errors.CAPErrorMessageParameterless;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * The CAP ReturnError message without any parameters
@@ -15,7 +17,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("capErrorMessageParameterless")
+@JacksonXmlRootElement(localName = "capErrorMessageParameterless")
 public class CAPErrorMessageParameterlessImpl extends CAPErrorMessageImpl implements CAPErrorMessageParameterless {
 
     public CAPErrorMessageParameterlessImpl(Long errorCode) {
@@ -121,3 +123,4 @@ public class CAPErrorMessageParameterlessImpl extends CAPErrorMessageImpl implem
 
 
 }
+

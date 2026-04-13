@@ -3,8 +3,8 @@ package org.restcomm.protocols.ss7.map.primitives;
 
 import java.io.IOException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -21,7 +21,7 @@ import org.restcomm.protocols.ss7.map.api.primitives.LAIFixedLength;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("cellGlobalIdOrServiceAreaIdOrLAIImpl")
+@JacksonXmlRootElement(localName = "cellGlobalIdOrServiceAreaIdOrLAIImpl")
 public class CellGlobalIdOrServiceAreaIdOrLAIImpl implements CellGlobalIdOrServiceAreaIdOrLAI, MAPAsnPrimitive {
 
     private static final int _TAG_CELL_GLOBAL_ID_OR_SERVICE_AREAR_ID = 0;

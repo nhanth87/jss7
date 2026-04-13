@@ -10,7 +10,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 
-import com.thoughtworks.xstream.XStream;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 /**
  * read/write MAP layer configuration *.xml file
@@ -22,7 +22,7 @@ public class MAPStackConfigurationManagement {
     private static final String USER_DIR_KEY = "user.dir";
     private static final String DEFAULT_CONFIG_FILE_NAME = "MapStack";
 
-    private static final XStream xstream = MAPXStreamHelper.getXStream();
+    private static final XmlMapper xmlMapper = MAPJacksonHelper.getXmlMapper();
     private static MAPStackConfigurationManagement instance = new MAPStackConfigurationManagement();
 
     private String persistFile;
@@ -62,7 +62,7 @@ public class MAPStackConfigurationManagement {
      */
     public void store() {
         try (Writer writer = new OutputStreamWriter(new FileOutputStream(persistFile), StandardCharsets.UTF_8)) {
-            xstream.toXML(this, writer);
+            xmlMapper.writeValue(writer, this);
         } catch (Exception e) {
             System.err.println(String.format("Error while persisting the MAP Resource state in file=%s", persistFile));
             e.printStackTrace();
@@ -83,7 +83,7 @@ public class MAPStackConfigurationManagement {
                 return;
             }
             try (Reader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
-                MAPStackConfigurationManagement loaded = (MAPStackConfigurationManagement) xstream.fromXML(reader);
+                MAPStackConfigurationManagement loaded = xmlMapper.readValue(reader, MAPStackConfigurationManagement.class);
                 this.shortTimer = loaded.shortTimer;
                 this.mediumTimer = loaded.mediumTimer;
                 this.longTimer = loaded.longTimer;

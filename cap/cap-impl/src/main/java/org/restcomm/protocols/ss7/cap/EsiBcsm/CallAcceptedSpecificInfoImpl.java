@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 import org.mobicents.protocols.asn.AsnException;
@@ -21,14 +24,13 @@ import org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation.Loc
 * @author sergey vetyutnev
 *
 */
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias("callAcceptedSpecificInfo")
+@JacksonXmlRootElement(localName = "callAcceptedSpecificInfo")
 public class CallAcceptedSpecificInfoImpl extends SequenceBase implements CallAcceptedSpecificInfo {
 
     public static final int _ID_locationInformation = 50;
 
-    @XStreamAlias("locationInformation")
+    @JacksonXmlProperty(localName = "locationInformation")
     private LocationInformation locationInformation;
 
     public CallAcceptedSpecificInfoImpl() {
@@ -103,3 +105,4 @@ public class CallAcceptedSpecificInfoImpl extends SequenceBase implements CallAc
     }
 
 }
+

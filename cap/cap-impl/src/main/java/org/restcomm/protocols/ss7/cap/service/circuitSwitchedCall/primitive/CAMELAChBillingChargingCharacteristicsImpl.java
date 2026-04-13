@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -16,7 +19,6 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.cap.primitives.CAPExtensionsImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -25,7 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author alerant appngin
  *
  */
-@XStreamAlias("cAMELAChBillingChargingCharacteristics")
+@JacksonXmlRootElement(localName = "cAMELAChBillingChargingCharacteristics")
 public class CAMELAChBillingChargingCharacteristicsImpl implements CAMELAChBillingChargingCharacteristics, CAPAsnPrimitive {
 
     private static final String MAX_CALL_PERIOD_DURATION = "maxCallPeriodDuration";
@@ -380,3 +382,4 @@ public class CAMELAChBillingChargingCharacteristicsImpl implements CAMELAChBilli
         return sb.toString();
     }
 }
+

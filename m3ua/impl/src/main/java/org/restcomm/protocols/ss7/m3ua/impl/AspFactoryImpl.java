@@ -1,6 +1,9 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.CompositeByteBuf;
@@ -64,6 +67,7 @@ import org.restcomm.protocols.ss7.mtp.Mtp3StatusPrimitive;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "aspFactory")
 public class AspFactoryImpl implements AssociationListener, AspFactory {
 
     private static final Logger logger = Logger.getLogger(AspFactoryImpl.class);
@@ -79,13 +83,17 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
     private static final String ASP_ID = "aspid";
     private static final String HEART_BEAT = "heartbeat";
 
+    @JsonProperty("name")
     protected String name;
 
+    @JsonProperty("started")
     protected boolean started = false;
 
     protected Association association = null;
+    @JsonProperty("associationName")
     protected String associationName = null;
 
+    @JsonProperty("aspList")
     protected final CopyOnWriteArrayList<Asp> aspList = new CopyOnWriteArrayList<Asp>();
 
     private ByteBuffer txBuffer = ByteBuffer.allocateDirect(8192);

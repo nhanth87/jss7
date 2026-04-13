@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -14,14 +17,13 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.MessageID;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("inbandInfo")
+@JacksonXmlRootElement(localName = "inbandInfo")
 public class InbandInfoImpl extends SequenceBase implements InbandInfo {
 
     public static final int _ID_messageID = 0;
@@ -173,3 +175,4 @@ public class InbandInfoImpl extends SequenceBase implements InbandInfo {
         return sb.toString();
     }
 }
+

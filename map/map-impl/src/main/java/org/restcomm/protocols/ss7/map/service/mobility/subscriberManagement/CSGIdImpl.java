@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.BitSetStrictLength;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.CSGId;
 import org.restcomm.protocols.ss7.map.primitives.BitStringBase;
@@ -12,7 +12,7 @@ import org.restcomm.protocols.ss7.map.primitives.BitStringBase;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("cSGIdImpl")
+@JacksonXmlRootElement(localName = "cSGIdImpl")
 public class CSGIdImpl extends BitStringBase implements CSGId {
 
     private static final int BIT_STRING_LENGTH = 27;

@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -15,7 +18,6 @@ import org.restcomm.protocols.ss7.cap.isup.CauseCapImpl;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -23,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author Amit Bhayani
  *
  */
-@XStreamAlias("oCalledPartyBusySpecificInfo")
+@JacksonXmlRootElement(localName = "oCalledPartyBusySpecificInfo")
 public class OCalledPartyBusySpecificInfoImpl extends SequenceBase implements OCalledPartyBusySpecificInfo {
 
     private static final String BUSY_CAUSE = "busyCause";
@@ -98,3 +100,4 @@ public class OCalledPartyBusySpecificInfoImpl extends SequenceBase implements OC
         return sb.toString();
     }
 }
+

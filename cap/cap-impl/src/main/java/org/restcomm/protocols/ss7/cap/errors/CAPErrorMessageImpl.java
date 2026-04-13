@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.errors;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import org.restcomm.protocols.ss7.cap.api.errors.CAPErrorMessage;
 import org.restcomm.protocols.ss7.cap.api.errors.CAPErrorMessageCancelFailed;
 import org.restcomm.protocols.ss7.cap.api.errors.CAPErrorMessageParameterless;
@@ -14,13 +17,11 @@ import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
  * @author sergey vetyutnev
  *
  */
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-@XStreamAlias("capErrorMessage")
+@JacksonXmlRootElement(localName = "capErrorMessage")
 public abstract class CAPErrorMessageImpl implements CAPErrorMessage, CAPAsnPrimitive {
 
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     protected Long errorCode;
 
     protected CAPErrorMessageImpl(Long errorCode) {
@@ -86,3 +87,5 @@ public abstract class CAPErrorMessageImpl implements CAPErrorMessage, CAPAsnPrim
     }
 
 }
+
+

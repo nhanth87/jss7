@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -17,14 +20,13 @@ import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.ExtBasicServiceCode;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.ExtBasicServiceCodeImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("tServiceChangeSpecificInfo")
+@JacksonXmlRootElement(localName = "tServiceChangeSpecificInfo")
 public class TServiceChangeSpecificInfoImpl extends SequenceBase implements TServiceChangeSpecificInfo {
 
     public static final String EXT_BASIC_SERVICE_CODE = "extBasicServiceCode";
@@ -115,3 +117,4 @@ public class TServiceChangeSpecificInfoImpl extends SequenceBase implements TSer
         return sb.toString();
     }
 }
+

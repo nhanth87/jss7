@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -19,14 +22,13 @@ import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.inap.api.primitives.LegID;
 import org.restcomm.protocols.ss7.inap.primitives.LegIDImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author tamas gyorgyey
  *
  */
-@XStreamAlias("splitLegRequest")
+@JacksonXmlRootElement(localName = "splitLegRequest")
 public class SplitLegRequestImpl extends CircuitSwitchedCallMessageImpl implements SplitLegRequest {
     private static final long serialVersionUID = 1L;
 
@@ -223,3 +225,4 @@ public class SplitLegRequestImpl extends CircuitSwitchedCallMessageImpl implemen
         return sb.toString();
     }
 }
+

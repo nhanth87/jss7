@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.supplementary;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.restcomm.protocols.ss7.map.api.service.supplementary.SSStatus;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringLength1Base;
 
@@ -12,7 +12,7 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringLength1Base;
  * @author amit bhayani
  *
  */
-@XStreamAlias("sSStatusImpl")
+@JacksonXmlRootElement(localName = "sSStatusImpl")
 public class SSStatusImpl extends OctetStringLength1Base implements SSStatus {
 
     public static final int _mask_QBit = 0x08;

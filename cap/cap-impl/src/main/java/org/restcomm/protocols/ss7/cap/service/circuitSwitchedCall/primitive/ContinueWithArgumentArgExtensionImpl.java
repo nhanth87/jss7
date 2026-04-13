@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -14,14 +17,13 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.LegOrCallSegment;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author Povilas Jurna
  *
  */
-@XStreamAlias("continueWithArgumentArgExtension")
+@JacksonXmlRootElement(localName = "continueWithArgumentArgExtension")
 public class ContinueWithArgumentArgExtensionImpl extends SequenceBase implements ContinueWithArgumentArgExtension {
 
     private static final String SUPPRESS_D_CSI = "suppressDCSI";
@@ -174,3 +176,4 @@ public class ContinueWithArgumentArgExtensionImpl extends SequenceBase implement
     }
 
 }
+

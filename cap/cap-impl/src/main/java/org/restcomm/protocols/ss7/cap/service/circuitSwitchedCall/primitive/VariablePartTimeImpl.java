@@ -1,17 +1,19 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.VariablePartTime;
 import org.restcomm.protocols.ss7.cap.primitives.OctetStringBase;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("variablePartTime")
+@JacksonXmlRootElement(localName = "variablePartTime")
 public class VariablePartTimeImpl extends OctetStringBase implements VariablePartTime {
 
     private static final String HOUR = "hour";
@@ -102,3 +104,4 @@ public class VariablePartTimeImpl extends OctetStringBase implements VariablePar
         return sb.toString();
     }
 }
+

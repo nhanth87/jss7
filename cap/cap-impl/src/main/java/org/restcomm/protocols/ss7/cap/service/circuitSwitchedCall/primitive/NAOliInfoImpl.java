@@ -1,17 +1,19 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.NAOliInfo;
 import org.restcomm.protocols.ss7.cap.primitives.OctetStringLength1Base;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("nAOliInfo")
+@JacksonXmlRootElement(localName = "nAOliInfo")
 public class NAOliInfoImpl extends OctetStringLength1Base implements NAOliInfo {
 
     private static final String VALUE = "value";
@@ -29,3 +31,4 @@ public class NAOliInfoImpl extends OctetStringLength1Base implements NAOliInfo {
         return data;
     }
 }
+

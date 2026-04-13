@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -48,14 +51,13 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("eventSpecificInformationBCSM")
+@JacksonXmlRootElement(localName = "eventSpecificInformationBCSM")
 public class EventSpecificInformationBCSMImpl implements EventSpecificInformationBCSM, CAPAsnPrimitive {
 
     private static final String ROUTE_SELECT_FAILURE_SPECIFIC_INFO = "routeSelectFailureSpecificInfo";
@@ -620,3 +622,4 @@ public class EventSpecificInformationBCSMImpl implements EventSpecificInformatio
         return sb.toString();
     }
 }
+

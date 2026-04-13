@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -18,14 +21,13 @@ import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.cap.primitives.SendingSideIDImpl;
 import org.restcomm.protocols.ss7.inap.api.primitives.LegType;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("fCIBCCCAMELsequence1")
+@JacksonXmlRootElement(localName = "fCIBCCCAMELsequence1")
 public class FCIBCCCAMELsequence1Impl implements FCIBCCCAMELsequence1, CAPAsnPrimitive {
 
     public static final int _ID_freeFormatData = 0;
@@ -240,3 +242,4 @@ public class FCIBCCCAMELsequence1Impl implements FCIBCCCAMELsequence1, CAPAsnPri
         return sb.toString();
     }
 }
+

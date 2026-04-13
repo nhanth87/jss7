@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -18,14 +21,13 @@ import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.primitives.ArrayListSerializingBase;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("dpSpecificCriteriaAlt")
+@JacksonXmlRootElement(localName = "dpSpecificCriteriaAlt")
 public class DpSpecificCriteriaAltImpl extends SequenceBase implements DpSpecificCriteriaAlt {
 
     private static final String CHANGE_OF_POSITION_CONTROL_INFO = "changeOfPositionControlInfo";
@@ -183,3 +185,4 @@ public static class DpSpecificCriteriaAlt_ChangeOfLocation extends ArrayListSeri
     }
 
 }
+

@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -18,14 +21,13 @@ import org.restcomm.protocols.ss7.inap.api.primitives.LegID;
 import org.restcomm.protocols.ss7.inap.primitives.LegIDImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author Povilas Jurna
  *
  */
-@XStreamAlias("legOrCallSegment")
+@JacksonXmlRootElement(localName = "legOrCallSegment")
 public class LegOrCallSegmentImpl implements LegOrCallSegment, CAPAsnPrimitive {
 
     private static final String CALL_SEGMENT_ID = "callSegmentID";
@@ -215,3 +217,4 @@ public class LegOrCallSegmentImpl implements LegOrCallSegment, CAPAsnPrimitive {
         return legID;
     }
 }
+

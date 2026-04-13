@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.errors;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 import org.mobicents.protocols.asn.AsnException;
@@ -18,14 +21,13 @@ import org.restcomm.protocols.ss7.cap.api.errors.UnavailableNetworkResource;
  * @author sergey vetyutnev
  *
  */
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias("capErrorMessageSystemFailure")
+@JacksonXmlRootElement(localName = "capErrorMessageSystemFailure")
 public class CAPErrorMessageSystemFailureImpl extends CAPErrorMessageImpl implements CAPErrorMessageSystemFailure {
 
     public static final String _PrimitiveName = "CAPErrorMessageSystemFailure";
 
-    @XStreamAlias("unavailableNetworkResource")
+    @JacksonXmlProperty(localName = "unavailableNetworkResource")
     private UnavailableNetworkResource unavailableNetworkResource;
 
     protected CAPErrorMessageSystemFailureImpl(UnavailableNetworkResource unavailableNetworkResource) {
@@ -155,3 +157,4 @@ public class CAPErrorMessageSystemFailureImpl extends CAPErrorMessageImpl implem
 
 
 }
+

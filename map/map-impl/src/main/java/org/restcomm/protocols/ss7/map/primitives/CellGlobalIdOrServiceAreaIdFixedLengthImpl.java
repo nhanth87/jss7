@@ -3,7 +3,7 @@ package org.restcomm.protocols.ss7.map.primitives;
 
 import java.io.IOException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -16,7 +16,7 @@ import org.restcomm.protocols.ss7.map.api.primitives.CellGlobalIdOrServiceAreaId
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("cellGlobalIdOrServiceAreaIdFixedLength")
+@JacksonXmlRootElement(localName = "cellGlobalIdOrServiceAreaIdFixedLength")
 public class CellGlobalIdOrServiceAreaIdFixedLengthImpl extends OctetStringBase implements CellGlobalIdOrServiceAreaIdFixedLength {
 
     public CellGlobalIdOrServiceAreaIdFixedLengthImpl() {

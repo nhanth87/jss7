@@ -1,17 +1,19 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.VariablePartDate;
 import org.restcomm.protocols.ss7.cap.primitives.OctetStringBase;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("variablePartDate")
+@JacksonXmlRootElement(localName = "variablePartDate")
 public class VariablePartDateImpl extends OctetStringBase implements VariablePartDate {
 
     private static final String YEAR = "year";
@@ -120,3 +122,4 @@ public class VariablePartDateImpl extends OctetStringBase implements VariablePar
         return sb.toString();
     }
 }
+

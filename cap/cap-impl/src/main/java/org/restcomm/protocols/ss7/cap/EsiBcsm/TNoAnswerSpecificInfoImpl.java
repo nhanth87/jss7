@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -15,14 +18,13 @@ import org.restcomm.protocols.ss7.cap.isup.CalledPartyNumberCapImpl;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("tNoAnswerSpecificInfo")
+@JacksonXmlRootElement(localName = "tNoAnswerSpecificInfo")
 public class TNoAnswerSpecificInfoImpl extends SequenceBase implements TNoAnswerSpecificInfo {
 
     private static final String CALL_FORWARDED = "callForwarded";
@@ -125,3 +127,4 @@ public class TNoAnswerSpecificInfoImpl extends SequenceBase implements TNoAnswer
         return sb.toString();
     }
 }
+

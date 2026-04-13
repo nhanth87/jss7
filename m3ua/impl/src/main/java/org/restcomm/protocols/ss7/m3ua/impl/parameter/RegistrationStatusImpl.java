@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
 import org.restcomm.protocols.ss7.m3ua.parameter.RegistrationStatus;
 
@@ -8,8 +11,10 @@ import org.restcomm.protocols.ss7.m3ua.parameter.RegistrationStatus;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "registrationStatus")
 public class RegistrationStatusImpl extends ParameterImpl implements RegistrationStatus {
 
+    @JsonProperty("status")
     private int status;
 
     public RegistrationStatusImpl(byte[] data) {

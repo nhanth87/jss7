@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import org.restcomm.protocols.ss7.m3ua.parameter.CorrelationId;
 import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
 
@@ -8,9 +11,12 @@ import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "correlationId")
 public class CorrelationIdImpl extends ParameterImpl implements CorrelationId {
 
     private static final long UNSIGNED_INT_MAX_VALUE = 0xFFFFFFFF;
+
+    @JsonProperty("corrId")
     private long corrId;
 
     protected CorrelationIdImpl(long corrId) {

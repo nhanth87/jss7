@@ -1,8 +1,7 @@
 
 package org.restcomm.protocols.ss7.map.errors;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessage;
 import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessageAbsentSubscriber;
@@ -32,10 +31,9 @@ import org.restcomm.protocols.ss7.map.primitives.MAPAsnPrimitive;
  * @author amit bhayani
  *
  */
-@XStreamAlias("mapErrorMessage")
 public abstract class MAPErrorMessageImpl implements MAPErrorMessage, MAPAsnPrimitive {
 
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     protected Long errorCode;
 
     protected MAPErrorMessageImpl(Long errorCode) {

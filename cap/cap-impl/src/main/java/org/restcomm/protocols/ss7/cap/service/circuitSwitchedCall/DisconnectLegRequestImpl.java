@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -23,14 +26,13 @@ import org.restcomm.protocols.ss7.inap.api.primitives.LegID;
 import org.restcomm.protocols.ss7.inap.primitives.LegIDImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author Povilas Jurna
  *
  */
-@XStreamAlias("disconnectLegRequest")
+@JacksonXmlRootElement(localName = "disconnectLegRequest")
 public class DisconnectLegRequestImpl extends CircuitSwitchedCallMessageImpl implements DisconnectLegRequest {
 
     public static final int _ID_legToBeReleased = 0;
@@ -236,3 +238,4 @@ public class DisconnectLegRequestImpl extends CircuitSwitchedCallMessageImpl imp
         return sb.toString();
     }
 }
+

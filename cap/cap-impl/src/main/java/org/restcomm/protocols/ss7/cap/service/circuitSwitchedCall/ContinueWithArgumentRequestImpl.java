@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -40,14 +43,13 @@ import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.
 import org.restcomm.protocols.ss7.map.primitives.ArrayListSerializingBase;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.CUGInterlockImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author Povilas Jurna
  *
  */
-@XStreamAlias("continueWithArgumentRequest")
+@JacksonXmlRootElement(localName = "continueWithArgumentRequest")
 public class ContinueWithArgumentRequestImpl extends CircuitSwitchedCallMessageImpl implements
         ContinueWithArgumentRequest {
 
@@ -539,3 +541,4 @@ public static class ContinueWithArgument_GenericNumbers extends ArrayListSeriali
     }
 
 }
+

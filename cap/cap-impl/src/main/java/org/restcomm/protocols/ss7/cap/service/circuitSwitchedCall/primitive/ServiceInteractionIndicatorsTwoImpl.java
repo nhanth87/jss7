@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -20,14 +23,13 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.inap.api.primitives.BothwayThroughConnectionInd;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("serviceInteractionIndicatorsTwo")
+@JacksonXmlRootElement(localName = "serviceInteractionIndicatorsTwo")
 public class ServiceInteractionIndicatorsTwoImpl extends SequenceBase implements ServiceInteractionIndicatorsTwo {
 
     public static final int _ID_forwardServiceInteractionInd = 0;
@@ -294,3 +296,4 @@ public class ServiceInteractionIndicatorsTwoImpl extends SequenceBase implements
         return sb.toString();
     }
 }
+

@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.isup;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 import org.mobicents.protocols.asn.AsnException;
@@ -21,14 +24,13 @@ import org.restcomm.protocols.ss7.isup.message.parameter.CalledPartyNumber;
  * @author sergey vetyutnev
  *
  */
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias("calledPartyNumberCap")
+@JacksonXmlRootElement(localName = "calledPartyNumberCap")
 public class CalledPartyNumberCapImpl implements CalledPartyNumberCap, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "CalledPartyNumberCap";
 
-    @XStreamAlias("isupCalledPartyNumber")
+    @JacksonXmlProperty(localName = "isupCalledPartyNumber")
     private byte[] data;
 
     public CalledPartyNumberCapImpl() {
@@ -194,3 +196,4 @@ public class CalledPartyNumberCapImpl implements CalledPartyNumberCap, CAPAsnPri
     }
 
 }
+

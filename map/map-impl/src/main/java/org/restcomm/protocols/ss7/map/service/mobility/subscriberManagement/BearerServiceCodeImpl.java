@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.BearerServiceCode;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.BearerServiceCodeValue;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringLength1Base;
@@ -13,7 +13,7 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringLength1Base;
  * @author amit bhayani
  *
  */
-@XStreamAlias("bearerServiceCodeImpl")
+@JacksonXmlRootElement(localName = "bearerServiceCodeImpl")
 public class BearerServiceCodeImpl extends OctetStringLength1Base implements BearerServiceCode {
 
     public BearerServiceCodeImpl() {

@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -12,7 +15,6 @@ import org.restcomm.protocols.ss7.cap.api.EsiBcsm.ONoAnswerSpecificInfo;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -20,7 +22,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author Amit Bhayani
  *
  */
-@XStreamAlias("oNoAnswerSpecificInfo")
+@JacksonXmlRootElement(localName = "oNoAnswerSpecificInfo")
 public class ONoAnswerSpecificInfoImpl extends SequenceBase implements ONoAnswerSpecificInfo {
 
     public ONoAnswerSpecificInfoImpl() {
@@ -56,3 +58,4 @@ public class ONoAnswerSpecificInfoImpl extends SequenceBase implements ONoAnswer
         return sb.toString();
     }
 }
+

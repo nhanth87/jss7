@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.sms;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -17,7 +20,6 @@ import org.restcomm.protocols.ss7.cap.api.service.sms.primitive.FCIBCCCAMELseque
 import org.restcomm.protocols.ss7.cap.service.sms.primitive.FCIBCCCAMELsequence1SMSImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -25,7 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author alerant appngin
  *
  */
-@XStreamAlias("furnishChargingInformationSMSRequest")
+@JacksonXmlRootElement(localName = "furnishChargingInformationSMSRequest")
 public class FurnishChargingInformationSMSRequestImpl extends SmsMessageImpl implements FurnishChargingInformationSMSRequest {
 
     private static final String FCI_BCC_CAMEL_SEQUENCE1 = "fCIBCCCAMELsequence1";
@@ -198,3 +200,4 @@ public class FurnishChargingInformationSMSRequestImpl extends SmsMessageImpl imp
         return sb.toString();
     }
 }
+

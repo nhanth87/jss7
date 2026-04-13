@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 
 
 import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
@@ -10,10 +13,12 @@ import org.restcomm.protocols.ss7.m3ua.parameter.TrafficModeType;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "trafficModeType")
 public class TrafficModeTypeImpl extends ParameterImpl implements TrafficModeType {
 
     private static final String MODE = "mode";
 
+    @JsonProperty("mode")
     private int mode = 0;
     private byte[] value;
 

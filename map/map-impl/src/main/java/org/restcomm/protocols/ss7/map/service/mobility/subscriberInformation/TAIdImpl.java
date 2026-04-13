@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.map.api.MAPException;
@@ -16,7 +16,7 @@ import java.io.IOException;
 /**
  * @author <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
  */
-@XStreamAlias("tAIdImpl")
+@JacksonXmlRootElement(localName = "tAIdImpl")
 public class TAIdImpl extends OctetStringBase implements TAId {
     public TAIdImpl() {
         super(5, 5, "TAId");

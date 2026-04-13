@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.supplementary;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.map.MessageImpl;
 import org.restcomm.protocols.ss7.map.api.MAPException;
@@ -18,7 +18,7 @@ import org.restcomm.protocols.ss7.map.primitives.USSDStringImpl;
  * @author amit bhayani
  *
  */
-@XStreamAlias("supplementaryMessageImpl")
+@JacksonXmlRootElement(localName = "supplementaryMessageImpl")
 public abstract class SupplementaryMessageImpl extends MessageImpl implements SupplementaryMessage, MAPAsnPrimitive {
 
     private static final Logger logger = Logger.getLogger(SupplementaryMessageImpl.class);

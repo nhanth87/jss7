@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -20,14 +23,13 @@ import org.restcomm.protocols.ss7.map.api.primitives.LAIFixedLength;
 import org.restcomm.protocols.ss7.map.primitives.CellGlobalIdOrServiceAreaIdFixedLengthImpl;
 import org.restcomm.protocols.ss7.map.primitives.LAIFixedLengthImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("metDPCriterion")
+@JacksonXmlRootElement(localName = "metDPCriterion")
 public class MetDPCriterionImpl implements MetDPCriterion, CAPAsnPrimitive {
 
     private static final String ENTERING_CELL_GLOBAL_ID = "enteringCellGlobalId";
@@ -453,3 +455,4 @@ public class MetDPCriterionImpl implements MetDPCriterion, CAPAsnPrimitive {
     }
 
 }
+

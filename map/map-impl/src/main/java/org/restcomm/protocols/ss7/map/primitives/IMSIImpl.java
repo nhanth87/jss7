@@ -1,7 +1,7 @@
 
 package org.restcomm.protocols.ss7.map.primitives;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.restcomm.protocols.ss7.map.api.primitives.IMSI;
 
@@ -10,7 +10,7 @@ import org.restcomm.protocols.ss7.map.api.primitives.IMSI;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("imsi")
+@JacksonXmlRootElement(localName = "imsi")
 public class IMSIImpl extends TbcdString implements IMSI {
 
     public IMSIImpl() {

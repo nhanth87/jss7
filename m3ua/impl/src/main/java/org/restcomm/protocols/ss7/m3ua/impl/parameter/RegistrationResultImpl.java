@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -10,10 +13,14 @@ import org.restcomm.protocols.ss7.m3ua.parameter.RegistrationResult;
 import org.restcomm.protocols.ss7.m3ua.parameter.RegistrationStatus;
 import org.restcomm.protocols.ss7.m3ua.parameter.RoutingContext;
 
+@JacksonXmlRootElement(localName = "registrationResult")
 public class RegistrationResultImpl extends ParameterImpl implements RegistrationResult {
 
+    @JsonProperty("localRKId")
     private LocalRKIdentifier localRKId;
+    @JsonProperty("status")
     private RegistrationStatus status;
+    @JsonProperty("rc")
     private RoutingContext rc;
 
     private ByteBuf buf = Unpooled.buffer(24);

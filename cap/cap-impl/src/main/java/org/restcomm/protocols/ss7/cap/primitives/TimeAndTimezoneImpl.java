@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.primitives;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 import org.mobicents.protocols.asn.AsnException;
@@ -16,27 +19,25 @@ import org.restcomm.protocols.ss7.cap.api.primitives.TimeAndTimezone;
  * @author sergey vetyutnev
  *
  */
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-@XStreamAlias("timeAndTimezone")
+@JacksonXmlRootElement(localName = "timeAndTimezone")
 public class TimeAndTimezoneImpl implements TimeAndTimezone, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "TimeAndTimezone";
 
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     private int year;
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     private int month;
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     private int day;
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     private int hour;
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     private int minute;
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     private int second;
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     private int timeZone;
 
     private byte[] data;
@@ -319,3 +320,4 @@ public class TimeAndTimezoneImpl implements TimeAndTimezone, CAPAsnPrimitive {
     }
 
 }
+

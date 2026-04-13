@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberInformation.TransactionId;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
 
@@ -11,7 +11,7 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("transactionIdImpl")
+@JacksonXmlRootElement(localName = "transactionIdImpl")
 public class TransactionIdImpl extends OctetStringBase implements TransactionId {
     public TransactionIdImpl() {
         super(1, 2, "TransactionId");

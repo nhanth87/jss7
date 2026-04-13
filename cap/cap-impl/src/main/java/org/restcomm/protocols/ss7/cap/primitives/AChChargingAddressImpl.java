@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.primitives;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -17,14 +20,13 @@ import org.restcomm.protocols.ss7.inap.api.primitives.LegID;
 import org.restcomm.protocols.ss7.inap.primitives.LegIDImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("aChChargingAddress")
+@JacksonXmlRootElement(localName = "aChChargingAddress")
 public class AChChargingAddressImpl implements AChChargingAddress, CAPAsnPrimitive {
 
     public static final int _ID_legID = 2;
@@ -219,3 +221,4 @@ public class AChChargingAddressImpl implements AChChargingAddress, CAPAsnPrimiti
         return sb.toString();
     }
 }
+

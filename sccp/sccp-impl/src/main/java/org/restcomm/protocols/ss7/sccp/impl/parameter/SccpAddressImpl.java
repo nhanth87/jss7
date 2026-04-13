@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 import org.restcomm.protocols.ss7.indicator.AddressIndicator;
 import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
@@ -22,6 +23,7 @@ import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
  * @author baranowb
  *
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SccpAddressImpl extends AbstractParameter implements SccpAddress {
 
     private static final byte ROUTE_ON_PC_FLAG = 0x40;
@@ -36,9 +38,16 @@ public class SccpAddressImpl extends AbstractParameter implements SccpAddress {
     private static final String NETWORK_ID = "networkId";
     private static final String AI = "ai";
 
+    @JacksonXmlProperty(localName = "globalTitle")
     private GlobalTitle gt;
+    
+    @JacksonXmlProperty(localName = "pc")
     private int pc = 0;
+    
+    @JacksonXmlProperty(localName = "ssn")
     private int ssn = -1;
+    
+    @JacksonXmlProperty(localName = "networkId")
     private int networkId = 0;
 
     private AddressIndicator ai;

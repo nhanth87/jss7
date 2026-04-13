@@ -4,7 +4,7 @@ package org.restcomm.protocols.ss7.map.primitives;
 import java.io.IOException;
 import java.util.Arrays;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -20,7 +20,7 @@ import org.restcomm.protocols.ss7.map.api.primitives.MAPPrivateExtension;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("mapPrivateExtension")
+@JacksonXmlRootElement(localName = "mapPrivateExtension")
 public class MAPPrivateExtensionImpl implements MAPPrivateExtension, MAPAsnPrimitive {
 
     private long[] oId;

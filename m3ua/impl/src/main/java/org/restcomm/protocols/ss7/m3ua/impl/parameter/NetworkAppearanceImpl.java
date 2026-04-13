@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 
 
 import org.restcomm.protocols.ss7.m3ua.parameter.NetworkAppearance;
@@ -9,11 +12,14 @@ import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
  * @author amit bhayani
  * @author kulikov
  */
+@JacksonXmlRootElement(localName = "networkAppearance")
 public class NetworkAppearanceImpl extends ParameterImpl implements NetworkAppearance {
 
     private static final String VALUE = "value";
 
     private static final long UNSIGNED_INT_MAX_VALUE = 0xFFFFFFFF;
+
+    @JsonProperty("value")
     private long value;
 
     public NetworkAppearanceImpl() {

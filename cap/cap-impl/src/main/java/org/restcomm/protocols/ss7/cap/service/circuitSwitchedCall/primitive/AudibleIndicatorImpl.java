@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -16,14 +19,13 @@ import org.restcomm.protocols.ss7.cap.primitives.BurstListImpl;
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("audibleIndicator")
+@JacksonXmlRootElement(localName = "audibleIndicator")
 public class AudibleIndicatorImpl implements AudibleIndicator, CAPAsnPrimitive {
 
     public static final int _ID_burstList = 1;
@@ -215,3 +217,4 @@ public class AudibleIndicatorImpl implements AudibleIndicator, CAPAsnPrimitive {
         return sb.toString();
     }
 }
+

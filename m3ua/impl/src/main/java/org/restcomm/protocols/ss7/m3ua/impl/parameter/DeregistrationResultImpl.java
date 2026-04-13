@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -13,9 +16,12 @@ import org.restcomm.protocols.ss7.m3ua.parameter.RoutingContext;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "deregistrationResult")
 public class DeregistrationResultImpl extends ParameterImpl implements DeregistrationResult {
 
+    @JsonProperty("routingContext")
     private RoutingContext routingContext;
+    @JsonProperty("status")
     private DeregistrationStatus status;
     private byte[] value;
 

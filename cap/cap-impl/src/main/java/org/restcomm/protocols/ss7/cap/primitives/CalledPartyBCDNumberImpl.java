@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.primitives;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,14 +24,13 @@ import org.restcomm.protocols.ss7.map.datacoding.GSMCharsetEncoder;
 import org.restcomm.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
 import org.restcomm.protocols.ss7.map.primitives.TbcdString;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("calledPartyBCDNumber")
+@JacksonXmlRootElement(localName = "calledPartyBCDNumber")
 public class CalledPartyBCDNumberImpl extends OctetStringBase implements CalledPartyBCDNumber {
 
     private static final String NAI = "nai";
@@ -221,3 +223,4 @@ public class CalledPartyBCDNumberImpl extends OctetStringBase implements CalledP
         return sb.toString();
     }
 }
+

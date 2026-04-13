@@ -3,8 +3,8 @@ package org.restcomm.protocols.ss7.map.errors;
 
 import java.io.IOException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -23,7 +23,7 @@ import org.restcomm.protocols.ss7.map.primitives.MAPExtensionContainerImpl;
  * @author sergey vetyutnev
  * @author amit bhayani
  */
-@XStreamAlias("mAPErrorMessageAbsentSubscriberImpl")
+@JacksonXmlRootElement(localName = "mAPErrorMessageAbsentSubscriberImpl")
 public class MAPErrorMessageAbsentSubscriberImpl extends MAPErrorMessageImpl implements MAPErrorMessageAbsentSubscriber {
 
     public static final int AbsentSubscriberReason_TAG = 0;

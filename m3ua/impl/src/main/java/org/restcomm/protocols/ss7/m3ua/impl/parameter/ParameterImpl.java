@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import io.netty.buffer.ByteBuf;
 
 import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
@@ -8,9 +11,12 @@ import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
  * @author amit bhayani
  * @author kulikov
  */
+@JacksonXmlRootElement(localName = "parameter")
 public abstract class ParameterImpl implements Parameter {
 
+    @JsonProperty("tag")
     protected volatile short tag;
+    @JsonProperty("length")
     protected volatile short length;
 
     public short getTag() {

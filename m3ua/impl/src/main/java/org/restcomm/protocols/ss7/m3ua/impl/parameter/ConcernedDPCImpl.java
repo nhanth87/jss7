@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import org.restcomm.protocols.ss7.m3ua.parameter.ConcernedDPC;
 import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
 
@@ -8,8 +11,10 @@ import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "concernedDpc")
 public class ConcernedDPCImpl extends ParameterImpl implements ConcernedDPC {
 
+    @JsonProperty("pointCode")
     private int pointCode;
 
     protected ConcernedDPCImpl(int pointCode) {

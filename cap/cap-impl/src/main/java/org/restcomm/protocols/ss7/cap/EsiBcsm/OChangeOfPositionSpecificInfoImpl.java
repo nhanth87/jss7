@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -20,14 +23,13 @@ import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberInformation
 import org.restcomm.protocols.ss7.map.primitives.ArrayListSerializingBase;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation.LocationInformationImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("oChangeOfPositionSpecificInfo")
+@JacksonXmlRootElement(localName = "oChangeOfPositionSpecificInfo")
 public class OChangeOfPositionSpecificInfoImpl extends SequenceBase implements OChangeOfPositionSpecificInfo {
 
     private static final String LOCATION_INFORMATION = "locationInformation";
@@ -177,3 +179,4 @@ public static class OChangeOfPositionSpecificInfo_MetDPCriterion extends ArrayLi
     }
 
 }
+

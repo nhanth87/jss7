@@ -1,6 +1,9 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -21,10 +24,7 @@ import org.restcomm.protocols.ss7.m3ua.State;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSM;
 import org.restcomm.protocols.ss7.m3ua.impl.message.MessageFactoryImpl;
 import org.restcomm.protocols.ss7.m3ua.impl.oam.M3UAOAMMessages;
-import org.restcomm.protocols.ss7.m3ua.impl.parameter.NetworkAppearanceImpl;
 import org.restcomm.protocols.ss7.m3ua.impl.parameter.ParameterFactoryImpl;
-import org.restcomm.protocols.ss7.m3ua.impl.parameter.RoutingContextImpl;
-import org.restcomm.protocols.ss7.m3ua.impl.parameter.TrafficModeTypeImpl;
 import org.restcomm.protocols.ss7.m3ua.message.MessageFactory;
 import org.restcomm.protocols.ss7.m3ua.message.transfer.PayloadData;
 import org.restcomm.protocols.ss7.m3ua.parameter.NetworkAppearance;
@@ -38,6 +38,7 @@ import org.restcomm.protocols.ss7.mtp.RoutingLabelFormat;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "as")
 public class AsImpl implements As {
 
     private static final Logger logger = Logger.getLogger(AsImpl.class);
@@ -52,20 +53,26 @@ public class AsImpl implements As {
 
     public static final String ATTRIBUTE_ASP = "asp";
 
+    @JsonProperty("minAspActiveForLb")
     protected int minAspActiveForLb = 1;
 
     // List of all the ASP's for this AS
+    @JsonProperty("appServerProcs")
     protected final CopyOnWriteArrayList<Asp> appServerProcs = new CopyOnWriteArrayList<Asp>();
 
-    // List of As state listeners
+    // List of As state listeners - transient, don't serialize
     private final Set<AsStateListener> asStateListeners = ConcurrentHashMap.newKeySet();
 
     private AspTrafficListener aspTrafficListener;
 
+    @JsonProperty("name")
     protected String name;
+    @JsonProperty("routingContext")
     protected RoutingContext routingContext;
+    @JsonProperty("trafficModeType")
     protected TrafficModeType trafficModeType;
 
+    @JsonProperty("defaultTrafficModeType")
     protected TrafficModeType defaultTrafficModeType;
 
     protected ConcurrentLinkedQueue<PayloadData> penQueue = new ConcurrentLinkedQueue<PayloadData>();

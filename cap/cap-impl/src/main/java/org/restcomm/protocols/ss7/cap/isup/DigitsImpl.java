@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.isup;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 import org.mobicents.protocols.asn.AsnException;
@@ -23,14 +26,13 @@ import org.restcomm.protocols.ss7.isup.message.parameter.GenericNumber;
  * @author sergey vetyutnev
  *
  */
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias("digits")
+@JacksonXmlRootElement(localName = "digits")
 public class DigitsImpl implements Digits, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "Digits";
 
-    @XStreamAlias("genericDigits")
+    @JacksonXmlProperty(localName = "genericDigits")
     private byte[] data;
     private boolean isGenericDigits;
     private boolean isGenericNumber;
@@ -266,3 +268,4 @@ public class DigitsImpl implements Digits, CAPAsnPrimitive {
 
 
 }
+

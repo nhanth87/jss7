@@ -1,12 +1,17 @@
-
 package org.restcomm.protocols.ss7.sccp.impl.router;
 
-import org.jctools.maps.NonBlockingHashMap;
+import java.util.HashMap;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
- * @author amit bhayani
- *
+ * Wrapper class for LongMessageRule map to support Jackson serialization
  */
-public class LongMessageRuleMap<Integer, LongMessageRule> extends NonBlockingHashMap<Integer, LongMessageRule> {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class LongMessageRuleMap<K, V> extends HashMap<K, V> {
+    private static final long serialVersionUID = 1L;
 
+    public LongMessageRuleMap() {
+        super();
+    }
 }

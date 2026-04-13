@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.isup;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 import org.mobicents.protocols.asn.AsnException;
@@ -21,14 +24,13 @@ import org.restcomm.protocols.ss7.isup.message.parameter.CauseIndicators;
  * @author Amit Bhayani
  *
  */
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias("causeCap")
+@JacksonXmlRootElement(localName = "causeCap")
 public class CauseCapImpl implements CauseCap, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "CauseCap";
 
-    @XStreamAlias("isupCauseIndicators")
+    @JacksonXmlProperty(localName = "isupCauseIndicators")
     private byte[] data;
 
     public CauseCapImpl() {
@@ -194,3 +196,4 @@ public class CauseCapImpl implements CauseCap, CAPAsnPrimitive {
     }
 
 }
+

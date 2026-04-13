@@ -72,6 +72,10 @@ import static org.restcomm.protocols.ss7.sccp.impl.message.MessageUtil.calculate
 import static org.restcomm.protocols.ss7.sccp.impl.message.MessageUtil.calculateXudtFieldsLengthWithoutData;
 import static org.restcomm.protocols.ss7.sccp.impl.message.MessageUtil.calculateXudtFieldsLengthWithoutData2;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 /**
  *
  * @author amit bhayani
@@ -1621,32 +1625,34 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
     /**
      * Configuration class for SCCP persistence
      */
+    @JacksonXmlRootElement(localName = "SccpConfig")
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SccpConfig {
-        public int zMarginXudtMessage;
-        public int connEstTimerDelay;
-        public int iasTimerDelay;
-        public int iarTimerDelay;
-        public int relTimerDelay;
-        public int repeatRelTimerDelay;
-        public int intTimerDelay;
-        public int guardTimerDelay;
-        public int resetTimerDelay;
-        public int reassemblyTimerDelay;
-        public int maxDataMessage;
-        public int periodOfLogging;
-        public boolean removeSpc;
-        public boolean respectPc;
-        public boolean canRelay;
-        public int timerExecutorsThreadCount;
-        public boolean previewMode;
-        public String sccpProtocolVersion;
-        public int congControl_TIMER_A;
-        public int congControl_TIMER_D;
-        public String congControl_Algo;
-        public boolean congControl_blockingOutgoingSccpMessages;
-        public int sstTimerDuration_Min;
-        public int sstTimerDuration_Max;
-        public double sstTimerDuration_IncreaseFactor;
+        @JacksonXmlProperty public int zMarginXudtMessage;
+        @JacksonXmlProperty public int connEstTimerDelay;
+        @JacksonXmlProperty public int iasTimerDelay;
+        @JacksonXmlProperty public int iarTimerDelay;
+        @JacksonXmlProperty public int relTimerDelay;
+        @JacksonXmlProperty public int repeatRelTimerDelay;
+        @JacksonXmlProperty public int intTimerDelay;
+        @JacksonXmlProperty public int guardTimerDelay;
+        @JacksonXmlProperty public int resetTimerDelay;
+        @JacksonXmlProperty public int reassemblyTimerDelay;
+        @JacksonXmlProperty public int maxDataMessage;
+        @JacksonXmlProperty public int periodOfLogging;
+        @JacksonXmlProperty public boolean removeSpc;
+        @JacksonXmlProperty public boolean respectPc;
+        @JacksonXmlProperty public boolean canRelay;
+        @JacksonXmlProperty public int timerExecutorsThreadCount;
+        @JacksonXmlProperty public boolean previewMode;
+        @JacksonXmlProperty public String sccpProtocolVersion;
+        @JacksonXmlProperty public int congControl_TIMER_A;
+        @JacksonXmlProperty public int congControl_TIMER_D;
+        @JacksonXmlProperty public String congControl_Algo;
+        @JacksonXmlProperty public boolean congControl_blockingOutgoingSccpMessages;
+        @JacksonXmlProperty public int sstTimerDuration_Min;
+        @JacksonXmlProperty public int sstTimerDuration_Max;
+        @JacksonXmlProperty public double sstTimerDuration_IncreaseFactor;
     }
 
     /**
@@ -1661,7 +1667,7 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
                 return;
             }
             try (FileReader reader = new FileReader(persistFile.toString())) {
-                SccpConfig config = (SccpConfig) SCCPXStreamHelper.fromXML(reader);
+                SccpConfig config = SCCPXStreamHelper.fromXML(reader, SccpConfig.class);
                 if (config != null) {
                     load(config);
                 }

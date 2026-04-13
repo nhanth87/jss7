@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.PDPType;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.PDPTypeValue;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
@@ -12,7 +12,7 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("pDPTypeImpl")
+@JacksonXmlRootElement(localName = "pDPTypeImpl")
 public class PDPTypeImpl extends OctetStringBase implements PDPType {
     public static final int _VALUE_ETSI = 0xF0 + 0; // PPP
     public static final int _VALUE_IETF = 0xF0 + 1; // IPv4, IPv6

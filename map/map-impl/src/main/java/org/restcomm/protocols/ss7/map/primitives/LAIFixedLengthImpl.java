@@ -3,7 +3,7 @@ package org.restcomm.protocols.ss7.map.primitives;
 
 import java.io.IOException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -17,7 +17,7 @@ import org.restcomm.protocols.ss7.map.api.primitives.LAIFixedLength;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("laiFixedLength")
+@JacksonXmlRootElement(localName = "laiFixedLength")
 public class LAIFixedLengthImpl extends OctetStringBase implements LAIFixedLength {
 
     public LAIFixedLengthImpl() {

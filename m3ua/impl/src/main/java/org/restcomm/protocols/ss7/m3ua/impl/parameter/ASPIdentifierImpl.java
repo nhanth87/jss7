@@ -1,10 +1,15 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import org.restcomm.protocols.ss7.m3ua.parameter.ASPIdentifier;
 import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
 
+@JacksonXmlRootElement(localName = "aspIdentifier")
 public class ASPIdentifierImpl extends ParameterImpl implements ASPIdentifier {
 
+    @JsonProperty("aspID")
     private long aspID = 0;
     private byte[] value;
 

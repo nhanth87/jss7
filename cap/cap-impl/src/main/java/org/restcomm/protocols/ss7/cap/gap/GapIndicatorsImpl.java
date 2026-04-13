@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.gap;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -13,13 +16,12 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.cap.api.gap.GapIndicators;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
-@XStreamAlias("gapIndicators")
+@JacksonXmlRootElement(localName = "gapIndicators")
 public class GapIndicatorsImpl extends SequenceBase implements GapIndicators {
 
     private static final String DURATION = "duration";
@@ -149,3 +151,4 @@ public class GapIndicatorsImpl extends SequenceBase implements GapIndicators {
     }
 
 }
+

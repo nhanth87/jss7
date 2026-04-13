@@ -1,6 +1,9 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import org.restcomm.protocols.ss7.m3ua.parameter.ProtocolData;
 
 /**
@@ -9,14 +12,22 @@ import org.restcomm.protocols.ss7.m3ua.parameter.ProtocolData;
  * @author amit bhayani
  * @author kulikov
  */
+@JacksonXmlRootElement(localName = "protocolData")
 public class ProtocolDataImpl extends ParameterImpl implements ProtocolData {
 
+    @JsonProperty("opc")
     private int opc;
+    @JsonProperty("dpc")
     private int dpc;
+    @JsonProperty("si")
     private int si;
+    @JsonProperty("ni")
     private int ni;
+    @JsonProperty("messagePriority")
     private int messagePriority;
+    @JsonProperty("sls")
     private int sls;
+    @JsonProperty("data")
     private byte[] data;
 
     protected ProtocolDataImpl() {

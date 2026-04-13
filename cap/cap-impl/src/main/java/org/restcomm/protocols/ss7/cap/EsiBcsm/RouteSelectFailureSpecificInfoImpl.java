@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -15,14 +18,13 @@ import org.restcomm.protocols.ss7.cap.isup.CauseCapImpl;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("routeSelectFailureSpecificInfo")
+@JacksonXmlRootElement(localName = "routeSelectFailureSpecificInfo")
 public class RouteSelectFailureSpecificInfoImpl extends SequenceBase implements RouteSelectFailureSpecificInfo {
 
     private static final String CAUSE_CAP = "causeCap";
@@ -97,3 +99,4 @@ public class RouteSelectFailureSpecificInfoImpl extends SequenceBase implements 
         return sb.toString();
     }
 }
+

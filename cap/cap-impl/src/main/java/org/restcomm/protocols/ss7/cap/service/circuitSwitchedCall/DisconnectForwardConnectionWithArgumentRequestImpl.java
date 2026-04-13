@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -18,14 +21,13 @@ import org.restcomm.protocols.ss7.cap.primitives.CAPExtensionsImpl;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author Povilas Jurna
  *
  */
-@XStreamAlias("disconnectForwardConnectionWithArgumentRequest")
+@JacksonXmlRootElement(localName = "disconnectForwardConnectionWithArgumentRequest")
 public class DisconnectForwardConnectionWithArgumentRequestImpl extends CircuitSwitchedCallMessageImpl implements DisconnectForwardConnectionWithArgumentRequest {
 
     public static final int _ID_callSegmentID = 1;
@@ -205,3 +207,4 @@ public class DisconnectForwardConnectionWithArgumentRequestImpl extends CircuitS
     }
 
 }
+

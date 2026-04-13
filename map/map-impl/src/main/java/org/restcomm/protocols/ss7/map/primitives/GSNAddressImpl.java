@@ -3,8 +3,8 @@ package org.restcomm.protocols.ss7.map.primitives;
 
 import jakarta.xml.bind.DatatypeConverter;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.primitives.GSNAddress;
@@ -15,7 +15,7 @@ import org.restcomm.protocols.ss7.map.api.primitives.GSNAddressAddressType;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("gsnAddress")
+@JacksonXmlRootElement(localName = "gsnAddress")
 public class GSNAddressImpl extends OctetStringBase implements GSNAddress {
 
     public GSNAddressImpl() {

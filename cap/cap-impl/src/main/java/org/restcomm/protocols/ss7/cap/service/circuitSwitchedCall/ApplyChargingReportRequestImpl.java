@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -16,7 +19,6 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.ApplyCharg
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.TimeDurationChargingResult;
 import org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive.TimeDurationChargingResultImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -24,7 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author Amit Bhayani
  *
  */
-@XStreamAlias("applyChargingReportRequest")
+@JacksonXmlRootElement(localName = "applyChargingReportRequest")
 public class ApplyChargingReportRequestImpl extends CircuitSwitchedCallMessageImpl implements ApplyChargingReportRequest {
 
     private static final String TIME_DURATION_CHARGING_RESULT = "timeDurationChargingResult";
@@ -173,3 +175,4 @@ public class ApplyChargingReportRequestImpl extends CircuitSwitchedCallMessageIm
         return sb.toString();
     }
 }
+

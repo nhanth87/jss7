@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.ExtTeleserviceCode;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.TeleserviceCodeValue;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
@@ -12,7 +12,7 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("extTeleserviceCodeImpl")
+@JacksonXmlRootElement(localName = "extTeleserviceCodeImpl")
 public class ExtTeleserviceCodeImpl extends OctetStringBase implements ExtTeleserviceCode {
     public ExtTeleserviceCodeImpl() {
         super(1, 5, "ExtTeleserviceCode");

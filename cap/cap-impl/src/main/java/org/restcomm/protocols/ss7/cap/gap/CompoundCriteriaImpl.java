@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.gap;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -16,13 +19,12 @@ import org.restcomm.protocols.ss7.cap.api.primitives.ScfID;
 import org.restcomm.protocols.ss7.cap.primitives.ScfIDImpl;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
-@XStreamAlias("compoundCriteria")
+@JacksonXmlRootElement(localName = "compoundCriteria")
 public class CompoundCriteriaImpl extends SequenceBase implements CompoundCriteria {
 
     private static final int _ID_basicGapCriteria = 0;
@@ -148,3 +150,4 @@ public class CompoundCriteriaImpl extends SequenceBase implements CompoundCriter
     }
 
 }
+

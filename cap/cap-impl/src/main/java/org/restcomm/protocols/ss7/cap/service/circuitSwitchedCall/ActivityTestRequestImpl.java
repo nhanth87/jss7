@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -10,14 +13,13 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentException;
 import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.ActivityTestRequest;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("activityTestRequest")
+@JacksonXmlRootElement(localName = "activityTestRequest")
 public class ActivityTestRequestImpl extends CircuitSwitchedCallMessageImpl implements ActivityTestRequest {
 
     public static final String _PrimitiveName = "ActivityTestRequest";
@@ -86,3 +88,4 @@ public class ActivityTestRequestImpl extends CircuitSwitchedCallMessageImpl impl
         return sb.toString();
     }
 }
+
