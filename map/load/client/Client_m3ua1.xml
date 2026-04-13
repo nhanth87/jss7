@@ -1,0 +1,28 @@
+<org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl_-M3UAConfig>
+  <timeBetweenHeartbeat>10000</timeBetweenHeartbeat>
+  <statisticsEnabled>false</statisticsEnabled>
+  <statisticsTaskDelay>5000</statisticsTaskDelay>
+  <statisticsTaskPeriod>5000</statisticsTaskPeriod>
+  <routingKeyManagementEnabled>false</routingKeyManagementEnabled>
+  <useLsbForLinksetSelection>false</useLsbForLinksetSelection>
+  <aspFactories serialization="custom">
+    <java.util.concurrent.CopyOnWriteArrayList>
+      <default/>
+      <int>0</int>
+    </java.util.concurrent.CopyOnWriteArrayList>
+  </aspFactories>
+  <appServers serialization="custom">
+    <java.util.concurrent.CopyOnWriteArrayList>
+      <default/>
+      <int>0</int>
+    </java.util.concurrent.CopyOnWriteArrayList>
+  </appServers>
+  <route serialization="custom">
+    <unserializable-parents/>
+    <org.jctools.maps.NonBlockingHashMap>
+      <default/>
+      <null/>
+      <null/>
+    </org.jctools.maps.NonBlockingHashMap>
+  </route>
+</org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl_-M3UAConfig>

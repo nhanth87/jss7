@@ -42,7 +42,7 @@
 		<stream.version>1.0.0.CR1</stream.version>
 		<sctp.version>2.0.11</sctp.version>
 		<commons.version>1.0.0.CR1</commons.version>
-		<netty.version>4.0.36.Final</netty.version>
+		<netty.version>4.2.11.Final</netty.version>
 		<ss7.restcomm.version>8.2.6-SNAPSHOT</ss7.restcomm.version>
 
 		<version.wildfly.as>24.0.1.Final</version.wildfly.as>
@@ -104,6 +104,12 @@
 				<groupId>org.mobicents.protocols.sctp</groupId>
 				<artifactId>sctp-impl</artifactId>
 				<version>${sctp.version}</version>
+			</dependency>
+			<!-- Netty SCTP Transport -->
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-transport-sctp</artifactId>
+				<version>${netty.version}</version>
 			</dependency>
 			<!-- Scheduler -->
 			<dependency>

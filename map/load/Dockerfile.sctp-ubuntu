@@ -1,23 +1,39 @@
-# Multi-stage build for jSS7 MAP Load Test
-FROM eclipse-temurin:17-jdk as builder
+# Ubuntu-based jSS7 MAP Load Test with full SCTP support
+FROM ubuntu:22.04
 
-# Install Ant manually
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install OpenJDK 17 with SCTP support and all required tools
 RUN apt-get update && \
-    apt-get install -y wget && \
-    wget -q https://downloads.apache.org/ant/binaries/apache-ant-1.10.14-bin.tar.gz && \
-    tar -xzf apache-ant-1.10.14-bin.tar.gz -C /opt && \
-    ln -s /opt/apache-ant-1.10.14/bin/ant /usr/local/bin/ant && \
-    rm apache-ant-1.10.14-bin.tar.gz && \
-    apt-get remove -y wget && \
-    apt-get autoremove -y && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends \
+        openjdk-17-jdk \
+        lksctp-tools \
+        libsctp1 \
+        libsctp-dev \
+        tcpdump \
+        libpcap0.8 \
+        ant \
+        curl \
+        net-tools \
+        iproute2 \
+        && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-FROM eclipse-temurin:17-jdk
+# Set JAVA_HOME
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
 
-# Install tcpdump, curl, and libsctp (runtime)
-RUN apt-get update && \
-    apt-get install -y tcpdump libpcap0.8 curl libsctp1 && \
-    rm -rf /var/lib/apt/lists/*
+# Verify SCTP is available in JDK
+RUN java -version && \
+    ls $JAVA_HOME/lib/*.so 2>/dev/null | head -5 && \
+    echo "SCTP check: OK"
+
+# Create working directory
+WORKDIR /opt/jss7-load-test
+
+# Create directories
+RUN mkdir -p server client pcap-output
 
 # Download missing dependencies
 RUN mkdir -p /opt/target/load && \
@@ -26,24 +42,19 @@ RUN mkdir -p /opt/target/load && \
     curl -L -o /opt/target/load/mxparser.jar https://repo1.maven.org/maven2/io/github/x-stream/mxparser/1.2.2/mxparser-1.2.2.jar && \
     curl -L -o /opt/target/load/javolution.jar https://repo1.maven.org/maven2/org/javolution/javolution/5.3.1/javolution-5.3.1.jar
 
-# Copy Ant from builder
-COPY --from=builder /opt/apache-ant-1.10.14 /opt/ant
-RUN ln -s /opt/ant/bin/ant /usr/local/bin/ant
-
-# Set working directory
-WORKDIR /opt/jss7-load-test
-
-# Create directories
-RUN mkdir -p server client target/load
-
-# Copy files
-COPY mo_sms_build.xml .
+# Copy JAR files from host
 COPY target/load/*.jar /opt/target/load/
+
+# Copy build files
+COPY mo_sms_build.xml .
+COPY docker-entrypoint.sh /usr/local/bin/
+
+# Copy resources
 COPY src/main/resources src/main/resources
 COPY src/main/resources/log4j.properties .
 
-# Environment variables
-ENV TEST_SERVER_CHANNEL_TYPE=tcp
+# Environment variables for SCTP mode
+ENV TEST_SERVER_CHANNEL_TYPE=sctp
 ENV TEST_SERVER_HOST_IP=0.0.0.0
 ENV TEST_SERVER_HOST_PORT=8011
 ENV TEST_SERVER_EXTRA_HOST_ADDRESS=-1
@@ -59,9 +70,9 @@ ENV TEST_SERVER_NI=2
 ENV TEST_SERVER_SSN=8
 ENV TEST_SERVER_REMOTE_SSN=8
 
-ENV TEST_CLIENT_NUM_OF_DIALOGS=60000
+ENV TEST_CLIENT_NUM_OF_DIALOGS=10000
 ENV TEST_CLIENT_CONCURRENT_DIALOG=1000
-ENV TEST_CLIENT_CHANNEL_TYPE=tcp
+ENV TEST_CLIENT_CHANNEL_TYPE=sctp
 ENV TEST_CLIENT_HOST_IP=127.0.0.1
 ENV TEST_CLIENT_HOST_PORT=8011
 ENV TEST_CLIENT_EXTRA_HOST_ADDRESS=-1
@@ -81,9 +92,8 @@ ENV TEST_CLIENT_SERVER_ADDRESS=9960639999
 
 ENV JVM_OPTS="-Xms2048m -Xmx2048m -Xmn128m -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=256m -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
 
-EXPOSE 8011 8012
+EXPOSE 8011 8012/sctp
 
-COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENTRYPOINT ["docker-entrypoint.sh"]

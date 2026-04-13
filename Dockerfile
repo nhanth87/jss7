@@ -1,20 +1,16 @@
-FROM amazoncorretto:8-alpine
+# Runtime stage with SCTP support
+FROM amazoncorretto:11-alpine
 
-# maintainer
-MAINTAINER James Amo - james.amo@paicbd.com
-
-# install dependencies
+# Install SCTP support
 RUN apk add net-tools lksctp-tools supervisor lksctp-tools-dev
 
-# create and set workspace
+# Create workspace
 RUN mkdir -p /opt/paic/jss7
 WORKDIR /opt/paic/jss7
 
-# the version number will be changed during the CI/CD build
-COPY Extended-jSS7-8.2.6-243-wildfly/. .
+# Copy pre-built artifacts from local build
+COPY map/load/target/load /opt/paic/jss7/load
 
-RUN chmod +x wildfly-10.1.0.Final/bin/standalone.sh
-
-# run application
-ENTRYPOINT ["/bin/"]
-CMD ["standalone.sh","-b 0.0.0.0"]
+# Entry point
+ENTRYPOINT ["/bin/sh"]
+CMD ["echo", "jSS7 MAP Load ready. JARs are in /opt/paic/jss7/load"]

@@ -7,7 +7,7 @@
     <property name="javac.source" value="1.8" />
     <property name="srcroot" value="${root}/src" />
 
-    <property name="assemble.dir" value="${basedir}/../target/load" />
+    <property name="assemble.dir" value="${basedir}/target/load" />
 
     <property name="test.server.channelType" value="sctp" />
     <property name="test.server.hostIp" value="127.0.0.1" />
@@ -88,7 +88,15 @@
         <pathelement location="${assemble.dir}/javolution.jar" />
         <pathelement location="${assemble.dir}/concurrent.jar" />
         <pathelement location="${assemble.dir}/guava.jar" />
-        <pathelement location="${assemble.dir}/netty-all.jar" />
+        <!-- Netty 4.2.11 -->
+        <pathelement location="${assemble.dir}/netty-common-4.2.11.Final.jar" />
+        <pathelement location="${assemble.dir}/netty-buffer-4.2.11.Final.jar" />
+        <pathelement location="${assemble.dir}/netty-resolver-4.2.11.Final.jar" />
+        <pathelement location="${assemble.dir}/netty-transport-4.2.11.Final.jar" />
+        <pathelement location="${assemble.dir}/netty-transport-native-unix-common-4.2.11.Final.jar" />
+        <pathelement location="${assemble.dir}/netty-handler-4.2.11.Final.jar" />
+        <pathelement location="${assemble.dir}/netty-codec-4.2.11.Final.jar" />
+        <pathelement location="${assemble.dir}/netty-transport-sctp-4.2.11.Final.jar" />
         <pathelement location="${assemble.dir}/jctools-core.jar" />
         <pathelement location="${assemble.dir}/xstream.jar" />
         <pathelement location="${assemble.dir}/mxparser.jar" />
@@ -152,6 +160,13 @@
             <jvmarg value="-Dio.netty.leakDetection.level=advanced"/>
             -->
             <jvmarg value="-XX:+UseParallelGC"/>
+            <!-- Java 17 module system compatibility -->
+            <jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
+            <jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
+            <jvmarg value="--add-opens=java.base/java.lang.reflect=ALL-UNNAMED"/>
+            <jvmarg value="--add-opens=java.base/java.text=ALL-UNNAMED"/>
+            <jvmarg value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"/>
+            <jvmarg value="--add-opens=java.desktop/java.awt.font=ALL-UNNAMED"/>
             <!--
             <jvmarg value="-XX:+PrintGCDetails" />
             <jvmarg value="-XX:+PrintGCTimeStamps" />
@@ -201,6 +216,13 @@
             <jvmarg value="-Dio.netty.leakDetection.level=advanced"/>
             -->
             <jvmarg value="-XX:+UseParallelGC"/>
+            <!-- Java 17 module system compatibility -->
+            <jvmarg value="--add-opens=java.base/java.util=ALL-UNNAMED"/>
+            <jvmarg value="--add-opens=java.base/java.lang=ALL-UNNAMED"/>
+            <jvmarg value="--add-opens=java.base/java.lang.reflect=ALL-UNNAMED"/>
+            <jvmarg value="--add-opens=java.base/java.text=ALL-UNNAMED"/>
+            <jvmarg value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"/>
+            <jvmarg value="--add-opens=java.desktop/java.awt.font=ALL-UNNAMED"/>
             <arg value="${test.client.numOfDialogs}" />
             <arg value="${test.client.concurrentDialog}" />
             <arg value="${test.client.channelType}" />

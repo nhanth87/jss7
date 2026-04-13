@@ -43,6 +43,11 @@
             <artifactId>netty-all</artifactId>
             <version>${netty.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-sctp</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.restcomm.protocols.ss7.mtp</groupId>

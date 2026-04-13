@@ -5,10 +5,13 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import io.netty.buffer.ByteBufAllocator;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.jctools.maps.NonBlockingHashMap;
+import org.mobicents.protocols.api.PayloadDataPool;
 
 import org.mobicents.protocols.api.Association;
 import org.mobicents.protocols.api.AssociationListener;
@@ -18,6 +21,7 @@ import org.mobicents.protocols.api.IpChannelType;
 import org.mobicents.protocols.api.Management;
 import org.mobicents.protocols.api.ManagementEventListener;
 import org.mobicents.protocols.api.PayloadData;
+import org.mobicents.protocols.api.PayloadDataPool;
 import org.mobicents.protocols.api.Server;
 import org.mobicents.protocols.api.ServerListener;
 import org.restcomm.protocols.ss7.m3ua.Util;
@@ -74,7 +78,7 @@ public class M3UAShellExecutorTest {
     @Test
     public void testServerCommands() throws Exception {
 
-        FastMap<String, M3UAManagementImpl> m3uaManagements = new FastMap<String, M3UAManagementImpl>();
+        Map<String, M3UAManagementImpl> m3uaManagements = new HashMap<String, M3UAManagementImpl>();
         m3uaManagements.put(clientM3UAMgmt.getName(), clientM3UAMgmt);
         m3uaExec.setM3uaManagements(m3uaManagements);
 
@@ -342,11 +346,22 @@ public class M3UAShellExecutorTest {
             // TODO Auto-generated method stub
             return 0;
         }
+
+        @Override
+        public void setExtraPeerHostAddresses(String[] extraPeerHostAddresses) {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public String[] getExtraPeerHostAddresses() {
+            // TODO Auto-generated method stub
+            return null;
+        }
     }
 
     class TransportManagement implements Management {
 
-        private FastMap<String, Association> associations = new FastMap<String, Association>();
+        private Map<String, Association> associations = new HashMap<String, Association>();
 
         @Override
         public Association addAssociation(String hostAddress, int hostPort, String peerAddress, int peerPort, String assocName)
@@ -383,7 +398,7 @@ public class M3UAShellExecutorTest {
 
         @Override
         public Map<String, Association> getAssociations() {
-            return associations.unmodifiable();
+            return Collections.unmodifiableMap(new HashMap<String, Association>(associations));
         }
 
         @Override
@@ -770,6 +785,39 @@ public class M3UAShellExecutorTest {
                 String assocName, IpChannelType ipChannelType, String[] extraHostAddresses) throws Exception {
             // TODO Auto-generated method stub
             
+        }
+
+        public void setExtraPeerHostAddresses(String assocName, String[] extraPeerHostAddresses) throws Exception {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public PayloadDataPool.PoolStatistics getPoolStatistics() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void setTargetThroughput(int targetThroughput) throws Exception {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public int getTargetThroughput() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public void setPayloadDataPool(PayloadDataPool payloadDataPool) {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public PayloadDataPool getPayloadDataPool() {
+            // TODO Auto-generated method stub
+            return null;
         }
 
     }

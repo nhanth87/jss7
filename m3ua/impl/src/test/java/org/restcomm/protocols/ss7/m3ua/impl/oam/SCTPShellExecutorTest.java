@@ -5,9 +5,14 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
-import org.jctools.maps.NonBlockingHashMap;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.jctools.maps.NonBlockingHashMap;
 import org.mobicents.protocols.api.Management;
+import org.mobicents.protocols.api.PayloadDataPool;
 import org.mobicents.protocols.api.Server;
 import org.mobicents.protocols.sctp.ManagementImpl;
 import org.restcomm.protocols.ss7.m3ua.impl.oam.M3UAOAMMessages;
@@ -25,7 +30,7 @@ import org.testng.annotations.Test;
  */
 public class SCTPShellExecutorTest {
 
-    private FastMap<String, Management> sctpManagements = null;
+    private Map<String, Management> sctpManagements = null;
     private SCTPShellExecutor sctpShellExecutor = null;
 
     private ManagementImpl management1;
@@ -47,7 +52,7 @@ public class SCTPShellExecutorTest {
         this.management1 = new ManagementImpl("TestSCTP1");
         this.management2 = new ManagementImpl("TestSCTP2");
 
-        this.sctpManagements = new FastMap<String, Management>();
+        this.sctpManagements = new HashMap<String, Management>();
 
         this.sctpManagements.put("TestSCTP1", management1);
         this.sctpManagements.put("TestSCTP2", management2);

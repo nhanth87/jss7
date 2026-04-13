@@ -1,0 +1,34 @@
+<org.restcomm.protocols.ss7.tcap.TCAPStackImpl_-TCAPConfig>
+  <dialogTimeout>60000</dialogTimeout>
+  <invokeTimeout>30000</invokeTimeout>
+  <maxDialogs>500000</maxDialogs>
+  <dialogIdRangeStart>1</dialogIdRangeStart>
+  <dialogIdRangeEnd>2147483647</dialogIdRangeEnd>
+  <ssn>8</ssn>
+  <previewMode>false</previewMode>
+  <doNotSendProtocolVersion>false</doNotSendProtocolVersion>
+  <congControl__blockingIncomingTcapMessages>false</congControl__blockingIncomingTcapMessages>
+  <congControl__ExecutorDelayThreshold>
+    <double>1.0</double>
+    <double>6.0</double>
+    <double>12.0</double>
+  </congControl__ExecutorDelayThreshold>
+  <congControl__ExecutorBackToNormalDelayThreshold>
+    <double>0.5</double>
+    <double>3.0</double>
+    <double>8.0</double>
+  </congControl__ExecutorBackToNormalDelayThreshold>
+  <congControl__MemoryThreshold>
+    <double>77.0</double>
+    <double>87.0</double>
+    <double>97.0</double>
+  </congControl__MemoryThreshold>
+  <congControl__BackToNormalMemoryThreshold>
+    <double>72.0</double>
+    <double>82.0</double>
+    <double>92.0</double>
+  </congControl__BackToNormalMemoryThreshold>
+  <statisticsEnabled>false</statisticsEnabled>
+  <slsRange>All</slsRange>
+  <isSwapTcapIdBytes>true</isSwapTcapIdBytes>
+</org.restcomm.protocols.ss7.tcap.TCAPStackImpl_-TCAPConfig>

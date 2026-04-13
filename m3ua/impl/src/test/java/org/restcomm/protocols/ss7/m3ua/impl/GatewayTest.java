@@ -326,9 +326,9 @@ public class GatewayTest {
 
     private class Mtp3UserPartListenerImpl implements Mtp3UserPartListener {
 
-        private FastList<Mtp3TransferPrimitive> receivedData = new FastList<Mtp3TransferPrimitive>();
+        private ArrayList<Mtp3TransferPrimitive> receivedData = new ArrayList<Mtp3TransferPrimitive>();
 
-        public FastList<Mtp3TransferPrimitive> getReceivedData() {
+        public ArrayList<Mtp3TransferPrimitive> getReceivedData() {
             return receivedData;
         }
 

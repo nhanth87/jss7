@@ -138,14 +138,11 @@
 		</dependency>
 
 		
-		
 		<dependency>
 		   <groupId>org.apache.commons</groupId>
 		   <artifactId>commons-email</artifactId>
 		   <version>1.3.2</version>
 		</dependency>
-
-
 
 		<!-- SS7 stats -->
 		<dependency>
@@ -157,8 +154,7 @@
 			<artifactId>statistics-impl</artifactId>
 			<groupId>org.restcomm.protocols.ss7.statistics</groupId>
 			<!-- <version>${project.version}</version> -->
-		</dependency>						
-
+		</dependency>					
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -170,6 +166,52 @@
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
 			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-common</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-buffer</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-resolver</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-transport</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-transport-native-unix-common</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-handler</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-codec</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-transport-sctp</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<!-- jctools -->
+		<dependency>
+			<groupId>org.jctools</groupId>
+			<artifactId>jctools-core</artifactId>
+			<version>${jctools.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -488,7 +530,6 @@
 											</destFileName>
 										</artifactItem>
 
-
 										<artifactItem>
 											<groupId>io.netty</groupId>
 											<artifactId>netty-all</artifactId>
@@ -499,6 +540,19 @@
 											</outputDirectory>
 											<destFileName>
 												netty-all.jar
+											</destFileName>
+										</artifactItem>
+
+										<artifactItem>
+											<groupId>org.jctools</groupId>
+											<artifactId>jctools-core</artifactId>
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>
+												${assemble.dir}
+											</outputDirectory>
+											<destFileName>
+												jctools-core.jar
 											</destFileName>
 										</artifactItem>
 
@@ -552,9 +606,9 @@
 											<destFileName>
 												commons-email.jar
 											</destFileName>
-										</artifactItem>		
+										</artifactItem>											
 										
-										<!-- Stats jars -->	
+										<!-- Stats jars -->
 										<artifactItem>
 											<groupId>org.restcomm.protocols.ss7.statistics</groupId>
 											<artifactId>statistics-api</artifactId>
@@ -566,7 +620,7 @@
 											<destFileName>
 												statistics-api.jar
 											</destFileName>
-										</artifactItem>	
+										</artifactItem>
 										
 										<artifactItem>
 											<groupId>org.restcomm.protocols.ss7.statistics</groupId>
@@ -580,36 +634,14 @@
 												statistics-impl.jar
 											</destFileName>
 										</artifactItem>
-
-
-																				
-										<!-- <artifactItem> <groupId>org.mobicents.external.appframework</groupId> 
-											<artifactId>appframework</artifactId> <type>jar</type> <overWrite>true</overWrite> 
-											<outputDirectory> ${assemble.dir}/lib </outputDirectory> <destFileName> appframework.jar 
-											</destFileName> </artifactItem> <artifactItem> <groupId>org.mobicents.external.appframework</groupId> 
-											<artifactId>swing-layout</artifactId> <type>jar</type> <overWrite>true</overWrite> 
-											<outputDirectory> ${assemble.dir}/lib </outputDirectory> <destFileName> swing-layout.jar 
-											</destFileName> </artifactItem> <artifactItem> <groupId>org.mobicents.external.appframework</groupId> 
-											<artifactId>swing-worker</artifactId> <type>jar</type> <overWrite>true</overWrite> 
-											<outputDirectory> ${assemble.dir}/lib </outputDirectory> <destFileName> swing-worker.jar 
-											</destFileName> </artifactItem> <artifactItem> <groupId>org.mobicents.external.opencsv</groupId> 
-											<artifactId>opencsv</artifactId> <type>jar</type> <overWrite>true</overWrite> 
-											<outputDirectory> ${assemble.dir}/lib </outputDirectory> <destFileName> opencsv.jar 
-											</destFileName> </artifactItem> -->
 									</artifactItems>
 								</configuration>
 							</execution>
 						</executions>
 					</plugin>
-					<!-- <plugin> <artifactId>maven-antrun-plugin</artifactId> <executions> 
-						<execution> <id>deploy-DU</id> <phase>install</phase> <goals> <goal>run</goal> 
-						</goals> <configuration> <tasks> <copy overwrite="true" file="bin/run.sh" todir="${assemble.dir}" /> </tasks> </configuration> </execution> </executions> 
-						</plugin> -->
 				</plugins>
 			</build>
 		</profile>
 	</profiles>
-
-
 
 </project>

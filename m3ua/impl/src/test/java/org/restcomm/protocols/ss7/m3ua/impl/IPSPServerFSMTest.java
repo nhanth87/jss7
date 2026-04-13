@@ -7,13 +7,15 @@ import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 import io.netty.buffer.ByteBufAllocator;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import org.jctools.maps.NonBlockingHashMap;
+
 
 import org.mobicents.protocols.api.Association;
 import org.mobicents.protocols.api.AssociationListener;
@@ -23,6 +25,7 @@ import org.mobicents.protocols.api.IpChannelType;
 import org.mobicents.protocols.api.Management;
 import org.mobicents.protocols.api.ManagementEventListener;
 import org.mobicents.protocols.api.PayloadData;
+import org.mobicents.protocols.api.PayloadDataPool;
 import org.mobicents.protocols.api.Server;
 import org.mobicents.protocols.api.ServerListener;
 import org.restcomm.protocols.ss7.m3ua.ExchangeType;
@@ -684,11 +687,22 @@ public class IPSPServerFSMTest {
             return 0;
         }
 
+        @Override
+        public void setExtraPeerHostAddresses(String[] extraPeerHostAddresses) {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public String[] getExtraPeerHostAddresses() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
     }
 
     class NettyTransportManagement implements Management {
 
-        private FastMap<String, Association> associations = new FastMap<String, Association>();
+        private HashMap<String, Association> associations = new HashMap<String, Association>();
 
         @Override
         public Association addAssociation(String hostAddress, int hostPort, String peerAddress, int peerPort, String assocName)
@@ -725,7 +739,7 @@ public class IPSPServerFSMTest {
 
         @Override
         public Map<String, Association> getAssociations() {
-            return associations.unmodifiable();
+            return Collections.unmodifiableMap(associations);
         }
 
         @Override
@@ -1109,6 +1123,34 @@ public class IPSPServerFSMTest {
                 String assocName, IpChannelType ipChannelType, String[] extraHostAddresses) throws Exception {
             // TODO Auto-generated method stub
             
+        }
+
+        @Override
+        public void setTargetThroughput(int targetThroughput) throws Exception {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public int getTargetThroughput() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public PayloadDataPool.PoolStatistics getPoolStatistics() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void setPayloadDataPool(PayloadDataPool payloadDataPool) {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public PayloadDataPool getPayloadDataPool() {
+            // TODO Auto-generated method stub
+            return null;
         }
 
     }
