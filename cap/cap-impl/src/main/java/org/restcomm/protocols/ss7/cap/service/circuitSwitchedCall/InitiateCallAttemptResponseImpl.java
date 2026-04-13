@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -23,14 +26,13 @@ import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.OfferedCamel4FunctionalitiesImpl;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.SupportedCamelPhasesImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author Povilas Jurna
  *
  */
-@XStreamAlias("initiateCallAttemptResponse")
+@JacksonXmlRootElement(localName = "initiateCallAttemptResponse")
 public class InitiateCallAttemptResponseImpl extends CircuitSwitchedCallMessageImpl implements InitiateCallAttemptResponse {
 
     public static final int _ID_supportedCamelPhases = 0;
@@ -255,3 +257,4 @@ public class InitiateCallAttemptResponseImpl extends CircuitSwitchedCallMessageI
         return releaseCallArgExtensionAllowed;
     }
 }
+

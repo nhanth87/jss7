@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.gap;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -15,13 +18,12 @@ import org.restcomm.protocols.ss7.cap.api.isup.Digits;
 import org.restcomm.protocols.ss7.cap.isup.DigitsImpl;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
-@XStreamAlias("calledAddressAndService")
+@JacksonXmlRootElement(localName = "calledAddressAndService")
 public class CalledAddressAndServiceImpl extends SequenceBase implements CalledAddressAndService {
 
     public static final int _ID_calledAddressValue = 0;
@@ -140,3 +142,4 @@ public class CalledAddressAndServiceImpl extends SequenceBase implements CalledA
     }
 
 }
+

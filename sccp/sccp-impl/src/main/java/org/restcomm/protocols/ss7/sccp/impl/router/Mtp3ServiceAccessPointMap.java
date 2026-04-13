@@ -1,12 +1,17 @@
-
 package org.restcomm.protocols.ss7.sccp.impl.router;
 
-import org.jctools.maps.NonBlockingHashMap;
+import java.util.HashMap;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
- * @author abhayani
- *
+ * Wrapper class for Mtp3ServiceAccessPoint map to support Jackson serialization
  */
-public class Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> extends NonBlockingHashMap<Integer, Mtp3ServiceAccessPoint> {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Mtp3ServiceAccessPointMap<K, V> extends HashMap<K, V> {
+    private static final long serialVersionUID = 1L;
 
+    public Mtp3ServiceAccessPointMap() {
+        super();
+    }
 }

@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import java.util.Arrays;
 
 
@@ -12,11 +15,13 @@ import org.restcomm.protocols.ss7.m3ua.parameter.RoutingContext;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "routingContext")
 public class RoutingContextImpl extends ParameterImpl implements RoutingContext {
 
     private static final String ARRAY_SIZE = "size";
     private static final String ROUTING_CONTEXT = "rc";
 
+    @JsonProperty("rcs")
     private long[] rcs = null;
     private byte[] value;
 

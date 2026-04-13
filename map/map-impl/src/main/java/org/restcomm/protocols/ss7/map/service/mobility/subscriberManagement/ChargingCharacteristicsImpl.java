@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.ChargingCharacteristics;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
 
@@ -11,7 +11,7 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("chargingCharacteristicsImpl")
+@JacksonXmlRootElement(localName = "chargingCharacteristicsImpl")
 public class ChargingCharacteristicsImpl extends OctetStringBase implements ChargingCharacteristics {
 
     public static final int _FLAG_NORMAL_CHARGING = 0x08;

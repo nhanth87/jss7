@@ -3,14 +3,14 @@ package org.restcomm.protocols.ss7.map.primitives;
 
 import java.util.ArrayList;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("arrayListSerializingBase")
+@JacksonXmlRootElement(localName = "arrayListSerializingBase")
 public class ArrayListSerializingBase<T> {
 
     private ArrayList<T> data = new ArrayList<T>();

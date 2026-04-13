@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.supplementary;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
@@ -19,7 +19,7 @@ import org.restcomm.protocols.ss7.map.primitives.MAPAsnPrimitive;
  * @author amit bhayani
  *
  */
-@XStreamAlias("unstructuredSSNotifyResponseImpl")
+@JacksonXmlRootElement(localName = "unstructuredSSNotifyResponseImpl")
 public class UnstructuredSSNotifyResponseImpl extends SupplementaryMessageImpl implements UnstructuredSSNotifyResponse, MAPAsnPrimitive {
 
     public MAPDialogSupplementary getMAPDialog() {

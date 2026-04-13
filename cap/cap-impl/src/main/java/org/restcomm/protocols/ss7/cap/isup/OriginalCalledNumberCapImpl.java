@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.isup;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 
 import org.restcomm.protocols.ss7.cap.api.CAPException;
 import org.restcomm.protocols.ss7.cap.api.isup.OriginalCalledNumberCap;
@@ -8,7 +11,6 @@ import org.restcomm.protocols.ss7.isup.ParameterException;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.OriginalCalledNumberImpl;
 import org.restcomm.protocols.ss7.isup.message.parameter.OriginalCalledNumber;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -16,7 +18,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("originalCalledNumberCap")
+@JacksonXmlRootElement(localName = "originalCalledNumberCap")
 public class OriginalCalledNumberCapImpl extends OctetStringBase implements OriginalCalledNumberCap {
 
     private static final String ISUP_ORIGINAL_CALLED_NUMBER_XML = "isupOriginalCalledNumber";
@@ -86,3 +88,4 @@ public class OriginalCalledNumberCapImpl extends OctetStringBase implements Orig
         return sb.toString();
     }
 }
+

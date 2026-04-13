@@ -1,7 +1,8 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl;
 
-
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.As;
@@ -19,12 +20,14 @@ import org.restcomm.protocols.ss7.m3ua.parameter.ASPIdentifier;
  * @author amit bhayani
  * @author <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
  */
+@JacksonXmlRootElement(localName = "asp")
 public class AspImpl implements Asp {
 
     private static final Logger logger = Logger.getLogger(AspImpl.class);
 
     protected static final String NAME = "name";
 
+    @JsonProperty("name")
     protected String name;
 
     /**
@@ -37,10 +40,17 @@ public class AspImpl implements Asp {
      **/
     protected FSM peerFSM;
 
-    protected AspFactoryImpl aspFactoryImpl;
+    @JsonProperty("aspFactoryName")
+    protected String aspFactoryName;
 
-    protected AsImpl asImpl;
+    @JsonProperty("asName")
+    protected String asName;
 
+    protected transient AspFactoryImpl aspFactoryImpl;
+
+    protected transient AsImpl asImpl;
+
+    @JsonProperty("aspIdentifier")
     protected ASPIdentifier aspIdentifier;
 
     private MessageFactory messageFactory = new MessageFactoryImpl();
@@ -319,12 +329,38 @@ public class AspImpl implements Asp {
         return this.aspFactoryImpl;
     }
 
+    @JsonProperty("aspFactoryName")
+    public String getAspFactoryName() {
+        if (this.aspFactoryImpl != null) {
+            return this.aspFactoryImpl.getName();
+        }
+        return this.aspFactoryName;
+    }
+
+    @JsonProperty("aspFactoryName")
+    public void setAspFactoryName(String name) {
+        this.aspFactoryName = name;
+    }
+
+    @JsonProperty("asName")
+    public String getAsName() {
+        if (this.asImpl != null) {
+            return this.asImpl.getName();
+        }
+        return this.asName;
+    }
+
+    @JsonProperty("asName")
+    public void setAsName(String name) {
+        this.asName = name;
+    }
+
     public ASPIdentifier getASPIdentifier() {
         return aspIdentifier;
     }
 
     public void setASPIdentifier(ASPIdentifier aspIdentifier) {
-        aspIdentifier = aspIdentifier;
+        this.aspIdentifier = aspIdentifier;
     }
 
     public MessageFactory getMessageFactory() {

@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
@@ -22,6 +25,7 @@ import org.restcomm.protocols.ss7.m3ua.parameter.TrafficModeType;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "routingKey")
 public class RoutingKeyImpl extends ParameterImpl implements RoutingKey {
 
     private static final String LOCAL_RK_ID = "localRkId";
@@ -35,12 +39,19 @@ public class RoutingKeyImpl extends ParameterImpl implements RoutingKey {
     private static final String OPC_LIST = "opcList";
     private static final String OPC_ARRAY_SIZE = "opcSize";
 
+    @JsonProperty("localRkId")
     private LocalRKIdentifier localRkId;
+    @JsonProperty("rc")
     private RoutingContext rc;
+    @JsonProperty("trafficModeType")
     private TrafficModeType trafficModeType;
+    @JsonProperty("networkAppearance")
     private NetworkAppearance networkAppearance;
+    @JsonProperty("dpc")
     private DestinationPointCode[] dpc;
+    @JsonProperty("serviceIndicators")
     private ServiceIndicators[] serviceIndicators;
+    @JsonProperty("opcList")
     private OPCList[] opcList;
 
     private ByteBuf buf = Unpooled.buffer(256);

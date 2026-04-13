@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.gap;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -15,13 +18,12 @@ import org.restcomm.protocols.ss7.cap.api.gap.CompoundCriteria;
 import org.restcomm.protocols.ss7.cap.api.gap.GapCriteria;
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
-@XStreamAlias("gapCriteria")
+@JacksonXmlRootElement(localName = "gapCriteria")
 public class GapCriteriaImpl implements GapCriteria, CAPAsnPrimitive {
 
     private static final String BASIC_GAP_CRITERIA = "basicGapCriteria";
@@ -181,3 +183,4 @@ public class GapCriteriaImpl implements GapCriteria, CAPAsnPrimitive {
     }
 
 }
+

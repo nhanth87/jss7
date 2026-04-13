@@ -1,45 +1,54 @@
 package org.restcomm.protocols.ss7.m3ua.impl;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.thoughtworks.xstream.security.AnyTypePermission;
-import java.io.*;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
- * XStream helper for M3UA module XML serialization.
- * Replaces Javolution XMLBinding.
+ * Jackson XML helper for M3UA module XML serialization.
+ * Replaces XStream to avoid Java module system issues.
  */
 public class M3UAXStreamHelper {
-    private static final XStream xstream = new XStream(new DomDriver());
-    
+    private static final XmlMapper xmlMapper = new XmlMapper();
+
     static {
-        xstream.addPermission(AnyTypePermission.ANY);
+        // Configure for pretty printing
+        xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        xmlMapper.enable(ToXmlGenerator.Feature.WRITE_XML_DECLARATION);
         
-        // Configure aliases for cleaner XML output
-        xstream.alias("aspFactory", AspFactoryImpl.class);
-        xstream.alias("as", AsImpl.class);
-        xstream.alias("asp", AspImpl.class);
-        xstream.alias("route", RouteMap.class);
-        xstream.alias("routeAs", RouteAsImpl.class);
+        // Configure to allow deserialization of generic types
+        xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        
+        // Configure polymorphic type handling
+        PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
+                .allowIfBaseType("org.restcomm.protocols.ss7.m3ua")
+                .build();
+        xmlMapper.activateDefaultTyping(ptv, com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.NON_FINAL);
+    }
+
+    public static XmlMapper getXmlMapper() {
+        return xmlMapper;
     }
     
-    public static XStream getXStream() {
-        return xstream;
+    public static void toXML(Object obj, Writer writer) throws IOException {
+        xmlMapper.writeValue(writer, obj);
+    }
+
+    public static String toXML(Object obj) throws IOException {
+        return xmlMapper.writeValueAsString(obj);
     }
     
-    public static void toXML(Object obj, Writer writer) {
-        xstream.toXML(obj, writer);
+    public static <T> T fromXML(Reader reader, Class<T> clazz) throws IOException {
+        return xmlMapper.readValue(reader, clazz);
     }
-    
-    public static String toXML(Object obj) {
-        return xstream.toXML(obj);
-    }
-    
-    public static Object fromXML(Reader reader) {
-        return xstream.fromXML(reader);
-    }
-    
-    public static Object fromXML(String xml) {
-        return xstream.fromXML(xml);
+
+    public static Object fromXML(String xml) throws IOException {
+        return xmlMapper.readValue(xml, Object.class);
     }
 }

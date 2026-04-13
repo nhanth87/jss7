@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -13,7 +16,6 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.CallSegmentToCancel;
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -21,7 +23,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author Amit Bhayani
  *
  */
-@XStreamAlias("callSegmentToCancel")
+@JacksonXmlRootElement(localName = "callSegmentToCancel")
 public class CallSegmentToCancelImpl implements CallSegmentToCancel, CAPAsnPrimitive {
 
     private static final String INVOKE_ID = "invokeID";
@@ -184,3 +186,4 @@ public class CallSegmentToCancelImpl implements CallSegmentToCancel, CAPAsnPrimi
         return sb.toString();
     }
 }
+

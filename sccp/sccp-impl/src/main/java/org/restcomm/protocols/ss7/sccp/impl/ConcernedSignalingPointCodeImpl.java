@@ -2,15 +2,21 @@ package org.restcomm.protocols.ss7.sccp.impl;
 
 import org.restcomm.protocols.ss7.sccp.ConcernedSignalingPointCode;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 /**
  *
  * @author sergey vetyutnev
  * @author Amit Bhayani
  *
  */
+@JacksonXmlRootElement(localName = "concernedSignalingPointCode")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ConcernedSignalingPointCodeImpl implements ConcernedSignalingPointCode {
 
-    private int remoteSpc;
+    @JacksonXmlProperty private int remoteSpc;
 
     public ConcernedSignalingPointCodeImpl() {
     }

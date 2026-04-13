@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.isup;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -16,7 +19,6 @@ import org.restcomm.protocols.ss7.isup.ParameterException;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.LocationNumberImpl;
 import org.restcomm.protocols.ss7.isup.message.parameter.LocationNumber;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -24,7 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("locationNumberCap")
+@JacksonXmlRootElement(localName = "locationNumberCap")
 public class LocationNumberCapImpl implements LocationNumberCap, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "LocationNumberCap";
@@ -192,3 +194,4 @@ public class LocationNumberCapImpl implements LocationNumberCap, CAPAsnPrimitive
         return sb.toString();
     }
 }
+

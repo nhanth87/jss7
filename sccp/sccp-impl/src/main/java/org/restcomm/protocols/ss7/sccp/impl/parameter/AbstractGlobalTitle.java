@@ -4,7 +4,9 @@ package org.restcomm.protocols.ss7.sccp.impl.parameter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import org.restcomm.protocols.ss7.sccp.SccpProtocolVersion;
 import org.restcomm.protocols.ss7.sccp.message.ParseException;
@@ -15,6 +17,19 @@ import org.restcomm.protocols.ss7.sccp.parameter.ParameterFactory;
 /**
  * @author baranowb
  */
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type"
+)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = GlobalTitle0100Impl.class, name = "GlobalTitle0100Impl"),
+    @JsonSubTypes.Type(value = GlobalTitle0011Impl.class, name = "GlobalTitle0011Impl"),
+    @JsonSubTypes.Type(value = GlobalTitle0010Impl.class, name = "GlobalTitle0010Impl"),
+    @JsonSubTypes.Type(value = GlobalTitle0001Impl.class, name = "GlobalTitle0001Impl"),
+    @JsonSubTypes.Type(value = NoGlobalTitle.class, name = "NoGlobalTitle")
+})
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class AbstractGlobalTitle extends AbstractParameter implements GlobalTitle {
 
     protected String digits;

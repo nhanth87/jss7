@@ -1,33 +1,74 @@
 package org.restcomm.protocols.ss7.map;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.thoughtworks.xstream.security.AnyTypePermission;
+import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
- * XStream helper for MAP module XML serialization.
- * Replaces Javolution XMLBinding.
+ * XML helper for MAP module XML serialization.
+ * Uses Jackson XML instead of XStream for better performance and security.
+ * 
+ * @deprecated Use {@link MAPJacksonHelper} instead. This class is kept for backward compatibility.
  */
 public class MAPXStreamHelper {
-    private static final XStream xstream = new XStream(new DomDriver());
+    private static final XmlMapper xmlMapper = new XmlMapper();
     
     static {
-        // Configure security - allow all types for now (can be restricted later)
-        xstream.addPermission(AnyTypePermission.ANY);
-        
-        // Process annotations from all MAP implementation classes
-        // Note: Individual classes will have @XStreamAlias annotations
+        // Configure XML mapper
+        xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, false);
     }
     
-    public static XStream getXStream() {
-        return xstream;
+    /**
+     * @deprecated Use {@link MAPJacksonHelper#getXmlMapper()} instead.
+     */
+    @Deprecated
+    public static XmlMapper getXStream() {
+        return xmlMapper;
+    }
+    
+    /**
+     * @deprecated Use {@link MAPJacksonHelper#getXmlMapper()} instead.
+     */
+    @Deprecated
+    public static XmlMapper getXmlMapper() {
+        return xmlMapper;
     }
     
     public static String toXML(Object obj) {
-        return xstream.toXML(obj);
+        try {
+            return xmlMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException("Error serializing object to XML", e);
+        }
     }
     
     public static Object fromXML(String xml) {
-        return xstream.fromXML(xml);
+        try {
+            return xmlMapper.readValue(xml, Object.class);
+        } catch (JacksonException e) {
+            throw new RuntimeException("Error deserializing XML", e);
+        }
+    }
+    
+    public static <T> T fromXML(String xml, Class<T> clazz) {
+        try {
+            return xmlMapper.readValue(xml, clazz);
+        } catch (JacksonException e) {
+            throw new RuntimeException("Error deserializing XML to " + clazz.getName(), e);
+        }
+    }
+    
+    public static void toXML(Object obj, Writer writer) throws IOException {
+        xmlMapper.writeValue(writer, obj);
+    }
+    
+    public static <T> T fromXML(Reader reader, Class<T> clazz) throws IOException {
+        return xmlMapper.readValue(reader, clazz);
     }
 }

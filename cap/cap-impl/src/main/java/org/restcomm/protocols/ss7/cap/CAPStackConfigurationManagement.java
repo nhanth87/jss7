@@ -1,6 +1,8 @@
 package org.restcomm.protocols.ss7.cap;
 
-import com.thoughtworks.xstream.XStream;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 
 import java.io.File;
 import java.io.FileReader;
@@ -60,9 +62,8 @@ public class CAPStackConfigurationManagement {
      * Persist
      */
     public void store() {
-        XStream xstream = CAPXStreamHelper.getXStream();
         try (Writer writer = new FileWriter(persistFile.toString())) {
-            xstream.toXML(this, writer);
+            CAPXStreamHelper.getXmlMapper().writeValue(writer, this);
         } catch (IOException e) {
             System.err.println(String.format("Error while persisting the CAP Resource state in file=%s", persistFile.toString()));
             e.printStackTrace();
@@ -81,9 +82,8 @@ public class CAPStackConfigurationManagement {
             if (!file.exists()) {
                 return;
             }
-            XStream xstream = CAPXStreamHelper.getXStream();
             try (Reader reader = new FileReader(file)) {
-                CAPStackConfigurationManagement loaded = (CAPStackConfigurationManagement) xstream.fromXML(reader);
+                CAPStackConfigurationManagement loaded = CAPXStreamHelper.getXmlMapper().readValue(reader, CAPStackConfigurationManagement.class);
                 // Copy loaded values to this instance
                 this._Timer_CircuitSwitchedCallControl_Short = loaded._Timer_CircuitSwitchedCallControl_Short;
                 this._Timer_CircuitSwitchedCallControl_Medium = loaded._Timer_CircuitSwitchedCallControl_Medium;

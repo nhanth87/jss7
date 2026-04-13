@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.primitives;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -14,14 +17,13 @@ import org.restcomm.protocols.ss7.cap.api.primitives.ReceivingSideID;
 import org.restcomm.protocols.ss7.inap.api.primitives.LegType;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("receivingSideID")
+@JacksonXmlRootElement(localName = "receivingSideID")
 public class ReceivingSideIDImpl implements ReceivingSideID, CAPAsnPrimitive {
 
     private static final String RECEIVING_SIDE_ID = "receivingSideID";
@@ -159,3 +161,4 @@ public class ReceivingSideIDImpl implements ReceivingSideID, CAPAsnPrimitive {
         return sb.toString();
     }
 }
+

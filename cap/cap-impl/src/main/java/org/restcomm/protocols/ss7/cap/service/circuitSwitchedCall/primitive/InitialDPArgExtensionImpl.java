@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -36,7 +39,6 @@ import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.ExtB
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.OfferedCamel4FunctionalitiesImpl;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.SupportedCamelPhasesImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -44,7 +46,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author alerant appngin
  *
  */
-@XStreamAlias("initialDPArgExtension")
+@JacksonXmlRootElement(localName = "initialDPArgExtension")
 public class InitialDPArgExtensionImpl extends SequenceBase implements InitialDPArgExtension {
 
     public static final int _ID_gmscAddress = 0;
@@ -471,3 +473,4 @@ public class InitialDPArgExtensionImpl extends SequenceBase implements InitialDP
         return sb.toString();
     }
 }
+

@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -48,14 +51,13 @@ import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.
 import org.restcomm.protocols.ss7.map.primitives.ArrayListSerializingBase;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.CUGInterlockImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  * @author tamas gyorgyey
  */
-@XStreamAlias("connectRequest")
+@JacksonXmlRootElement(localName = "connectRequest")
 public class ConnectRequestImpl extends CircuitSwitchedCallMessageImpl implements ConnectRequest {
 
     public static final int _ID_destinationRoutingAddress = 0;
@@ -660,3 +662,4 @@ public static class ConnectRequest_GenericNumbers extends ArrayListSerializingBa
 
     }
 }
+

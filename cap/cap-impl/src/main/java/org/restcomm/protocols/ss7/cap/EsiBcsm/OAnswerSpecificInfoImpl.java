@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 import org.mobicents.protocols.asn.AsnException;
@@ -23,9 +26,8 @@ import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.ExtB
  * @author sergey vetyutnev
  *
  */
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias("oAnswerSpecificInfo")
+@JacksonXmlRootElement(localName = "oAnswerSpecificInfo")
 public class OAnswerSpecificInfoImpl extends SequenceBase implements OAnswerSpecificInfo {
 
     public static final int _ID_destinationAddress = 50;
@@ -35,17 +37,17 @@ public class OAnswerSpecificInfoImpl extends SequenceBase implements OAnswerSpec
     public static final int _ID_extBasicServiceCode = 54;
     public static final int _ID_extBasicServiceCode2 = 55;
 
-    @XStreamAlias("destinationAddress")
+    @JacksonXmlProperty(localName = "destinationAddress")
     private CalledPartyNumberCap destinationAddress;
-    @XStreamAlias("orCall")
+    @JacksonXmlProperty(localName = "orCall")
     private boolean orCall;
-    @XStreamAlias("forwardedCall")
+    @JacksonXmlProperty(localName = "forwardedCall")
     private boolean forwardedCall;
-    @XStreamAlias("chargeIndicator")
+    @JacksonXmlProperty(localName = "chargeIndicator")
     private ChargeIndicator chargeIndicator;
-    @XStreamAlias("extBasicServiceCode")
+    @JacksonXmlProperty(localName = "extBasicServiceCode")
     private ExtBasicServiceCode extBasicServiceCode;
-    @XStreamAlias("extBasicServiceCode2")
+    @JacksonXmlProperty(localName = "extBasicServiceCode2")
     private ExtBasicServiceCode extBasicServiceCode2;
 
     public OAnswerSpecificInfoImpl() {
@@ -228,3 +230,4 @@ public class OAnswerSpecificInfoImpl extends SequenceBase implements OAnswerSpec
     }
 
 }
+

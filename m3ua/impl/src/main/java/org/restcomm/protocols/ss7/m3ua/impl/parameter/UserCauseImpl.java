@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
 import org.restcomm.protocols.ss7.m3ua.parameter.UserCause;
 
@@ -8,9 +11,12 @@ import org.restcomm.protocols.ss7.m3ua.parameter.UserCause;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "userCause")
 public class UserCauseImpl extends ParameterImpl implements UserCause {
 
+    @JsonProperty("user")
     private int user = 0;
+    @JsonProperty("cause")
     private int cause = 0;
 
     private byte[] value;

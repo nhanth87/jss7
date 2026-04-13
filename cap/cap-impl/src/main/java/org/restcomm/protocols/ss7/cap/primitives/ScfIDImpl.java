@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.primitives;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 import org.mobicents.protocols.asn.AsnException;
@@ -16,14 +19,13 @@ import org.restcomm.protocols.ss7.cap.api.primitives.ScfID;
  * @author sergey vetyutnev
  *
  */
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias("scfID")
+@JacksonXmlRootElement(localName = "scfID")
 public class ScfIDImpl implements ScfID, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "ScfID";
 
-    @XStreamAlias("data")
+    @JacksonXmlProperty(localName = "data")
     private byte[] data;
 
     public ScfIDImpl() {
@@ -149,3 +151,4 @@ public class ScfIDImpl implements ScfID, CAPAsnPrimitive {
         return sb.toString();
     }
 }
+

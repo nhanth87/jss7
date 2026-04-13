@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.errors;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 import org.mobicents.protocols.asn.AsnException;
@@ -18,14 +21,13 @@ import org.restcomm.protocols.ss7.cap.api.errors.CancelProblem;
  * @author sergey vetyutnev
  *
  */
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias("capErrorMessageCancelFailed")
+@JacksonXmlRootElement(localName = "capErrorMessageCancelFailed")
 public class CAPErrorMessageCancelFailedImpl extends CAPErrorMessageImpl implements CAPErrorMessageCancelFailed {
 
     public static final String _PrimitiveName = "CAPErrorMessageCancelFailed";
 
-    @XStreamAlias("cancelProblem")
+    @JacksonXmlProperty(localName = "cancelProblem")
     private CancelProblem cancelProblem;
 
     protected CAPErrorMessageCancelFailedImpl(CancelProblem cancelProblem) {
@@ -157,3 +159,4 @@ public class CAPErrorMessageCancelFailedImpl extends CAPErrorMessageImpl impleme
     }
 
 }
+

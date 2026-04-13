@@ -23,7 +23,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.api.Association;
@@ -981,15 +983,27 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
     /**
      * Configuration class for M3UA persistence
      */
+    @JacksonXmlRootElement(localName = "m3uaConfig")
     public static class M3UAConfig {
+        @JsonProperty("timeBetweenHeartbeat")
         public int timeBetweenHeartbeat;
+        @JsonProperty("statisticsEnabled")
         public boolean statisticsEnabled;
+        @JsonProperty("statisticsTaskDelay")
         public long statisticsTaskDelay;
+        @JsonProperty("statisticsTaskPeriod")
         public long statisticsTaskPeriod;
+        @JsonProperty("routingKeyManagementEnabled")
         public boolean routingKeyManagementEnabled;
+        @JsonProperty("useLsbForLinksetSelection")
         public boolean useLsbForLinksetSelection;
+        @JsonProperty("aspFactories")
+        @JacksonXmlElementWrapper(localName = "aspFactories")
         public CopyOnWriteArrayList<AspFactory> aspFactories;
+        @JsonProperty("appServers")
+        @JacksonXmlElementWrapper(localName = "appServers")
         public CopyOnWriteArrayList<As> appServers;
+        @JsonProperty("route")
         public RouteMap route;
     }
 
@@ -1129,7 +1143,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
 
     protected void loadVer2(String fn) throws IOException {
         try (FileReader reader = new FileReader(fn)) {
-            M3UAConfig config = (M3UAConfig) M3UAXStreamHelper.fromXML(reader);
+            M3UAConfig config = M3UAXStreamHelper.fromXML(reader, M3UAConfig.class);
             this.loadActualData(config);
         }
     }

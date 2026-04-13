@@ -1,7 +1,7 @@
 
 package org.restcomm.protocols.ss7.map.primitives;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.map.api.MAPException;
@@ -12,7 +12,7 @@ import org.restcomm.protocols.ss7.map.api.primitives.IMEI;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("imei")
+@JacksonXmlRootElement(localName = "imei")
 public class IMEIImpl extends TbcdString implements IMEI {
 
     public IMEIImpl() {

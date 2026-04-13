@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.gap;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -13,13 +16,12 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.cap.api.gap.GapOnService;
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
-@XStreamAlias("gapOnService")
+@JacksonXmlRootElement(localName = "gapOnService")
 public class GapOnServiceImpl extends SequenceBase implements GapOnService {
 
     public static final int _ID_serviceKey = 0;
@@ -105,3 +107,4 @@ public class GapOnServiceImpl extends SequenceBase implements GapOnService {
     }
 
 }
+

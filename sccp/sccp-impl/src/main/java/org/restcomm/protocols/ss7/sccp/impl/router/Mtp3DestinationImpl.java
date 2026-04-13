@@ -2,18 +2,24 @@ package org.restcomm.protocols.ss7.sccp.impl.router;
 
 import org.restcomm.protocols.ss7.sccp.Mtp3Destination;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 /**
  *
  * @author sergey vetyutnev
  * @author Amit Bhayani
  */
+@JacksonXmlRootElement(localName = "mtp3Destination")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Mtp3DestinationImpl implements Mtp3Destination {
 
-    private int firstDpc;
-    private int lastDpc;
-    private int firstSls;
-    private int lastSls;
-    private int slsMask;
+    @JacksonXmlProperty private int firstDpc;
+    @JacksonXmlProperty private int lastDpc;
+    @JacksonXmlProperty private int firstSls;
+    @JacksonXmlProperty private int lastSls;
+    @JacksonXmlProperty private int slsMask;
 
     public Mtp3DestinationImpl() {
     }

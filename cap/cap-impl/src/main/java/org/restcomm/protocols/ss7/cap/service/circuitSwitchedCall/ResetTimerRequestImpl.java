@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -17,14 +20,13 @@ import org.restcomm.protocols.ss7.cap.api.primitives.TimerID;
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.ResetTimerRequest;
 import org.restcomm.protocols.ss7.cap.primitives.CAPExtensionsImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  * @author alerant appngin
  */
-@XStreamAlias("resetTimerRequest")
+@JacksonXmlRootElement(localName = "resetTimerRequest")
 public class ResetTimerRequestImpl extends CircuitSwitchedCallMessageImpl implements ResetTimerRequest {
 
     public static final int _ID_timerID = 0;
@@ -236,3 +238,4 @@ public class ResetTimerRequestImpl extends CircuitSwitchedCallMessageImpl implem
         return sb.toString();
     }
 }
+

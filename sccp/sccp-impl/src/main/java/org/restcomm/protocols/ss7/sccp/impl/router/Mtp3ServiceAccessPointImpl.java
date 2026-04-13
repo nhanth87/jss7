@@ -7,22 +7,28 @@ import org.restcomm.protocols.ss7.sccp.Mtp3Destination;
 import org.restcomm.protocols.ss7.sccp.Mtp3ServiceAccessPoint;
 import org.restcomm.protocols.ss7.sccp.impl.oam.SccpOAMMessage;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 /**
  *
  * @author sergey vetyutnev
  * @author Amit Bhayani
  *
  */
+@JacksonXmlRootElement(localName = "mtp3ServiceAccessPoint")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Mtp3ServiceAccessPointImpl implements Mtp3ServiceAccessPoint {
 
-    private int mtp3Id;
-    private int opc;
-    private int ni;
-    private String stackName;
-    private int networkId;
-    private String localGtDigits;
+    @JacksonXmlProperty private int mtp3Id;
+    @JacksonXmlProperty private int opc;
+    @JacksonXmlProperty private int ni;
+    @JacksonXmlProperty private String stackName;
+    @JacksonXmlProperty private int networkId;
+    @JacksonXmlProperty private String localGtDigits;
 
-    private Mtp3DestinationMap<Integer, Mtp3Destination> dpcList = new Mtp3DestinationMap<Integer, Mtp3Destination>();
+    @JacksonXmlProperty private Mtp3DestinationMap<Integer, Mtp3Destination> dpcList = new Mtp3DestinationMap<Integer, Mtp3Destination>();
 
     public Mtp3ServiceAccessPointImpl() {
     }

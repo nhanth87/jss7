@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -18,14 +21,13 @@ import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("forwardServiceInteractionInd")
+@JacksonXmlRootElement(localName = "forwardServiceInteractionInd")
 public class ForwardServiceInteractionIndImpl extends SequenceBase implements ForwardServiceInteractionInd {
 
     public static final int _ID_conferenceTreatmentIndicator = 1;
@@ -180,3 +182,4 @@ public class ForwardServiceInteractionIndImpl extends SequenceBase implements Fo
     }
 
 }
+

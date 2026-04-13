@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.isup;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 import org.mobicents.protocols.asn.AsnException;
@@ -21,14 +24,13 @@ import org.restcomm.protocols.ss7.isup.message.parameter.UserServiceInformation;
  * @author sergey vetyutnev
  *
  */
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias("bearerCap")
+@JacksonXmlRootElement(localName = "bearerCap")
 public class BearerCapImpl implements BearerCap, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "BearerCap";
 
-    @XStreamAlias("userServiceInformation")
+    @JacksonXmlProperty(localName = "userServiceInformation")
     private byte[] data;
 
     public BearerCapImpl() {
@@ -194,3 +196,4 @@ public class BearerCapImpl implements BearerCap, CAPAsnPrimitive {
     }
 
 }
+

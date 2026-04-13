@@ -2,23 +2,29 @@ package org.restcomm.protocols.ss7.sccp.impl;
 
 import org.restcomm.protocols.ss7.sccp.RemoteSignalingPointCode;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 /**
  * @author amit bhayani
  * @author sergey vetyutnev
  *
  */
+@JacksonXmlRootElement(localName = "remoteSignalingPointCode")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RemoteSignalingPointCodeImpl implements RemoteSignalingPointCode {
 
-    private int remoteSpc;
-    private int remoteSpcFlag;
-    private int mask;
-    protected boolean remoteSpcProhibited;
-    protected boolean remoteSccpProhibited;
+    @JacksonXmlProperty private int remoteSpc;
+    @JacksonXmlProperty private int remoteSpcFlag;
+    @JacksonXmlProperty private int mask;
+    @JacksonXmlProperty protected boolean remoteSpcProhibited;
+    @JacksonXmlProperty protected boolean remoteSccpProhibited;
 
-    protected int rl;
-    protected int rsl;
+    @JacksonXmlProperty protected int rl;
+    @JacksonXmlProperty protected int rsl;
 
-    private RemoteSignalingPointCodeExt remoteSignalingPointCodeExt;
+    private transient RemoteSignalingPointCodeExt remoteSignalingPointCodeExt;
 
     public RemoteSignalingPointCodeImpl() {
     }

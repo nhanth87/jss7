@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.gap;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -17,13 +20,12 @@ import org.restcomm.protocols.ss7.cap.isup.CauseCapImpl;
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive.InformationToSendImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author <a href="mailto:bartosz.krok@pro-ids.com"> Bartosz Krok (ProIDS sp. z o.o.)</a>
  */
-@XStreamAlias("gapTreatment")
+@JacksonXmlRootElement(localName = "gapTreatment")
 public class GapTreatmentImpl implements GapTreatment, CAPAsnPrimitive {
 
     public static final int _ID_InformationToSend = 0;
@@ -193,3 +195,4 @@ public class GapTreatmentImpl implements GapTreatment, CAPAsnPrimitive {
     }
 
 }
+

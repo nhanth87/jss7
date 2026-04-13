@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -30,14 +33,13 @@ import org.restcomm.protocols.ss7.map.api.service.callhandling.CallReferenceNumb
 import org.restcomm.protocols.ss7.map.primitives.ISDNAddressStringImpl;
 import org.restcomm.protocols.ss7.map.service.callhandling.CallReferenceNumberImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author Povilas Jurna
  *
  */
-@XStreamAlias("initiateCallAttemptRequest")
+@JacksonXmlRootElement(localName = "initiateCallAttemptRequest")
 public class InitiateCallAttemptRequestImpl extends CircuitSwitchedCallMessageImpl implements InitiateCallAttemptRequest {
 
     public static final int _ID_destinationRoutingAddress = 0;
@@ -359,3 +361,4 @@ public class InitiateCallAttemptRequestImpl extends CircuitSwitchedCallMessageIm
     }
 
 }
+

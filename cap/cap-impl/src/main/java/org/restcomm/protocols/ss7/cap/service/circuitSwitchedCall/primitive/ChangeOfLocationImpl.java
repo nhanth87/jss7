@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -20,14 +23,13 @@ import org.restcomm.protocols.ss7.map.api.primitives.LAIFixedLength;
 import org.restcomm.protocols.ss7.map.primitives.CellGlobalIdOrServiceAreaIdFixedLengthImpl;
 import org.restcomm.protocols.ss7.map.primitives.LAIFixedLengthImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("changeOfLocation")
+@JacksonXmlRootElement(localName = "changeOfLocation")
 public class ChangeOfLocationImpl implements ChangeOfLocation, CAPAsnPrimitive {
 
     private static final String CELL_GLOBAL_ID = "cellGlobalId";
@@ -349,3 +351,4 @@ public class ChangeOfLocationImpl implements ChangeOfLocation, CAPAsnPrimitive {
     }
 
 }
+

@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 import org.mobicents.protocols.asn.AsnException;
@@ -17,14 +20,13 @@ import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
  * @author sergey vetyutnev
  *
  */
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-@XStreamAlias("oAbandonSpecificInfo")
+@JacksonXmlRootElement(localName = "oAbandonSpecificInfo")
 public class OAbandonSpecificInfoImpl extends SequenceBase implements OAbandonSpecificInfo {
 
     public static final int _ID_routeNotPermitted = 50;
 
-    @XStreamAlias("routeNotPermitted")
+    @JacksonXmlProperty(localName = "routeNotPermitted")
     private boolean routeNotPermitted;
 
     public OAbandonSpecificInfoImpl() {
@@ -104,3 +106,4 @@ public class OAbandonSpecificInfoImpl extends SequenceBase implements OAbandonSp
     }
 
 }
+

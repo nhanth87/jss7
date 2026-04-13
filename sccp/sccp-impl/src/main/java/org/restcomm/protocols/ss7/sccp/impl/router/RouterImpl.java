@@ -24,6 +24,10 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 /**
  * <p>
  * The default implementation for the SCCP router.
@@ -569,9 +573,11 @@ public class RouterImpl implements Router {
     /**
      * Configuration class for Router persistence
      */
+    @JacksonXmlRootElement(localName = "RouterConfig")
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class RouterConfig {
-        public LongMessageRuleMap<Integer, LongMessageRule> longMessageRules;
-        public Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> saps;
+        @JacksonXmlProperty public LongMessageRuleMap<Integer, LongMessageRule> longMessageRules;
+        @JacksonXmlProperty public Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> saps;
     }
 
     /**
@@ -619,15 +625,19 @@ public class RouterImpl implements Router {
     }
 
     protected void loadVer4(FileReader reader) throws FileNotFoundException {
-        RouterConfig config = (RouterConfig) SCCPXStreamHelper.fromXML(reader);
-        if (config != null) {
-            longMessageRules = config.longMessageRules;
-            saps = config.saps;
+        try {
+            RouterConfig config = SCCPXStreamHelper.fromXML(reader, RouterConfig.class);
+            if (config != null) {
+                longMessageRules = config.longMessageRules;
+                saps = config.saps;
 
-            for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
-                Mtp3ServiceAccessPoint sap = e.getValue();
-                ((Mtp3ServiceAccessPointImpl)sap).setStackName(name);
+                for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
+                    Mtp3ServiceAccessPoint sap = e.getValue();
+                    ((Mtp3ServiceAccessPointImpl)sap).setStackName(name);
+                }
             }
+        } catch (IOException e) {
+            logger.error(String.format("Failed to parse RouterConfig from XML"), e);
         }
     }
 }

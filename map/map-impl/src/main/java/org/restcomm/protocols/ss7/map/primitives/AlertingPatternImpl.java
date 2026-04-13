@@ -1,7 +1,7 @@
 
 package org.restcomm.protocols.ss7.map.primitives;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.restcomm.protocols.ss7.map.api.primitives.AlertingCategory;
 import org.restcomm.protocols.ss7.map.api.primitives.AlertingLevel;
@@ -13,7 +13,7 @@ import org.restcomm.protocols.ss7.map.api.primitives.AlertingPattern;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("alertingPattern")
+@JacksonXmlRootElement(localName = "alertingPattern")
 public class AlertingPatternImpl extends OctetStringLength1Base implements AlertingPattern {
 
     public AlertingPatternImpl() {

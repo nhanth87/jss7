@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import org.restcomm.protocols.ss7.cap.api.CAPDialog;
 import org.restcomm.protocols.ss7.cap.api.CAPMessage;
 
@@ -9,13 +12,11 @@ import org.restcomm.protocols.ss7.cap.api.CAPMessage;
  * @author sergey vetyutnev
  *
  */
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-@XStreamAlias("message")
+@JacksonXmlRootElement(localName = "message")
 public abstract class MessageImpl implements CAPMessage {
 
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     private long invokeId;
     private CAPDialog capDialog;
 
@@ -41,3 +42,5 @@ public abstract class MessageImpl implements CAPMessage {
     }
 
 }
+
+

@@ -3,7 +3,7 @@ package org.restcomm.protocols.ss7.map.primitives;
 
 import java.io.IOException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -16,7 +16,7 @@ import org.restcomm.protocols.ss7.map.api.primitives.GlobalCellId;
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("globalCellId")
+@JacksonXmlRootElement(localName = "globalCellId")
 public class GlobalCellIdImpl extends OctetStringBase implements GlobalCellId {
 
     public GlobalCellIdImpl() {

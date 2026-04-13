@@ -2,8 +2,8 @@ package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import java.io.IOException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -27,7 +27,7 @@ import org.restcomm.protocols.ss7.map.primitives.MAPExtensionContainerImpl;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("mNPInfoResImpl")
+@JacksonXmlRootElement(localName = "mNPInfoResImpl")
 public class MNPInfoResImpl implements MNPInfoRes, MAPAsnPrimitive {
 
     public static final String _PrimitiveName = "MNPInfoRes";

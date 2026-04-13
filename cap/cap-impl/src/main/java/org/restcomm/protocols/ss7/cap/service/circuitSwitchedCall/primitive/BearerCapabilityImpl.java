@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -16,14 +19,13 @@ import org.restcomm.protocols.ss7.cap.isup.BearerCapImpl;
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("bearerCapability")
+@JacksonXmlRootElement(localName = "bearerCapability")
 public class BearerCapabilityImpl implements BearerCapability, CAPAsnPrimitive {
 
     public static final int _ID_bearerCap = 0;
@@ -166,3 +168,4 @@ public class BearerCapabilityImpl implements BearerCapability, CAPAsnPrimitive {
         return sb.toString();
     }
 }
+

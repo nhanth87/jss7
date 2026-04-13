@@ -3,7 +3,7 @@ package org.restcomm.protocols.ss7.sccp.impl.parameter;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
 import org.restcomm.protocols.ss7.sccp.SccpProtocolVersion;
@@ -14,6 +14,7 @@ import org.restcomm.protocols.ss7.sccp.parameter.ParameterFactory;
  * @author amit bhayani
  *
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NoGlobalTitle extends AbstractGlobalTitle {
 
 

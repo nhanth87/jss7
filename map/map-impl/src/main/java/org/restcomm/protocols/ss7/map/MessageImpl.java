@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.restcomm.protocols.ss7.map.api.MAPDialog;
 import org.restcomm.protocols.ss7.map.api.MAPMessage;
@@ -13,13 +13,15 @@ import org.restcomm.protocols.ss7.map.api.MAPMessage;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("mapMessage")
 public abstract class MessageImpl implements MAPMessage {
 
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     private long invokeId;
+    
+    @JsonIgnore
     private MAPDialog mapDialog;
-    @XStreamAsAttribute
+    
+    @JacksonXmlProperty(isAttribute = true)
     private boolean returnResultNotLast = false;
 
     public long getInvokeId() {

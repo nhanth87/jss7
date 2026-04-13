@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -18,7 +21,6 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.CAPExtensionsImpl;
 import org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive.InformationToSendImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -26,7 +28,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author kiss.balazs@alerant.hu
  *
  */
-@XStreamAlias("playAnnouncementRequest")
+@JacksonXmlRootElement(localName = "playAnnouncementRequest")
 public class PlayAnnouncementRequestImpl extends CircuitSwitchedCallMessageImpl implements PlayAnnouncementRequest {
 
     private static final String INFORMATION_TO_SEND = "informationToSend";
@@ -297,3 +299,4 @@ public class PlayAnnouncementRequestImpl extends CircuitSwitchedCallMessageImpl 
         return sb.toString();
     }
 }
+

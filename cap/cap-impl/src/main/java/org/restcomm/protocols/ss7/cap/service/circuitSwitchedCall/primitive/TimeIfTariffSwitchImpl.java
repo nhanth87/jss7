@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -14,7 +17,6 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -22,7 +24,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author Amit Bhayani
  *
  */
-@XStreamAlias("timeIfTariffSwitch")
+@JacksonXmlRootElement(localName = "timeIfTariffSwitch")
 public class TimeIfTariffSwitchImpl extends SequenceBase implements TimeIfTariffSwitch {
 
     private static final String TIME_SINCE_TARIFF_SWITCH = "timeSinceTariffSwitch";
@@ -133,3 +135,4 @@ public class TimeIfTariffSwitchImpl extends SequenceBase implements TimeIfTariff
         return sb.toString();
     }
 }
+

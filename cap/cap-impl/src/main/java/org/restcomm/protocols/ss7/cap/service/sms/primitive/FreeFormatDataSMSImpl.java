@@ -1,11 +1,13 @@
 package org.restcomm.protocols.ss7.cap.service.sms.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 
 import org.restcomm.protocols.ss7.cap.api.service.sms.primitive.FreeFormatDataSMS;
 import org.restcomm.protocols.ss7.cap.primitives.OctetStringBase;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.ByteArrayContainer;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -13,7 +15,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author alerant appngin
  *
  */
-@XStreamAlias("freeFormatDataSMS")
+@JacksonXmlRootElement(localName = "freeFormatDataSMS")
 public class FreeFormatDataSMSImpl extends OctetStringBase implements FreeFormatDataSMS {
 
     private static final String DATA = "data";
@@ -31,3 +33,4 @@ public class FreeFormatDataSMSImpl extends OctetStringBase implements FreeFormat
         return data;
     }
 }
+

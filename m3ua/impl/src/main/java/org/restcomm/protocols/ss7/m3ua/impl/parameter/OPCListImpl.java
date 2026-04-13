@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import java.util.Arrays;
 
 
@@ -12,6 +15,7 @@ import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "opcList")
 public class OPCListImpl extends ParameterImpl implements OPCList {
 
     private static final String OPC = "opc";
@@ -19,7 +23,9 @@ public class OPCListImpl extends ParameterImpl implements OPCList {
     private static final String ARRAY_SIZE = "size";
 
     private byte[] value;
+    @JsonProperty("pointCodes")
     private int[] pointCodes;
+    @JsonProperty("masks")
     private short[] masks;
 
     public OPCListImpl() {

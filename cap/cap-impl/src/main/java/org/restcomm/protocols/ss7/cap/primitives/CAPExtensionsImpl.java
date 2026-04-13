@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.primitives;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -15,14 +18,13 @@ import org.restcomm.protocols.ss7.cap.api.primitives.CAPExtensions;
 import org.restcomm.protocols.ss7.cap.api.primitives.ExtensionField;
 import org.restcomm.protocols.ss7.map.primitives.ArrayListSerializingBase;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("cAPExtensions")
+@JacksonXmlRootElement(localName = "cAPExtensions")
 public class CAPExtensionsImpl implements CAPExtensions, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "CAPExtensions";
@@ -183,3 +185,4 @@ public static class CAPExtensions_ExtensionFields extends ArrayListSerializingBa
 
     }
 }
+

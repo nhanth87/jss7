@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -16,14 +19,13 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.FurnishCha
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.FCIBCCCAMELsequence1;
 import org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive.FCIBCCCAMELsequence1Impl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("furnishChargingInformationRequest")
+@JacksonXmlRootElement(localName = "furnishChargingInformationRequest")
 public class FurnishChargingInformationRequestImpl extends CircuitSwitchedCallMessageImpl implements
         FurnishChargingInformationRequest {
 
@@ -195,3 +197,4 @@ public class FurnishChargingInformationRequestImpl extends CircuitSwitchedCallMe
         return sb.toString();
     }
 }
+

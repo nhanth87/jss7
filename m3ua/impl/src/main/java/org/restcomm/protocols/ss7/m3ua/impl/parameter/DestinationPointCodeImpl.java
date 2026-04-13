@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 
 
 import org.restcomm.protocols.ss7.m3ua.parameter.DestinationPointCode;
@@ -10,12 +13,15 @@ import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "destinationPointCode")
 public class DestinationPointCodeImpl extends ParameterImpl implements DestinationPointCode {
 
     private static final String DPC = "dpc";
     private static final String MASK = "mask";
 
+    @JsonProperty("destPC")
     private int destPC = 0;
+    @JsonProperty("mask")
     private short mask = 0;
     private byte[] value;
 

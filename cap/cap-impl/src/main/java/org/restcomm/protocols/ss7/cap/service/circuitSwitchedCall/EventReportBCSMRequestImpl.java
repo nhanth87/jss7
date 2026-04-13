@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -25,7 +28,6 @@ import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.inap.api.primitives.MiscCallInfo;
 import org.restcomm.protocols.ss7.inap.primitives.MiscCallInfoImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -33,7 +35,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author Amit Bhayani
  *
  */
-@XStreamAlias("eventReportBCSMRequest")
+@JacksonXmlRootElement(localName = "eventReportBCSMRequest")
 public class EventReportBCSMRequestImpl extends CircuitSwitchedCallMessageImpl implements EventReportBCSMRequest {
 
     private static final String EVENT_TYPE_BCSM = "eventTypeBCSM";
@@ -301,3 +303,4 @@ public class EventReportBCSMRequestImpl extends CircuitSwitchedCallMessageImpl i
     }
 
 }
+

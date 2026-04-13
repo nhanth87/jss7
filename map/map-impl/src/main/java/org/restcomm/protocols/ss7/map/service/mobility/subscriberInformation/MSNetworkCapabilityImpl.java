@@ -1,8 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberInformation.MSNetworkCapability;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
 
@@ -11,7 +11,7 @@ import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("mSNetworkCapabilityImpl")
+@JacksonXmlRootElement(localName = "mSNetworkCapabilityImpl")
 public class MSNetworkCapabilityImpl extends OctetStringBase implements MSNetworkCapability {
     public MSNetworkCapabilityImpl() {
         super(1, 8, "MSNetworkCapability");

@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -15,14 +18,13 @@ import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("midCallControlInfo")
+@JacksonXmlRootElement(localName = "midCallControlInfo")
 public class MidCallControlInfoImpl extends SequenceBase implements MidCallControlInfo {
 
     private static final String MINIMUM_NUMBER_OF_DIGITS = "minimumNumberOfDigits";
@@ -329,3 +331,4 @@ public class MidCallControlInfoImpl extends SequenceBase implements MidCallContr
         return sb.toString();
     }
 }
+

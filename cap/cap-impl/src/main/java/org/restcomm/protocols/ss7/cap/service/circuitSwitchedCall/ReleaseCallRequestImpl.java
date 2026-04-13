@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -17,14 +20,13 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.ReleaseCal
 import org.restcomm.protocols.ss7.cap.isup.CauseCapImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("releaseCallRequest")
+@JacksonXmlRootElement(localName = "releaseCallRequest")
 public class ReleaseCallRequestImpl extends CircuitSwitchedCallMessageImpl implements ReleaseCallRequest {
 
     public static final String _PrimitiveName = "ReleaseCallRequestIndication";
@@ -157,3 +159,4 @@ public class ReleaseCallRequestImpl extends CircuitSwitchedCallMessageImpl imple
         return sb.toString();
     }
 }
+

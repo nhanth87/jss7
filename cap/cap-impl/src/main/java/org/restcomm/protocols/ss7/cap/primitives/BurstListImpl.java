@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.primitives;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -15,14 +18,13 @@ import org.restcomm.protocols.ss7.cap.api.primitives.BurstList;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("burstList")
+@JacksonXmlRootElement(localName = "burstList")
 public class BurstListImpl extends SequenceBase implements BurstList {
 
     public static final int _ID_warningPeriod = 0;
@@ -136,3 +138,4 @@ public class BurstListImpl extends SequenceBase implements BurstList {
         return sb.toString();
     }
 }
+

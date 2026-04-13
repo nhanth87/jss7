@@ -213,6 +213,17 @@
 			<artifactId>jctools-core</artifactId>
 			<version>${jctools.version}</version>
 		</dependency>
+		<!-- Jackson XML for serialization (replaces XStream) -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>2.15.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.15.2</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
@@ -228,30 +239,50 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
 						<executions>
+							<!-- Copy project JAR after package phase -->
 							<execution>
-								<id>copy-dependency-jar</id>
-								<phase>process-resources</phase>
+								<id>copy-project-jar</id>
+								<phase>package</phase>
 								<goals>
 									<goal>copy</goal>
 								</goals>
 								<configuration>
 									<artifactItems>
-										<!-- this artifact :) -->
 										<artifactItem>
 											<groupId>${project.groupId}</groupId>
 											<artifactId>${project.artifactId}</artifactId>
 											<version>${project.version}</version>
 											<type>jar</type>
 											<overWrite>true</overWrite>
-											<outputDirectory>
-												${assemble.dir}
-											</outputDirectory>
-											<destFileName>
-												map-load.jar
-											</destFileName>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>map-load.jar</destFileName>
 										</artifactItem>
-
-										<!-- deps -->
+									</artifactItems>
+								</configuration>
+							</execution>
+							<!-- Copy dependencies -->
+							<execution>
+								<id>copy-dependencies</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy-dependencies</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${assemble.dir}</outputDirectory>
+									<overWriteReleases>true</overWriteReleases>
+									<overWriteSnapshots>true</overWriteSnapshots>
+									<stripVersion>true</stripVersion>
+								</configuration>
+							</execution>
+							<!-- Copy specific artifacts with custom names (for Ant build compatibility) -->
+							<execution>
+								<id>copy-dependency-jar</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
 
 										<artifactItem>
 											<groupId>org.restcomm.protocols.ss7.congestion</groupId>
@@ -530,17 +561,78 @@
 											</destFileName>
 										</artifactItem>
 
+										<!-- Netty 4.2.11 individual modules (netty-all 4.2.x is empty aggregator) -->
 										<artifactItem>
 											<groupId>io.netty</groupId>
-											<artifactId>netty-all</artifactId>
+											<artifactId>netty-common</artifactId>
+											<version>${netty.version}</version>
 											<type>jar</type>
 											<overWrite>true</overWrite>
-											<outputDirectory>
-												${assemble.dir}
-											</outputDirectory>
-											<destFileName>
-												netty-all.jar
-											</destFileName>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>netty-common-4.2.11.Final.jar</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>io.netty</groupId>
+											<artifactId>netty-buffer</artifactId>
+											<version>${netty.version}</version>
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>netty-buffer-4.2.11.Final.jar</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>io.netty</groupId>
+											<artifactId>netty-resolver</artifactId>
+											<version>${netty.version}</version>
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>netty-resolver-4.2.11.Final.jar</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>io.netty</groupId>
+											<artifactId>netty-transport</artifactId>
+											<version>${netty.version}</version>
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>netty-transport-4.2.11.Final.jar</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>io.netty</groupId>
+											<artifactId>netty-transport-native-unix-common</artifactId>
+											<version>${netty.version}</version>
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>netty-transport-native-unix-common-4.2.11.Final.jar</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>io.netty</groupId>
+											<artifactId>netty-handler</artifactId>
+											<version>${netty.version}</version>
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>netty-handler-4.2.11.Final.jar</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>io.netty</groupId>
+											<artifactId>netty-codec</artifactId>
+											<version>${netty.version}</version>
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>netty-codec-4.2.11.Final.jar</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>io.netty</groupId>
+											<artifactId>netty-transport-sctp</artifactId>
+											<version>${netty.version}</version>
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>netty-transport-sctp-4.2.11.Final.jar</destFileName>
 										</artifactItem>
 
 										<artifactItem>
@@ -633,6 +725,66 @@
 											<destFileName>
 												statistics-impl.jar
 											</destFileName>
+										</artifactItem>
+
+										<!-- javolution -->
+										<artifactItem>
+											<groupId>javolution</groupId>
+											<artifactId>javolution</artifactId>
+											<version>5.3.1</version>
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>javolution.jar</destFileName>
+										</artifactItem>
+
+										<!-- xstream -->
+										<artifactItem>
+											<groupId>com.thoughtworks.xstream</groupId>
+											<artifactId>xstream</artifactId>
+											<version>1.4.20</version>
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>xstream.jar</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>io.github.x-stream</groupId>
+											<artifactId>mxparser</artifactId>
+											<version>1.2.2</version>
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>mxparser.jar</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>xmlpull</groupId>
+											<artifactId>xmlpull</artifactId>
+											<version>1.1.3.1</version>
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>xmlpull.jar</destFileName>
+										</artifactItem>
+
+										<!-- License jars -->
+										<artifactItem>
+											<groupId>com.paic</groupId>
+											<artifactId>PAiClicenser</artifactId>
+											<version>1.0</version>
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>PAiClicenser.jar</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.license4j</groupId>
+											<artifactId>LICENSE4J-Runtime-Library</artifactId>
+											<version>4.7.3</version>
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>LICENSE4J-Runtime-Library.jar</destFileName>
 										</artifactItem>
 									</artifactItems>
 								</configuration>

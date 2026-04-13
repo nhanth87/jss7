@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -18,14 +21,13 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.isup.DigitsImpl;
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("variablePart")
+@JacksonXmlRootElement(localName = "variablePart")
 public class VariablePartImpl implements VariablePart, CAPAsnPrimitive {
 
     public static final int _ID_integer = 0;
@@ -278,3 +280,4 @@ public class VariablePartImpl implements VariablePart, CAPAsnPrimitive {
         return sb.toString();
     }
 }
+

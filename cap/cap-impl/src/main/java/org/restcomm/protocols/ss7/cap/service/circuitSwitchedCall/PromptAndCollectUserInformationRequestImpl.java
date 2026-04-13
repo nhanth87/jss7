@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -20,14 +23,13 @@ import org.restcomm.protocols.ss7.cap.primitives.CAPExtensionsImpl;
 import org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive.CollectedInfoImpl;
 import org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive.InformationToSendImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("promptAndCollectUserInformationRequest")
+@JacksonXmlRootElement(localName = "promptAndCollectUserInformationRequest")
 public class PromptAndCollectUserInformationRequestImpl extends CircuitSwitchedCallMessageImpl implements PromptAndCollectUserInformationRequest {
 
     public static final int _ID_collectedInfo = 0;
@@ -305,3 +307,4 @@ public class PromptAndCollectUserInformationRequestImpl extends CircuitSwitchedC
         return sb.toString();
     }
 }
+

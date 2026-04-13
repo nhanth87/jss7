@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -15,7 +18,6 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -23,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author Amit Bhayani
  *
  */
-@XStreamAlias("timeInformation")
+@JacksonXmlRootElement(localName = "timeInformation")
 public class TimeInformationImpl implements TimeInformation, CAPAsnPrimitive {
 
     private static final String TIME_IF_NO_TARIFF_SWITCH = "timeIfNoTariffSwitch";
@@ -202,3 +204,4 @@ public class TimeInformationImpl implements TimeInformation, CAPAsnPrimitive {
         return sb.toString();
     }
 }
+

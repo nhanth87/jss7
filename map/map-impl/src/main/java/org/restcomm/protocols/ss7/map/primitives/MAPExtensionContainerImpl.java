@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -22,7 +22,7 @@ import org.restcomm.protocols.ss7.map.api.primitives.MAPPrivateExtension;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("mAPExtensionContainerImpl")
+@JacksonXmlRootElement(localName = "mAPExtensionContainerImpl")
 public class MAPExtensionContainerImpl extends SequenceBase implements MAPExtensionContainer {
 
     protected static final int PRIVATE_EXTENSION_LIST_REF_TAG = 0x00;

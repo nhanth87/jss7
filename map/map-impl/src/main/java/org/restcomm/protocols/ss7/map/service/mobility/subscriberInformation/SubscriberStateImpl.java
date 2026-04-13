@@ -3,8 +3,8 @@ package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
 import java.io.IOException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -22,7 +22,7 @@ import org.restcomm.protocols.ss7.map.primitives.MAPAsnPrimitive;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("subscriberStateImpl")
+@JacksonXmlRootElement(localName = "subscriberStateImpl")
 public class SubscriberStateImpl implements SubscriberState, MAPAsnPrimitive {
 
     public static final int _ID_assumedIdle = 0;

@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.isup;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -16,7 +19,6 @@ import org.restcomm.protocols.ss7.isup.ParameterException;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.CallingPartyNumberImpl;
 import org.restcomm.protocols.ss7.isup.message.parameter.CallingPartyNumber;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -24,7 +26,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("callingPartyNumberCap")
+@JacksonXmlRootElement(localName = "callingPartyNumberCap")
 public class CallingPartyNumberCapImpl implements CallingPartyNumberCap, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "CallingPartyNumberCap";
@@ -195,3 +197,4 @@ public class CallingPartyNumberCapImpl implements CallingPartyNumberCap, CAPAsnP
         return sb.toString();
     }
 }
+

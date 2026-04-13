@@ -1,19 +1,21 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import jakarta.xml.bind.DatatypeConverter;
 
 
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.LowLayerCompatibility;
 import org.restcomm.protocols.ss7.cap.primitives.OctetStringBase;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("lowLayerCompatibility")
+@JacksonXmlRootElement(localName = "lowLayerCompatibility")
 public class LowLayerCompatibilityImpl extends OctetStringBase implements LowLayerCompatibility {
 
     private static final String DATA = "data";
@@ -32,3 +34,4 @@ public class LowLayerCompatibilityImpl extends OctetStringBase implements LowLay
         return data;
     }
 }
+

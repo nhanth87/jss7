@@ -3,7 +3,7 @@ package org.restcomm.protocols.ss7.map.primitives;
 
 import jakarta.xml.bind.DatatypeConverter;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.restcomm.protocols.ss7.map.api.primitives.DiameterIdentity;
 
@@ -12,7 +12,7 @@ import org.restcomm.protocols.ss7.map.api.primitives.DiameterIdentity;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("diameterIdentity")
+@JacksonXmlRootElement(localName = "diameterIdentity")
 public class DiameterIdentityImpl extends OctetStringBase implements DiameterIdentity {
 
     public DiameterIdentityImpl() {

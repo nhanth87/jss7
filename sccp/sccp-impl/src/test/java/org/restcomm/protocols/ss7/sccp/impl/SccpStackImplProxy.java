@@ -5,10 +5,9 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import javolution.util.FastMap;
 
 import org.restcomm.protocols.ss7.mtp.Mtp3UserPart;
 import org.restcomm.protocols.ss7.sccp.impl.SccpProviderImpl;
@@ -46,7 +45,7 @@ public class SccpStackImplProxy extends SccpStackImpl {
 
     @Override
     public void start() {
-        this.persistFile.clear();
+        this.persistFile.setLength(0);
 
         ss7ExtSccpDetailedInterface.startExtBefore(persistDir, name);
 
@@ -91,8 +90,7 @@ public class SccpStackImplProxy extends SccpStackImpl {
 
         this.timerExecutors = Executors.newScheduledThreadPool(1);
 
-        for (FastMap.Entry<Integer, Mtp3UserPart> e = this.mtp3UserParts.head(), end = this.mtp3UserParts.tail(); (e = e
-                .getNext()) != end;) {
+        for (Map.Entry<Integer, Mtp3UserPart> e : this.mtp3UserParts.entrySet()) {
             Mtp3UserPart mup = e.getValue();
             mup.addMtp3UserPartListener(this);
         }

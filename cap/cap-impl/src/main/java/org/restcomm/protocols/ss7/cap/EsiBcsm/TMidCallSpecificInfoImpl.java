@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -15,14 +18,13 @@ import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("tMidCallSpecificInfo")
+@JacksonXmlRootElement(localName = "tMidCallSpecificInfo")
 public class TMidCallSpecificInfoImpl extends SequenceBase implements TMidCallSpecificInfo {
 
     public static final String MID_CALL_EVENTS = "midCallEvents";
@@ -109,3 +111,4 @@ public class TMidCallSpecificInfoImpl extends SequenceBase implements TMidCallSp
         return sb.toString();
     }
 }
+

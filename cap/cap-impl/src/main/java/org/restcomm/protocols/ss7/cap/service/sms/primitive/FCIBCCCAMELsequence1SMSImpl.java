@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.sms.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -17,7 +20,6 @@ import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
@@ -25,7 +27,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * @author alerant appngin
  *
  */
-@XStreamAlias("fCIBCCCAMELsequence1SMS")
+@JacksonXmlRootElement(localName = "fCIBCCCAMELsequence1SMS")
 public class FCIBCCCAMELsequence1SMSImpl extends SequenceBase implements FCIBCCCAMELsequence1SMS {
 
     private static final String FREE_FORMAT_DATA = "freeFormatData";
@@ -160,3 +162,4 @@ public class FCIBCCCAMELsequence1SMSImpl extends SequenceBase implements FCIBCCC
         return sb.toString();
     }
 }
+

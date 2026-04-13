@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -14,14 +17,13 @@ import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.ByteArrayContainer;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("iPSSPCapabilities")
+@JacksonXmlRootElement(localName = "iPSSPCapabilities")
 public class IPSSPCapabilitiesImpl implements IPSSPCapabilities, CAPAsnPrimitive {
 
     public static int _Mask_IPRoutingAddress = 0;
@@ -251,3 +253,4 @@ public class IPSSPCapabilitiesImpl implements IPSSPCapabilities, CAPAsnPrimitive
         return sb.toString();
     }
 }
+

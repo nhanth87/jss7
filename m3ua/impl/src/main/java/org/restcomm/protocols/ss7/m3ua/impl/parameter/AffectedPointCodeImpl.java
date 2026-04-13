@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import java.util.Arrays;
 
 import org.restcomm.protocols.ss7.m3ua.parameter.AffectedPointCode;
@@ -10,10 +13,13 @@ import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
  * @author amit bhayani
  *
  */
+@JacksonXmlRootElement(localName = "affectedPointCode")
 public class AffectedPointCodeImpl extends ParameterImpl implements AffectedPointCode {
 
     private byte[] value;
+    @JsonProperty("pointCodes")
     private int[] pointCodes;
+    @JsonProperty("masks")
     private short[] masks;
 
     protected AffectedPointCodeImpl(byte[] value) {

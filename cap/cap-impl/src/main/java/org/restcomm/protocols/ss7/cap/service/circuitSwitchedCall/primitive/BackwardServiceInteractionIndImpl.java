@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -17,14 +20,13 @@ import org.restcomm.protocols.ss7.cap.primitives.SequenceBase;
 import org.restcomm.protocols.ss7.inap.api.INAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("backwardServiceInteractionInd")
+@JacksonXmlRootElement(localName = "backwardServiceInteractionInd")
 public class BackwardServiceInteractionIndImpl extends SequenceBase implements BackwardServiceInteractionInd {
 
     public static final int _ID_conferenceTreatmentIndicator = 1;
@@ -149,3 +151,4 @@ public class BackwardServiceInteractionIndImpl extends SequenceBase implements B
     }
 
 }
+

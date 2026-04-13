@@ -1,19 +1,21 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 
 import org.restcomm.protocols.ss7.cap.api.service.circuitSwitchedCall.primitive.AlertingPatternCap;
 import org.restcomm.protocols.ss7.cap.primitives.OctetStringBase;
 import org.restcomm.protocols.ss7.map.api.primitives.AlertingPattern;
 import org.restcomm.protocols.ss7.map.primitives.AlertingPatternImpl;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("alertingPatternCap")
+@JacksonXmlRootElement(localName = "alertingPatternCap")
 public class AlertingPatternCapImpl extends OctetStringBase implements AlertingPatternCap {
 
     private static final String ALERTING_PATTERN = "alertingPattern";
@@ -70,3 +72,4 @@ public class AlertingPatternCapImpl extends OctetStringBase implements AlertingP
         return sb.toString();
     }
 }
+

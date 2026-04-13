@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.primitives;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -21,14 +24,13 @@ import org.restcomm.protocols.ss7.inap.api.primitives.LegID;
 import org.restcomm.protocols.ss7.inap.primitives.LegIDImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  *
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("bCSMEvent")
+@JacksonXmlRootElement(localName = "bCSMEvent")
 public class BCSMEventImpl extends SequenceBase implements BCSMEvent {
 
     public static final int _ID_eventTypeBCSM = 0;
@@ -215,3 +217,4 @@ public class BCSMEventImpl extends SequenceBase implements BCSMEvent {
         return sb.toString();
     }
 }
+

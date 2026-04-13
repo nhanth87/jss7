@@ -11,6 +11,10 @@ import org.restcomm.protocols.ss7.sccp.RemoteSubSystem;
 import org.restcomm.protocols.ss7.sccp.SccpResource;
 import org.restcomm.protocols.ss7.sccp.impl.oam.SccpOAMMessage;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 /**
  * @author amit bhayani
  */
@@ -328,12 +332,14 @@ public class SccpResourceImpl implements SccpResource {
         }
 
         /**
-         * Configuration class for XStream persistence
+         * Configuration class for Jackson persistence
          */
+        @JacksonXmlRootElement(localName = "ResourcesConfig")
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class ResourcesConfig {
-            public RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsns;
-            public RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcs;
-            public ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode> concernedSpcs;
+            @JacksonXmlProperty public RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsns;
+            @JacksonXmlProperty public RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcs;
+            @JacksonXmlProperty public ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode> concernedSpcs;
         }
 
         /**
@@ -365,7 +371,7 @@ public class SccpResourceImpl implements SccpResource {
             try {
                 File f = new File(this.persistFile);
                 if (f.exists()) {
-                    // we have V3 config (XStream format)
+                    // we have V3 config (Jackson format)
                     resources = loadVer3(this.persistFile);
                 } else {
                     // Try legacy format (sccpresource2.xml)
@@ -405,7 +411,7 @@ public class SccpResourceImpl implements SccpResource {
 
         protected ResourcesSet loadVer3(String fn) throws FileNotFoundException {
             try (FileReader reader = new FileReader(fn)) {
-                ResourcesConfig config = (ResourcesConfig) SCCPXStreamHelper.fromXML(reader);
+                ResourcesConfig config = SCCPXStreamHelper.fromXML(reader, ResourcesConfig.class);
                 if (config != null) {
                     return new ResourcesSet(config.remoteSpcs, config.remoteSsns, config.concernedSpcs);
                 }

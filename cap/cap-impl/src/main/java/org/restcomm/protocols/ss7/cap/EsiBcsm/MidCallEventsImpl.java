@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.cap.EsiBcsm;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 import java.io.IOException;
 
 
@@ -16,14 +19,13 @@ import org.restcomm.protocols.ss7.cap.isup.DigitsImpl;
 import org.restcomm.protocols.ss7.cap.primitives.CAPAsnPrimitive;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
 *
 * @author sergey vetyutnev
 *
 */
-@XStreamAlias("midCallEvents")
+@JacksonXmlRootElement(localName = "midCallEvents")
 public class MidCallEventsImpl implements MidCallEvents, CAPAsnPrimitive {
     private static final String DTMF_DIGITS_COMPLETED = "dtmfDigitsCompleted";
     private static final String DTMF_DIGITS_TIME_OUT = "dtmfDigitsTimeOut";
@@ -201,3 +203,4 @@ public class MidCallEventsImpl implements MidCallEvents, CAPAsnPrimitive {
 
 
 }
+

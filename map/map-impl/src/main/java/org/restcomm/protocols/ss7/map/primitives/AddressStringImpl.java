@@ -2,8 +2,7 @@ package org.restcomm.protocols.ss7.map.primitives;
 
 import java.io.IOException;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -22,18 +21,19 @@ import org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan;
  * @author sergey vetyutnev
  *
  */
-@XStreamAlias("addressString")
 public class AddressStringImpl implements AddressString, MAPAsnPrimitive {
 
     protected int NO_EXTENSION_MASK = 0x80;
     protected int NATURE_OF_ADD_IND_MASK = 0x70;
     protected int NUMBERING_PLAN_IND_MASK = 0x0F;
 
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     protected AddressNature addressNature;
-    @XStreamAsAttribute
+    
+    @JacksonXmlProperty(isAttribute = true)
     protected NumberingPlan numberingPlan;
-    @XStreamAsAttribute
+    
+    @JacksonXmlProperty(isAttribute = true)
     protected String address;
 
     private boolean isExtension;

@@ -1,7 +1,7 @@
 package org.restcomm.protocols.ss7.map.errors;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.map.api.MAPException;
@@ -14,7 +14,7 @@ import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessageParameterless;
  * @author sergey vetyutnev
  * @author amit bhayani
  */
-@XStreamAlias("mAPErrorMessageParameterlessImpl")
+@JacksonXmlRootElement(localName = "mAPErrorMessageParameterlessImpl")
 public class MAPErrorMessageParameterlessImpl extends MAPErrorMessageImpl implements MAPErrorMessageParameterless {
 
     public MAPErrorMessageParameterlessImpl() {
