@@ -1,7 +1,7 @@
 
 package org.restcomm.protocols.ss7.sccpext.impl.congestion;
 
-import javolution.util.FastMap;
+import java.util.Map;
 
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
 import org.restcomm.protocols.ss7.indicator.NumberingPlan;
@@ -55,7 +55,7 @@ public class NetworkIdAffectedPCTest {
         RouterExtImpl routerExt = (RouterExtImpl) sccpExtModule1.getRouterExt();
 
         // no rules
-        FastMap<Integer, NetworkIdState> map = routerExt.getNetworkIdList(101);
+        Map<Integer, NetworkIdState> map = routerExt.getNetworkIdList(101);
         assertEquals(map.size(), 0);
 
         // simple case

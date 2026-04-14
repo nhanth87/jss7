@@ -210,9 +210,9 @@
 
     <target name="server" description="run the Load Test Server." depends="setup-deps">
         <echo message="${cp.property}" />
-        <delete dir="server" />
+        <delete dir="server" failonerror="false" />
         <mkdir dir="server" />
-        <delete file="log4j-server.log" />
+        <delete file="log4j-server.log" failonerror="false" />
         <java classname="${packageprefix}.Server" fork="true" maxmemory="2048m" classpathref="project.class.path" dir="server">
             <jvmarg value="-Dlog.file.name=log4j-server.log" />
             <jvmarg value="-Djboss.server.base.dir=/opt/paic/map-load" />
@@ -274,7 +274,7 @@
 
     <target name="client" description="run the Load Test Client" depends="setup-deps">
         <echo message="${cp.property}" />
-        <delete dir="client" />
+        <delete dir="client" failonerror="false" />
         <mkdir dir="client" />
         <java classname="${packageprefix}.Client" fork="true" maxmemory="2048m" classpathref="project.class.path" dir="client">
             <jvmarg value="-Dlog.file.name=log4j-client.log"/>
@@ -338,7 +338,7 @@
     </target>
 
     <target name="clean" description="clean the logs">
-        <delete dir="server" />
-        <delete dir="client" />
+        <delete dir="server" failonerror="false" />
+        <delete dir="client" failonerror="false" />
     </target>
 </project>

@@ -19,11 +19,8 @@ RUN apt-get update && \
     apt-get install -y tcpdump libpcap0.8 curl libsctp1 && \
     rm -rf /var/lib/apt/lists/*
 
-# Download missing dependencies
+# Download javolution only (xstream/xmlpull/mxparser removed - now using Jackson XML)
 RUN mkdir -p /opt/target/load && \
-    curl -L -o /opt/target/load/xstream.jar https://repo1.maven.org/maven2/com/thoughtworks/xstream/xstream/1.4.20/xstream-1.4.20.jar && \
-    curl -L -o /opt/target/load/xmlpull.jar https://repo1.maven.org/maven2/xmlpull/xmlpull/1.1.3.1/xmlpull-1.1.3.1.jar && \
-    curl -L -o /opt/target/load/mxparser.jar https://repo1.maven.org/maven2/io/github/x-stream/mxparser/1.2.2/mxparser-1.2.2.jar && \
     curl -L -o /opt/target/load/javolution.jar https://repo1.maven.org/maven2/org/javolution/javolution/5.3.1/javolution-5.3.1.jar
 
 # Copy Ant from builder

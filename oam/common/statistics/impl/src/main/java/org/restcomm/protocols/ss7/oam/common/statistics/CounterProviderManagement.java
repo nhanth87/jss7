@@ -12,8 +12,9 @@ import java.util.Map;
 
 import org.jctools.maps.NonBlockingHashMap;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.restcomm.protocols.ss7.oam.common.jmx.OAMXStreamHelper;
+
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.oam.common.jmx.MBeanHost;
@@ -434,10 +435,8 @@ public class CounterProviderManagement implements CounterProviderManagementMBean
      */
     public void store() {
         try {
-            XStream xstream = new XStream(new DomDriver());
-            xstream.alias(COUNTER_CAMPAIGNS, CounterCampaignMap.class);
-            xstream.alias("counterCampaign", CounterCampaignImpl.class);
-            String xml = xstream.toXML(this.lstCounterCampaign);
+            XmlMapper xmlMapper = OAMXStreamHelper.getXmlMapper();
+            String xml = xmlMapper.writeValueAsString(this.lstCounterCampaign);
             FileOutputStream fos = new FileOutputStream(persistFile.toString());
             fos.write(xml.getBytes());
             fos.close();
@@ -455,11 +454,9 @@ public class CounterProviderManagement implements CounterProviderManagementMBean
         try {
             File f = new File(persistFile.toString());
             if (f.exists()) {
-                XStream xstream = new XStream(new DomDriver());
-                xstream.alias(COUNTER_CAMPAIGNS, CounterCampaignMap.class);
-                xstream.alias("counterCampaign", CounterCampaignImpl.class);
+                XmlMapper xmlMapper = OAMXStreamHelper.getXmlMapper();
                 FileInputStream fis = new FileInputStream(persistFile.toString());
-                this.lstCounterCampaign = (CounterCampaignMap<String, CounterCampaignImpl>) xstream.fromXML(fis);
+                this.lstCounterCampaign = xmlMapper.readValue(fis, CounterCampaignMap.class);
                 fis.close();
             }
         } catch (FileNotFoundException e) {
@@ -566,3 +563,4 @@ public class CounterProviderManagement implements CounterProviderManagementMBean
     }
 
 }
+

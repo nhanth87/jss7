@@ -10,8 +10,8 @@ import org.restcomm.protocols.ss7.oam.common.statistics.api.CounterOutputFormat;
 import org.restcomm.protocols.ss7.oam.common.statistics.api.CounterValueSet;
 import org.restcomm.protocols.ss7.oam.common.statistics.api.SourceValueSet;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+
 
 /**
 *
@@ -22,16 +22,16 @@ public class CounterCampaignImpl implements CounterCampaign {
 
     private static final long serialVersionUID = -185667602668518572L;
 
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     private String name;
     private CounterDefSet counterSet;
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     private String counterSetName;
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     private int duration;
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     private CounterOutputFormat outputFormat = CounterOutputFormat.VERBOSE;
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     private boolean shortCampaign;
 
     private Date startTime;
