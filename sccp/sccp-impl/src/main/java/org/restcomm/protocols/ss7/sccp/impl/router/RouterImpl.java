@@ -3,7 +3,7 @@ package org.restcomm.protocols.ss7.sccp.impl.router;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.restcomm.protocols.ss7.sccp.impl.SCCPXStreamHelper;
+import org.restcomm.protocols.ss7.sccp.impl.SCCPJacksonXMLHelper;
 import org.restcomm.protocols.ss7.sccp.LongMessageRule;
 import org.restcomm.protocols.ss7.sccp.LongMessageRuleType;
 import org.restcomm.protocols.ss7.sccp.Mtp3ServiceAccessPoint;
@@ -561,7 +561,7 @@ public class RouterImpl implements Router {
             config.longMessageRules = this.longMessageRules;
             config.saps = this.saps;
 
-            String xml = SCCPXStreamHelper.toXML(config);
+            String xml = SCCPJacksonXMLHelper.toXML(config);
             try (FileWriter writer = new FileWriter(this.persistFile)) {
                 writer.write(xml);
             }
@@ -626,7 +626,7 @@ public class RouterImpl implements Router {
 
     protected void loadVer4(FileReader reader) throws FileNotFoundException {
         try {
-            RouterConfig config = SCCPXStreamHelper.fromXML(reader, RouterConfig.class);
+            RouterConfig config = SCCPJacksonXMLHelper.fromXML(reader, RouterConfig.class);
             if (config != null) {
                 longMessageRules = config.longMessageRules;
                 saps = config.saps;

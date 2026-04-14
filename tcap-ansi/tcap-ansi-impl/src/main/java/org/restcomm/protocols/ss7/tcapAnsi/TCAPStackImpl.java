@@ -669,7 +669,7 @@ public class TCAPStackImpl implements TCAPStack {
             config.statisticsEnabled = this.statisticsEnabled;
             config.isSwapTcapIdBytes = this.isSwapTcapIdBytes;
 
-            String xml = TCAPAnsiXStreamHelper.toXML(config);
+            String xml = TCAPAnsiJacksonXMLHelper.toXML(config);
             try (FileWriter writer = new FileWriter(persistFile.toString())) {
                 writer.write(xml);
             }
@@ -705,7 +705,7 @@ public class TCAPStackImpl implements TCAPStack {
                 return;
             }
             try (FileReader reader = new FileReader(persistFile.toString())) {
-                TCAPConfig config = (TCAPConfig) TCAPAnsiXStreamHelper.fromXML(reader);
+                TCAPConfig config = (TCAPConfig) TCAPAnsiJacksonXMLHelper.fromXML(reader);
                 if (config != null) {
                     this.dialogTimeout = config.dialogTimeout;
                     this.invokeTimeout = config.invokeTimeout;

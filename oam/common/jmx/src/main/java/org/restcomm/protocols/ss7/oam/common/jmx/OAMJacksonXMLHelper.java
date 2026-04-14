@@ -9,7 +9,7 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
  * Jackson XML helper for OAM module XML serialization.
  * Replaces XStream for better performance and Java 17+ compatibility.
  */
-public class OAMXStreamHelper {
+public class OAMJacksonXMLHelper {
     private static final XmlMapper xmlMapper;
 
     static {

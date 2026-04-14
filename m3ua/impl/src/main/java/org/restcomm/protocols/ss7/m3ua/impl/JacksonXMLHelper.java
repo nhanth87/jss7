@@ -14,7 +14,7 @@ import java.io.Writer;
 /**
  * Jackson XML helper for M3UA module XML serialization.
  * Replaces XStream to avoid Java module system issues.
- * @deprecated Use M3UAXStreamHelper instead
+ * @deprecated Use M3UAJacksonXMLHelper instead
  */
 @Deprecated
 public class JacksonXMLHelper {

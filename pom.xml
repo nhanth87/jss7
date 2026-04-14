@@ -1,4 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -9,7 +9,7 @@
 
 	<artifactId>ss7-parent</artifactId>
 	<groupId>org.restcomm.protocols.ss7</groupId>
-	<version>9.2.7</version>
+	<version>9.2.8-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 
@@ -40,7 +40,7 @@
 		<!-- restcomm but not strictly ss7 -->
 		<asn.version>2.2.0-143</asn.version>
 		<stream.version>1.0.0.CR1</stream.version>
-		<sctp.version>2.0.11</sctp.version>
+		<sctp.version>2.0.13-SNAPSHOT</sctp.version>
 		<commons.version>1.0.0.CR1</commons.version>
 		<netty.version>4.2.11.Final</netty.version>
 		<ss7.restcomm.version>8.2.6-SNAPSHOT</ss7.restcomm.version>

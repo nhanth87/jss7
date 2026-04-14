@@ -711,7 +711,7 @@ public class TCAPStackImpl implements TCAPStack {
             config.slsRange = this.slsRange.toString();
             config.isSwapTcapIdBytes = this.isSwapTcapIdBytes;
 
-            String xml = TCAPXStreamHelper.toXML(config);
+            String xml = TCAPJacksonXMLHelper.toXML(config);
             try (FileWriter writer = new FileWriter(persistFile.toString())) {
                 writer.write(xml);
             }
@@ -776,7 +776,7 @@ public class TCAPStackImpl implements TCAPStack {
                 return;
             }
             try (FileReader reader = new FileReader(persistFile.toString())) {
-                TCAPConfig config = (TCAPConfig) TCAPXStreamHelper.fromXML(reader);
+                TCAPConfig config = (TCAPConfig) TCAPJacksonXMLHelper.fromXML(reader);
                 if (config != null) {
                     load(config);
                 }

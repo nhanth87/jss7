@@ -63,7 +63,7 @@ public class CAPStackConfigurationManagement {
      */
     public void store() {
         try (Writer writer = new FileWriter(persistFile.toString())) {
-            CAPXStreamHelper.getXmlMapper().writeValue(writer, this);
+            CAPJacksonXMLHelper.getXmlMapper().writeValue(writer, this);
         } catch (IOException e) {
             System.err.println(String.format("Error while persisting the CAP Resource state in file=%s", persistFile.toString()));
             e.printStackTrace();
@@ -83,7 +83,7 @@ public class CAPStackConfigurationManagement {
                 return;
             }
             try (Reader reader = new FileReader(file)) {
-                CAPStackConfigurationManagement loaded = CAPXStreamHelper.getXmlMapper().readValue(reader, CAPStackConfigurationManagement.class);
+                CAPStackConfigurationManagement loaded = CAPJacksonXMLHelper.getXmlMapper().readValue(reader, CAPStackConfigurationManagement.class);
                 // Copy loaded values to this instance
                 this._Timer_CircuitSwitchedCallControl_Short = loaded._Timer_CircuitSwitchedCallControl_Short;
                 this._Timer_CircuitSwitchedCallControl_Medium = loaded._Timer_CircuitSwitchedCallControl_Medium;

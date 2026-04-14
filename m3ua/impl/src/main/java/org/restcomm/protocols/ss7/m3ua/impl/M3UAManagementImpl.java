@@ -971,7 +971,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
             config.appServers = this.appServers;
             config.route = this.routeManagement.route;
 
-            String xml = M3UAXStreamHelper.toXML(config);
+            String xml = M3UAJacksonXMLHelper.toXML(config);
             try (FileWriter writer = new FileWriter(persistFile.toString())) {
                 writer.write(xml);
             }
@@ -1143,7 +1143,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
 
     protected void loadVer2(String fn) throws IOException {
         try (FileReader reader = new FileReader(fn)) {
-            M3UAConfig config = M3UAXStreamHelper.fromXML(reader, M3UAConfig.class);
+            M3UAConfig config = M3UAJacksonXMLHelper.fromXML(reader, M3UAConfig.class);
             this.loadActualData(config);
         }
     }
