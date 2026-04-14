@@ -850,7 +850,7 @@ public class TesterHostImpl extends NotificationBroadcasterSupport implements Te
     public synchronized void store() {
         try {
             StringWriter writer = new StringWriter();
-            ToolsXStreamHelper.toXML(this.configurationData, writer);
+            ToolsJacksonXMLHelper.toXML(this.configurationData, writer);
             
             FileOutputStream fos = new FileOutputStream(persistFile.toString());
             fos.write(writer.toString().getBytes());
@@ -874,7 +874,7 @@ public class TesterHostImpl extends NotificationBroadcasterSupport implements Te
             fis.close();
             
             String xml = new String(buffer);
-            this.configurationData = (ConfigurationData) ToolsXStreamHelper.fromXML(xml);
+            this.configurationData = (ConfigurationData) ToolsJacksonXMLHelper.fromXML(xml);
 
             return true;
 

@@ -354,7 +354,7 @@ public class SccpResourceImpl implements SccpResource {
                 config.remoteSpcs = remoteSpcs;
                 config.concernedSpcs = concernedSpcs;
 
-                String xml = SCCPXStreamHelper.toXML(config);
+                String xml = SCCPJacksonXMLHelper.toXML(config);
                 try (FileWriter writer = new FileWriter(this.persistFile)) {
                     writer.write(xml);
                 }
@@ -411,7 +411,7 @@ public class SccpResourceImpl implements SccpResource {
 
         protected ResourcesSet loadVer3(String fn) throws FileNotFoundException {
             try (FileReader reader = new FileReader(fn)) {
-                ResourcesConfig config = SCCPXStreamHelper.fromXML(reader, ResourcesConfig.class);
+                ResourcesConfig config = SCCPJacksonXMLHelper.fromXML(reader, ResourcesConfig.class);
                 if (config != null) {
                     return new ResourcesSet(config.remoteSpcs, config.remoteSsns, config.concernedSpcs);
                 }

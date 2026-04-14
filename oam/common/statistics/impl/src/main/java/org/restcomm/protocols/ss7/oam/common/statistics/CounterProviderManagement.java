@@ -13,7 +13,7 @@ import java.util.Map;
 import org.jctools.maps.NonBlockingHashMap;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import org.restcomm.protocols.ss7.oam.common.jmx.OAMXStreamHelper;
+import org.restcomm.protocols.ss7.oam.common.jmx.OAMJacksonXMLHelper;
 
 
 import org.apache.log4j.Logger;
@@ -435,7 +435,7 @@ public class CounterProviderManagement implements CounterProviderManagementMBean
      */
     public void store() {
         try {
-            XmlMapper xmlMapper = OAMXStreamHelper.getXmlMapper();
+            XmlMapper xmlMapper = OAMJacksonXMLHelper.getXmlMapper();
             String xml = xmlMapper.writeValueAsString(this.lstCounterCampaign);
             FileOutputStream fos = new FileOutputStream(persistFile.toString());
             fos.write(xml.getBytes());
@@ -454,7 +454,7 @@ public class CounterProviderManagement implements CounterProviderManagementMBean
         try {
             File f = new File(persistFile.toString());
             if (f.exists()) {
-                XmlMapper xmlMapper = OAMXStreamHelper.getXmlMapper();
+                XmlMapper xmlMapper = OAMJacksonXMLHelper.getXmlMapper();
                 FileInputStream fis = new FileInputStream(persistFile.toString());
                 this.lstCounterCampaign = xmlMapper.readValue(fis, CounterCampaignMap.class);
                 fis.close();

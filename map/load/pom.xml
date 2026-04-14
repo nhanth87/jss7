@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -740,17 +740,14 @@
 
 										<!-- xstream -->
 										<artifactItem>
-											<groupId>com.thoughtworks.xstream</groupId>
-											<artifactId>xstream</artifactId>
-											<version>1.4.20</version>
+											<!-- XStream removed - using Jackson XML for serialization -->
 											<type>jar</type>
 											<overWrite>true</overWrite>
 											<outputDirectory>${assemble.dir}</outputDirectory>
 											<destFileName>xstream.jar</destFileName>
 										</artifactItem>
 										<artifactItem>
-											<groupId>io.github.x-stream</groupId>
-											<artifactId>mxparser</artifactId>
+											<!-- mxparser removed -->
 											<version>1.2.2</version>
 											<type>jar</type>
 											<overWrite>true</overWrite>

@@ -1612,7 +1612,7 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
             config.sstTimerDuration_Max = this.sstTimerDuration_Max;
             config.sstTimerDuration_IncreaseFactor = this.sstTimerDuration_IncreaseFactor;
 
-            String xml = SCCPXStreamHelper.toXML(config);
+            String xml = SCCPJacksonXMLHelper.toXML(config);
             try (FileWriter writer = new FileWriter(persistFile.toString())) {
                 writer.write(xml);
             }
@@ -1667,7 +1667,7 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
                 return;
             }
             try (FileReader reader = new FileReader(persistFile.toString())) {
-                SccpConfig config = SCCPXStreamHelper.fromXML(reader, SccpConfig.class);
+                SccpConfig config = SCCPJacksonXMLHelper.fromXML(reader, SccpConfig.class);
                 if (config != null) {
                     load(config);
                 }

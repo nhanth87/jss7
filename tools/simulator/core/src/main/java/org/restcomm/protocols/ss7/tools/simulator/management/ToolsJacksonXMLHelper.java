@@ -37,7 +37,7 @@ import org.restcomm.protocols.ss7.tools.simulator.tests.psi.TestPsiServerConfigu
  * Jackson XML helper for TOOLS simulator module XML serialization.
  * Replaces XStream for better performance and Java 17+ compatibility.
  */
-public class ToolsXStreamHelper {
+public class ToolsJacksonXMLHelper {
     private static final XmlMapper xmlMapper;
 
     static {

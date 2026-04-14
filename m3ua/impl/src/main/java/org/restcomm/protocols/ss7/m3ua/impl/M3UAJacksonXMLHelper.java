@@ -19,7 +19,7 @@ import java.lang.reflect.Field;
  * Jackson XML helper for M3UA module XML serialization.
  * Replaces XStream to avoid Java module system issues.
  */
-public class M3UAXStreamHelper {
+public class M3UAJacksonXMLHelper {
     private static final XmlMapper xmlMapper = new XmlMapper();
 
     static {
