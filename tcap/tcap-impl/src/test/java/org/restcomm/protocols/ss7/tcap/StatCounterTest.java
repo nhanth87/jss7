@@ -5,7 +5,7 @@ import static org.testng.Assert.*;
 
 import java.util.Date;
 
-import javolution.util.FastMap;
+import java.util.Map;
 
 import org.restcomm.protocols.ss7.statistics.StatDataCollectionImpl;
 import org.restcomm.protocols.ss7.statistics.api.LongValue;
@@ -171,7 +171,7 @@ public class StatCounterTest {
         assertNull(res4);
 
         res1 = sdc.restartAndGet("counter1", "a1");
-        FastMap<String, LongValue> resa1 = res1.getStringLongValue();
+        Map<String, LongValue> resa1 = res1.getStringLongValue();
         assertEquals(resa1.size(), 0);
 
         sdc.updateData("counter1", "x1");
@@ -179,7 +179,7 @@ public class StatCounterTest {
         assertNull(res2);
 
         res2 = sdc.restartAndGet("counter1", "a2");
-        FastMap<String, LongValue> resa2 = res2.getStringLongValue();
+        Map<String, LongValue> resa2 = res2.getStringLongValue();
         assertEquals(resa2.size(), 1);
         assertEquals(resa2.get("x1").getValue(), 1);
 
@@ -189,7 +189,7 @@ public class StatCounterTest {
 
         sdc.updateData("counter1", "x2");
         res3 = sdc.restartAndGet("counter1", "a3");
-        FastMap<String, LongValue> resa3 = res3.getStringLongValue();
+        Map<String, LongValue> resa3 = res3.getStringLongValue();
         assertEquals(resa3.size(), 2);
         assertEquals(resa3.get("x1").getValue(), 1);
         assertEquals(resa3.get("x2").getValue(), 1);
@@ -202,7 +202,7 @@ public class StatCounterTest {
         assertEquals(resa3.size(), 1);
         assertEquals(resa3.get("x1").getValue(), 1);
 
-        FastMap<String, LongValue> resa4 = res4.getStringLongValue();
+        Map<String, LongValue> resa4 = res4.getStringLongValue();
         assertEquals(resa4.size(), 2);
         assertEquals(resa4.get("x1").getValue(), 2);
         assertEquals(resa4.get("x2").getValue(), 1);

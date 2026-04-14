@@ -32,7 +32,7 @@
 		<junit.version>3.8.1</junit.version>
 		<testng.version>6.2</testng.version>
 		<jctools.version>4.0.3</jctools.version>
-		<xstream.version>1.4.20</xstream.version>
+
 		<compiler.plugin.version>3.8.1</compiler.plugin.version>
 		<compile.source>11</compile.source>
 		<maven.compiler.source>11</maven.compiler.source>
@@ -289,11 +289,6 @@
 				<groupId>org.jctools</groupId>
 				<artifactId>jctools-core</artifactId>
 				<version>${jctools.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.thoughtworks.xstream</groupId>
-				<artifactId>xstream</artifactId>
-				<version>${xstream.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -586,4 +581,5 @@
 		<!-- the place to extra repos -->
 	</repositories>
 </project>
+
 

@@ -1,33 +1,43 @@
 package org.restcomm.protocols.ss7.oam.common.jmx;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.thoughtworks.xstream.security.AnyTypePermission;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 
 /**
- * XStream helper for OAM module XML serialization.
- * Replaces Javolution XMLBinding.
+ * Jackson XML helper for OAM module XML serialization.
+ * Replaces XStream for better performance and Java 17+ compatibility.
  */
 public class OAMXStreamHelper {
-    private static final XStream xstream = new XStream(new DomDriver());
-    
+    private static final XmlMapper xmlMapper;
+
     static {
-        // Configure security - allow all types for now (can be restricted later)
-        xstream.addPermission(AnyTypePermission.ANY);
-        
-        // Process annotations from all OAM implementation classes
-        // Note: Individual classes will have @XStreamAlias annotations
+        xmlMapper = new XmlMapper();
+        xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
+        xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        // Allow unknown properties during deserialization (backward compatibility)
+        xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
-    
-    public static XStream getXStream() {
-        return xstream;
+
+    public static XmlMapper getXmlMapper() {
+        return xmlMapper;
     }
-    
+
     public static String toXML(Object obj) {
-        return xstream.toXML(obj);
+        try {
+            return xmlMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException("Error serializing to XML", e);
+        }
     }
-    
+
     public static Object fromXML(String xml) {
-        return xstream.fromXML(xml);
+        try {
+            return xmlMapper.readValue(xml, Object.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Error deserializing from XML", e);
+        }
     }
 }

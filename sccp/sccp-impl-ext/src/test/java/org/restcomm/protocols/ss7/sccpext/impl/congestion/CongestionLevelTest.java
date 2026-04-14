@@ -1,7 +1,7 @@
 
 package org.restcomm.protocols.ss7.sccpext.impl.congestion;
 
-import javolution.util.FastMap;
+import java.util.Map;
 
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
 import org.restcomm.protocols.ss7.indicator.NumberingPlan;
@@ -176,7 +176,7 @@ public class CongestionLevelTest {
         assertEquals(rspc1.getCurrentRestrictionSubLevel(), 0);
         assertEquals(listenerProxy.getNI_NISList().size(), 0);
 
-        FastMap<Integer, NetworkIdState> lstState = this.sccpStack.getSccpProvider().getNetworkIdStateList();
+        Map<Integer, NetworkIdState> lstState = this.sccpStack.getSccpProvider().getNetworkIdStateList();
         assertEquals(lstState.size(), 1);
         NetworkIdState nis = lstState.get(1);
         assertEquals(nis.getCongLevel(), 0);

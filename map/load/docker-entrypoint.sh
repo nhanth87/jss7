@@ -6,6 +6,7 @@ set -e
 cd /opt/jss7-load-test
 
 # Function to run server
+# Skip setup-deps since JARs are already copied at build time (no need to copy from Windows paths)
 run_server() {
     echo "Starting jSS7 MAP Load Test Server..."
     echo "Configuration:"
@@ -20,8 +21,10 @@ run_server() {
     mkdir -p server
     rm -f log4j-server.log
     
-    # Set classpath property for ant
+    # Set classpath property for ant (skip setup-deps - JARs already in /opt/target/load)
     ant -f mo_sms_build.xml server \
+        -Dassemble.dir=/opt/target/load \
+        -Dbasedir=/opt/jss7-load-test \
         -Dtest.server.channelType="${TEST_SERVER_CHANNEL_TYPE}" \
         -Dtest.server.hostIp="${TEST_SERVER_HOST_IP}" \
         -Dtest.server.hostPort="${TEST_SERVER_HOST_PORT}" \
@@ -40,6 +43,7 @@ run_server() {
 }
 
 # Function to run client
+# Skip setup-deps since JARs are already copied at build time (no need to copy from Windows paths)
 run_client() {
     echo "Starting jSS7 MAP Load Test Client..."
     echo "Configuration:"
@@ -54,8 +58,10 @@ run_client() {
     mkdir -p client
     rm -f log4j-client.log
     
-    # Run client
+    # Run client (skip setup-deps - JARs already in /opt/target/load)
     ant -f mo_sms_build.xml client \
+        -Dassemble.dir=/opt/target/load \
+        -Dbasedir=/opt/jss7-load-test \
         -Dtest.client.numOfDialogs="${TEST_CLIENT_NUM_OF_DIALOGS}" \
         -Dtest.client.concurrentDialog="${TEST_CLIENT_CONCURRENT_DIALOG}" \
         -Dtest.client.channelType="${TEST_CLIENT_CHANNEL_TYPE}" \

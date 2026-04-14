@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javolution.util.FastMap;
+import java.util.concurrent.ConcurrentHashMap;
 import junit.framework.Assert;
 
 import org.restcomm.protocols.ss7.sccp.MaxConnectionCountReached;
@@ -397,8 +397,8 @@ public class DialogPreviewModeMngConcurrentTest {
         }
 
         @Override
-        public FastMap<Integer, NetworkIdState> getNetworkIdStateList() {
-            return new FastMap<Integer, NetworkIdState>();
+        public ConcurrentHashMap<Integer, NetworkIdState> getNetworkIdStateList() {
+            return new ConcurrentHashMap<Integer, NetworkIdState>();
         }
 
         @Override
@@ -413,7 +413,7 @@ public class DialogPreviewModeMngConcurrentTest {
         }
 
         @Override
-        public FastMap<LocalReference, SccpConnection> getConnections() {
+        public ConcurrentHashMap<LocalReference, SccpConnection> getConnections() {
             // TODO Auto-generated method stub
             return null;
         }
@@ -437,7 +437,7 @@ public class DialogPreviewModeMngConcurrentTest {
 		}
 
         @Override
-        public FastList<SccpManagementEventListener> getManagementEventListeners() {
+        public CopyOnWriteArrayList<SccpManagementEventListener> getManagementEventListeners() {
             return null;
         }
     }

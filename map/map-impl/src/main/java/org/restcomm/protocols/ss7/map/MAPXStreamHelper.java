@@ -1,6 +1,7 @@
 package org.restcomm.protocols.ss7.map;
 
 import com.fasterxml.jackson.core.JacksonException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
@@ -22,6 +23,10 @@ public class MAPXStreamHelper {
         // Configure XML mapper
         xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, false);
+        // Allow unknown properties during deserialization (backward compatibility)
+        xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        // Allow empty beans during serialization
+        xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
     
     /**

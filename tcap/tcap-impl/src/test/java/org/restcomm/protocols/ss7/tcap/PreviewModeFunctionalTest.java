@@ -10,7 +10,7 @@ import java.util.List;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javolution.util.FastMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
 import org.restcomm.protocols.ss7.indicator.NumberingPlan;
@@ -571,8 +571,8 @@ public class PreviewModeFunctionalTest {
         }
 
         @Override
-        public FastMap<Integer, NetworkIdState> getNetworkIdStateList() {
-            return new FastMap<Integer, NetworkIdState>();
+        public ConcurrentHashMap<Integer, NetworkIdState> getNetworkIdStateList() {
+            return new ConcurrentHashMap<Integer, NetworkIdState>();
         }
 
         @Override
@@ -588,7 +588,7 @@ public class PreviewModeFunctionalTest {
         }
 
         @Override
-        public FastMap<LocalReference, SccpConnection> getConnections() {
+        public ConcurrentHashMap<LocalReference, SccpConnection> getConnections() {
             // TODO Auto-generated method stub
             return null;
         }
@@ -612,7 +612,7 @@ public class PreviewModeFunctionalTest {
 		}
 
         @Override
-        public FastList<SccpManagementEventListener> getManagementEventListeners() {
+        public CopyOnWriteArrayList<SccpManagementEventListener> getManagementEventListeners() {
             return null;
         }
     }
