@@ -77,7 +77,7 @@ public class SccpProviderImpl implements SccpProvider, Serializable {
     public void registerSccpListener(int ssn, SccpListener listener) {
         synchronized (this) {
             SccpListener existingListener = ssnToListener.get(ssn);
-            if (existingListener != null) {
+            if (existingListener != null && existingListener != listener) {
                 if (logger.isEnabledFor(Level.WARN)) {
                     logger.warn(String.format("Registering SccpListener=%s for already existing SccpListener=%s for SSN=%d",
                             listener, existingListener, ssn));
