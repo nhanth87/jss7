@@ -208,7 +208,7 @@
         </exec>
     </target>
 
-    <target name="server" description="run the Load Test Server." depends="setup-deps">
+    <target name="server" description="run the Load Test Server.">
         <echo message="${cp.property}" />
         <delete dir="server" failonerror="false" />
         <mkdir dir="server" />
@@ -272,7 +272,7 @@
         </java>
     </target>
 
-    <target name="client" description="run the Load Test Client" depends="setup-deps">
+    <target name="client" description="run the Load Test Client">
         <echo message="${cp.property}" />
         <delete dir="client" failonerror="false" />
         <mkdir dir="client" />
