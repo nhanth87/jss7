@@ -4,6 +4,7 @@ package org.restcomm.protocols.ss7.m3ua.impl;
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.Asp;
 import org.restcomm.protocols.ss7.m3ua.Functionality;
+import org.restcomm.protocols.ss7.m3ua.IPSPType;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSM;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSMState;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.TransitionHandler;
@@ -41,26 +42,29 @@ public class THLocalAsPendToAct implements TransitionHandler {
 
     public boolean process(FSMState state) {
 
-        if (this.asImpl.getTrafficModeType().getMode() == TrafficModeType.Broadcast) {
+        int trafficMode = (this.asImpl.getTrafficModeType() != null) ? this.asImpl.getTrafficModeType().getMode() : TrafficModeType.Override;
+        if (trafficMode == TrafficModeType.Broadcast) {
             // We don't handle this
             return false;
         }
 
         try {
 
-            // Iterate through ASP's and send AS_ACTIVE to ASP's who
-            // are INACTIVE or ACTIVE
-            for (Asp asp : this.asImpl.appServerProcs) {
-                AspImpl remAspImpl = (AspImpl) asp;
+            if (asImpl.getFunctionality() != Functionality.IPSP || asImpl.getIpspType() == IPSPType.SERVER) {
+                // Iterate through ASP's and send AS_ACTIVE to ASP's who
+                // are INACTIVE or ACTIVE
+                for (Asp asp : this.asImpl.appServerProcs) {
+                    AspImpl remAspImpl = (AspImpl) asp;
 
-                FSM aspPeerFSM = remAspImpl.getPeerFSM();
-                AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
+                    FSM aspPeerFSM = remAspImpl.getPeerFSM();
+                    AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
 
-                if (aspState == AspState.INACTIVE || aspState == AspState.ACTIVE) {
-                    Notify msg = createNotify(remAspImpl);
-                    remAspImpl.getAspFactory().write(msg);
-                }
-            }// end of for
+                    if (aspState == AspState.INACTIVE || aspState == AspState.ACTIVE) {
+                        Notify msg = createNotify(remAspImpl);
+                        remAspImpl.getAspFactory().write(msg);
+                    }
+                }// end of for
+            }
 
             // Send the PayloadData (if any) from pending queue to other side
             AspImpl causeAsp = (AspImpl) this.fsm.getAttribute(AsImpl.ATTRIBUTE_ASP);

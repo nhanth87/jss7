@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.Asp;
 import org.restcomm.protocols.ss7.m3ua.ExchangeType;
 import org.restcomm.protocols.ss7.m3ua.Functionality;
+import org.restcomm.protocols.ss7.m3ua.IPSPType;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSM;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSMState;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSMStateEventHandler;
@@ -70,8 +71,10 @@ public class RemAsStatePenTimeout implements FSMStateEventHandler {
                         inactive = true;
                     }
 
-                    Notify msg = createNotify(remAspImpl);
-                    remAspImpl.getAspFactory().write(msg);
+                    if (asImpl.getFunctionality() != Functionality.IPSP || asImpl.getIpspType() == IPSPType.SERVER) {
+                        Notify msg = createNotify(remAspImpl);
+                        remAspImpl.getAspFactory().write(msg);
+                    }
                 } catch (UnknownTransitionException e) {
                     logger.error(String.format("Error while translating Rem AS to INACTIVE. %s", this.fsm.toString()), e);
                 }

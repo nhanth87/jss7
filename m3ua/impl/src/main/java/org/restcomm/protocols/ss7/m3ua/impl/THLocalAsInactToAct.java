@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.Asp;
 import org.restcomm.protocols.ss7.m3ua.ExchangeType;
 import org.restcomm.protocols.ss7.m3ua.Functionality;
+import org.restcomm.protocols.ss7.m3ua.IPSPType;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSM;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSMState;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.TransitionHandler;
@@ -38,7 +39,8 @@ public class THLocalAsInactToAct implements TransitionHandler {
     public boolean process(FSMState state) {
         try {
 
-            if (this.asImpl.getTrafficModeType().getMode() == TrafficModeType.Broadcast) {
+            int trafficMode = (this.asImpl.getTrafficModeType() != null) ? this.asImpl.getTrafficModeType().getMode() : TrafficModeType.Override;
+            if (trafficMode == TrafficModeType.Broadcast) {
                 // We don't handle this
                 return false;
             }
@@ -46,7 +48,7 @@ public class THLocalAsInactToAct implements TransitionHandler {
             // For Traffic Mode Type = load-balancing, need to check policy to
             // have 'minAspActiveForLb' ASP's ACTIVE before AS_ACTIVE NOTIFY is
             // sent.
-            if (this.asImpl.getTrafficModeType().getMode() == TrafficModeType.Loadshare) {
+            if (trafficMode == TrafficModeType.Loadshare) {
                 lbCount = this.asImpl.getMinAspActiveForLb();
 
                 // Find out how many ASP's are ACTIVE now
@@ -66,19 +68,21 @@ public class THLocalAsInactToAct implements TransitionHandler {
                 }
             }
 
-            // Iterate through ASP's and send AS_ACTIVE to ASP's who
-            // are INACTIVE or ACTIVE
-            for (Asp asp : this.asImpl.appServerProcs) {
-                AspImpl remAspImpl = (AspImpl) asp;
+            if (asImpl.getFunctionality() != Functionality.IPSP || asImpl.getIpspType() == IPSPType.SERVER) {
+                // Iterate through ASP's and send AS_ACTIVE to ASP's who
+                // are INACTIVE or ACTIVE
+                for (Asp asp : this.asImpl.appServerProcs) {
+                    AspImpl remAspImpl = (AspImpl) asp;
 
-                FSM aspPeerFSM = remAspImpl.getPeerFSM();
-                AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
+                    FSM aspPeerFSM = remAspImpl.getPeerFSM();
+                    AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
 
-                if (aspState == AspState.INACTIVE || aspState == AspState.ACTIVE) {
-                    Notify msg = createNotify(remAspImpl);
-                    remAspImpl.getAspFactory().write(msg);
-                }
-            }// for
+                    if (aspState == AspState.INACTIVE || aspState == AspState.ACTIVE) {
+                        Notify msg = createNotify(remAspImpl);
+                        remAspImpl.getAspFactory().write(msg);
+                    }
+                }// for
+            }
 
             // We want to pass MTP3 RESUME only for SE. If its DE the peer transition handler will take care of MTP3 RESUME
             if (asImpl.getExchangeType() == ExchangeType.SE) {

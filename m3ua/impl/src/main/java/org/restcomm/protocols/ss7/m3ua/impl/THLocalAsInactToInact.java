@@ -3,6 +3,7 @@ package org.restcomm.protocols.ss7.m3ua.impl;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.Functionality;
+import org.restcomm.protocols.ss7.m3ua.IPSPType;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSM;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSMState;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.TransitionHandler;
@@ -37,8 +38,10 @@ public class THLocalAsInactToInact implements TransitionHandler {
                 return false;
             }
 
-            Notify msg = createNotify(remAsp);
-            remAsp.getAspFactory().write(msg);
+            if (asImpl.getFunctionality() != Functionality.IPSP || asImpl.getIpspType() == IPSPType.SERVER) {
+                Notify msg = createNotify(remAsp);
+                remAsp.getAspFactory().write(msg);
+            }
             return true;
         } catch (Exception e) {
             logger.error(String.format("Error while translating Rem AS to INACTIVE message. %s", this.fsm.toString()), e);

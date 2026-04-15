@@ -35,13 +35,14 @@ public class THLocalAsActToPendRemAspDwn implements TransitionHandler {
         try {
             AspImpl remAsp = (AspImpl) this.fsm.getAttribute(AsImpl.ATTRIBUTE_ASP);
 
-            if (this.asImpl.getTrafficModeType().getMode() == TrafficModeType.Broadcast) {
+            int trafficMode = (this.asImpl.getTrafficModeType() != null) ? this.asImpl.getTrafficModeType().getMode() : TrafficModeType.Override;
+            if (trafficMode == TrafficModeType.Broadcast) {
                 // We don't support this
                 return false;
 
             }
 
-            if (this.asImpl.getTrafficModeType().getMode() == TrafficModeType.Loadshare) {
+            if (trafficMode == TrafficModeType.Loadshare) {
                 this.lbCount = 0;
 
                 for (Asp asp : this.asImpl.appServerProcs) {

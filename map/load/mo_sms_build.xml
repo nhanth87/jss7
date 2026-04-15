@@ -147,8 +147,8 @@
         <copy file="${jss7.root}/congestion/target/restcomm-congestion-9.2.7.jar" tofile="${assemble.dir}/restcomm-congestion.jar" failonerror="false" />
         
         <!-- Copy SCTP module JARs -->
-        <copy file="${ethiopia.root}/sctp/sctp-api/target/sctp-api-2.jar" tofile="${assemble.dir}/sctp-api.jar" failonerror="false" />
-        <copy file="${ethiopia.root}/sctp/sctp-impl/target/sctp-impl-2.jar" tofile="${assemble.dir}/sctp-impl.jar" failonerror="false" />
+        <copy file="${ethiopia.root}/sctp/sctp-api/target/sctp-api-2.0.13-SNAPSHOT.jar" tofile="${assemble.dir}/sctp-api.jar" failonerror="false" />
+        <copy file="${ethiopia.root}/sctp/sctp-impl/target/sctp-impl-2.0.13-SNAPSHOT.jar" tofile="${assemble.dir}/sctp-impl.jar" failonerror="false" />
         
         <!-- Copy external libs (try multiple locations) -->
         <copy file="${ethiopia.root}/gmlc/core/bootstrap/target/restcomm-gmlc-server/lib/asn-2.2.0-143.jar" tofile="${assemble.dir}/asn.jar" failonerror="false" />
@@ -207,7 +207,7 @@
         </exec>
     </target>
 
-    <target name="server" description="run the Load Test Server.">
+    <target name="server" description="run the Load Test Server." depends="setup-deps">
         <echo message="${cp.property}" />
         <delete dir="server" failonerror="false" />
         <mkdir dir="server" />
@@ -271,7 +271,7 @@
         </java>
     </target>
 
-    <target name="client" description="run the Load Test Client">
+    <target name="client" description="run the Load Test Client" depends="setup-deps">
         <echo message="${cp.property}" />
         <delete dir="client" failonerror="false" />
         <mkdir dir="client" />

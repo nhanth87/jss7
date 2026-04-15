@@ -4,6 +4,7 @@ package org.restcomm.protocols.ss7.m3ua.impl;
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.Asp;
 import org.restcomm.protocols.ss7.m3ua.Functionality;
+import org.restcomm.protocols.ss7.m3ua.IPSPType;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSM;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSMState;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.TransitionHandler;
@@ -68,13 +69,14 @@ public class THLocalAsActToPendRemAspInac implements TransitionHandler {
         try {
             AspImpl remAsp = (AspImpl) this.fsm.getAttribute(AsImpl.ATTRIBUTE_ASP);
 
-            if (this.asImpl.getTrafficModeType().getMode() == TrafficModeType.Broadcast) {
+            int trafficMode = (this.asImpl.getTrafficModeType() != null) ? this.asImpl.getTrafficModeType().getMode() : TrafficModeType.Override;
+            if (trafficMode == TrafficModeType.Broadcast) {
                 // We don't support this
                 return false;
 
             }
 
-            if (this.asImpl.getTrafficModeType().getMode() == TrafficModeType.Loadshare) {
+            if (trafficMode == TrafficModeType.Loadshare) {
                 this.lbCount = 0;
 
                 for (Asp asp : this.asImpl.appServerProcs) {
@@ -100,16 +102,18 @@ public class THLocalAsActToPendRemAspInac implements TransitionHandler {
                     // care of traffic, don't change state but send the "Ins.
                     // ASPs" to INACTIVE ASP's
 
-                    for (Asp asp : this.asImpl.appServerProcs) {
-                        remAsp = (AspImpl) asp;
+                    if (asImpl.getFunctionality() != Functionality.IPSP || asImpl.getIpspType() == IPSPType.SERVER) {
+                        for (Asp asp : this.asImpl.appServerProcs) {
+                            remAsp = (AspImpl) asp;
 
-                        FSM aspPeerFSM = remAsp.getPeerFSM();
-                        AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
+                            FSM aspPeerFSM = remAsp.getPeerFSM();
+                            AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
 
-                        if (aspState == AspState.INACTIVE) {
-                            Notify notify = this.createNotify(remAsp, Status.STATUS_Other,
-                                    Status.INFO_Insufficient_ASP_Resources_Active);
-                            remAsp.getAspFactory().write(notify);
+                            if (aspState == AspState.INACTIVE) {
+                                Notify notify = this.createNotify(remAsp, Status.STATUS_Other,
+                                        Status.INFO_Insufficient_ASP_Resources_Active);
+                                remAsp.getAspFactory().write(notify);
+                            }
                         }
                     }
 
@@ -120,15 +124,17 @@ public class THLocalAsActToPendRemAspInac implements TransitionHandler {
             // We have reached here means AS is transitioning to be PENDING.
             // Send new AS STATUS to all INACTIVE APS's
 
-            for (Asp asp : this.asImpl.appServerProcs) {
-                remAsp = (AspImpl) asp;
+            if (asImpl.getFunctionality() != Functionality.IPSP || asImpl.getIpspType() == IPSPType.SERVER) {
+                for (Asp asp : this.asImpl.appServerProcs) {
+                    remAsp = (AspImpl) asp;
 
-                FSM aspPeerFSM = remAsp.getPeerFSM();
-                AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
+                    FSM aspPeerFSM = remAsp.getPeerFSM();
+                    AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
 
-                if (aspState == AspState.INACTIVE) {
-                    Notify notify = this.createNotify(remAsp, Status.STATUS_AS_State_Change, Status.INFO_AS_PENDING);
-                    remAsp.getAspFactory().write(notify);
+                    if (aspState == AspState.INACTIVE) {
+                        Notify notify = this.createNotify(remAsp, Status.STATUS_AS_State_Change, Status.INFO_AS_PENDING);
+                        remAsp.getAspFactory().write(notify);
+                    }
                 }
             }
         } catch (Exception e) {
