@@ -97,6 +97,7 @@
         <pathelement location="${assemble.dir}/netty-transport-native-unix-common-4.2.11.Final.jar" />
         <pathelement location="${assemble.dir}/netty-handler-4.2.11.Final.jar" />
         <pathelement location="${assemble.dir}/netty-codec-4.2.11.Final.jar" />
+        <pathelement location="${assemble.dir}/netty-codec-base-4.2.11.Final.jar" />
         <pathelement location="${assemble.dir}/netty-transport-sctp-4.2.11.Final.jar" />
         <pathelement location="${assemble.dir}/jctools-core.jar" />
         <!-- Jackson XML (replaces XStream) -->
@@ -146,11 +147,8 @@
         <copy file="${jss7.root}/congestion/target/restcomm-congestion-9.2.7.jar" tofile="${assemble.dir}/restcomm-congestion.jar" failonerror="false" />
         
         <!-- Copy SCTP module JARs -->
-        <copy file="${ethiopia.root}/sctp/sctp-api/target/sctp-api-2.0.12.jar" tofile="${assemble.dir}/sctp-api.jar" failonerror="false" />
-        <copy file="${ethiopia.root}/sctp/sctp-impl/target/sctp-impl-2.0.12.jar" tofile="${assemble.dir}/sctp-impl.jar" failonerror="false" />
-        <!-- Fallback to 2.0.11 if 2.0.12 not found -->
-        <copy file="${ethiopia.root}/sctp/sctp-api/target/sctp-api-2.0.11.jar" tofile="${assemble.dir}/sctp-api.jar" failonerror="false" />
-        <copy file="${ethiopia.root}/sctp/sctp-impl/target/sctp-impl-2.0.11.jar" tofile="${assemble.dir}/sctp-impl.jar" failonerror="false" />
+        <copy file="${ethiopia.root}/sctp/sctp-api/target/sctp-api-2.jar" tofile="${assemble.dir}/sctp-api.jar" failonerror="false" />
+        <copy file="${ethiopia.root}/sctp/sctp-impl/target/sctp-impl-2.jar" tofile="${assemble.dir}/sctp-impl.jar" failonerror="false" />
         
         <!-- Copy external libs (try multiple locations) -->
         <copy file="${ethiopia.root}/gmlc/core/bootstrap/target/restcomm-gmlc-server/lib/asn-2.2.0-143.jar" tofile="${assemble.dir}/asn.jar" failonerror="false" />
@@ -165,6 +163,7 @@
         <copy file="${m2.repo}/io/netty/netty-transport-native-unix-common/4.2.11.Final/netty-transport-native-unix-common-4.2.11.Final.jar" tofile="${assemble.dir}/netty-transport-native-unix-common-4.2.11.Final.jar" failonerror="false" />
         <copy file="${m2.repo}/io/netty/netty-handler/4.2.11.Final/netty-handler-4.2.11.Final.jar" tofile="${assemble.dir}/netty-handler-4.2.11.Final.jar" failonerror="false" />
         <copy file="${m2.repo}/io/netty/netty-codec/4.2.11.Final/netty-codec-4.2.11.Final.jar" tofile="${assemble.dir}/netty-codec-4.2.11.Final.jar" failonerror="false" />
+        <copy file="${m2.repo}/io/netty/netty-codec-base/4.2.11.Final/netty-codec-base-4.2.11.Final.jar" tofile="${assemble.dir}/netty-codec-base-4.2.11.Final.jar" failonerror="false" />
         <copy file="${m2.repo}/io/netty/netty-transport-sctp/4.2.11.Final/netty-transport-sctp-4.2.11.Final.jar" tofile="${assemble.dir}/netty-transport-sctp-4.2.11.Final.jar" failonerror="false" />
         
         <copy file="${m2.repo}/org/jctools/jctools-core/4.0.3/jctools-core-4.0.3.jar" tofile="${assemble.dir}/jctools-core.jar" failonerror="false" />

@@ -6,7 +6,7 @@
       <mtp3Id>1</mtp3Id>
       <opc>1</opc>
       <ni>2</ni>
-      <stackName>MapLoadClientSccpStack</stackName>
+      <stackName>MapLoadServerSccpStack</stackName>
       <networkId>0</networkId>
       <localGtDigits/>
       <dpcList>

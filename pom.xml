@@ -111,6 +111,11 @@
 				<artifactId>netty-transport-sctp</artifactId>
 				<version>${netty.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-codec-base</artifactId>
+				<version>${netty.version}</version>
+			</dependency>
 			<!-- Scheduler -->
 			<dependency>
 				<groupId>org.restcomm.protocols.ss7.scheduler</groupId>
