@@ -158,7 +158,7 @@ public class Server extends TestHarnessSmsMo {
             ipspType = IPSPType.SERVER;
 
         // Step 1 : Create AS
-        As as = this.serverM3UAMgmt.createAs("AS1", AS_FUNCTIONALITY, ExchangeType.SE, ipspType, rc, trafficModeType,1, na);
+        As as = this.serverM3UAMgmt.createAs("AS1", AS_FUNCTIONALITY, ExchangeType.SE, ipspType, rc, trafficModeType, 1, na);
         // Step 2 : Create ASP
         AspFactory aspFactor = this.serverM3UAMgmt.createAspFactory("ASP1", SERVER_ASSOCIATION_NAME);
         // Step 3 : Assign ASP to AS
@@ -424,7 +424,7 @@ public class Server extends TestHarnessSmsMo {
         int i = 0;
         IpChannelType ipChannelType = IpChannelType.SCTP;
 
-        if (args.length >= 17) {
+        if (args.length >= 16) {
             if (args[i++].toLowerCase().equals("tcp"))
                 ipChannelType = IpChannelType.TCP;
             HOST_IP = args[i++];

@@ -6,8 +6,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import jakarta.xml.bind.DatatypeConverter;
-
 /**
  *
  * @author sergey vetyutnev
@@ -461,6 +459,17 @@ public class TraceReaderDriverPcap extends TraceReaderDriverBase implements Trac
         BIG_ENDIAN, LITTLE_ENDIAN,
     }
 
+    private static String bytesToHex(byte[] bytes) {
+        char[] hexArray = "0123456789ABCDEF".toCharArray();
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+
     public class PcapNgOption {
         public int optionCode;
         public byte[] value;
@@ -474,7 +483,7 @@ public class TraceReaderDriverPcap extends TraceReaderDriverBase implements Trac
             sb.append(", len=");
             sb.append(value.length);
             sb.append(", bytes=");
-            sb.append(DatatypeConverter.printHexBinary(value));
+            sb.append(bytesToHex(value));
             sb.append(", UTF8 String=");
             try {
                 String decoded = new String(value, "UTF-8");

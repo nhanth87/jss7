@@ -68,21 +68,17 @@ public class THLocalAsInactToAct implements TransitionHandler {
 
             // Iterate through ASP's and send AS_ACTIVE to ASP's who
             // are INACTIVE or ACTIVE
-            if (asImpl.getFunctionality() != Functionality.IPSP) {
-                // Send Notify only for ASP or SGW
+            for (Asp asp : this.asImpl.appServerProcs) {
+                AspImpl remAspImpl = (AspImpl) asp;
 
-                for (Asp asp : this.asImpl.appServerProcs) {
-                    AspImpl remAspImpl = (AspImpl) asp;
+                FSM aspPeerFSM = remAspImpl.getPeerFSM();
+                AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
 
-                    FSM aspPeerFSM = remAspImpl.getPeerFSM();
-                    AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
-
-                    if (aspState == AspState.INACTIVE || aspState == AspState.ACTIVE) {
-                        Notify msg = createNotify(remAspImpl);
-                        remAspImpl.getAspFactory().write(msg);
-                    }
-                }// for
-            }
+                if (aspState == AspState.INACTIVE || aspState == AspState.ACTIVE) {
+                    Notify msg = createNotify(remAspImpl);
+                    remAspImpl.getAspFactory().write(msg);
+                }
+            }// for
 
             // We want to pass MTP3 RESUME only for SE. If its DE the peer transition handler will take care of MTP3 RESUME
             if (asImpl.getExchangeType() == ExchangeType.SE) {

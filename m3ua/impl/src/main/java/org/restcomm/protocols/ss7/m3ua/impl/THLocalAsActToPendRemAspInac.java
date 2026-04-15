@@ -100,20 +100,16 @@ public class THLocalAsActToPendRemAspInac implements TransitionHandler {
                     // care of traffic, don't change state but send the "Ins.
                     // ASPs" to INACTIVE ASP's
 
-                    if (asImpl.getFunctionality() != Functionality.IPSP) {
-                        // In any case send Notify only for ASP or SGW
+                    for (Asp asp : this.asImpl.appServerProcs) {
+                        remAsp = (AspImpl) asp;
 
-                        for (Asp asp : this.asImpl.appServerProcs) {
-                            remAsp = (AspImpl) asp;
+                        FSM aspPeerFSM = remAsp.getPeerFSM();
+                        AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
 
-                            FSM aspPeerFSM = remAsp.getPeerFSM();
-                            AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
-
-                            if (aspState == AspState.INACTIVE) {
-                                Notify notify = this.createNotify(remAsp, Status.STATUS_Other,
-                                        Status.INFO_Insufficient_ASP_Resources_Active);
-                                remAsp.getAspFactory().write(notify);
-                            }
+                        if (aspState == AspState.INACTIVE) {
+                            Notify notify = this.createNotify(remAsp, Status.STATUS_Other,
+                                    Status.INFO_Insufficient_ASP_Resources_Active);
+                            remAsp.getAspFactory().write(notify);
                         }
                     }
 
@@ -124,19 +120,15 @@ public class THLocalAsActToPendRemAspInac implements TransitionHandler {
             // We have reached here means AS is transitioning to be PENDING.
             // Send new AS STATUS to all INACTIVE APS's
 
-            if (asImpl.getFunctionality() != Functionality.IPSP) {
-                // Send Notify only for ASP or SGW
+            for (Asp asp : this.asImpl.appServerProcs) {
+                remAsp = (AspImpl) asp;
 
-                for (Asp asp : this.asImpl.appServerProcs) {
-                    remAsp = (AspImpl) asp;
+                FSM aspPeerFSM = remAsp.getPeerFSM();
+                AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
 
-                    FSM aspPeerFSM = remAsp.getPeerFSM();
-                    AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
-
-                    if (aspState == AspState.INACTIVE) {
-                        Notify notify = this.createNotify(remAsp, Status.STATUS_AS_State_Change, Status.INFO_AS_PENDING);
-                        remAsp.getAspFactory().write(notify);
-                    }
+                if (aspState == AspState.INACTIVE) {
+                    Notify notify = this.createNotify(remAsp, Status.STATUS_AS_State_Change, Status.INFO_AS_PENDING);
+                    remAsp.getAspFactory().write(notify);
                 }
             }
         } catch (Exception e) {

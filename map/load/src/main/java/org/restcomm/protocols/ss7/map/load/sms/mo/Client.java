@@ -389,7 +389,7 @@ public class Client extends TestHarnessSmsMo {
         int i = 0;
         IpChannelType ipChannelType = IpChannelType.SCTP;
 
-        if (args.length == 23) {
+        if (args.length >= 22) {
             NDIALOGS = Integer.parseInt(args[i++]);
             MAXCONCURRENTDIALOGS = Integer.parseInt(args[i++]);
             if (args[i++].toLowerCase().equals("tcp"))
@@ -414,7 +414,9 @@ public class Client extends TestHarnessSmsMo {
             DELIVERY_TRANSFER_MESSAGE_THREAD_COUNT = Integer.parseInt(args[i++]);
             RAMP_UP_PERIOD = Integer.parseInt(args[i++]);
 
-            STATUS_REPORT_REQUEST = Boolean.parseBoolean(args[i++]);
+            if (args.length >= 23) {
+                STATUS_REPORT_REQUEST = Boolean.parseBoolean(args[i++]);
+            }
 
             System.out.println("IpChannelType = " + ipChannelType);
             System.out.println("HOST_IP = " + HOST_IP);

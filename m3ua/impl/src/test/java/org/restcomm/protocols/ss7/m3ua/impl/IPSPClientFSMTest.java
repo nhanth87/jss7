@@ -163,6 +163,12 @@ public class IPSPClientFSMTest {
         aspActiveAck.setRoutingContext(rc);
         localAspFactory.read(aspActiveAck);
 
+        // Simulate receiving NTFY(AS-ACTIVE) from peer
+        M3UAMessageImpl ntfy = messageFactory.createMessage(MessageClass.MANAGEMENT, MessageType.NOTIFY);
+        Notify notify = (Notify) ntfy;
+        notify.setStatus(parmFactory.createStatus(Status.STATUS_AS_State_Change, Status.INFO_AS_ACTIVE));
+        localAspFactory.read(ntfy);
+
         assertEquals(AspState.ACTIVE, this.getAspState(aspLocalFSM));
         // also the AS should be ACTIVE now
         assertEquals(AsState.ACTIVE, this.getAsState(asPeerFSM));
@@ -271,6 +277,12 @@ public class IPSPClientFSMTest {
 
         localAspFactory.read(aspActiveAck);
 
+        // Simulate receiving NTFY(AS-ACTIVE) from peer
+        M3UAMessageImpl ntfy = messageFactory.createMessage(MessageClass.MANAGEMENT, MessageType.NOTIFY);
+        Notify notify = (Notify) ntfy;
+        notify.setStatus(parmFactory.createStatus(Status.STATUS_AS_State_Change, Status.INFO_AS_ACTIVE));
+        localAspFactory.read(ntfy);
+
         assertEquals(AspState.ACTIVE, this.getAspState(aspLocalFSM));
         // also the AS should be ACTIVE now
         assertEquals(AsState.ACTIVE, this.getAsState(asPeerFSM));
@@ -359,6 +371,12 @@ public class IPSPClientFSMTest {
         aspActiveAck.setRoutingContext(rc);
         localAspFactory.read(aspActiveAck);
 
+        // Simulate receiving NTFY(AS-ACTIVE) from peer
+        M3UAMessageImpl ntfy = messageFactory.createMessage(MessageClass.MANAGEMENT, MessageType.NOTIFY);
+        Notify notify = (Notify) ntfy;
+        notify.setStatus(parmFactory.createStatus(Status.STATUS_AS_State_Change, Status.INFO_AS_ACTIVE));
+        localAspFactory.read(ntfy);
+
         assertEquals(AspState.ACTIVE, this.getAspState(aspLocalFSM));
         // also the AS should be ACTIVE now
         assertEquals(AsState.ACTIVE, this.getAsState(asPeerFSM));
@@ -422,6 +440,12 @@ public class IPSPClientFSMTest {
         aspActiveAck.setRoutingContext(rc);
         localAspFactory.read(aspActiveAck);
 
+        // Simulate receiving NTFY(AS-ACTIVE) from peer
+        ntfy = messageFactory.createMessage(MessageClass.MANAGEMENT, MessageType.NOTIFY);
+        notify = (Notify) ntfy;
+        notify.setStatus(parmFactory.createStatus(Status.STATUS_AS_State_Change, Status.INFO_AS_ACTIVE));
+        localAspFactory.read(ntfy);
+
         assertEquals(AspState.ACTIVE, this.getAspState(aspLocalFSM));
         // also the AS should be ACTIVE now
         assertEquals(AsState.ACTIVE, this.getAsState(asPeerFSM));
@@ -455,8 +479,8 @@ public class IPSPClientFSMTest {
         RoutingContext rc = parmFactory.createRoutingContext(new long[] { 100 });
 
         // As as = rsgw.createAppServer("testas", rc, rKey, trModType);
-        AsImpl asImpl = (AsImpl) this.clientM3UAMgmt.createAs("testas", Functionality.IPSP, ExchangeType.DE, null, rc, null, 1,
-                null);
+        AsImpl asImpl = (AsImpl) this.clientM3UAMgmt.createAs("testas", Functionality.IPSP, ExchangeType.DE, null, rc,
+                parmFactory.createTrafficModeType(TrafficModeType.Loadshare), 1, null);
 
         AspFactoryImpl localAspFactory = (AspFactoryImpl) this.clientM3UAMgmt.createAspFactory("testasp", "testAssoc1", false);
         localAspFactory.start();
@@ -517,6 +541,12 @@ public class IPSPClientFSMTest {
                 MessageType.ASP_ACTIVE);
         aspActiveAck.setRoutingContext(rc);
         localAspFactory.read(aspActive);
+
+        // Simulate receiving NTFY(AS-ACTIVE) from peer
+        M3UAMessageImpl ntfy = messageFactory.createMessage(MessageClass.MANAGEMENT, MessageType.NOTIFY);
+        Notify notify = (Notify) ntfy;
+        notify.setStatus(parmFactory.createStatus(Status.STATUS_AS_State_Change, Status.INFO_AS_ACTIVE));
+        localAspFactory.read(ntfy);
 
         // Asp both FSM ACTIVE now
         assertEquals(AspState.ACTIVE, this.getAspState(aspLocalFSM));

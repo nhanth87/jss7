@@ -176,10 +176,11 @@ public class Client extends TestHarnessUssd {
         this.sctpManagement.removeAllResources();
 
         // 1. Create SCTP Association
+        // Use ephemeral local port (0) to avoid BindException: Address already in use
         if (EXTRA_HOST_ADDRESS.equals("-1"))
-            sctpManagement.addAssociation(HOST_IP, HOST_PORT, PEER_IP, PEER_PORT, CLIENT_ASSOCIATION_NAME, ipChannelType, null);
+            sctpManagement.addAssociation(HOST_IP, 0, PEER_IP, PEER_PORT, CLIENT_ASSOCIATION_NAME, ipChannelType, null);
         else
-            sctpManagement.addAssociation(HOST_IP, HOST_PORT, PEER_IP, PEER_PORT, CLIENT_ASSOCIATION_NAME, ipChannelType, new String[] { EXTRA_HOST_ADDRESS });
+            sctpManagement.addAssociation(HOST_IP, 0, PEER_IP, PEER_PORT, CLIENT_ASSOCIATION_NAME, ipChannelType, new String[] { EXTRA_HOST_ADDRESS });
     }
 
     private void initM3UA() throws Exception {

@@ -91,7 +91,7 @@ $clientJob = Start-Job -ScriptBlock {
         -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError `
         -Dlog.file.name=log4j-client.log `
         org.restcomm.protocols.ss7.map.load.sms.mo.Client `
-        $numDialogs $concurrent tcp 127.0.0.1 8011 -1 127.0.0.1 8012 IPSP 101 102 1 2 3 2 8 8 1111112 9960639999 1 16 -100
+        $numDialogs $concurrent tcp 127.0.0.1 8012 -1 127.0.0.1 8011 IPSP 101 102 1 2 3 2 8 8 1111112 9960639999 1 16 -100
 } -ArgumentList $PSScriptRoot, (Get-Content "$PSScriptRoot\classpath.txt" -ErrorAction SilentlyContinue), $numDialogs, $concurrent
 
 # Monitor

@@ -7,8 +7,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import jakarta.xml.bind.annotation.adapters.HexBinaryAdapter;
-
 /**
  *
  * @author sergey vetyutnev
@@ -73,8 +71,12 @@ public class TraceReaderDriverHexStream extends TraceReaderDriverBase implements
     }
 
     public byte[] hexToBytes(String hexString) {
-        HexBinaryAdapter adapter = new HexBinaryAdapter();
-        byte[] bytes = adapter.unmarshal(hexString);
-        return bytes;
+        int len = hexString.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                                 + Character.digit(hexString.charAt(i + 1), 16));
+        }
+        return data;
     }
 }

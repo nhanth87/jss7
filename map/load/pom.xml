@@ -161,10 +161,8 @@
 			<version>${guava.version}</version>
 		</dependency>
 
-		<!-- netty -->
-		<dependency>
-			<groupId>io.netty</groupId>
-		<dependency>
+			<!-- netty -->
+			<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-common</artifactId>
 			<version>${netty.version}</version>

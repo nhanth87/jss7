@@ -41,10 +41,7 @@ public class THLocalAsActToActRemAspAct implements TransitionHandler {
 
             AspImpl remAsp = (AspImpl) this.fsm.getAttribute(AsImpl.ATTRIBUTE_ASP);
 
-            if (this.asImpl.getTrafficModeType().getMode() == TrafficModeType.Loadshare
-                    && asImpl.getFunctionality() != Functionality.IPSP) {
-                // Send Notify only for ASP or SGW
-
+            if (this.asImpl.getTrafficModeType().getMode() == TrafficModeType.Loadshare) {
                 // Iterate through ASP's and send AS_ACTIVE to ASP's who
                 // are INACTIVE
                 for (Asp asp : this.asImpl.appServerProcs) {
@@ -69,12 +66,8 @@ public class THLocalAsActToActRemAspAct implements TransitionHandler {
 
                     // Transition the other ASP to INACTIVE
                     if (aspState == AspState.ACTIVE && !(remAspImpl.getName().equals(remAsp.getName()))) {
-                        if (asImpl.getFunctionality() != Functionality.IPSP) {
-                            // Send Notify only for ASP or SGW
-
-                            Notify msg = createNotify(remAspImpl, Status.STATUS_Other, Status.INFO_Alternate_ASP_Active);
-                            remAspImpl.getAspFactory().write(msg);
-                        }
+                        Notify msg = createNotify(remAspImpl, Status.STATUS_Other, Status.INFO_Alternate_ASP_Active);
+                        remAspImpl.getAspFactory().write(msg);
 
                         // Transition this ASP to INACTIVE
                         aspPeerFSM.signal(TransitionState.OTHER_ALTERNATE_ASP_ACTIVE);

@@ -33,10 +33,10 @@
     <property name="test.client.concurrentDialog" value="400" />
     <property name="test.client.channelType" value="sctp" />
     <property name="test.client.hostIp" value="127.0.0.1" />
-    <property name="test.client.hostPort" value="8011" />
+    <property name="test.client.hostPort" value="8012" />
     <property name="test.client.extraHostAddress" value="-1" /> <!-- Not yet supported -->
     <property name="test.client.peerIp" value="127.0.0.1" />
-    <property name="test.client.peerPort" value="8012" />
+    <property name="test.client.peerPort" value="8011" />
     <!-- Application Server Functionality, possible values: AS, SGW, IPSP (Client) -->
     <property name="test.client.asFunctionality" value="IPSP" />
     <property name="test.client.rc" value="101" /> <!-- Routing Context -->
