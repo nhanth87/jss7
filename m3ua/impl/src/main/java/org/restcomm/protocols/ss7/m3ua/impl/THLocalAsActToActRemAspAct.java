@@ -4,6 +4,7 @@ package org.restcomm.protocols.ss7.m3ua.impl;
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.Asp;
 import org.restcomm.protocols.ss7.m3ua.Functionality;
+import org.restcomm.protocols.ss7.m3ua.IPSPType;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSM;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSMState;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.TransitionHandler;
@@ -34,28 +35,31 @@ public class THLocalAsActToActRemAspAct implements TransitionHandler {
     public boolean process(FSMState state) {
         try {
 
-            if (this.asImpl.getTrafficModeType().getMode() == TrafficModeType.Broadcast) {
+            int trafficMode = (this.asImpl.getTrafficModeType() != null) ? this.asImpl.getTrafficModeType().getMode() : TrafficModeType.Override;
+            if (trafficMode == TrafficModeType.Broadcast) {
                 // We don't handle this
                 return false;
             }
 
             AspImpl remAsp = (AspImpl) this.fsm.getAttribute(AsImpl.ATTRIBUTE_ASP);
 
-            if (this.asImpl.getTrafficModeType().getMode() == TrafficModeType.Loadshare) {
-                // Iterate through ASP's and send AS_ACTIVE to ASP's who
-                // are INACTIVE
-                for (Asp asp : this.asImpl.appServerProcs) {
-                    AspImpl remAspImpl = (AspImpl) asp;
+            if (trafficMode == TrafficModeType.Loadshare) {
+                if (asImpl.getFunctionality() != Functionality.IPSP || asImpl.getIpspType() == IPSPType.SERVER) {
+                    // Iterate through ASP's and send AS_ACTIVE to ASP's who
+                    // are INACTIVE
+                    for (Asp asp : this.asImpl.appServerProcs) {
+                        AspImpl remAspImpl = (AspImpl) asp;
 
-                    FSM aspPeerFSM = remAspImpl.getPeerFSM();
-                    AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
+                        FSM aspPeerFSM = remAspImpl.getPeerFSM();
+                        AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
 
-                    if (aspState == AspState.INACTIVE) {
-                        Notify msg = createNotify(remAspImpl, Status.STATUS_AS_State_Change, Status.INFO_AS_ACTIVE);
-                        remAspImpl.getAspFactory().write(msg);
+                        if (aspState == AspState.INACTIVE) {
+                            Notify msg = createNotify(remAspImpl, Status.STATUS_AS_State_Change, Status.INFO_AS_ACTIVE);
+                            remAspImpl.getAspFactory().write(msg);
+                        }
                     }
                 }
-            } else if (this.asImpl.getTrafficModeType().getMode() == TrafficModeType.Override) {
+            } else if (trafficMode == TrafficModeType.Override) {
                 // Look at 5.2.2. 1+1 Sparing, Backup Override
 
                 for (Asp asp : this.asImpl.appServerProcs) {
@@ -66,8 +70,10 @@ public class THLocalAsActToActRemAspAct implements TransitionHandler {
 
                     // Transition the other ASP to INACTIVE
                     if (aspState == AspState.ACTIVE && !(remAspImpl.getName().equals(remAsp.getName()))) {
-                        Notify msg = createNotify(remAspImpl, Status.STATUS_Other, Status.INFO_Alternate_ASP_Active);
-                        remAspImpl.getAspFactory().write(msg);
+                        if (asImpl.getFunctionality() != Functionality.IPSP || asImpl.getIpspType() == IPSPType.SERVER) {
+                            Notify msg = createNotify(remAspImpl, Status.STATUS_Other, Status.INFO_Alternate_ASP_Active);
+                            remAspImpl.getAspFactory().write(msg);
+                        }
 
                         // Transition this ASP to INACTIVE
                         aspPeerFSM.signal(TransitionState.OTHER_ALTERNATE_ASP_ACTIVE);
