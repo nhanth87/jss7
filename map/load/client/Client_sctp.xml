@@ -9,9 +9,9 @@
   <congControl_BackToNormalDelayThreshold_3>10.0</congControl_BackToNormalDelayThreshold_3>
   <servers/>
   <association>
-    <clientAssociation hostAddress="127.0.0.1" hostPort="2345" peerAddress="127.0.0.1" peerPort="3434" name="clientAssociation" ipChannelType="SCTP" type="CLIENT">
-      <congestionLevel>0</congestionLevel>
+    <clientAssociation hostAddress="127.0.0.1" hostPort="8012" peerAddress="127.0.0.1" peerPort="8011" name="clientAssociation" ipChannelType="SCTP" type="CLIENT">
       <connected>false</connected>
+      <congestionLevel>0</congestionLevel>
       <associationType>CLIENT</associationType>
       <byteBufAllocator/>
     </clientAssociation>

@@ -70,10 +70,8 @@ public class RemAsStatePenTimeout implements FSMStateEventHandler {
                         inactive = true;
                     }
 
-                    if (this.asImpl.getFunctionality() != Functionality.IPSP) {
-                        Notify msg = createNotify(remAspImpl);
-                        remAspImpl.getAspFactory().write(msg);
-                    }
+                    Notify msg = createNotify(remAspImpl);
+                    remAspImpl.getAspFactory().write(msg);
                 } catch (UnknownTransitionException e) {
                     logger.error(String.format("Error while translating Rem AS to INACTIVE. %s", this.fsm.toString()), e);
                 }

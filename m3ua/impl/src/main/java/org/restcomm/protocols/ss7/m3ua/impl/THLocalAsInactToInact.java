@@ -30,18 +30,15 @@ public class THLocalAsInactToInact implements TransitionHandler {
 
     public boolean process(FSMState state) {
         try {
-            if (asImpl.getFunctionality() != Functionality.IPSP) {
-                // Send Notify only for ASP or SGW
-                AspImpl remAsp = (AspImpl) this.fsm.getAttribute(AsImpl.ATTRIBUTE_ASP);
+            AspImpl remAsp = (AspImpl) this.fsm.getAttribute(AsImpl.ATTRIBUTE_ASP);
 
-                if (remAsp == null) {
-                    logger.error(String.format("No ASP found. %s", this.fsm.toString()));
-                    return false;
-                }
-
-                Notify msg = createNotify(remAsp);
-                remAsp.getAspFactory().write(msg);
+            if (remAsp == null) {
+                logger.error(String.format("No ASP found. %s", this.fsm.toString()));
+                return false;
             }
+
+            Notify msg = createNotify(remAsp);
+            remAsp.getAspFactory().write(msg);
             return true;
         } catch (Exception e) {
             logger.error(String.format("Error while translating Rem AS to INACTIVE message. %s", this.fsm.toString()), e);

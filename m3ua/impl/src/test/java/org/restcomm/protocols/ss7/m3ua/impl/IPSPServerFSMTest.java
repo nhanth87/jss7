@@ -128,7 +128,7 @@ public class IPSPServerFSMTest {
 
         // As remAs = sgw.createAppServer("testas", rc, rKey, trModType);
         AsImpl remAs = (AsImpl) serverM3UAMgmt.createAs("testas", Functionality.IPSP, ExchangeType.SE, IPSPType.SERVER, rc,
-                null, 1, null);
+                parmFactory.createTrafficModeType(TrafficModeType.Loadshare), 1, null);
         FSM asLocalFSM = remAs.getLocalFSM();
 
         AspFactoryImpl aspFactoryImpl = (AspFactoryImpl) serverM3UAMgmt.createAspFactory("testasp", "testAssoc1", false);
@@ -151,8 +151,10 @@ public class IPSPServerFSMTest {
 
         assertEquals(AspState.INACTIVE, this.getAspState(aspPeerFSM));
         assertTrue(validateMessage(testAssociation, MessageClass.ASP_STATE_MAINTENANCE, MessageType.ASP_UP_ACK, -1, -1));
+        assertTrue(validateMessage(testAssociation, MessageClass.MANAGEMENT, MessageType.NOTIFY, Status.STATUS_AS_State_Change,
+                Status.INFO_AS_INACTIVE));
 
-        // also the AS should be INACTIVE now an no Notify should have been sent
+        // also the AS should be INACTIVE now
         assertEquals(AsState.INACTIVE, this.getAsState(asLocalFSM));
 
         // Peer sends ASP_ACTIVE
@@ -162,6 +164,8 @@ public class IPSPServerFSMTest {
         aspFactoryImpl.read(message);
         assertEquals(AspState.ACTIVE, this.getAspState(aspPeerFSM));
         assertTrue(validateMessage(testAssociation, MessageClass.ASP_TRAFFIC_MAINTENANCE, MessageType.ASP_ACTIVE_ACK, -1, -1));
+        assertTrue(validateMessage(testAssociation, MessageClass.MANAGEMENT, MessageType.NOTIFY, Status.STATUS_AS_State_Change,
+                Status.INFO_AS_ACTIVE));
         // also the AS should be ACTIVE now
         assertEquals(AsState.ACTIVE, this.getAsState(asLocalFSM));
 
@@ -188,6 +192,8 @@ public class IPSPServerFSMTest {
         aspFactoryImpl.read(message);
         assertEquals(AspState.INACTIVE, this.getAspState(aspPeerFSM));
         assertTrue(validateMessage(testAssociation, MessageClass.ASP_TRAFFIC_MAINTENANCE, MessageType.ASP_INACTIVE_ACK, -1, -1));
+        assertTrue(validateMessage(testAssociation, MessageClass.MANAGEMENT, MessageType.NOTIFY, Status.STATUS_AS_State_Change,
+                Status.INFO_AS_PENDING));
         // also the AS should be PENDING now
         assertEquals(AsState.PENDING, this.getAsState(asLocalFSM));
 
@@ -223,7 +229,7 @@ public class IPSPServerFSMTest {
                 "testAssoc1");
 
         AsImpl remAs = (AsImpl) serverM3UAMgmt.createAs("testas", Functionality.IPSP, ExchangeType.SE, IPSPType.SERVER, null,
-                null, 1, null);
+                parmFactory.createTrafficModeType(TrafficModeType.Loadshare), 1, null);
         FSM asLocalFSM = remAs.getLocalFSM();
 
         AspFactoryImpl aspFactoryImpl = (AspFactoryImpl) serverM3UAMgmt.createAspFactory("testasp", "testAssoc1", false);
@@ -246,6 +252,8 @@ public class IPSPServerFSMTest {
 
         assertEquals(AspState.INACTIVE, this.getAspState(aspPeerFSM));
         assertTrue(validateMessage(testAssociation, MessageClass.ASP_STATE_MAINTENANCE, MessageType.ASP_UP_ACK, -1, -1));
+        assertTrue(validateMessage(testAssociation, MessageClass.MANAGEMENT, MessageType.NOTIFY, Status.STATUS_AS_State_Change,
+                Status.INFO_AS_INACTIVE));
         // also the AS should be INACTIVE now
         assertEquals(AsState.INACTIVE, this.getAsState(asLocalFSM));
 
@@ -255,6 +263,8 @@ public class IPSPServerFSMTest {
         aspFactoryImpl.read(message);
         assertEquals(AspState.ACTIVE, this.getAspState(aspPeerFSM));
         assertTrue(validateMessage(testAssociation, MessageClass.ASP_TRAFFIC_MAINTENANCE, MessageType.ASP_ACTIVE_ACK, -1, -1));
+        assertTrue(validateMessage(testAssociation, MessageClass.MANAGEMENT, MessageType.NOTIFY, Status.STATUS_AS_State_Change,
+                Status.INFO_AS_ACTIVE));
         // also the AS should be ACTIVE now
         assertEquals(AsState.ACTIVE, this.getAsState(asLocalFSM));
 
@@ -279,6 +289,8 @@ public class IPSPServerFSMTest {
         aspFactoryImpl.read(message);
         assertEquals(AspState.INACTIVE, this.getAspState(aspPeerFSM));
         assertTrue(validateMessage(testAssociation, MessageClass.ASP_TRAFFIC_MAINTENANCE, MessageType.ASP_INACTIVE_ACK, -1, -1));
+        assertTrue(validateMessage(testAssociation, MessageClass.MANAGEMENT, MessageType.NOTIFY, Status.STATUS_AS_State_Change,
+                Status.INFO_AS_PENDING));
         // also the AS should be PENDING now
         assertEquals(AsState.PENDING, this.getAsState(asLocalFSM));
 
@@ -346,6 +358,8 @@ public class IPSPServerFSMTest {
 
         assertEquals(AspState.INACTIVE, this.getAspState(aspPeerFSM));
         assertTrue(validateMessage(testAssociation1, MessageClass.ASP_STATE_MAINTENANCE, MessageType.ASP_UP_ACK, -1, -1));
+        assertTrue(validateMessage(testAssociation1, MessageClass.MANAGEMENT, MessageType.NOTIFY, Status.STATUS_AS_State_Change,
+                Status.INFO_AS_INACTIVE));
         // also the AS should be INACTIVE now
         assertEquals(AsState.INACTIVE, this.getAsState(asLocalFSM));
 
@@ -355,6 +369,8 @@ public class IPSPServerFSMTest {
         aspFactoryImpl.read(message);
         assertEquals(AspState.ACTIVE, this.getAspState(aspPeerFSM));
         assertTrue(validateMessage(testAssociation1, MessageClass.ASP_TRAFFIC_MAINTENANCE, MessageType.ASP_ACTIVE_ACK, -1, -1));
+        assertTrue(validateMessage(testAssociation1, MessageClass.MANAGEMENT, MessageType.NOTIFY, Status.STATUS_AS_State_Change,
+                Status.INFO_AS_ACTIVE));
         // also the AS should be ACTIVE now
         assertEquals(AsState.ACTIVE, this.getAsState(asLocalFSM));
 
@@ -380,6 +396,8 @@ public class IPSPServerFSMTest {
         // As well as receives Error message
         assertTrue(validateMessage(testAssociation1, MessageClass.MANAGEMENT, MessageType.ERROR, ErrorCode.Unexpected_Message,
                 100));
+        assertTrue(validateMessage(testAssociation1, MessageClass.MANAGEMENT, MessageType.NOTIFY, Status.STATUS_AS_State_Change,
+                Status.INFO_AS_PENDING));
 
         // also the AS should be PENDING now
         assertEquals(AsState.PENDING, this.getAsState(asLocalFSM));
@@ -395,6 +413,15 @@ public class IPSPServerFSMTest {
         // No more MTP3 Primitive or message
         assertNull(this.mtp3UserPartListener.rxMtp3PrimitivePoll());
         assertNull(this.mtp3UserPartListener.rxMtp3TransferPrimitivePoll());
+
+        assertTrue(validateMessage(testAssociation1, MessageClass.MANAGEMENT, MessageType.NOTIFY, Status.STATUS_AS_State_Change,
+                Status.INFO_AS_INACTIVE));
+
+        // Bring ASP down for cleanup
+        message = messageFactory.createMessage(MessageClass.ASP_STATE_MAINTENANCE, MessageType.ASP_DOWN);
+        aspFactoryImpl.read(message);
+        assertEquals(AspState.DOWN, this.getAspState(aspPeerFSM));
+        assertTrue(validateMessage(testAssociation1, MessageClass.ASP_STATE_MAINTENANCE, MessageType.ASP_DOWN_ACK, -1, -1));
 
         // Make sure we don't have any more
         assertNull(testAssociation1.txPoll());
@@ -435,6 +462,8 @@ public class IPSPServerFSMTest {
 
         assertEquals(AspState.INACTIVE, this.getAspState(aspPeerFSM));
         assertTrue(validateMessage(testAssociation1, MessageClass.ASP_STATE_MAINTENANCE, MessageType.ASP_UP_ACK, -1, -1));
+        assertTrue(validateMessage(testAssociation1, MessageClass.MANAGEMENT, MessageType.NOTIFY, Status.STATUS_AS_State_Change,
+                Status.INFO_AS_INACTIVE));
         // also the AS should be INACTIVE now
         assertEquals(AsState.INACTIVE, this.getAsState(asLocalFSM));
 
@@ -444,6 +473,8 @@ public class IPSPServerFSMTest {
         aspFactoryImpl.read(message);
         assertEquals(AspState.ACTIVE, this.getAspState(aspPeerFSM));
         assertTrue(validateMessage(testAssociation1, MessageClass.ASP_TRAFFIC_MAINTENANCE, MessageType.ASP_ACTIVE_ACK, -1, -1));
+        assertTrue(validateMessage(testAssociation1, MessageClass.MANAGEMENT, MessageType.NOTIFY, Status.STATUS_AS_State_Change,
+                Status.INFO_AS_ACTIVE));
         // also the AS should be ACTIVE now
         assertEquals(AsState.ACTIVE, this.getAsState(asLocalFSM));
 
@@ -465,6 +496,8 @@ public class IPSPServerFSMTest {
         aspFactoryImpl.read(message);
         assertEquals(AspState.INACTIVE, this.getAspState(aspPeerFSM));
         assertTrue(validateMessage(testAssociation1, MessageClass.ASP_TRAFFIC_MAINTENANCE, MessageType.ASP_INACTIVE_ACK, -1, -1));
+        assertTrue(validateMessage(testAssociation1, MessageClass.MANAGEMENT, MessageType.NOTIFY, Status.STATUS_AS_State_Change,
+                Status.INFO_AS_PENDING));
         // also the AS should be PENDING now
         assertEquals(AsState.PENDING, this.getAsState(asLocalFSM));
 
@@ -484,6 +517,8 @@ public class IPSPServerFSMTest {
         aspFactoryImpl.read(message);
 
         assertTrue(validateMessage(testAssociation1, MessageClass.ASP_TRAFFIC_MAINTENANCE, MessageType.ASP_ACTIVE_ACK, -1, -1));
+        assertTrue(validateMessage(testAssociation1, MessageClass.MANAGEMENT, MessageType.NOTIFY, Status.STATUS_AS_State_Change,
+                Status.INFO_AS_ACTIVE));
         // also the AS should be ACTIVE now
         assertEquals(AsState.ACTIVE, this.getAsState(asLocalFSM));
 
@@ -496,6 +531,12 @@ public class IPSPServerFSMTest {
         // No more MTP3 Primitive or message
         assertNull(this.mtp3UserPartListener.rxMtp3PrimitivePoll());
         assertNull(this.mtp3UserPartListener.rxMtp3TransferPrimitivePoll());
+
+        // Bring ASP down for cleanup
+        message = messageFactory.createMessage(MessageClass.ASP_STATE_MAINTENANCE, MessageType.ASP_DOWN);
+        aspFactoryImpl.read(message);
+        assertEquals(AspState.DOWN, this.getAspState(aspPeerFSM));
+        assertTrue(validateMessage(testAssociation1, MessageClass.ASP_STATE_MAINTENANCE, MessageType.ASP_DOWN_ACK, -1, -1));
 
         // Make sure we don't have any more
         assertNull(testAssociation1.txPoll());

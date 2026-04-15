@@ -1,0 +1,87 @@
+[2026-04-15 10:52:08,138] INFO     0[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPClientFSMTest_m3ua1.xml
+[2026-04-15 10:52:08,610] INFO   472[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:293) - Started M3UAManagement
+[2026-04-15 10:52:08,780] INFO   642[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:836) - Removing allocated resources: AppServers=1, AspFactories=1
+[2026-04-15 11:15:57,644] INFO     0[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPClientFSMTest_m3ua1.xml
+[2026-04-15 11:15:58,200] INFO   556[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPServerFSMTest_m3ua1.xml
+[2026-04-15 11:15:58,276] INFO   632[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:293) - Started M3UAManagement
+[2026-04-15 11:16:00,783] INFO  3139[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:836) - Removing allocated resources: AppServers=1, AspFactories=1
+[2026-04-15 11:24:14,142] INFO     0[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPClientFSMTest_m3ua1.xml
+[2026-04-15 11:24:14,728] INFO   586[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPServerFSMTest_m3ua1.xml
+[2026-04-15 11:24:14,733]ERROR   591[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.load(M3UAManagementImpl.java:1038) - Failed to load the M3UA configuration file. 
+Cannot construct instance of `org.restcomm.protocols.ss7.m3ua.AspFactory` (no Creators, like default constructor, exist): abstract types either need to be mapped to concrete types, have custom deserializer, or contain additional type information
+ at [Source: (FileReader); line: 10, column: 18] (through reference chain: org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl$M3UAConfig["aspFactories"]->java.util.concurrent.CopyOnWriteArrayList[0])
+[2026-04-15 11:24:14,734] INFO   592[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:293) - Started M3UAManagement
+[2026-04-15 11:24:17,239] INFO  3097[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:836) - Removing allocated resources: AppServers=1, AspFactories=1
+[2026-04-15 11:25:28,744] INFO     0[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPClientFSMTest_m3ua1.xml
+[2026-04-15 11:25:29,323] INFO   579[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPServerFSMTest_m3ua1.xml
+[2026-04-15 11:25:29,330]ERROR   586[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.load(M3UAManagementImpl.java:1038) - Failed to load the M3UA configuration file. 
+Cannot construct instance of `org.restcomm.protocols.ss7.m3ua.AspFactory` (no Creators, like default constructor, exist): abstract types either need to be mapped to concrete types, have custom deserializer, or contain additional type information
+ at [Source: (FileReader); line: 10, column: 18] (through reference chain: org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl$M3UAConfig["aspFactories"]->java.util.concurrent.CopyOnWriteArrayList[0])
+[2026-04-15 11:25:29,332] INFO   588[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:293) - Started M3UAManagement
+[2026-04-15 11:25:31,840] INFO  3096[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:836) - Removing allocated resources: AppServers=1, AspFactories=1
+[2026-04-15 11:34:05,518] INFO     0[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPServerFSMTest_m3ua1.xml
+[2026-04-15 11:34:06,562]ERROR  1044[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.load(M3UAManagementImpl.java:1038) - Failed to load the M3UA configuration file. 
+Cannot construct instance of `org.restcomm.protocols.ss7.m3ua.AspFactory` (no Creators, like default constructor, exist): abstract types either need to be mapped to concrete types, have custom deserializer, or contain additional type information
+ at [Source: (FileReader); line: 10, column: 18] (through reference chain: org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl$M3UAConfig["aspFactories"]->java.util.concurrent.CopyOnWriteArrayList[0])
+[2026-04-15 11:34:06,567] INFO  1049[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:293) - Started M3UAManagement
+[2026-04-15 11:34:09,084] INFO  3566[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:836) - Removing allocated resources: AppServers=1, AspFactories=1
+[2026-04-15 11:47:40,997] INFO     0[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPServerFSMTest_m3ua1.xml
+[2026-04-15 11:47:41,583]ERROR   586[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.load(M3UAManagementImpl.java:1038) - Failed to load the M3UA configuration file. 
+Cannot construct instance of `org.restcomm.protocols.ss7.m3ua.AspFactory` (no Creators, like default constructor, exist): abstract types either need to be mapped to concrete types, have custom deserializer, or contain additional type information
+ at [Source: (FileReader); line: 10, column: 18] (through reference chain: org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl$M3UAConfig["aspFactories"]->java.util.concurrent.CopyOnWriteArrayList[0])
+[2026-04-15 11:47:41,584] INFO   587[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:293) - Started M3UAManagement
+[2026-04-15 11:47:41,782]ERROR   785[main] - org.restcomm.protocols.ss7.m3ua.impl.THLocalAsInactToAct.process(THLocalAsInactToAct.java:98) - Error while translating Rem AS to INACTIVE. FSM.name=testas_LOCAL old state=INACTIVE, current state=INACTIVE
+java.lang.NullPointerException: Cannot invoke "org.restcomm.protocols.ss7.m3ua.parameter.TrafficModeType.getMode()" because the return value of "org.restcomm.protocols.ss7.m3ua.impl.AsImpl.getTrafficModeType()" is null
+	at org.restcomm.protocols.ss7.m3ua.impl.THLocalAsInactToAct.process(THLocalAsInactToAct.java:41)
+	at org.restcomm.protocols.ss7.m3ua.impl.fsm.Transition.process(Transition.java:36)
+	at org.restcomm.protocols.ss7.m3ua.impl.fsm.FSMState.signal(FSMState.java:108)
+	at org.restcomm.protocols.ss7.m3ua.impl.fsm.FSM.signal(FSM.java:130)
+	at org.restcomm.protocols.ss7.m3ua.impl.AspTrafficMaintenanceHandler.handleAspActive(AspTrafficMaintenanceHandler.java:140)
+	at org.restcomm.protocols.ss7.m3ua.impl.AspFactoryImpl.read(AspFactoryImpl.java:490)
+	at org.restcomm.protocols.ss7.m3ua.impl.IPSPServerFSMTest.testSingleAspInAsWithRC(IPSPServerFSMTest.java:164)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.testng.internal.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:80)
+	at org.testng.internal.Invoker.invokeMethod(Invoker.java:691)
+	at org.testng.internal.Invoker.invokeTestMethod(Invoker.java:883)
+	at org.testng.internal.Invoker.invokeTestMethods(Invoker.java:1208)
+	at org.testng.internal.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:127)
+	at org.testng.internal.TestMethodWorker.run(TestMethodWorker.java:111)
+	at org.testng.TestRunner.privateRun(TestRunner.java:754)
+	at org.testng.TestRunner.run(TestRunner.java:614)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:335)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:330)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:292)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:241)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1169)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1094)
+	at org.testng.TestNG.run(TestNG.java:1006)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:132)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeSingleClass(TestNGDirectoryTestSuite.java:112)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:99)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:147)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:290)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:242)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:121)
+[2026-04-15 11:47:41,796] INFO   799[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:836) - Removing allocated resources: AppServers=1, AspFactories=1
+[2026-04-15 11:54:47,147] INFO     0[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPServerFSMTest_m3ua1.xml
+[2026-04-15 11:54:47,920]ERROR   773[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.load(M3UAManagementImpl.java:1038) - Failed to load the M3UA configuration file. 
+Cannot construct instance of `org.restcomm.protocols.ss7.m3ua.AspFactory` (no Creators, like default constructor, exist): abstract types either need to be mapped to concrete types, have custom deserializer, or contain additional type information
+ at [Source: (FileReader); line: 10, column: 18] (through reference chain: org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl$M3UAConfig["aspFactories"]->java.util.concurrent.CopyOnWriteArrayList[0])
+[2026-04-15 11:54:47,922] INFO   775[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:293) - Started M3UAManagement
+[2026-04-15 11:54:48,689] INFO     0[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPClientFSMTest_m3ua1.xml
+[2026-04-15 11:54:50,427] INFO  3280[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:836) - Removing allocated resources: AppServers=1, AspFactories=1
+[2026-04-15 11:54:50,439] INFO  3292[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPServerFSMTest_m3ua1.xml
+[2026-04-15 11:56:08,479] INFO     0[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPServerFSMTest_m3ua1.xml
+[2026-04-15 11:56:10,184] INFO  1705[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:293) - Started M3UAManagement
+[2026-04-15 11:56:13,095] INFO     3[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPServerFSMTest_m3ua1.xml
+[2026-04-15 11:56:13,193] INFO  4714[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:836) - Removing allocated resources: AppServers=1, AspFactories=1
+[2026-04-15 11:56:14,718] INFO     0[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPServerFSMTest_m3ua1.xml
+[2026-04-15 12:01:25,728] INFO     0[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPServerFSMTest_m3ua1.xml
+[2026-04-15 12:01:26,064] INFO   336[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:293) - Started M3UAManagement
+[2026-04-15 12:01:28,569] INFO  2841[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:836) - Removing allocated resources: AppServers=1, AspFactories=1
+[2026-04-15 12:02:43,543] INFO     0[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:272) - M3UA configuration file path C:\Users\Windows\Desktop\ethiopia-working-dir\jSS7\m3ua\impl\IPSPClientFSMTest_m3ua1.xml
+[2026-04-15 12:02:44,257] INFO   714[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:293) - Started M3UAManagement
+[2026-04-15 12:02:44,535] INFO   992[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:836) - Removing allocated resources: AppServers=1, AspFactories=1

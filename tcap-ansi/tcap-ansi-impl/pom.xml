@@ -30,8 +30,6 @@
 		</dependency>
 
 		<!-- netty -->
-		<dependency>
-			<groupId>io.netty</groupId>
 		<!-- netty -->
 		<dependency>
 			<groupId>io.netty</groupId>

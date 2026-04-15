@@ -48,23 +48,19 @@ public class THLocalAsPendToAct implements TransitionHandler {
 
         try {
 
-            if (asImpl.getFunctionality() != Functionality.IPSP) {
-                // Send Notify only for ASP or SGW
+            // Iterate through ASP's and send AS_ACTIVE to ASP's who
+            // are INACTIVE or ACTIVE
+            for (Asp asp : this.asImpl.appServerProcs) {
+                AspImpl remAspImpl = (AspImpl) asp;
 
-                // Iterate through ASP's and send AS_ACTIVE to ASP's who
-                // are INACTIVE or ACTIVE
-                for (Asp asp : this.asImpl.appServerProcs) {
-                    AspImpl remAspImpl = (AspImpl) asp;
+                FSM aspPeerFSM = remAspImpl.getPeerFSM();
+                AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
 
-                    FSM aspPeerFSM = remAspImpl.getPeerFSM();
-                    AspState aspState = AspState.getState(aspPeerFSM.getState().getName());
-
-                    if (aspState == AspState.INACTIVE || aspState == AspState.ACTIVE) {
-                        Notify msg = createNotify(remAspImpl);
-                        remAspImpl.getAspFactory().write(msg);
-                    }
-                }// end of for
-            }
+                if (aspState == AspState.INACTIVE || aspState == AspState.ACTIVE) {
+                    Notify msg = createNotify(remAspImpl);
+                    remAspImpl.getAspFactory().write(msg);
+                }
+            }// end of for
 
             // Send the PayloadData (if any) from pending queue to other side
             AspImpl causeAsp = (AspImpl) this.fsm.getAttribute(AsImpl.ATTRIBUTE_ASP);

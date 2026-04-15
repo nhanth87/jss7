@@ -8,7 +8,6 @@ import org.restcomm.protocols.ss7.map.api.service.lsm.Polygon;
 import org.restcomm.protocols.ss7.map.primitives.OctetStringBase;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation.GeographicalInformationImpl;
 
-import jakarta.xml.bind.DatatypeConverter;
 
 /**
  * @author <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>

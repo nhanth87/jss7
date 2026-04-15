@@ -8,14 +8,14 @@
   <congControl_BackToNormalDelayThreshold_2>5.5</congControl_BackToNormalDelayThreshold_2>
   <congControl_BackToNormalDelayThreshold_3>10.0</congControl_BackToNormalDelayThreshold_3>
   <servers>
-    <server name="testserver" hostAddress="127.0.0.1" hostport="2345" started="true" ipChannelType="SCTP" acceptAnonymousConnections="false" maxConcurrentConnectionsCount="0">
+    <server name="testserver" hostAddress="0.0.0.0" hostport="8011" started="true" ipChannelType="SCTP" acceptAnonymousConnections="false" maxConcurrentConnectionsCount="0">
       <associations>
         <associations>serverAssociation</associations>
       </associations>
     </server>
   </servers>
   <association>
-    <serverAssociation hostPort="0" peerAddress="127.0.0.1" peerPort="3434" serverName="testserver" name="serverAssociation" ipChannelType="SCTP" type="SERVER">
+    <serverAssociation hostPort="0" peerAddress="127.0.0.1" peerPort="8012" serverName="testserver" name="serverAssociation" ipChannelType="SCTP" type="SERVER">
       <congestionLevel>0</congestionLevel>
       <connected>false</connected>
       <associationType>SERVER</associationType>

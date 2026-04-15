@@ -1,7 +1,6 @@
 
 package org.restcomm.protocols.ss7.map.primitives;
 
-import jakarta.xml.bind.DatatypeConverter;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
