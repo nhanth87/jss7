@@ -58,7 +58,6 @@ import org.restcomm.protocols.ss7.tools.simulator.tests.ussd.TestUssdClientMan;
 import org.restcomm.protocols.ss7.tools.simulator.tests.ussd.TestUssdServerConfigurationData_OldFormat;
 import org.restcomm.protocols.ss7.tools.simulator.tests.ussd.TestUssdServerMan;
 
-import com.thoughtworks.xstream.XStream;
 
 /**
  *

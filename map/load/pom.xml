@@ -164,9 +164,6 @@
 		<!-- netty -->
 		<dependency>
 			<groupId>io.netty</groupId>
-			<artifactId>netty-all</artifactId>
-			<version>${netty.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-common</artifactId>
@@ -200,6 +197,11 @@
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-codec</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-codec-base</artifactId>
 			<version>${netty.version}</version>
 		</dependency>
 		<dependency>
@@ -624,6 +626,15 @@
 											<overWrite>true</overWrite>
 											<outputDirectory>${assemble.dir}</outputDirectory>
 											<destFileName>netty-codec-4.2.11.Final.jar</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>io.netty</groupId>
+											<artifactId>netty-codec-base</artifactId>
+											<version>${netty.version}</version>
+											<type>jar</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${assemble.dir}</outputDirectory>
+											<destFileName>netty-codec-base-4.2.11.Final.jar</destFileName>
 										</artifactItem>
 										<artifactItem>
 											<groupId>io.netty</groupId>

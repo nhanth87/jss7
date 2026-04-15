@@ -9,7 +9,7 @@
 	<property name="javac.source" value="1.8" />
 	<property name="srcroot" value="${root}/src" />
 
-	<property name="assemble.dir" value="${basedir}/../target/load" />
+	<property name="assemble.dir" value="${basedir}/target/load" />
 
 	<property name="test.server.channelType" value="sctp" />
 	<property name="test.server.hostIp" value="127.0.0.1" />
@@ -92,7 +92,15 @@
 		<pathelement location="${assemble.dir}/javolution.jar" />
 		<pathelement location="${assemble.dir}/concurrent.jar" />
 		<pathelement location="${assemble.dir}/guava.jar" />
-		<pathelement location="${assemble.dir}/netty-all.jar" />
+		<pathelement location="${assemble.dir}/netty-common-4.2.11.Final.jar" />
+		<pathelement location="${assemble.dir}/netty-buffer-4.2.11.Final.jar" />
+		<pathelement location="${assemble.dir}/netty-resolver-4.2.11.Final.jar" />
+		<pathelement location="${assemble.dir}/netty-transport-4.2.11.Final.jar" />
+		<pathelement location="${assemble.dir}/netty-transport-native-unix-common-4.2.11.Final.jar" />
+		<pathelement location="${assemble.dir}/netty-handler-4.2.11.Final.jar" />
+		<pathelement location="${assemble.dir}/netty-codec-4.2.11.Final.jar" />
+		<pathelement location="${assemble.dir}/netty-codec-base-4.2.11.Final.jar" />
+		<pathelement location="${assemble.dir}/netty-transport-sctp-4.2.11.Final.jar" />
 		<pathelement location="src/main/resources" />
 	</path>
 
