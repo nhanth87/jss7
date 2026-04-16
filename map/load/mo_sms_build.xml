@@ -7,7 +7,7 @@
 
     <property name="packageprefix" value="org.restcomm.protocols.ss7.map.load.sms.mo" />
 
-    <property name="javac.source" value="1.8" />
+    <property name="javac.source" value="11" />
     <property name="srcroot" value="${root}/src" />
 
     <property name="assemble.dir" value="${basedir}/target/load" />
@@ -22,8 +22,8 @@
     <property name="test.server.asFunctionality" value="IPSP" />
     <property name="test.server.rc" value="101" /> <!-- Routing Context -->
     <property name="test.server.na" value="102" /> <!-- Network Appearance -->
-    <property name="test.server.originatingPc" value="1" />
-    <property name="test.server.destinationPc" value="2" />
+    <property name="test.server.originatingPc" value="2" />
+    <property name="test.server.destinationPc" value="1" />
     <property name="test.server.si" value="3" /> <!-- Service Indicator -->
     <property name="test.server.ni" value="2" /> <!-- Network Indicator -->
     <property name="test.server.ssn" value="8" /> <!-- Subsystem Number -->
@@ -49,6 +49,7 @@
     <property name="test.client.remoteSsn" value="8" /> <!-- Remote Subsystem Number -->
     <property name="test.client.clientAddress" value="1111112" /> <!-- Client SCCP Address -->
     <property name="test.client.serverAddress" value="9960639999" /> <!-- Server SCCP Address -->
+    <property name="test.client.rampUpPeriod" value="-100" />
 
     <path id="project.class.path">
         <!-- Compiled classes directory (for WSL2 direct run without assemble) -->
@@ -127,7 +128,7 @@
         
         <!-- Copy jSS7 module JARs from sibling modules -->
         <copy file="${jss7.root}/map/map-api/target/map-api-9.2.7.jar" tofile="${assemble.dir}/map-api.jar" failonerror="false" />
-        <copy file="${jss7.root}/map/map-impl/target/map-impl-9.2.7.jar" tofile="${assemble.dir}/map-impl.jar" failonerror="false" />
+        <copy file="${jss7.root}/map/map-impl/target/map-impl-9.2.8.jar" tofile="${assemble.dir}/map-impl.jar" failonerror="false" />
         <copy file="${jss7.root}/sccp/sccp-api/target/sccp-api-9.2.7.jar" tofile="${assemble.dir}/sccp-api.jar" failonerror="false" />
         <copy file="${jss7.root}/sccp/sccp-impl/target/sccp-impl-9.2.7.jar" tofile="${assemble.dir}/sccp-impl.jar" failonerror="false" />
         <copy file="${jss7.root}/sccp/sccp-api-ext/target/sccp-api-ext-9.2.7.jar" tofile="${assemble.dir}/sccp-api-ext.jar" failonerror="false" />
@@ -135,7 +136,7 @@
         <copy file="${jss7.root}/tcap/tcap-api/target/tcap-api-9.2.7.jar" tofile="${assemble.dir}/tcap-api.jar" failonerror="false" />
         <copy file="${jss7.root}/tcap/tcap-impl/target/tcap-impl-9.2.7.jar" tofile="${assemble.dir}/tcap-impl.jar" failonerror="false" />
         <copy file="${jss7.root}/m3ua/api/target/m3ua-api-9.2.7.jar" tofile="${assemble.dir}/m3ua-api.jar" failonerror="false" />
-        <copy file="${jss7.root}/m3ua/impl/target/m3ua-impl-9.2.7.jar" tofile="${assemble.dir}/m3ua-impl.jar" failonerror="false" />
+        <copy file="${jss7.root}/m3ua/impl/target/m3ua-impl-9.2.8.jar" tofile="${assemble.dir}/m3ua-impl.jar" failonerror="false" />
         <copy file="${jss7.root}/mtp/mtp-api/target/mtp-api-9.2.7.jar" tofile="${assemble.dir}/mtp-api.jar" failonerror="false" />
         <copy file="${jss7.root}/mtp/mtp-impl/target/mtp-9.2.7.jar" tofile="${assemble.dir}/mtp.jar" failonerror="false" />
         <copy file="${jss7.root}/isup/isup-api/target/isup-api-9.2.7.jar" tofile="${assemble.dir}/isup-api.jar" failonerror="false" />
@@ -147,8 +148,8 @@
         <copy file="${jss7.root}/congestion/target/restcomm-congestion-9.2.7.jar" tofile="${assemble.dir}/restcomm-congestion.jar" failonerror="false" />
         
         <!-- Copy SCTP module JARs -->
-        <copy file="${ethiopia.root}/sctp/sctp-api/target/sctp-api-2.0.13-SNAPSHOT.jar" tofile="${assemble.dir}/sctp-api.jar" failonerror="false" />
-        <copy file="${ethiopia.root}/sctp/sctp-impl/target/sctp-impl-2.0.13-SNAPSHOT.jar" tofile="${assemble.dir}/sctp-impl.jar" failonerror="false" />
+        <copy file="${ethiopia.root}/sctp/sctp-api/target/sctp-api-2.0.13.jar" tofile="${assemble.dir}/sctp-api.jar" failonerror="false" />
+        <copy file="${ethiopia.root}/sctp/sctp-impl/target/sctp-impl-2.0.13.jar" tofile="${assemble.dir}/sctp-impl.jar" failonerror="false" />
         
         <!-- Copy external libs (try multiple locations) -->
         <copy file="${ethiopia.root}/gmlc/core/bootstrap/target/restcomm-gmlc-server/lib/asn-2.2.0-143.jar" tofile="${assemble.dir}/asn.jar" failonerror="false" />
@@ -207,7 +208,19 @@
         </exec>
     </target>
 
-    <target name="server" description="run the Load Test Server." depends="setup-deps">
+    <target name="compile" description="Compile map/load sources to target/classes">
+        <mkdir dir="${basedir}/target/classes" />
+        <javac srcdir="${basedir}/src/main/java"
+               destdir="${basedir}/target/classes"
+               classpathref="project.class.path"
+               source="${javac.source}"
+               target="${javac.source}"
+               includeantruntime="false"
+               debug="true"
+               fork="true" />
+    </target>
+
+    <target name="server" description="run the Load Test Server." depends="setup-deps,compile">
         <echo message="${cp.property}" />
         <delete dir="server" failonerror="false" />
         <mkdir dir="server" />
@@ -267,11 +280,11 @@
             <arg value="${test.server.ni}" />
             <arg value="${test.server.ssn}" />
             <arg value="${test.server.remoteSsn}" />
-            <arg value="16" /> <!-- deliveryTransferMessageThreadCount -->
+            <arg value="64" /> <!-- deliveryTransferMessageThreadCount -->
         </java>
     </target>
 
-    <target name="client" description="run the Load Test Client" depends="setup-deps">
+    <target name="client" description="run the Load Test Client" depends="setup-deps,compile">
         <echo message="${cp.property}" />
         <delete dir="client" failonerror="false" />
         <mkdir dir="client" />
@@ -331,8 +344,8 @@
             <arg value="${test.client.clientAddress}" />
             <arg value="${test.client.serverAddress}" />
             <arg value="1" /> <!-- routing indicator: 0 - GT, 1 - PC+SSN -->
-            <arg value="16" /> <!-- deliveryTransferMessageThreadCount -->
-            <arg value="-100" /> <!-- ramp up period, set to zero to enable single dialog injection -->
+            <arg value="64" /> <!-- deliveryTransferMessageThreadCount -->
+            <arg value="${test.client.rampUpPeriod}" /> <!-- ramp up period, set to zero to enable single dialog injection -->
         </java>
     </target>
 

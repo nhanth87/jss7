@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>map-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7.map</groupId>
-		<version>9.2.7</version>
+		<version>9.2.8</version>
 	</parent>
 
 	<artifactId>map-load</artifactId>

@@ -144,7 +144,7 @@ public class Client extends TestHarnessSmsMo {
     private NettySctpManagementImpl sctpManagement;
 
     // a ramp-up period is required for performance testing.
-    int endCount;
+    volatile int endCount;
     transient boolean endReportPrinted;
 
     // AtomicInteger nbConcurrentDialogs = new AtomicInteger(0);
@@ -190,8 +190,14 @@ public class Client extends TestHarnessSmsMo {
     private void initSCTP(IpChannelType ipChannelType) throws Exception {
         this.sctpManagement = new NettySctpManagementImpl("Client");
         // this.sctpManagement.setSingleThread(false);
+        this.sctpManagement.setBossGroupThreadCount(8);
+        this.sctpManagement.setWorkerGroupThreadCount(16);
+        this.sctpManagement.setOptionSoSndbuf(8 * 1024 * 1024);
+        this.sctpManagement.setOptionSoRcvbuf(8 * 1024 * 1024);
+        this.sctpManagement.setOptionSctpInitMaxstreams_MaxInStreams(256);
+        this.sctpManagement.setOptionSctpInitMaxstreams_MaxOutStreams(256);
         this.sctpManagement.start();
-        this.sctpManagement.setConnectDelay(10000);
+        this.sctpManagement.setConnectDelay(1000);
         this.sctpManagement.removeAllResources();
 
         // 1. Create SCTP Association
@@ -277,8 +283,8 @@ public class Client extends TestHarnessSmsMo {
         this.tcapStack = new TCAPStackImpl("Test", this.sccpStack.getSccpProvider(), SSN);
         this.tcapStack.setExtraSsns(extraSsns);
         this.tcapStack.start();
-        this.tcapStack.setDialogIdleTimeout(60000);
-        this.tcapStack.setInvokeTimeout(30000);
+        this.tcapStack.setDialogIdleTimeout(300000);
+        this.tcapStack.setInvokeTimeout(120000);
         this.tcapStack.setMaxDialogs(MAX_DIALOGS);
     }
 
@@ -446,11 +452,15 @@ public class Client extends TestHarnessSmsMo {
 
         final Client client = new Client();
         client.endCount = RAMP_UP_PERIOD;
+        // SENDING_MESSAGE_THREAD_COUNT = 1; // use default from TestHarnessSmsMo
 
         try {
             client.initializeStack(ipChannelType);
 
             Thread.sleep(TEST_START_DELAY);
+
+            client.start = System.currentTimeMillis();
+            client.prev = client.start;
 
            // threads creating
             Thread[] threads = new Thread[SENDING_MESSAGE_THREAD_COUNT];
@@ -673,8 +683,11 @@ public class Client extends TestHarnessSmsMo {
         if (logger.isDebugEnabled()) {
             logger.debug(String.format("onDialogRelease for DialogId=%d", mapDialog.getLocalDialogId()));
         }
+        System.out.println("[Client] Dialog released, endCount=" + (this.endCount + 1));
         this.csvWriter.incrementCounter(SUCCESSFUL_DIALOGS);
-        this.endCount++;
+        synchronized (this) {
+            this.endCount++;
+        }
 
         if (this.endCount < NDIALOGS) {
             if ((this.endCount % 10000) == 0) {
@@ -777,7 +790,7 @@ public class Client extends TestHarnessSmsMo {
 
     @Override
     public void onMoForwardShortMessageResponse(MoForwardShortMessageResponse moForwardShortMessageResponseIndication) {
-
+        System.out.println("[Client] Received MoForwardShortMessageResponse");
     }
 
     @Override
