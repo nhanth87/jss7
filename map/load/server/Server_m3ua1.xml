@@ -11,6 +11,21 @@
     <livenessTimer/>
     <heartbeatTimer/>
   </aspFactories>
+  <aspFactories>
+    <name>ASP2</name>
+    <livenessTimer/>
+    <heartbeatTimer/>
+  </aspFactories>
+  <aspFactories>
+    <name>ASP3</name>
+    <livenessTimer/>
+    <heartbeatTimer/>
+  </aspFactories>
+  <aspFactories>
+    <name>ASP4</name>
+    <livenessTimer/>
+    <heartbeatTimer/>
+  </aspFactories>
   <appServers>
     <name>AS1</name>
     <rc/>

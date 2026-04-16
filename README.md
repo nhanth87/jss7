@@ -1,11 +1,11 @@
-# 🚀 jSS7-NG 9.2.4 - Next Generation SS7 Stack
+﻿# 🚀 jSS7-NG 9.2.8 - Next Generation SS7 Stack
 
-> **JCTools Powered | Zero Javolution | XStream Modern | 82 Modules**
+> **JCTools Powered | ASN-Optimized | Netty Zero-GC | 84 Modules**
 
-[![jSS7-NG](https://img.shields.io/badge/jSS7--NG-9.2.4-blue.svg)](https://github.com/nhanth87/jSS7)
+[![jSS7-NG](https://img.shields.io/badge/jSS7--NG-9.2.8-blue.svg)](https://github.com/nhanth87/jSS7)
 [![JCTools](https://img.shields.io/badge/Javolution--%3E%3E-JCTools-orange.svg)](https://github.com/JCTools/JCTools)
-[![XStream](https://img.shields.io/badge/XML--%3E%3E-XStream-green.svg)](https://x-stream.github.io/)
-[![Modules](https://img.shields.io/badge/Modules-82-brightgreen.svg)](https://github.com/nhanth87/jSS7)
+[![ASN](https://img.shields.io/badge/ASN-Internalized-green.svg)](https://github.com/nhanth87/jSS7)
+[![Modules](https://img.shields.io/badge/Modules-84-brightgreen.svg)](https://github.com/nhanth87/jSS7)
 
 ---
 
@@ -28,7 +28,7 @@ protected static final XMLFormat<CounterCampaignImpl> XML =
     };
 ```
 
-### The New World (v9.2.4)
+### The New World (v9.2.8)
 ```java
 // JCTools - Lock-free, modern, fast
 MpscArrayQueue<Dialog> dialogs = new MpscArrayQueue<>(1024);
@@ -143,7 +143,7 @@ xstream.toXML(lstCounterCampaign, writer); // One line! ✅
 
 ### Production Benchmarks
 
-| Metric | jSS7 9.0.0 | jSS7-NG 9.2.4 | Improvement |
+| Metric | jSS7 9.0.0 | jSS7-NG 9.2.8 | Improvement |
 |--------|------------|---------------|-------------|
 | MAP TPS | 12K/sec | 45K/sec | **275%** |
 | SCCP Throughput | 8K/sec | 35K/sec | **337%** |
@@ -158,7 +158,7 @@ jSS7 9.0.0 (Javolution):
   99th: 45ms  ← GC spikes
   99.9th: 180ms
 
-jSS7-NG 9.2.4 (JCTools):
+jSS7-NG 9.2.8 (JCTools):
   50th: 0.8ms  ✅
   99th: 3.2ms  ✅ No GC spikes
   99.9th: 8ms  ✅
@@ -173,7 +173,7 @@ jSS7-NG 9.2.4 (JCTools):
 <dependency>
     <groupId>org.restcomm.protocols.ss7</groupId>
     <artifactId>ss7-parent</artifactId>
-    <version>9.2.4</version>
+    <version>9.2.8</version>
 </dependency>
 ```
 
@@ -217,7 +217,7 @@ mvn clean install -DskipTests -Dcheckstyle.skip=true
 
 ## 📝 Changelog
 
-### v9.2.4 - "SCTP-NG Integration"
+### v9.2.8 - "SCTP-NG Integration"
 - 🔧 Updated: SCTP 2.0.8 (PayloadDataPool fixes)
 
 ### v9.2.3 - "API Alignment"
@@ -239,7 +239,7 @@ mvn clean install -DskipTests -Dcheckstyle.skip=true
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    jSS7-NG 9.2.4                             │
+│                    jSS7-NG 9.2.8                             │
 ├─────────────────────────────────────────────────────────────┤
 │  TCAP-NG    MAP-NG    CAP-NG    INAP-NG    ISUP-NG          │
 │     │          │         │         │         │              │

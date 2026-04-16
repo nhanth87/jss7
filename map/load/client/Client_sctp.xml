@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <sctp>
-  <connectdelay>10000</connectdelay>
+  <connectdelay>1000</connectdelay>
   <congControl_DelayThreshold_1>2.5</congControl_DelayThreshold_1>
   <congControl_DelayThreshold_2>8.0</congControl_DelayThreshold_2>
   <congControl_DelayThreshold_3>14.0</congControl_DelayThreshold_3>
@@ -10,10 +10,10 @@
   <servers/>
   <association>
     <clientAssociation hostAddress="127.0.0.1" hostPort="8012" peerAddress="127.0.0.1" peerPort="8011" name="clientAssociation" ipChannelType="SCTP" type="CLIENT">
-      <congestionLevel>0</congestionLevel>
       <connected>false</connected>
-      <associationType>CLIENT</associationType>
+      <congestionLevel>0</congestionLevel>
       <byteBufAllocator/>
+      <associationType>CLIENT</associationType>
     </clientAssociation>
   </association>
 </sctp>
