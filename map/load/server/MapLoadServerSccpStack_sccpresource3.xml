@@ -2,7 +2,7 @@
 <ResourcesConfig>
   <remoteSsns>
     <1>
-      <remoteSpc>2</remoteSpc>
+      <remoteSpc>1</remoteSpc>
       <remoteSsn>8</remoteSsn>
       <remoteSsnFlag>0</remoteSsnFlag>
       <markProhibitedWhenSpcResuming>false</markProhibitedWhenSpcResuming>
@@ -11,7 +11,7 @@
   </remoteSsns>
   <remoteSpcs>
     <1>
-      <remoteSpc>2</remoteSpc>
+      <remoteSpc>1</remoteSpc>
       <remoteSpcFlag>0</remoteSpcFlag>
       <mask>0</mask>
       <remoteSpcProhibited>false</remoteSpcProhibited>

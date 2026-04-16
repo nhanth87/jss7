@@ -1,6 +1,8 @@
 
 package org.restcomm.protocols.ss7.map;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.map.api.MAPApplicationContext;
@@ -61,6 +63,7 @@ public abstract class MAPDialogImpl implements MAPDialog {
     protected MAPExtensionContainer receivedExtensionContainer;
 
     protected MAPDialogState state = MAPDialogState.IDLE;
+    private final ReentrantLock stateLock = new ReentrantLock();
 
     // private Set<Long> incomingInvokeList = new HashSet<Long>();
 
@@ -422,17 +425,16 @@ public abstract class MAPDialogImpl implements MAPDialog {
         return state;
     }
 
-    protected synchronized void setState(MAPDialogState newState) {
-        // add checks?
-        if (this.state == MAPDialogState.EXPUNGED) {
-            return;
+    protected void setState(MAPDialogState newState) {
+        stateLock.lock();
+        try {
+            if (this.state == MAPDialogState.EXPUNGED) {
+                return;
+            }
+            this.state = newState;
+        } finally {
+            stateLock.unlock();
         }
-
-        this.state = newState;
-        // if (newState == MAPDialogState.EXPUNGED) {
-        // this.mapProviderImpl.removeDialog(tcapDialog.getDialogId());
-        // this.mapProviderImpl.deliverDialogResease(this);
-        // }
     }
 
     public void processInvokeWithoutAnswer(Long invokeId) {

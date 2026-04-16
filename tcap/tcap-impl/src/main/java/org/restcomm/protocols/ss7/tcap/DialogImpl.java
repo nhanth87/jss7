@@ -2,9 +2,9 @@
 package org.restcomm.protocols.ss7.tcap;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -135,7 +135,7 @@ public class DialogImpl implements Dialog {
     // only originating side keeps FSM, see: Q.771 - 3.1.5
     protected InvokeImpl[] operationsSent = new InvokeImpl[invokeIDTable.length];
     protected InvokeImpl[] operationsSentA = new InvokeImpl[invokeIDTable.length];
-    private Set<Long> incomingInvokeList = new HashSet<Long>();
+    private Set<Long> incomingInvokeList = ConcurrentHashMap.<Long>newKeySet();
     private ScheduledExecutorService executor;
 
     // scheduled components list
@@ -493,20 +493,11 @@ public class DialogImpl implements Dialog {
      * @return false: failure - this invokeId already present in the list
      */
     private boolean addIncomingInvokeId(Long invokeId) {
-        synchronized (this.incomingInvokeList) {
-            if (this.incomingInvokeList.contains(invokeId))
-                return false;
-            else {
-                this.incomingInvokeList.add(invokeId);
-                return true;
-            }
-        }
+        return this.incomingInvokeList.add(invokeId);
     }
 
     private void removeIncomingInvokeId(Long invokeId) {
-        synchronized (this.incomingInvokeList) {
-            this.incomingInvokeList.remove(invokeId);
-        }
+        this.incomingInvokeList.remove(invokeId);
     }
 
     /*

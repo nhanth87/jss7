@@ -14,6 +14,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.jctools.maps.NonBlockingHashMap;
 
@@ -120,6 +121,9 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     private long curDialogId = 0;
 //    private AtomicLong currentDialogId = new AtomicLong(1);
 
+    private final ReentrantLock txIdLock = new ReentrantLock();
+    private final ReentrantLock congestionLock = new ReentrantLock();
+
     private int cumulativeCongestionLevel = 0;
     private int executorCongestionLevel = 0;
     private int executorCountWithCongestionLevel_1 = 0;
@@ -177,27 +181,23 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
             return false;
     }
 
-    private synchronized Long getAvailableTxId() throws TCAPException {
-        if (this.dialogs.size() >= this.stack.getMaxDialogs())
-            throw new TCAPException("Current dialog count exceeds its maximum value");
+    private Long getAvailableTxId() throws TCAPException {
+        txIdLock.lock();
+        try {
+            if (this.dialogs.size() >= this.stack.getMaxDialogs())
+                throw new TCAPException("Current dialog count exceeds its maximum value");
 
-        while (true) {
-//            Long id;
-//            if (!currentDialogId.compareAndSet(this.stack.getDialogIdRangeEnd(), this.stack.getDialogIdRangeStart() + 1)) {
-//                id = currentDialogId.getAndIncrement();
-//            } else {
-//                id = this.stack.getDialogIdRangeStart();
-//            }
-//            if (checkAvailableTxId(id))
-//                return id;
-
-            if (this.curDialogId < this.stack.getDialogIdRangeStart())
-                this.curDialogId = this.stack.getDialogIdRangeStart() - 1;
-            if (++this.curDialogId > this.stack.getDialogIdRangeEnd())
-                this.curDialogId = this.stack.getDialogIdRangeStart();
-            Long id = this.curDialogId;
-            if (checkAvailableTxId(id))
-                return id;
+            while (true) {
+                if (this.curDialogId < this.stack.getDialogIdRangeStart())
+                    this.curDialogId = this.stack.getDialogIdRangeStart() - 1;
+                if (++this.curDialogId > this.stack.getDialogIdRangeEnd())
+                    this.curDialogId = this.stack.getDialogIdRangeStart();
+                Long id = this.curDialogId;
+                if (checkAvailableTxId(id))
+                    return id;
+            }
+        } finally {
+            txIdLock.unlock();
         }
     }
 
@@ -1051,22 +1051,16 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
         // }
     }
 
-    protected synchronized Long getAvailableTxIdPreview() throws TCAPException {
-        while (true) {
-            // Long id;
-            // if (!currentDialogId.compareAndSet(this.stack.getDialogIdRangeEnd(), this.stack.getDialogIdRangeStart() + 1)) {
-            // id = currentDialogId.getAndIncrement();
-            // } else {
-            // id = this.stack.getDialogIdRangeStart();
-            // }
-            // return id;
-
+    protected Long getAvailableTxIdPreview() throws TCAPException {
+        txIdLock.lock();
+        try {
             if (this.curDialogId < this.stack.getDialogIdRangeStart())
                 this.curDialogId = this.stack.getDialogIdRangeStart() - 1;
             if (++this.curDialogId > this.stack.getDialogIdRangeEnd())
                 this.curDialogId = this.stack.getDialogIdRangeStart();
-            Long id = this.curDialogId;
-            return id;
+            return this.curDialogId;
+        } finally {
+            txIdLock.unlock();
         }
     }
 
@@ -1485,8 +1479,12 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     }
 
     @Override
-    public synchronized void setUserPartCongestionLevel(String congestionObject, int level) {
-        if (congestionObject != null) {
+    public void setUserPartCongestionLevel(String congestionObject, int level) {
+        if (congestionObject == null) {
+            return;
+        }
+        congestionLock.lock();
+        try {
             if (level > 0) {
                 lstUserPartCongestionLevel.put(congestionObject, level);
             } else {
@@ -1517,6 +1515,8 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
             stack.getCounterProviderImpl().updateMaxUserPartsCongLevel_1(userPartCongestionLevel_1);
             stack.getCounterProviderImpl().updateMaxUserPartsCongLevel_2(userPartCongestionLevel_2);
             stack.getCounterProviderImpl().updateMaxUserPartsCongLevel_3(userPartCongestionLevel_3);
+        } finally {
+            congestionLock.unlock();
         }
     }
 

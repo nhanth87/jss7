@@ -1,5 +1,7 @@
 package org.restcomm.protocols.ss7.cap;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.cap.api.CAPApplicationContext;
@@ -49,6 +51,7 @@ public abstract class CAPDialogImpl implements CAPDialog {
     protected CAPGprsReferenceNumber receivedGprsReferenceNumber;
 
     protected CAPDialogState state = CAPDialogState.Idle;
+    private final ReentrantLock stateLock = new ReentrantLock();
 
     // protected boolean normalDialogShutDown = false;
 
@@ -179,16 +182,16 @@ public abstract class CAPDialogImpl implements CAPDialog {
         return state;
     }
 
-    protected synchronized void setState(CAPDialogState newState) {
-        if (this.state == CAPDialogState.Expunged) {
-            return;
+    protected void setState(CAPDialogState newState) {
+        stateLock.lock();
+        try {
+            if (this.state == CAPDialogState.Expunged) {
+                return;
+            }
+            this.state = newState;
+        } finally {
+            stateLock.unlock();
         }
-
-        this.state = newState;
-        // if (newState == CAPDialogState.Expunged) {
-        // this.capProviderImpl.removeDialog(tcapDialog.getDialogId());
-        // this.capProviderImpl.deliverDialogRelease(this);
-        // }
     }
 
     public void setGprsReferenceNumber(CAPGprsReferenceNumber gprsReferenceNumber) {
