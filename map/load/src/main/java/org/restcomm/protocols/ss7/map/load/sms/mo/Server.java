@@ -118,28 +118,38 @@ public class Server extends TestHarnessSmsMo {
         // Initialize MAP
         this.initMAP();
 
-        // Finally, start the ASP
-        serverM3UAMgmt.startAsp("ASP1");
+        // Finally, start all 4 ASPs
+        for (int i = 0; i < 4; i++) {
+            serverM3UAMgmt.startAsp("ASP" + (i + 1));
+        }
     }
 
     private void initSCTP(IpChannelType ipChannelType) throws Exception {
         this.sctpManagement = new NettySctpManagementImpl("Server");
         // this.sctpManagement.setSingleThread(false);
+        this.sctpManagement.setBossGroupThreadCount(8);
+        this.sctpManagement.setWorkerGroupThreadCount(16);
+        this.sctpManagement.setOptionSoSndbuf(8 * 1024 * 1024);
+        this.sctpManagement.setOptionSoRcvbuf(8 * 1024 * 1024);
+        this.sctpManagement.setOptionSctpInitMaxstreams_MaxInStreams(256);
+        this.sctpManagement.setOptionSctpInitMaxstreams_MaxOutStreams(256);
         this.sctpManagement.start();
         this.sctpManagement.setConnectDelay(10000);
         this.sctpManagement.removeAllResources();
 
-        // 1. Create SCTP Server
-        if (EXTRA_HOST_ADDRESS.equals("-1"))
-            sctpManagement.addServer(SERVER_NAME, HOST_IP, HOST_PORT, ipChannelType, null);
-        else
-            sctpManagement.addServer(SERVER_NAME, HOST_IP, HOST_PORT, ipChannelType, new String[] { EXTRA_HOST_ADDRESS });
-
-        // 2. Create SCTP Server Association
-        sctpManagement.addServerAssociation(PEER_IP, PEER_PORT, SERVER_NAME, SERVER_ASSOCIATION_NAME, ipChannelType);
-
-        // 3. Start Server
-        sctpManagement.startServer(SERVER_NAME);
+        // Create 4 SCTP Servers and Associations for load sharing
+        for (int i = 0; i < 4; i++) {
+            String serverName = SERVER_NAME + i;
+            String assocName = SERVER_ASSOCIATION_NAME + i;
+            int hostPort = (i == 0) ? HOST_PORT : (HOST_PORT + (i * 5));
+            int peerPort = PEER_PORT + i;
+            if (EXTRA_HOST_ADDRESS.equals("-1"))
+                sctpManagement.addServer(serverName, HOST_IP, hostPort, ipChannelType, null);
+            else
+                sctpManagement.addServer(serverName, HOST_IP, hostPort, ipChannelType, new String[] { EXTRA_HOST_ADDRESS });
+            sctpManagement.addServerAssociation(PEER_IP, peerPort, serverName, assocName, ipChannelType);
+            sctpManagement.startServer(serverName);
+        }
     }
 
     private void initM3UA() throws Exception {
@@ -159,11 +169,14 @@ public class Server extends TestHarnessSmsMo {
 
         // Step 1 : Create AS
         As as = this.serverM3UAMgmt.createAs("AS1", AS_FUNCTIONALITY, ExchangeType.SE, ipspType, rc, trafficModeType, 1, na);
-        // Step 2 : Create ASP
-        AspFactory aspFactor = this.serverM3UAMgmt.createAspFactory("ASP1", SERVER_ASSOCIATION_NAME);
-        // Step 3 : Assign ASP to AS
-        Asp asp = this.serverM3UAMgmt.assignAspToAs("AS1", "ASP1");
-        // Step 4: Add Route. Remote point code is 2
+        // Step 2 : Create 4 ASPs for 4 SCTP associations
+        for (int i = 0; i < 4; i++) {
+            String aspName = "ASP" + (i + 1);
+            String assocName = SERVER_ASSOCIATION_NAME + i;
+            AspFactory aspFactor = this.serverM3UAMgmt.createAspFactory(aspName, assocName);
+            Asp asp = this.serverM3UAMgmt.assignAspToAs("AS1", aspName);
+        }
+        // Step 3: Add Route. Remote point code is 2
         this.serverM3UAMgmt.addRoute(DESTINATION_PC, ORIGINATING_PC, SERVICE_INDICATOR, "AS1");
     }
 
@@ -210,8 +223,8 @@ public class Server extends TestHarnessSmsMo {
     private void initTCAP() throws Exception {
         this.tcapStack = new TCAPStackImpl("TestServer", this.sccpStack.getSccpProvider(), SSN);
         this.tcapStack.start();
-        this.tcapStack.setDialogIdleTimeout(60000);
-        this.tcapStack.setInvokeTimeout(30000);
+        this.tcapStack.setDialogIdleTimeout(300000);
+        this.tcapStack.setInvokeTimeout(120000);
         this.tcapStack.setMaxDialogs(MAX_DIALOGS);
     }
 
@@ -532,6 +545,7 @@ public class Server extends TestHarnessSmsMo {
 
     @Override
     public void onMoForwardShortMessageRequest(MoForwardShortMessageRequest moForwardShortMessageRequestIndication) {
+        System.out.println("[Server] Received MoForwardShortMessageRequest");
         if (logger.isDebugEnabled()) {
             logger.debug(String.format("onMoForwardShortMessageRequest for DialogId=%d", moForwardShortMessageRequestIndication
                 .getMAPDialog().getLocalDialogId()));
@@ -543,6 +557,7 @@ public class Server extends TestHarnessSmsMo {
             returnResultLast.setInvokeId(invokeId);
             mapDialogSms.sendReturnResultLastComponent(returnResultLast);
             mapDialogSms.close(false);
+            System.out.println("[Server] Sent response and closed dialog");
 
         } catch (MAPException e) {
             logger.error("Error while sending MoForwardShortMessageRequest ", e);

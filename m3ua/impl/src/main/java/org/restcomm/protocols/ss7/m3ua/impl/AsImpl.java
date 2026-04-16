@@ -219,6 +219,9 @@ public class AsImpl implements As {
         this.peerFSM.createTransition(TransitionState.ASP_DOWN, AsState.ACTIVE.toString(), AsState.PENDING.toString())
                 .setHandler(new THPeerAsActToPen(this, this.peerFSM));
 
+        this.peerFSM.createTransition(TransitionState.AS_STATE_CHANGE_INACTIVE, AsState.ACTIVE.toString(),
+                AsState.INACTIVE.toString());
+
         // ******************************************************************/
         // STATE PENDING /
         // ******************************************************************/

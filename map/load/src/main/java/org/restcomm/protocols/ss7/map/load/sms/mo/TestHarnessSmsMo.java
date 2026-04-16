@@ -57,7 +57,7 @@ public abstract class TestHarnessSmsMo implements MAPDialogListener, MAPServiceS
     protected static int NETWORK_APPEARANCE = 102;
 
     protected static int DELIVERY_TRANSFER_MESSAGE_THREAD_COUNT = Runtime.getRuntime().availableProcessors() * 2;
-    protected static int SENDING_MESSAGE_THREAD_COUNT = Runtime.getRuntime().availableProcessors() * 2;
+    protected static int SENDING_MESSAGE_THREAD_COUNT = 64;
 
     protected static int RAMP_UP_PERIOD = -100;
 
@@ -76,7 +76,7 @@ public abstract class TestHarnessSmsMo implements MAPDialogListener, MAPServiceS
 
     protected final ParameterFactoryImpl factory = new ParameterFactoryImpl();
 
-    protected static int TEST_START_DELAY = 20000;
+    protected static int TEST_START_DELAY = 40000;
     protected static int TEST_END_DELAY = 3000;
     protected static int PRINT_WRITER_PERIOD = 2000;
 
