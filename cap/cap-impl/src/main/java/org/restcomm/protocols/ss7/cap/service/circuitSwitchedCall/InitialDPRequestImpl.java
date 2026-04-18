@@ -1,5 +1,6 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
@@ -151,36 +152,67 @@ public class InitialDPRequestImpl extends CircuitSwitchedCallMessageImpl impleme
 
     public static final String _PrimitiveName = "InitialDPRequestIndication";
 
+    @JacksonXmlProperty(localName = "serviceKey")
     private int serviceKey;
+    @JacksonXmlProperty(localName = "calledPartyNumber")
     private CalledPartyNumberCap calledPartyNumber;
+    @JacksonXmlProperty(localName = "callingPartyNumber")
     private CallingPartyNumberCap callingPartyNumber;
+    @JacksonXmlProperty(localName = "callingPartysCategory")
     private CallingPartysCategoryInap callingPartysCategory;
+    @JacksonXmlProperty(localName = "cgEncountered")
     private CGEncountered CGEncountered;
+    @JacksonXmlProperty(localName = "ipsspCapabilities")
     private IPSSPCapabilities IPSSPCapabilities;
+    @JacksonXmlProperty(localName = "locationNumber")
     private LocationNumberCap locationNumber;
+    @JacksonXmlProperty(localName = "originalCalledPartyID")
     private OriginalCalledNumberCap originalCalledPartyID;
+    @JacksonXmlProperty(localName = "extensions")
     private CAPExtensions extensions;
+    @JacksonXmlProperty(localName = "highLayerCompatibility")
     private HighLayerCompatibilityInap highLayerCompatibility;
+    @JacksonXmlProperty(localName = "additionalCallingPartyNumber")
     private Digits additionalCallingPartyNumber;
+    @JacksonXmlProperty(localName = "bearerCapability")
     private BearerCapability bearerCapability;
+    @JacksonXmlProperty(localName = "eventTypeBCSM")
     private EventTypeBCSM eventTypeBCSM;
+    @JacksonXmlProperty(localName = "redirectingPartyID")
     private RedirectingPartyIDCap redirectingPartyID;
+    @JacksonXmlProperty(localName = "redirectionInformation")
     private RedirectionInformationInap redirectionInformation;
+    @JacksonXmlProperty(localName = "cause")
     private CauseCap cause;
+    @JacksonXmlProperty(localName = "serviceInteractionIndicatorsTwo")
     private ServiceInteractionIndicatorsTwo serviceInteractionIndicatorsTwo;
+    @JacksonXmlProperty(localName = "carrier")
     private Carrier carrier;
+    @JacksonXmlProperty(localName = "cugIndex")
     private CUGIndex cugIndex;
+    @JacksonXmlProperty(localName = "cugInterlock")
     private CUGInterlock cugInterlock;
+    @JacksonXmlProperty(localName = "cugOutgoingAccess")
     private boolean cugOutgoingAccess;
+    @JacksonXmlProperty(localName = "imsi")
     private IMSI imsi;
+    @JacksonXmlProperty(localName = "subscriberState")
     private SubscriberState subscriberState;
+    @JacksonXmlProperty(localName = "locationInformation")
     private LocationInformation locationInformation;
+    @JacksonXmlProperty(localName = "extBasicServiceCode")
     private ExtBasicServiceCode extBasicServiceCode;
+    @JacksonXmlProperty(localName = "callReferenceNumber")
     private CallReferenceNumber callReferenceNumber;
+    @JacksonXmlProperty(localName = "mscAddress")
     private ISDNAddressString mscAddress;
+    @JacksonXmlProperty(localName = "calledPartyBCDNumber")
     private CalledPartyBCDNumber calledPartyBCDNumber;
+    @JacksonXmlProperty(localName = "timeAndTimezone")
     private TimeAndTimezone timeAndTimezone;
+    @JacksonXmlProperty(localName = "callForwardingSSPending")
     private boolean callForwardingSSPending;
+    @JacksonXmlProperty(localName = "initialDPArgExtension")
     private InitialDPArgExtension initialDPArgExtension;
 
     private boolean isCAPVersion3orLater;
@@ -252,156 +284,187 @@ public class InitialDPRequestImpl extends CircuitSwitchedCallMessageImpl impleme
         return CAPOperationCode.initialDP;
     }
 
+    @JsonIgnore
     @Override
     public int getServiceKey() {
         return this.serviceKey;
     }
 
+    @JsonIgnore
     @Override
     public CalledPartyNumberCap getCalledPartyNumber() {
         return this.calledPartyNumber;
     }
 
+    @JsonIgnore
     @Override
     public CallingPartyNumberCap getCallingPartyNumber() {
         return callingPartyNumber;
     }
 
+    @JsonIgnore
     @Override
     public CallingPartysCategoryInap getCallingPartysCategory() {
         return callingPartysCategory;
     }
 
+    @JsonIgnore
     @Override
     public CGEncountered getCGEncountered() {
         return CGEncountered;
     }
 
+    @JsonIgnore
     @Override
     public IPSSPCapabilities getIPSSPCapabilities() {
         return IPSSPCapabilities;
     }
 
+    @JsonIgnore
     @Override
     public LocationNumberCap getLocationNumber() {
         return locationNumber;
     }
 
+    @JsonIgnore
     @Override
     public OriginalCalledNumberCap getOriginalCalledPartyID() {
         return originalCalledPartyID;
     }
 
+    @JsonIgnore
     @Override
     public CAPExtensions getExtensions() {
         return extensions;
     }
 
+    @JsonIgnore
     @Override
     public HighLayerCompatibilityInap getHighLayerCompatibility() {
         return highLayerCompatibility;
     }
 
+    @JsonIgnore
     @Override
     public Digits getAdditionalCallingPartyNumber() {
         return additionalCallingPartyNumber;
     }
 
+    @JsonIgnore
     @Override
     public BearerCapability getBearerCapability() {
         return bearerCapability;
     }
 
+    @JsonIgnore
     @Override
     public EventTypeBCSM getEventTypeBCSM() {
         return eventTypeBCSM;
     }
 
+    @JsonIgnore
     @Override
     public RedirectingPartyIDCap getRedirectingPartyID() {
         return redirectingPartyID;
     }
 
+    @JsonIgnore
     @Override
     public RedirectionInformationInap getRedirectionInformation() {
         return redirectionInformation;
     }
 
+    @JsonIgnore
     @Override
     public CauseCap getCause() {
         return cause;
     }
 
+    @JsonIgnore
     @Override
     public ServiceInteractionIndicatorsTwo getServiceInteractionIndicatorsTwo() {
         return serviceInteractionIndicatorsTwo;
     }
 
+    @JsonIgnore
     @Override
     public Carrier getCarrier() {
         return carrier;
     }
 
+    @JsonIgnore
     @Override
     public CUGIndex getCugIndex() {
         return cugIndex;
     }
 
+    @JsonIgnore
     @Override
     public CUGInterlock getCugInterlock() {
         return cugInterlock;
     }
 
+    @JsonIgnore
     @Override
     public boolean getCugOutgoingAccess() {
         return cugOutgoingAccess;
     }
 
+    @JsonIgnore
     @Override
     public IMSI getIMSI() {
         return imsi;
     }
 
+    @JsonIgnore
     @Override
     public SubscriberState getSubscriberState() {
         return subscriberState;
     }
 
+    @JsonIgnore
     @Override
     public LocationInformation getLocationInformation() {
         return locationInformation;
     }
 
+    @JsonIgnore
     @Override
     public ExtBasicServiceCode getExtBasicServiceCode() {
         return extBasicServiceCode;
     }
 
+    @JsonIgnore
     @Override
     public CallReferenceNumber getCallReferenceNumber() {
         return callReferenceNumber;
     }
 
+    @JsonIgnore
     @Override
     public ISDNAddressString getMscAddress() {
         return mscAddress;
     }
 
+    @JsonIgnore
     @Override
     public CalledPartyBCDNumber getCalledPartyBCDNumber() {
         return calledPartyBCDNumber;
     }
 
+    @JsonIgnore
     @Override
     public TimeAndTimezone getTimeAndTimezone() {
         return timeAndTimezone;
     }
 
+    @JsonIgnore
     @Override
     public boolean getCallForwardingSSPending() {
         return callForwardingSSPending;
     }
 
+    @JsonIgnore
     @Override
     public InitialDPArgExtension getInitialDPArgExtension() {
         return initialDPArgExtension;

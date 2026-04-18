@@ -9,9 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.map.api.datacoding.CBSDataCodingScheme;
@@ -29,6 +26,9 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
  * Real trace.
@@ -92,7 +92,7 @@ public class ProcessUnstructuredSSRequestTest {
 
     @Test(groups = { "functional.xml.serialize", "service.ussd" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         ISDNAddressStringImpl isdnAddress = new ISDNAddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN,
                 "79273605819");
         AlertingPatternImpl alertingPattern = new AlertingPatternImpl(AlertingCategory.Category3);
@@ -101,23 +101,11 @@ public class ProcessUnstructuredSSRequestTest {
                 ussdStr, alertingPattern, isdnAddress);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(original, "processUnstructuredSSRequest", ProcessUnstructuredSSRequestImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        ProcessUnstructuredSSRequestImpl copy = reader.read("processUnstructuredSSRequest",
-                ProcessUnstructuredSSRequestImpl.class);
+        ProcessUnstructuredSSRequestImpl copy = xmlMapper.readValue(serializedEvent, ProcessUnstructuredSSRequestImpl.class);
 
         assertEquals(copy.getMSISDNAddressString(), original.getMSISDNAddressString());
         assertEquals(copy.getDataCodingScheme().getCode(), original.getDataCodingScheme().getCode());

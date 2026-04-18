@@ -5,8 +5,7 @@ import static org.testng.Assert.assertEquals;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import org.restcomm.protocols.ss7.sccp.impl.parameter.NoGlobalTitle;
 import org.testng.annotations.AfterClass;
@@ -14,6 +13,8 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.sccp.SCCPJacksonXMLHelper;
 
 /**
  * @author amit bhayani
@@ -46,21 +47,13 @@ public class NoGlobalTitleTest {
 
     @Test(groups = { "parameter", "functional.encode" })
     public void testSerialization() throws Exception {
+        XmlMapper xmlMapper = SCCPJacksonXMLHelper.getXmlMapper();
         NoGlobalTitle gt = new NoGlobalTitle("9023629581");
 
-        // Writes
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-        // indentation).
-        writer.write(gt, "NoGlobalTitle", NoGlobalTitle.class);
-        writer.close();
+        String xml = xmlMapper.writeValueAsString(gt);
+        System.out.println(xml);
 
-        System.out.println(output.toString());
-
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        NoGlobalTitle aiOut = reader.read("NoGlobalTitle", NoGlobalTitle.class);
+        NoGlobalTitle aiOut = xmlMapper.readValue(xml, NoGlobalTitle.class);
 
         // check results
         assertEquals(aiOut.getDigits(), "9023629581");

@@ -9,9 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.map.MAPParameterFactoryImpl;
@@ -25,6 +22,9 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
  * @author amit bhayani
@@ -84,26 +84,16 @@ public class CellGlobalIdOrServiceAreaIdOrLAITest {
 
     @Test(groups = { "functional.xml.serialize", "service.lsm" })
     public void testSerialization() throws Exception {
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         CellGlobalIdOrServiceAreaIdFixedLength par = new CellGlobalIdOrServiceAreaIdFixedLengthImpl(250, 1, 4444, 3333);
         CellGlobalIdOrServiceAreaIdOrLAIImpl original = new CellGlobalIdOrServiceAreaIdOrLAIImpl(par);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "cellGlobalIdOrServiceAreaIdOrLAI", CellGlobalIdOrServiceAreaIdOrLAIImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        CellGlobalIdOrServiceAreaIdOrLAIImpl copy = reader.read("cellGlobalIdOrServiceAreaIdOrLAI",
-                CellGlobalIdOrServiceAreaIdOrLAIImpl.class);
+        CellGlobalIdOrServiceAreaIdOrLAIImpl copy = xmlMapper.readValue(serializedEvent, CellGlobalIdOrServiceAreaIdOrLAIImpl.class);
 
         assertEquals(copy.getCellGlobalIdOrServiceAreaIdFixedLength().getMCC(), original
                 .getCellGlobalIdOrServiceAreaIdFixedLength().getMCC());
@@ -118,21 +108,11 @@ public class CellGlobalIdOrServiceAreaIdOrLAITest {
         original = new CellGlobalIdOrServiceAreaIdOrLAIImpl(par2);
 
         // Writes the area to a file.
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "cellGlobalIdOrServiceAreaIdOrLAI", CellGlobalIdOrServiceAreaIdOrLAIImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-        copy = reader.read("cellGlobalIdOrServiceAreaIdOrLAI", CellGlobalIdOrServiceAreaIdOrLAIImpl.class);
+        copy = xmlMapper.readValue(serializedEvent, CellGlobalIdOrServiceAreaIdOrLAIImpl.class);
 
         assertEquals(copy.getLAIFixedLength().getMCC(), original.getLAIFixedLength().getMCC());
         assertEquals(copy.getLAIFixedLength().getMNC(), original.getLAIFixedLength().getMNC());

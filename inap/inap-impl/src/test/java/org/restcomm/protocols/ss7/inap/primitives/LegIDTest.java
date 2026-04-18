@@ -9,14 +9,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.inap.api.primitives.LegType;
 import org.restcomm.protocols.ss7.inap.primitives.LegIDImpl;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.inap.INAPJacksonXMLHelper;
 
 /**
  *
@@ -73,25 +73,15 @@ public class LegIDTest {
 
     @Test(groups = { "functional.xml.serialize", "primitives" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = INAPJacksonXMLHelper.getXmlMapper();
         LegIDImpl original = new LegIDImpl(true, LegType.leg1);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "legID", LegIDImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        LegIDImpl copy = reader.read("legID", LegIDImpl.class);
+        LegIDImpl copy = xmlMapper.readValue(serializedEvent, LegIDImpl.class);
 
         assertEquals(copy.getSendingSideID(), original.getSendingSideID());
         assertEquals(copy.getReceivingSideID(), original.getReceivingSideID());
@@ -99,21 +89,11 @@ public class LegIDTest {
         original = new LegIDImpl(false, LegType.leg2);
 
         // Writes the area to a file.
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "legID", LegIDImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-        copy = reader.read("legID", LegIDImpl.class);
+        copy = xmlMapper.readValue(serializedEvent, LegIDImpl.class);
 
         assertEquals(copy.getSendingSideID(), original.getSendingSideID());
         assertEquals(copy.getReceivingSideID(), original.getReceivingSideID());

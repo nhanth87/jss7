@@ -11,9 +11,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.restcomm.protocols.ss7.isup.ParameterException;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.AbstractISUPParameter;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.UserTeleserviceInformationImpl;
@@ -23,6 +20,9 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.isup.ISUPJacksonXMLHelper;
 
 /**
  * Start time:11:36:27 2009-04-27<br>
@@ -132,27 +132,17 @@ public class UserTeleserviceInformationTest extends ParameterHarness {
 
     @Test(groups = { "functional.xml.serialize", "parameter" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = ISUPJacksonXMLHelper.getXmlMapper();
         UserTeleserviceInformationImpl original = new UserTeleserviceInformationImpl(
                 UserTeleserviceInformation._CODING_STANDARD_ITU_T, UserTeleserviceInformation._INTERPRETATION_FHGCI,
                 UserTeleserviceInformation._PRESENTATION_METHOD_HLPP, UserTeleserviceInformation._HLCI_MAINTAINENCE, 53);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "userTeleserviceInformation", UserTeleserviceInformationImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        UserTeleserviceInformationImpl copy = reader.read("userTeleserviceInformation", UserTeleserviceInformationImpl.class);
+        UserTeleserviceInformationImpl copy = xmlMapper.readValue(serializedEvent, UserTeleserviceInformationImpl.class);
 
         assertEquals(copy.getCodingStandard(), original.getCodingStandard());
         assertEquals(copy.getInterpretation(), original.getInterpretation());
@@ -168,21 +158,11 @@ public class UserTeleserviceInformationTest extends ParameterHarness {
                 UserTeleserviceInformation._HLCI_AUDIOGRAPHIC_CONF, UserTeleserviceInformation._EACI_CSIC_H221, true);
 
         // Writes the area to a file.
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "userTeleserviceInformation", UserTeleserviceInformationImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-        copy = reader.read("userTeleserviceInformation", UserTeleserviceInformationImpl.class);
+        copy = xmlMapper.readValue(serializedEvent, UserTeleserviceInformationImpl.class);
 
         assertEquals(copy.getCodingStandard(), original.getCodingStandard());
         assertEquals(copy.getInterpretation(), original.getInterpretation());

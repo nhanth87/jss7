@@ -9,9 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
@@ -29,6 +26,9 @@ import org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation.Loc
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation.RAIdentityImpl;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.LSAIdentityImpl;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
  *
@@ -184,6 +184,7 @@ public class LocationInformationGPRSTest {
 
     @Test(groups = { "functional.xml.serialize", "subscriberInformation" })
     public void testXMLSerialize() throws Exception {
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         LAIFixedLengthImpl lai = new LAIFixedLengthImpl(250, 1, 4444);
         CellGlobalIdOrServiceAreaIdOrLAIImpl cgi = new CellGlobalIdOrServiceAreaIdOrLAIImpl(lai);
         RAIdentityImpl ra = new RAIdentityImpl(this.getEncodedDataRAIdentity());
@@ -197,21 +198,11 @@ public class LocationInformationGPRSTest {
         LocationInformationGPRSImpl original = new LocationInformationGPRSImpl(cgi, ra, ggi, sgsn, lsa, null, true, gdi, true, 13);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "locationInformationGPRS", LocationInformationGPRSImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        LocationInformationGPRSImpl copy = reader.read("locationInformationGPRS", LocationInformationGPRSImpl.class);
+        LocationInformationGPRSImpl copy = xmlMapper.readValue(serializedEvent, LocationInformationGPRSImpl.class);
 
         assertEquals(copy.getCellGlobalIdOrServiceAreaIdOrLAI().getLAIFixedLength().getLac(), original.getCellGlobalIdOrServiceAreaIdOrLAI().getLAIFixedLength().getLac());
         assertEquals(copy.getCellGlobalIdOrServiceAreaIdOrLAI().getLAIFixedLength().getMCC(), original.getCellGlobalIdOrServiceAreaIdOrLAI().getLAIFixedLength().getMCC());

@@ -30,6 +30,9 @@ public abstract class OctetStringBase implements MAPAsnPrimitive {
     protected int maxLength;
     protected String _PrimitiveName;
 
+    protected OctetStringBase() {
+    }
+
     public OctetStringBase(int minLength, int maxLength, String _PrimitiveName) {
         this.minLength = minLength;
         this.maxLength = maxLength;

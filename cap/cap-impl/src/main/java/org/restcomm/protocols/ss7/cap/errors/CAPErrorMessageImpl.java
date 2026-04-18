@@ -1,4 +1,5 @@
 package org.restcomm.protocols.ss7.cap.errors;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
@@ -62,26 +63,31 @@ public abstract class CAPErrorMessageImpl implements CAPErrorMessage, CAPAsnPrim
     }
 
     @Override
+    @JsonIgnore
     public CAPErrorMessageParameterless getEmParameterless() {
         return null;
     }
 
     @Override
+    @JsonIgnore
     public CAPErrorMessageCancelFailed getEmCancelFailed() {
         return null;
     }
 
     @Override
+    @JsonIgnore
     public CAPErrorMessageRequestedInfoError getEmRequestedInfoError() {
         return null;
     }
 
     @Override
+    @JsonIgnore
     public CAPErrorMessageSystemFailure getEmSystemFailure() {
         return null;
     }
 
     @Override
+    @JsonIgnore
     public CAPErrorMessageTaskRefused getEmTaskRefused() {
         return null;
     }

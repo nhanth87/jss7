@@ -67,6 +67,7 @@ public class TAIdImpl extends OctetStringBase implements TAId {
         data[4] = (byte) (tac % 256);
     }
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public int getMCC() throws MAPException {
         if (data == null)
             throw new MAPException("Data must not be empty");
@@ -91,6 +92,7 @@ public class TAIdImpl extends OctetStringBase implements TAId {
         return Integer.parseInt(sMcc);
     }
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public int getMNC() throws MAPException {
         if (data == null)
             throw new MAPException("Data must not be empty");
@@ -120,6 +122,7 @@ public class TAIdImpl extends OctetStringBase implements TAId {
         return Integer.parseInt(sMnc);
     }
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public int getTAC() throws MAPException {
         if (data == null)
             throw new MAPException("Data must not be empty");

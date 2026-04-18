@@ -35,7 +35,9 @@ public class MidCallEventsImpl implements MidCallEvents, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "MidCallEvents";
 
+    @JacksonXmlProperty(localName = "dtmfDigitsCompleted")
     private Digits dtmfDigitsCompleted;
+    @JacksonXmlProperty(localName = "dtmfDigitsTimeOut")
     private Digits dtmfDigitsTimeOut;
 
     public MidCallEventsImpl() {

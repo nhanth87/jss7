@@ -9,9 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
@@ -19,6 +16,9 @@ import org.restcomm.protocols.ss7.map.api.primitives.AddressNature;
 import org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan;
 import org.restcomm.protocols.ss7.map.primitives.ISDNAddressStringImpl;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
  *
@@ -69,25 +69,16 @@ public class ISDNAddressStringTest {
 
     @Test(groups = { "functional.serialize", "primitives" })
     public void testSerialization() throws Exception {
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         ISDNAddressStringImpl original = new ISDNAddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN,
                 "79273605819");
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "isdnAddressString", ISDNAddressStringImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        ISDNAddressStringImpl copy = reader.read("isdnAddressString", ISDNAddressStringImpl.class);
+        ISDNAddressStringImpl copy = xmlMapper.readValue(serializedEvent, ISDNAddressStringImpl.class);
 
         // test result
         assertEquals(copy.getAddressNature(), original.getAddressNature());

@@ -225,7 +225,15 @@ public class AnyTimeInterrogationResponseImpl extends MobilityMessageImpl implem
      * @see org.restcomm.protocols.ss7.map.api.service.subscriberInformation.
      * AnyTimeInterrogationResponseIndication#getSubscriberInfo()
      */
-    public SubscriberInfo getSubscriberInfo() {
+
+    public void setSubscriberInfo(SubscriberInfo subscriberInfo) {
+        this.subscriberInfo = subscriberInfo;
+    }
+
+    public void setExtensionContainer(MAPExtensionContainer extensionContainer) {
+        this.extensionContainer = extensionContainer;
+    }
+        public SubscriberInfo getSubscriberInfo() {
         return this.subscriberInfo;
     }
 

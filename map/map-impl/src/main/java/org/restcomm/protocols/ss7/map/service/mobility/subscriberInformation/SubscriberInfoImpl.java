@@ -72,6 +72,42 @@ public class SubscriberInfoImpl implements SubscriberInfo, MAPAsnPrimitive {
         this.mnpInfoRes = mnpInfoRes;
     }
 
+
+    public void setLocationInformation(LocationInformation locationInformation) {
+        this.locationInformation = locationInformation;
+    }
+
+    public void setSubscriberState(SubscriberState subscriberState) {
+        this.subscriberState = subscriberState;
+    }
+
+    public void setExtensionContainer(MAPExtensionContainer extensionContainer) {
+        this.extensionContainer = extensionContainer;
+    }
+
+    public void setLocationInformationGPRS(LocationInformationGPRS locationInformationGPRS) {
+        this.locationInformationGPRS = locationInformationGPRS;
+    }
+
+    public void setPSSubscriberState(PSSubscriberState psSubscriberState) {
+        this.psSubscriberState = psSubscriberState;
+    }
+
+    public void setImei(IMEI imei) {
+        this.imei = imei;
+    }
+
+    public void setMsClassmark2(MSClassmark2 msClassmark2) {
+        this.msClassmark2 = msClassmark2;
+    }
+
+    public void setGprsMSClass(GPRSMSClass gprsMSClass) {
+        this.gprsMSClass = gprsMSClass;
+    }
+
+    public void setMnpInfoRes(MNPInfoRes mnpInfoRes) {
+        this.mnpInfoRes = mnpInfoRes;
+    }
     /*
      * (non-Javadoc)
      *

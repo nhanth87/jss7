@@ -6,11 +6,11 @@ import static org.testng.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation.MSClassmark2Impl;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
 *
@@ -25,25 +25,15 @@ public class MSClassmark2Test {
 
     @Test(groups = { "functional.xml.serialize", "mobility.subscriberInformation" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         MSClassmark2Impl original = new MSClassmark2Impl(getMSClassmark2Data());
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "msClassmark2", MSClassmark2Impl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        MSClassmark2Impl copy = reader.read("msClassmark2", MSClassmark2Impl.class);
+        MSClassmark2Impl copy = xmlMapper.readValue(serializedEvent, MSClassmark2Impl.class);
 
         assertEquals(copy.getData(), original.getData());
     }

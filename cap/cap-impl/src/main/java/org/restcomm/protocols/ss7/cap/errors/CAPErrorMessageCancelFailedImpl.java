@@ -1,4 +1,5 @@
 package org.restcomm.protocols.ss7.cap.errors;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
@@ -46,6 +47,7 @@ public class CAPErrorMessageCancelFailedImpl extends CAPErrorMessageImpl impleme
     }
 
     @Override
+    @JsonIgnore
     public CAPErrorMessageCancelFailed getEmCancelFailed() {
         return this;
     }

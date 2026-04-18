@@ -1,6 +1,7 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
@@ -89,13 +90,15 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
     @JsonProperty("started")
     protected boolean started = false;
 
+    @JsonIgnore
     protected Association association = null;
     @JsonProperty("associationName")
     protected String associationName = null;
 
     @JsonProperty("aspList")
-    protected final CopyOnWriteArrayList<Asp> aspList = new CopyOnWriteArrayList<Asp>();
+    protected final CopyOnWriteArrayList<AspImpl> aspList = new CopyOnWriteArrayList<AspImpl>();
 
+    @JsonIgnore
     private ByteBuffer txBuffer = ByteBuffer.allocateDirect(8192);
 
     // data buffer for incoming TCP data
@@ -110,10 +113,15 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
     protected ParameterFactory parameterFactory = new ParameterFactoryImpl();
     protected MessageFactory messageFactory = new MessageFactoryImpl();
 
+    @JsonIgnore
     private TransferMessageHandler transferMessageHandler = new TransferMessageHandler(this);
+    @JsonIgnore
     private SignalingNetworkManagementHandler signalingNetworkManagementHandler = new SignalingNetworkManagementHandler(this);
+    @JsonIgnore
     private ManagementMessageHandler managementMessageHandler = new ManagementMessageHandler(this);
+    @JsonIgnore
     private AspStateMaintenanceHandler aspStateMaintenanceHandler = new AspStateMaintenanceHandler(this);
+    @JsonIgnore
     private AspTrafficMaintenanceHandler aspTrafficMaintenanceHandler = new AspTrafficMaintenanceHandler(this);
     private RoutingKeyManagementHandler routingKeyManagementHandler = new RoutingKeyManagementHandler(this);
 
@@ -170,6 +178,7 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
         this.transferMessageHandler.setM3UAManagement(m3uaManagement);
     }
 
+    @JsonIgnore
     public M3UAManagementImpl getM3UAManagement() {
         return m3UAManagementImpl;
     }

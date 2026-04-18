@@ -23,4 +23,8 @@ public class RouteingNumberImpl extends TbcdString implements RouteingNumber {
     public String getRouteingNumber() {
         return data;
     }
+
+    public void setRouteingNumber(String routeingNumber) {
+        this.data = routeingNumber;
+    }
 }

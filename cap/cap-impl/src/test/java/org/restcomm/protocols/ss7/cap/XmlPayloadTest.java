@@ -1,14 +1,13 @@
 package org.restcomm.protocols.ss7.cap;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
-import javolution.xml.XMLObjectReader;
-
 import org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.ConnectRequestImpl;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.restcomm.protocols.ss7.cap.CAPJacksonXMLHelper;
 
 
 public class XmlPayloadTest {
@@ -27,12 +26,11 @@ public class XmlPayloadTest {
         }
         br.close();
 
-        byte[] rawData = sb.toString().getBytes();
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
+        String rawData = sb.toString();
+        XmlMapper xmlMapper = CAPJacksonXMLHelper.getXmlMapper();
         ConnectRequestImpl copy;
         try {
-            copy = reader.read("connect_Request", ConnectRequestImpl.class);
+            copy = xmlMapper.readValue(rawData, ConnectRequestImpl.class);
             int g = 0;
         } catch (Exception e) {
             int g1 = 0;

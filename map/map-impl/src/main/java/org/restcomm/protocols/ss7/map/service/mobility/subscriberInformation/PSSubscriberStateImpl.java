@@ -68,6 +68,10 @@ public class PSSubscriberStateImpl implements PSSubscriberState, MAPAsnPrimitive
         return pdpContextInfoList;
     }
 
+    public void setPDPContextInfoList(ArrayList<PDPContextInfo> pdpContextInfoList) {
+        this.pdpContextInfoList = pdpContextInfoList;
+    }
+
     /*
      * (non-Javadoc)
      *

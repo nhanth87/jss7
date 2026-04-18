@@ -2,9 +2,6 @@
 package org.restcomm.protocols.ss7.sccpext.impl.router;
 
 import javolution.xml.XMLBinding;
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
 import org.restcomm.protocols.ss7.indicator.NumberingPlan;
@@ -38,6 +35,9 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.sccp.SCCPJacksonXMLHelper;
 
 /**
  * @author amit bhayani
@@ -466,6 +466,7 @@ public class RuleTest {
 
     @Test(groups = { "router", "functional.encode" })
     public void testSerialization() throws Exception {
+        XmlMapper xmlMapper = SCCPJacksonXMLHelper.getXmlMapper();
         SccpAddress pattern = factory.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, factory.createGlobalTitle("441425/*", 1), 0, 0);
         SccpAddress patternDefaultCalling = factory.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, factory.createGlobalTitle("5678/92", 1), 0, 0);
 
@@ -475,18 +476,11 @@ public class RuleTest {
         rule.setPrimaryAddressId(1);
 
         // Writes
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-        // indentation).
-        writer.write(rule, "Rule", RuleImpl.class);
-        writer.close();
+        String serializedEvent = xmlMapper.writeValueAsString(rule);
 
-        System.out.println(output.toString());
+        System.out.println(serializedEvent);
 
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        RuleImpl aiOut = reader.read("Rule", RuleImpl.class);
+        RuleImpl aiOut = xmlMapper.readValue(serializedEvent, RuleImpl.class);
 
         assertNotNull(aiOut);
         assertEquals(aiOut.getRuleType(), RuleType.SOLITARY);
@@ -505,18 +499,11 @@ public class RuleTest {
         rule.setNewCallingPartyAddressId(13);
 
         // Writes
-        output = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-        // indentation).
-        writer.write(rule, "Rule", RuleImpl.class);
-        writer.close();
+        serializedEvent = xmlMapper.writeValueAsString(rule);
 
-        System.out.println(output.toString());
+        System.out.println(serializedEvent);
 
-        input = new ByteArrayInputStream(output.toByteArray());
-        reader = XMLObjectReader.newInstance(input);
-        aiOut = reader.read("Rule", RuleImpl.class);
+        aiOut = xmlMapper.readValue(serializedEvent, RuleImpl.class);
 
         assertNotNull(aiOut);
         assertEquals(aiOut.getRuleType(), RuleType.BROADCAST);
@@ -533,6 +520,7 @@ public class RuleTest {
 
     @Test(groups = { "router", "functional.encode" })
     public void testSerialization2() throws Exception {
+        XmlMapper xmlMapper = SCCPJacksonXMLHelper.getXmlMapper();
         SccpAddress pattern = factory.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, factory.createGlobalTitle("441425/*", 1), 0, 0);
 
         SccpAddress primaryAddress = factory.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, factory.createGlobalTitle("-/-"), 123, 8);
@@ -541,18 +529,11 @@ public class RuleTest {
         rule.setPrimaryAddressId(1);
 
         // Writes
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-        // indentation).
-        writer.write(rule, "Rule", RuleImpl.class);
-        writer.close();
+        String serializedEvent = xmlMapper.writeValueAsString(rule);
 
-        System.out.println(output.toString());
+        System.out.println(serializedEvent);
 
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        RuleImpl aiOut = reader.read("Rule", RuleImpl.class);
+        RuleImpl aiOut = xmlMapper.readValue(serializedEvent, RuleImpl.class);
 
         assertNotNull(aiOut);
         assertEquals(aiOut.getRuleType(), RuleType.SOLITARY);
@@ -571,18 +552,11 @@ public class RuleTest {
         rule.setNewCallingPartyAddressId(13);
 
         // Writes
-        output = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-        // indentation).
-        writer.write(rule, "Rule", RuleImpl.class);
-        writer.close();
+        serializedEvent = xmlMapper.writeValueAsString(rule);
 
-        System.out.println(output.toString());
+        System.out.println(serializedEvent);
 
-        input = new ByteArrayInputStream(output.toByteArray());
-        reader = XMLObjectReader.newInstance(input);
-        aiOut = reader.read("Rule", RuleImpl.class);
+        aiOut = xmlMapper.readValue(serializedEvent, RuleImpl.class);
 
         assertNotNull(aiOut);
         assertEquals(aiOut.getRuleType(), RuleType.BROADCAST);

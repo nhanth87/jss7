@@ -9,9 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.GenericNumberImpl;
 import org.restcomm.protocols.ss7.isup.message.parameter.GenericNumber;
 import org.testng.annotations.AfterClass;
@@ -19,6 +16,9 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.isup.ISUPJacksonXMLHelper;
 
 /**
  * Start time:14:11:03 2009-04-23<br>
@@ -110,27 +110,17 @@ public class GenericNumberTest {
 
     @Test(groups = { "functional.xml.serialize", "parameter" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = ISUPJacksonXMLHelper.getXmlMapper();
         GenericNumberImpl original = new GenericNumberImpl(GenericNumber._NAI_NATIONAL_SN, "12345",
                 GenericNumber._NQIA_CONNECTED_NUMBER, GenericNumber._NPI_TELEX, GenericNumber._APRI_ALLOWED,
                 GenericNumber._NI_INCOMPLETE, GenericNumber._SI_USER_PROVIDED_VERIFIED_FAILED);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "genericNumber", GenericNumberImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        GenericNumberImpl copy = reader.read("genericNumber", GenericNumberImpl.class);
+        GenericNumberImpl copy = xmlMapper.readValue(serializedEvent, GenericNumberImpl.class);
 
         assertEquals(copy.getNatureOfAddressIndicator(), original.getNatureOfAddressIndicator());
         assertEquals(copy.getAddress(), original.getAddress());

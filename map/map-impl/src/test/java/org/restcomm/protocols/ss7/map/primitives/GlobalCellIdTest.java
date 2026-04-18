@@ -7,13 +7,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.map.primitives.GlobalCellIdImpl;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
 *
@@ -84,26 +84,15 @@ public class GlobalCellIdTest {
 
     @Test(groups = { "functional.xml.serialize", "primitives" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         GlobalCellIdImpl original = new GlobalCellIdImpl(250, 1, 4444, 3333);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(original, "globalCellId", GlobalCellIdImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        GlobalCellIdImpl copy = reader.read("globalCellId", GlobalCellIdImpl.class);
+        GlobalCellIdImpl copy = xmlMapper.readValue(serializedEvent, GlobalCellIdImpl.class);
 
         assertEquals(copy.getMcc(), original.getMcc());
         assertEquals(copy.getMnc(), original.getMnc());

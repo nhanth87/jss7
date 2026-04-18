@@ -98,22 +98,39 @@ public class EventSpecificInformationBCSMImpl implements EventSpecificInformatio
 
     public static final String _PrimitiveName = "EventSpecificInformationBCSM";
 
+    @JacksonXmlProperty(localName = "routeSelectFailureSpecificInfo")
     private RouteSelectFailureSpecificInfo routeSelectFailureSpecificInfo;
+    @JacksonXmlProperty(localName = "oCalledPartyBusySpecificInfo")
     private OCalledPartyBusySpecificInfo oCalledPartyBusySpecificInfo;
+    @JacksonXmlProperty(localName = "oNoAnswerSpecificInfo")
     private ONoAnswerSpecificInfo oNoAnswerSpecificInfo;
+    @JacksonXmlProperty(localName = "oAnswerSpecificInfo")
     private OAnswerSpecificInfo oAnswerSpecificInfo;
+    @JacksonXmlProperty(localName = "oMidCallSpecificInfo")
     private OMidCallSpecificInfo oMidCallSpecificInfo;
+    @JacksonXmlProperty(localName = "oDisconnectSpecificInfo")
     private ODisconnectSpecificInfo oDisconnectSpecificInfo;
+    @JacksonXmlProperty(localName = "tBusySpecificInfo")
     private TBusySpecificInfo tBusySpecificInfo;
+    @JacksonXmlProperty(localName = "tNoAnswerSpecificInfo")
     private TNoAnswerSpecificInfo tNoAnswerSpecificInfo;
+    @JacksonXmlProperty(localName = "tAnswerSpecificInfo")
     private TAnswerSpecificInfo tAnswerSpecificInfo;
+    @JacksonXmlProperty(localName = "tMidCallSpecificInfo")
     private TMidCallSpecificInfo tMidCallSpecificInfo;
+    @JacksonXmlProperty(localName = "tDisconnectSpecificInfo")
     private TDisconnectSpecificInfo tDisconnectSpecificInfo;
+    @JacksonXmlProperty(localName = "oTermSeizedSpecificInfo")
     private OTermSeizedSpecificInfo oTermSeizedSpecificInfo;
+    @JacksonXmlProperty(localName = "callAcceptedSpecificInfo")
     private CallAcceptedSpecificInfo callAcceptedSpecificInfo;
+    @JacksonXmlProperty(localName = "oAbandonSpecificInfo")
     private OAbandonSpecificInfo oAbandonSpecificInfo;
+    @JacksonXmlProperty(localName = "oChangeOfPositionSpecificInfo")
     private OChangeOfPositionSpecificInfo oChangeOfPositionSpecificInfo;
+    @JacksonXmlProperty(localName = "tChangeOfPositionSpecificInfo")
     private TChangeOfPositionSpecificInfo tChangeOfPositionSpecificInfo;
+    @JacksonXmlProperty(localName = "dpSpecificInfoAlt")
     private DpSpecificInfoAlt dpSpecificInfoAlt;
 
     public EventSpecificInformationBCSMImpl() {

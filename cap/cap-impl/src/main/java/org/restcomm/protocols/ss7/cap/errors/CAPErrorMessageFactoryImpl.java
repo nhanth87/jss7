@@ -1,4 +1,5 @@
 package org.restcomm.protocols.ss7.cap.errors;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.restcomm.protocols.ss7.cap.api.errors.CAPErrorCode;
 import org.restcomm.protocols.ss7.cap.api.errors.CAPErrorMessage;

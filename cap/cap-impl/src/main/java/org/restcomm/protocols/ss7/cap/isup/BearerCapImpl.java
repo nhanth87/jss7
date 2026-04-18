@@ -2,6 +2,7 @@ package org.restcomm.protocols.ss7.cap.isup;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.IOException;
 
@@ -30,7 +31,6 @@ public class BearerCapImpl implements BearerCap, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "BearerCap";
 
-    @JacksonXmlProperty(localName = "userServiceInformation")
     private byte[] data;
 
     public BearerCapImpl() {
@@ -54,11 +54,13 @@ public class BearerCapImpl implements BearerCap, CAPAsnPrimitive {
         }
     }
 
+    @JacksonXmlProperty(localName = "userServiceInformation")
     @Override
     public byte[] getData() {
         return data;
     }
 
+    @JsonIgnore
     @Override
     public UserServiceInformation getUserServiceInformation() throws CAPException {
         if (this.data == null)

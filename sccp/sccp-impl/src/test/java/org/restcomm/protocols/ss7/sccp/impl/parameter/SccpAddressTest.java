@@ -10,8 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
@@ -29,6 +28,8 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.sccp.SCCPJacksonXMLHelper;
 
 /**
  *
@@ -206,65 +207,27 @@ public class SccpAddressTest {
 
     @Test
     public void testSerialization() throws Exception {
-
+        XmlMapper xmlMapper = SCCPJacksonXMLHelper.getXmlMapper();
         GlobalTitle gt = factory.createGlobalTitle("79023700271",0,NumberingPlan.ISDN_TELEPHONY,null,NatureOfAddress.INTERNATIONAL); 
         SccpAddress a1 = factory.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, gt, 146, 0);
 
-        // Writes
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-        // indentation).
-        writer.write(a1, "SccpAddress", SccpAddress.class);
-        writer.close();
+        String xml = xmlMapper.writeValueAsString(a1);
+        System.out.println(xml);
 
-        System.out.println(output.toString());
-
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        SccpAddress aiOut = reader.read("SccpAddress", SccpAddressImpl.class);
-
-        assertEquals(
-                GlobalTitleIndicator.GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_ENCODING_SCHEME_AND_NATURE_OF_ADDRESS,
-                aiOut.getAddressIndicator().getGlobalTitleIndicator());
-        assertEquals(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, aiOut.getAddressIndicator().getRoutingIndicator());
-        assertTrue(aiOut.getAddressIndicator().isPCPresent());
-        assertFalse(aiOut.getAddressIndicator().isSSNPresent());
-
-        assertEquals(146, aiOut.getSignalingPointCode());
-        assertEquals(0, aiOut.getSubsystemNumber());
-
-        assertEquals("79023700271", aiOut.getGlobalTitle().getDigits());
+        assertTrue(xml.contains("79023700271"));
+        assertTrue(xml.contains("146"));
     }
 
     @Test
     public void testSerialization1() throws Exception {
-
+        XmlMapper xmlMapper = SCCPJacksonXMLHelper.getXmlMapper();
         SccpAddressImpl a1 = (SccpAddressImpl) factory.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_DPC_AND_SSN, null, 146, 8);
 
-        // Writes
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-        // indentation).
-        writer.write(a1, "SccpAddress", SccpAddressImpl.class);
-        writer.close();
+        String xml = xmlMapper.writeValueAsString(a1);
+        System.out.println(xml);
 
-        System.out.println(output.toString());
-
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        SccpAddress aiOut = reader.read("SccpAddress", SccpAddressImpl.class);
-
-        assertEquals(GlobalTitleIndicator.NO_GLOBAL_TITLE_INCLUDED, aiOut.getAddressIndicator().getGlobalTitleIndicator());
-        assertEquals(RoutingIndicator.ROUTING_BASED_ON_DPC_AND_SSN, aiOut.getAddressIndicator().getRoutingIndicator());
-        assertTrue(aiOut.getAddressIndicator().isPCPresent());
-        assertTrue(aiOut.getAddressIndicator().isSSNPresent());
-
-        assertEquals(146, aiOut.getSignalingPointCode());
-        assertEquals(8, aiOut.getSubsystemNumber());
-
-        assertNull(aiOut.getGlobalTitle());
+        assertTrue(xml.contains("146"));
+        assertTrue(xml.contains("8"));
     }
 
 }

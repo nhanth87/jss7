@@ -1,5 +1,6 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
@@ -42,7 +43,9 @@ public class RequestReportBCSMEventRequestImpl extends CircuitSwitchedCallMessag
     private static final String BCSM_EVENT = "bcsmEvent";
     private static final String BCSM_EVENT_LIST = "bcsmEventList";
 
+    @JacksonXmlProperty(localName = "bcsmEventList")
     private ArrayList<BCSMEvent> bcsmEventList;
+    @JacksonXmlProperty(localName = "extensions")
     private CAPExtensions extensions;
 
     public RequestReportBCSMEventRequestImpl() {
@@ -63,11 +66,13 @@ public class RequestReportBCSMEventRequestImpl extends CircuitSwitchedCallMessag
         return CAPOperationCode.requestReportBCSMEvent;
     }
 
+    @JsonIgnore
     @Override
     public ArrayList<BCSMEvent> getBCSMEventList() {
         return bcsmEventList;
     }
 
+    @JsonIgnore
     @Override
     public CAPExtensions getExtensions() {
         return extensions;

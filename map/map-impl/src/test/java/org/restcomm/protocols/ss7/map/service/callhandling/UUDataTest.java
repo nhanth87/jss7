@@ -7,9 +7,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
@@ -20,6 +17,9 @@ import org.restcomm.protocols.ss7.map.service.callhandling.UUDataImpl;
 import org.restcomm.protocols.ss7.map.service.callhandling.UUIImpl;
 import org.restcomm.protocols.ss7.map.service.callhandling.UUIndicatorImpl;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
 *
@@ -94,26 +94,16 @@ public class UUDataTest {
 
     @Test(groups = { "functional.xml.serialize", "circuitSwitchedCall.primitive" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         UUIndicator uuIndicator = new UUIndicatorImpl(140);
         UUDataImpl original = new UUDataImpl(uuIndicator, null, false, null);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "uuData", UUDataImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        UUDataImpl copy = reader.read("uuData", UUDataImpl.class);
+        UUDataImpl copy = xmlMapper.readValue(serializedEvent, UUDataImpl.class);
 
         assertEquals(copy.getUUIndicator().getData(), original.getUUIndicator().getData());
         assertNull(copy.getUUI());
@@ -125,20 +115,11 @@ public class UUDataTest {
         original = new UUDataImpl(uuIndicator, uuI, true, MAPExtensionContainerTest.GetTestExtensionContainer());
 
         // Writes the area to a file.
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t");
-        writer.write(original, "uuData", UUDataImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-        copy = reader.read("uuData", UUDataImpl.class);
+        copy = xmlMapper.readValue(serializedEvent, UUDataImpl.class);
 
         assertEquals(copy.getUUIndicator().getData(), original.getUUIndicator().getData());
         assertEquals(copy.getUUI().getData(), original.getUUI().getData());

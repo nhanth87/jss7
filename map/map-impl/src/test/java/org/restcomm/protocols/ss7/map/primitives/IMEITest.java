@@ -11,14 +11,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
 import org.restcomm.protocols.ss7.map.primitives.IMEIImpl;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
  *
@@ -92,6 +92,7 @@ public class IMEITest {
 
     @Test(groups = { "functional.serialize", "primitives" })
     public void testSerialization() throws Exception {
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         IMEIImpl original = new IMEIImpl("1234567890123456");
         // serialize
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -113,25 +114,15 @@ public class IMEITest {
 
     @Test(groups = { "functional.xml.serialize", "primitives" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         IMEIImpl original = new IMEIImpl("12345123450000");
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "imei", IMEIImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        IMEIImpl copy = reader.read("imei", IMEIImpl.class);
+        IMEIImpl copy = xmlMapper.readValue(serializedEvent, IMEIImpl.class);
 
         assertEquals(copy.getIMEI(), original.getIMEI());
     }

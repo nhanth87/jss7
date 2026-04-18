@@ -55,6 +55,10 @@ public class UserCSGInformationImpl implements UserCSGInformation, MAPAsnPrimiti
         return this.csgId;
     }
 
+    public void setCSGId(CSGId csgId) {
+        this.csgId = csgId;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -62,6 +66,10 @@ public class UserCSGInformationImpl implements UserCSGInformation, MAPAsnPrimiti
      */
     public MAPExtensionContainer getExtensionContainer() {
         return this.extensionContainer;
+    }
+
+    public void setExtensionContainer(MAPExtensionContainer extensionContainer) {
+        this.extensionContainer = extensionContainer;
     }
 
     /*
@@ -73,6 +81,10 @@ public class UserCSGInformationImpl implements UserCSGInformation, MAPAsnPrimiti
         return this.accessMode;
     }
 
+    public void setAccessMode(Integer accessMode) {
+        this.accessMode = accessMode;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -80,6 +92,10 @@ public class UserCSGInformationImpl implements UserCSGInformation, MAPAsnPrimiti
      */
     public Integer getCmi() {
         return this.cmi;
+    }
+
+    public void setCmi(Integer cmi) {
+        this.cmi = cmi;
     }
 
     /*

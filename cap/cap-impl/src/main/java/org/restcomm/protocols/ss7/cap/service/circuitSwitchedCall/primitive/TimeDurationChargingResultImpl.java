@@ -48,11 +48,17 @@ public class TimeDurationChargingResultImpl extends SequenceBase implements Time
     public static final int _ID_extensions = 4;
     public static final int _ID_aChChargingAddress = 5;
 
+    @JacksonXmlProperty(localName = "partyToCharge")
     private ReceivingSideID partyToCharge;
+    @JacksonXmlProperty(localName = "timeInformation")
     private TimeInformation timeInformation;
+    @JacksonXmlProperty(localName = "legActive")
     private boolean legActive;
+    @JacksonXmlProperty(localName = "callLegReleasedAtTcpExpiry")
     private boolean callLegReleasedAtTcpExpiry;
+    @JacksonXmlProperty(localName = "extensions")
     private CAPExtensions extensions;
+    @JacksonXmlProperty(localName = "aChChargingAddress")
     private AChChargingAddress aChChargingAddress;
 
     public TimeDurationChargingResultImpl() {
@@ -120,14 +126,20 @@ public class TimeDurationChargingResultImpl extends SequenceBase implements Time
 
             if (ais.getTagClass() == Tag.CLASS_CONTEXT_SPECIFIC) {
                 switch (tag) {
-                    case _ID_partyToCharge:
+                    case _ID_partyToCharge: {
+                        AsnInputStream ais2 = ais.readSequenceStream();
+                        ais2.readTag();
                         this.partyToCharge = new ReceivingSideIDImpl();
-                        ((ReceivingSideIDImpl) this.partyToCharge).decodeAll(ais);
+                        ((ReceivingSideIDImpl) this.partyToCharge).decodeAll(ais2);
                         break;
-                    case _ID_timeInformation:
+                    }
+                    case _ID_timeInformation: {
+                        AsnInputStream ais2 = ais.readSequenceStream();
+                        ais2.readTag();
                         this.timeInformation = new TimeInformationImpl();
-                        ((TimeInformationImpl) this.timeInformation).decodeAll(ais);
+                        ((TimeInformationImpl) this.timeInformation).decodeAll(ais2);
                         break;
+                    }
                     case _ID_legActive:
                         this.legActive = ais.readBoolean();
                         break;
@@ -139,10 +151,13 @@ public class TimeDurationChargingResultImpl extends SequenceBase implements Time
                         this.extensions = new CAPExtensionsImpl();
                         ((CAPExtensionsImpl) this.extensions).decodeAll(ais);
                         break;
-                    case _ID_aChChargingAddress:
+                    case _ID_aChChargingAddress: {
+                        AsnInputStream ais2 = ais.readSequenceStream();
+                        ais2.readTag();
                         this.aChChargingAddress = new AChChargingAddressImpl();
-                        ((AChChargingAddressImpl) this.aChChargingAddress).decodeAll(ais);
+                        ((AChChargingAddressImpl) this.aChChargingAddress).decodeAll(ais2);
                         break;
+                    }
 
                     default:
                         ais.advanceElement();
@@ -173,11 +188,15 @@ public class TimeDurationChargingResultImpl extends SequenceBase implements Time
             throw new CAPException("Error while encoding " + _PrimitiveName + ": timeInformation must not be null");
 
         try {
-            ((ReceivingSideIDImpl) this.partyToCharge).encodeAll(asnOutputStream, Tag.CLASS_CONTEXT_SPECIFIC,
-                    _ID_partyToCharge);
+            asnOutputStream.writeTag(Tag.CLASS_CONTEXT_SPECIFIC, false, _ID_partyToCharge);
+            int pos = asnOutputStream.StartContentDefiniteLength();
+            ((ReceivingSideIDImpl) this.partyToCharge).encodeAll(asnOutputStream);
+            asnOutputStream.FinalizeContent(pos);
 
-            ((TimeInformationImpl) this.timeInformation).encodeAll(asnOutputStream, Tag.CLASS_CONTEXT_SPECIFIC,
-                    _ID_timeInformation);
+            asnOutputStream.writeTag(Tag.CLASS_CONTEXT_SPECIFIC, false, _ID_timeInformation);
+            pos = asnOutputStream.StartContentDefiniteLength();
+            ((TimeInformationImpl) this.timeInformation).encodeAll(asnOutputStream);
+            asnOutputStream.FinalizeContent(pos);
 
             if (!this.legActive)
                 asnOutputStream.writeBoolean(Tag.CLASS_CONTEXT_SPECIFIC, _ID_legActive, false);
@@ -189,9 +208,12 @@ public class TimeDurationChargingResultImpl extends SequenceBase implements Time
                 ((CAPExtensionsImpl) this.extensions).encodeAll(asnOutputStream, Tag.CLASS_CONTEXT_SPECIFIC,
                         _ID_extensions);
 
-            if (this.aChChargingAddress != null)
-                ((AChChargingAddressImpl) this.aChChargingAddress).encodeAll(asnOutputStream, Tag.CLASS_CONTEXT_SPECIFIC,
-                        _ID_aChChargingAddress);
+            if (this.aChChargingAddress != null) {
+                asnOutputStream.writeTag(Tag.CLASS_CONTEXT_SPECIFIC, false, _ID_aChChargingAddress);
+                pos = asnOutputStream.StartContentDefiniteLength();
+                ((AChChargingAddressImpl) this.aChChargingAddress).encodeAll(asnOutputStream);
+                asnOutputStream.FinalizeContent(pos);
+            }
 
         } catch (IOException e) {
             throw new CAPException("IOException when encoding " + _PrimitiveName + ": " + e.getMessage(), e);

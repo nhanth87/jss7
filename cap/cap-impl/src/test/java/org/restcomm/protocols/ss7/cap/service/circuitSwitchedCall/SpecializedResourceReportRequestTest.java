@@ -8,13 +8,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.SpecializedResourceReportRequestImpl;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.cap.CAPJacksonXMLHelper;
 
 /**
  *
@@ -86,26 +86,14 @@ public class SpecializedResourceReportRequestTest {
 
     @Test(groups = { "functional.xml.serialize", "circuitSwitchedCall" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = CAPJacksonXMLHelper.getXmlMapper();
         SpecializedResourceReportRequestImpl original = new SpecializedResourceReportRequestImpl(false, true, true);
         original.setLinkedId(12L);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(original, "specializedResourceReport", SpecializedResourceReportRequestImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
-
+        String serializedEvent = xmlMapper.writeValueAsString(original);
         System.out.println(serializedEvent);
         System.out.flush();
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        SpecializedResourceReportRequestImpl copy = reader.read("specializedResourceReport",
+        SpecializedResourceReportRequestImpl copy = xmlMapper.readValue(serializedEvent,
                 SpecializedResourceReportRequestImpl.class);
 
         assertEquals(original.getAllAnnouncementsComplete(), copy.getAllAnnouncementsComplete());

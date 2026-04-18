@@ -105,6 +105,10 @@ public class LocationInformationGPRSImpl extends SequenceBase implements Locatio
         return this.cellGlobalIdOrServiceAreaIdOrLAI;
     }
 
+    public void setCellGlobalIdOrServiceAreaIdOrLAI(CellGlobalIdOrServiceAreaIdOrLAI cellGlobalIdOrServiceAreaIdOrLAI) {
+        this.cellGlobalIdOrServiceAreaIdOrLAI = cellGlobalIdOrServiceAreaIdOrLAI;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -112,6 +116,10 @@ public class LocationInformationGPRSImpl extends SequenceBase implements Locatio
      */
     public RAIdentity getRouteingAreaIdentity() {
         return this.routeingAreaIdentity;
+    }
+
+    public void setRouteingAreaIdentity(RAIdentity routeingAreaIdentity) {
+        this.routeingAreaIdentity = routeingAreaIdentity;
     }
 
     /*
@@ -124,6 +132,10 @@ public class LocationInformationGPRSImpl extends SequenceBase implements Locatio
         return this.geographicalInformation;
     }
 
+    public void setGeographicalInformation(GeographicalInformation geographicalInformation) {
+        this.geographicalInformation = geographicalInformation;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -131,6 +143,10 @@ public class LocationInformationGPRSImpl extends SequenceBase implements Locatio
      */
     public ISDNAddressString getSGSNNumber() {
         return this.sgsnNumber;
+    }
+
+    public void setSGSNNumber(ISDNAddressString sgsnNumber) {
+        this.sgsnNumber = sgsnNumber;
     }
 
     /*
@@ -142,6 +158,10 @@ public class LocationInformationGPRSImpl extends SequenceBase implements Locatio
         return this.selectedLSAIdentity;
     }
 
+    public void setLSAIdentity(LSAIdentity selectedLSAIdentity) {
+        this.selectedLSAIdentity = selectedLSAIdentity;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -149,6 +169,10 @@ public class LocationInformationGPRSImpl extends SequenceBase implements Locatio
      */
     public MAPExtensionContainer getExtensionContainer() {
         return this.extensionContainer;
+    }
+
+    public void setExtensionContainer(MAPExtensionContainer extensionContainer) {
+        this.extensionContainer = extensionContainer;
     }
 
     /*
@@ -160,6 +184,10 @@ public class LocationInformationGPRSImpl extends SequenceBase implements Locatio
         return this.saiPresent;
     }
 
+    public void setSaiPresent(boolean saiPresent) {
+        this.saiPresent = saiPresent;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -167,6 +195,10 @@ public class LocationInformationGPRSImpl extends SequenceBase implements Locatio
      */
     public GeodeticInformation getGeodeticInformation() {
         return this.geodeticInformation;
+    }
+
+    public void setGeodeticInformation(GeodeticInformation geodeticInformation) {
+        this.geodeticInformation = geodeticInformation;
     }
 
     /*
@@ -179,6 +211,10 @@ public class LocationInformationGPRSImpl extends SequenceBase implements Locatio
         return this.currentLocationRetrieved;
     }
 
+    public void setCurrentLocationRetrieved(boolean currentLocationRetrieved) {
+        this.currentLocationRetrieved = currentLocationRetrieved;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -187,6 +223,10 @@ public class LocationInformationGPRSImpl extends SequenceBase implements Locatio
      */
     public Integer getAgeOfLocationInformation() {
         return this.ageOfLocationInformation;
+    }
+
+    public void setAgeOfLocationInformation(Integer ageOfLocationInformation) {
+        this.ageOfLocationInformation = ageOfLocationInformation;
     }
 
     public static CellGlobalIdOrServiceAreaIdOrLAI decodeCellGlobalIdOrServiceAreaIdOrLAI(AsnInputStream ais,

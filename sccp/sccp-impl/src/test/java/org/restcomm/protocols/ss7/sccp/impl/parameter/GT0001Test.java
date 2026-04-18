@@ -7,8 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
 import org.restcomm.protocols.ss7.sccp.SccpProtocolVersion;
@@ -19,6 +18,8 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.sccp.SCCPJacksonXMLHelper;
 
 /**
  * @author amit bhayani
@@ -117,21 +118,13 @@ public class GT0001Test {
 
     @Test(groups = { "parameter", "functional.encode" })
     public void testSerialization() throws Exception {
+        XmlMapper xmlMapper = SCCPJacksonXMLHelper.getXmlMapper();
         GlobalTitle0001Impl gt = new GlobalTitle0001Impl("9023629581",NatureOfAddress.NATIONAL);
 
-        // Writes
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-        // indentation).
-        writer.write(gt, "GT0001", GlobalTitle0001Impl.class);
-        writer.close();
+        String xml = xmlMapper.writeValueAsString(gt);
+        System.out.println(xml);
 
-        System.out.println(output.toString());
-
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        GlobalTitle0001Impl aiOut = reader.read("GT0001", GlobalTitle0001Impl.class);
+        GlobalTitle0001Impl aiOut = xmlMapper.readValue(xml, GlobalTitle0001Impl.class);
 
         // check results
         assertEquals(aiOut.getNatureOfAddress(), NatureOfAddress.NATIONAL);

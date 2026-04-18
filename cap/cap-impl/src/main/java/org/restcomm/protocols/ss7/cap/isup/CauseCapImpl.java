@@ -2,6 +2,7 @@ package org.restcomm.protocols.ss7.cap.isup;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.IOException;
 
@@ -30,7 +31,6 @@ public class CauseCapImpl implements CauseCap, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "CauseCap";
 
-    @JacksonXmlProperty(localName = "isupCauseIndicators")
     private byte[] data;
 
     public CauseCapImpl() {
@@ -54,11 +54,13 @@ public class CauseCapImpl implements CauseCap, CAPAsnPrimitive {
         }
     }
 
+    @JacksonXmlProperty(localName = "isupCauseIndicators")
     @Override
     public byte[] getData() {
         return data;
     }
 
+    @JsonIgnore
     @Override
     public CauseIndicators getCauseIndicators() throws CAPException {
         if (this.data == null)

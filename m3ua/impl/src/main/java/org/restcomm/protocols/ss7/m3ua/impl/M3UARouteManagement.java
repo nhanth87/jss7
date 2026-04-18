@@ -136,14 +136,16 @@ public class M3UARouteManagement {
      * Reset the routeTable. Called after the persistence state of route is read from xml file.
      */
     protected void reset() {
-        for (RouteAsImpl routeAs : this.route.values()) {
+        for (java.util.Map.Entry<String, RouteAsImpl> entry : this.route.entrySet()) {
+            String key = entry.getKey();
+            RouteAsImpl routeAs = entry.getValue();
             routeAs.setM3uaManagement(this.m3uaManagement);
             routeAs.reset();
 
             As[] asList = routeAs.getAsArray();
 
             try {
-                String[] keys = routeAs.toString().split(KEY_SEPARATOR);
+                String[] keys = key.split(KEY_SEPARATOR);
                 int dpc = Integer.parseInt(keys[0]);
                 for (count = 0; count < asList.length; count++) {
                     AsImpl asImpl = (AsImpl) asList[count];
@@ -152,7 +154,7 @@ public class M3UARouteManagement {
                     }
                 }
             } catch (Exception ex) {
-                logger.error(String.format("Error while adding key=%s to As list=%s", routeAs, Arrays.toString(asList)));
+                logger.error(String.format("Error while adding key=%s to As list=%s", key, Arrays.toString(asList)));
             }
         }
     }

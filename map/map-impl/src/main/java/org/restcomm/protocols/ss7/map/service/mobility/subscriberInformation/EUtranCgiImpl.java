@@ -108,6 +108,7 @@ public class EUtranCgiImpl extends OctetStringBase implements EUtranCgi {
         data[6] = (byte) (ci & 0xFF); // data[6] = (byte) (ci % 256);
     }
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public int getMCC() throws MAPException {
         if (data == null)
             throw new MAPException("Data must not be empty");
@@ -132,6 +133,7 @@ public class EUtranCgiImpl extends OctetStringBase implements EUtranCgi {
         return Integer.parseInt(sMcc);
     }
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public int getMNC() throws MAPException {
         if (data == null)
             throw new MAPException("Data must not be empty");
@@ -161,6 +163,7 @@ public class EUtranCgiImpl extends OctetStringBase implements EUtranCgi {
         return Integer.parseInt(sMnc);
     }
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public long getENodeBId() throws MAPException {
         if (data == null)
             throw new MAPException("Data must not be empty");
@@ -171,6 +174,7 @@ public class EUtranCgiImpl extends OctetStringBase implements EUtranCgi {
         return eNodeBId;
     }
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public int getCi() throws MAPException {
         if (data == null)
             throw new MAPException("Data must not be empty");
@@ -181,6 +185,7 @@ public class EUtranCgiImpl extends OctetStringBase implements EUtranCgi {
         return ci;
     }
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public long getEci() throws MAPException {
         if (data == null)
             throw new MAPException("Data must not be empty");

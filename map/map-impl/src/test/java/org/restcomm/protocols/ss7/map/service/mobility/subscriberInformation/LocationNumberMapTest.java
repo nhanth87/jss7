@@ -8,9 +8,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
@@ -18,6 +15,9 @@ import org.restcomm.protocols.ss7.isup.impl.message.parameter.LocationNumberImpl
 import org.restcomm.protocols.ss7.isup.message.parameter.LocationNumber;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation.LocationNumberMapImpl;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
  *
@@ -82,28 +82,18 @@ public class LocationNumberMapTest {
 
     @Test(groups = { "functional.xml.serialize", "primitives" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         LocationNumberImpl ln = new LocationNumberImpl(LocationNumber._NAI_NATIONAL_SN, "80207910020",
                 LocationNumber._NPI_TELEX, LocationNumber._INN_ROUTING_NOT_ALLOWED, LocationNumber._APRI_ALLOWED,
                 LocationNumber._SI_USER_PROVIDED_VERIFIED_PASSED);
         LocationNumberMapImpl original = new LocationNumberMapImpl(ln);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "locationNumberMap", LocationNumberMapImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        LocationNumberMapImpl copy = reader.read("locationNumberMap", LocationNumberMapImpl.class);
+        LocationNumberMapImpl copy = xmlMapper.readValue(serializedEvent, LocationNumberMapImpl.class);
 
         assertEquals(copy.getLocationNumber().getAddress(), original.getLocationNumber().getAddress());
         assertEquals(copy.getLocationNumber().getAddressRepresentationRestrictedIndicator(), original.getLocationNumber()

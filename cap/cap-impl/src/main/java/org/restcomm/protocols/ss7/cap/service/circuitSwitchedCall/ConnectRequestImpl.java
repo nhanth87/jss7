@@ -1,5 +1,6 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
@@ -103,24 +104,43 @@ public class ConnectRequestImpl extends CircuitSwitchedCallMessageImpl implement
 
     public static final String _PrimitiveName = "ConnectRequestIndication";
 
+    @JacksonXmlProperty(localName = "destinationRoutingAddress")
     private DestinationRoutingAddress destinationRoutingAddress;
+    @JacksonXmlProperty(localName = "alertingPattern")
     private AlertingPatternCap alertingPattern;
+    @JacksonXmlProperty(localName = "originalCalledPartyID")
     private OriginalCalledNumberCap originalCalledPartyID;
+    @JacksonXmlProperty(localName = "extensions")
     private CAPExtensions capExtensions;
+    @JacksonXmlProperty(localName = "carrier")
     private Carrier carrier;
+    @JacksonXmlProperty(localName = "callingPartysCategory")
     private CallingPartysCategoryInap callingPartysCategory;
+    @JacksonXmlProperty(localName = "redirectingPartyID")
     private RedirectingPartyIDCap redirectingPartyID;
+    @JacksonXmlProperty(localName = "redirectionInformation")
     private RedirectionInformationInap redirectionInformation;
+    @JacksonXmlProperty(localName = "genericNumbers")
     private ArrayList<GenericNumberCap> genericNumbers;
+    @JacksonXmlProperty(localName = "serviceInteractionIndicatorsTwo")
     private ServiceInteractionIndicatorsTwo serviceInteractionIndicatorsTwo;
+    @JacksonXmlProperty(localName = "chargeNumber")
     private LocationNumberCap chargeNumber;
+    @JacksonXmlProperty(localName = "legToBeConnected")
     private LegID legToBeConnected;
+    @JacksonXmlProperty(localName = "cugInterlock")
     private CUGInterlock cugInterlock;
+    @JacksonXmlProperty(localName = "cugOutgoingAccess")
     private boolean cugOutgoingAccess;
+    @JacksonXmlProperty(localName = "suppressionOfAnnouncement")
     private boolean suppressionOfAnnouncement;
+    @JacksonXmlProperty(localName = "ocsIApplicable")
     private boolean ocsIApplicable;
+    @JacksonXmlProperty(localName = "naoliInfo")
     private NAOliInfo naoliInfo;
+    @JacksonXmlProperty(localName = "borInterrogationRequested")
     private boolean borInterrogationRequested;
+    @JacksonXmlProperty(localName = "suppressNCSI")
     private boolean suppressNCSI;
 
     public ConnectRequestImpl() {
@@ -164,96 +184,115 @@ public class ConnectRequestImpl extends CircuitSwitchedCallMessageImpl implement
         return CAPOperationCode.connect;
     }
 
+    @JsonIgnore
     @Override
     public DestinationRoutingAddress getDestinationRoutingAddress() {
         return destinationRoutingAddress;
     }
 
+    @JsonIgnore
     @Override
     public AlertingPatternCap getAlertingPattern() {
         return alertingPattern;
     }
 
+    @JsonIgnore
     @Override
     public OriginalCalledNumberCap getOriginalCalledPartyID() {
         return originalCalledPartyID;
     }
 
+    @JsonIgnore
     @Override
     public CAPExtensions getExtensions() {
         return capExtensions;
     }
 
+    @JsonIgnore
     @Override
     public Carrier getCarrier() {
         return carrier;
     }
 
+    @JsonIgnore
     @Override
     public CallingPartysCategoryInap getCallingPartysCategory() {
         return callingPartysCategory;
     }
 
+    @JsonIgnore
     @Override
     public RedirectingPartyIDCap getRedirectingPartyID() {
         return redirectingPartyID;
     }
 
+    @JsonIgnore
     @Override
     public RedirectionInformationInap getRedirectionInformation() {
         return redirectionInformation;
     }
 
+    @JsonIgnore
     @Override
     public ArrayList<GenericNumberCap> getGenericNumbers() {
         return genericNumbers;
     }
 
+    @JsonIgnore
     @Override
     public ServiceInteractionIndicatorsTwo getServiceInteractionIndicatorsTwo() {
         return serviceInteractionIndicatorsTwo;
     }
 
+    @JsonIgnore
     @Override
     public LocationNumberCap getChargeNumber() {
         return chargeNumber;
     }
 
+    @JsonIgnore
     @Override
     public LegID getLegToBeConnected() {
         return legToBeConnected;
     }
 
+    @JsonIgnore
     @Override
     public CUGInterlock getCUGInterlock() {
         return cugInterlock;
     }
 
+    @JsonIgnore
     @Override
     public boolean getCugOutgoingAccess() {
         return cugOutgoingAccess;
     }
 
+    @JsonIgnore
     @Override
     public boolean getSuppressionOfAnnouncement() {
         return suppressionOfAnnouncement;
     }
 
+    @JsonIgnore
     @Override
     public boolean getOCSIApplicable() {
         return ocsIApplicable;
     }
 
+    @JsonIgnore
     @Override
     public NAOliInfo getNAOliInfo() {
         return naoliInfo;
     }
 
+    @JsonIgnore
     @Override
     public boolean getBorInterrogationRequested() {
         return borInterrogationRequested;
     }
 
+    @JsonIgnore
     @Override
     public boolean getSuppressNCSI() {
         return suppressNCSI;

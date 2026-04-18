@@ -8,15 +8,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
 import org.restcomm.protocols.ss7.map.api.primitives.GSNAddressAddressType;
 import org.restcomm.protocols.ss7.map.primitives.GSNAddressImpl;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
  *
@@ -101,25 +101,15 @@ public class GSNAddressTest {
 
     @Test(groups = { "functional.xml.serialize", "primitives" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         GSNAddressImpl original = new GSNAddressImpl(GSNAddressAddressType.IPv4, getData());
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "gsnAddress", GSNAddressImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        GSNAddressImpl copy = reader.read("gsnAddress", GSNAddressImpl.class);
+        GSNAddressImpl copy = xmlMapper.readValue(serializedEvent, GSNAddressImpl.class);
 
         assertEquals(copy.getGSNAddressData(), original.getGSNAddressData());
         assertEquals(copy.getGSNAddressAddressType(), original.getGSNAddressAddressType());

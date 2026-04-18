@@ -10,9 +10,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.map.api.primitives.AlertingCategory;
@@ -23,6 +20,9 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
  * @author amit bhayani
@@ -77,24 +77,15 @@ public class AlertingPatternTest {
 
     @Test(groups = { "functional.serialize", "primitives" })
     public void testSerialization() throws Exception {
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         AlertingPatternImpl original = new AlertingPatternImpl(AlertingCategory.Category4);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "alertingPattern", AlertingPatternImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        AlertingPatternImpl copy = reader.read("alertingPattern", AlertingPatternImpl.class);
+        AlertingPatternImpl copy = xmlMapper.readValue(serializedEvent, AlertingPatternImpl.class);
 
         // test result
         assertEquals(copy.getAlertingCategory(), original.getAlertingCategory());
@@ -104,21 +95,11 @@ public class AlertingPatternTest {
         original = new AlertingPatternImpl(AlertingLevel.Level1);
 
         // Writes the area to a file.
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "alertingPattern", AlertingPatternImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-        copy = reader.read("alertingPattern", AlertingPatternImpl.class);
+        copy = xmlMapper.readValue(serializedEvent, AlertingPatternImpl.class);
 
         // test result
         assertEquals(copy.getAlertingLevel(), original.getAlertingLevel());

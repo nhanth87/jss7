@@ -45,8 +45,11 @@ public class DisconnectLegRequestImpl extends CircuitSwitchedCallMessageImpl imp
 
     public static final String _PrimitiveName = "DisconnectlegRequestIndication";
 
+    @JacksonXmlProperty(localName = "legToBeReleased")
     private LegID legToBeReleased;
+    @JacksonXmlProperty(localName = "releaseCause")
     private CauseCap capReleaseCause;
+    @JacksonXmlProperty(localName = "extensions")
     private CAPExtensions extensions;
 
     public DisconnectLegRequestImpl() {

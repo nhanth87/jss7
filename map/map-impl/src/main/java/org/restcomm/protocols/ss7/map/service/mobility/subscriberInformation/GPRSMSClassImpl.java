@@ -203,6 +203,10 @@ public class GPRSMSClassImpl implements GPRSMSClass, MAPAsnPrimitive {
         return this.mSNetworkCapability;
     }
 
+    public void setMSNetworkCapability(MSNetworkCapability mSNetworkCapability) {
+        this.mSNetworkCapability = mSNetworkCapability;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -210,6 +214,10 @@ public class GPRSMSClassImpl implements GPRSMSClass, MAPAsnPrimitive {
      */
     public MSRadioAccessCapability getMSRadioAccessCapability() {
         return this.mSRadioAccessCapability;
+    }
+
+    public void setMSRadioAccessCapability(MSRadioAccessCapability mSRadioAccessCapability) {
+        this.mSRadioAccessCapability = mSRadioAccessCapability;
     }
 
     public String toString() {

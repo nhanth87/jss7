@@ -55,6 +55,10 @@ public class CellGlobalIdOrServiceAreaIdOrLAIImpl implements CellGlobalIdOrServi
         return this.cellGlobalIdOrServiceAreaIdFixedLength;
     }
 
+    public void setCellGlobalIdOrServiceAreaIdFixedLength(CellGlobalIdOrServiceAreaIdFixedLength cellGlobalIdOrServiceAreaIdFixedLength) {
+        this.cellGlobalIdOrServiceAreaIdFixedLength = cellGlobalIdOrServiceAreaIdFixedLength;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -62,6 +66,10 @@ public class CellGlobalIdOrServiceAreaIdOrLAIImpl implements CellGlobalIdOrServi
      */
     public LAIFixedLength getLAIFixedLength() {
         return this.laiFixedLength;
+    }
+
+    public void setLAIFixedLength(LAIFixedLength laiFixedLength) {
+        this.laiFixedLength = laiFixedLength;
     }
 
     /*

@@ -33,10 +33,13 @@ public class SpecializedResourceReportRequestImpl extends CircuitSwitchedCallMes
 
     public static final String _PrimitiveName = "SpecializedResourceReportRequestIndication";
 
+    @JacksonXmlProperty(localName = "linkedId")
     private Long linkedId;
     private Invoke linkedInvoke;
 
+    @JacksonXmlProperty(localName = "allAnnouncementsComplete")
     private boolean isAllAnnouncementsComplete;
+    @JacksonXmlProperty(localName = "firstAnnouncementStarted")
     private boolean isFirstAnnouncementStarted;
 
     private boolean isCAPVersion4orLater;

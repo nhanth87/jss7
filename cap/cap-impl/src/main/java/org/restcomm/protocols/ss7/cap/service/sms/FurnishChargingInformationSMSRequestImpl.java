@@ -34,6 +34,7 @@ public class FurnishChargingInformationSMSRequestImpl extends SmsMessageImpl imp
 
     public static final String _PrimitiveName = "FurnishChargingInformationSMSRequest";
 
+    @JacksonXmlProperty(localName = "fCIBCCCAMELsequence1")
     private FCIBCCCAMELsequence1SMS FCIBCCCAMELsequence1;
 
     public FurnishChargingInformationSMSRequestImpl() {

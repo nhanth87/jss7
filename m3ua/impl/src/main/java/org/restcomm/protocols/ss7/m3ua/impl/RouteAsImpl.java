@@ -26,6 +26,8 @@ public class RouteAsImpl implements RouteAs {
     private transient M3UAManagementImpl m3uaManagement;
 
     @JsonProperty("asArray")
+    @com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper(localName = "asArray")
+    @com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty(localName = "as")
     private As[] asArray = null;
 
     @JsonProperty("trafficModeType")
@@ -175,9 +177,8 @@ public class RouteAsImpl implements RouteAs {
     }
 
     protected void reset() {
-        AsImpl[] asList = new AsImpl[this.m3uaManagement.getMaxAsForRoute()];
-
         if (asArraytemp != null && !asArraytemp.equals("")) {
+            AsImpl[] asList = new AsImpl[this.m3uaManagement.getMaxAsForRoute()];
             String[] asNames = asArraytemp.split(",");
             for (int count = 0; count < asList.length && count < asNames.length; count++) {
                 String asName = asNames[count];
@@ -188,9 +189,18 @@ public class RouteAsImpl implements RouteAs {
                 }
                 asList[count] = (AsImpl) as;
             }
-        }// if (value != null && !value.equals(""))
-
-        this.asArray = asList;
+            this.asArray = asList;
+        } else if (this.asArray != null && this.m3uaManagement != null) {
+            for (int count = 0; count < this.asArray.length; count++) {
+                AsImpl asImpl = (AsImpl) this.asArray[count];
+                if (asImpl != null) {
+                    As as = this.m3uaManagement.getAs(asImpl.getName());
+                    if (as != null) {
+                        this.asArray[count] = (AsImpl) as;
+                    }
+                }
+            }
+        }
     }
 
 }

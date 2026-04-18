@@ -1,5 +1,6 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall.primitive;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
@@ -84,20 +85,35 @@ public class InitialDPArgExtensionImpl extends SequenceBase implements InitialDP
 
     public static final String _PrimitiveName = "InitialDPArgExtension";
 
+    @JacksonXmlProperty(localName = "gmscAddress")
     private ISDNAddressString gmscAddress;
+    @JacksonXmlProperty(localName = "forwardingDestinationNumber")
     private CalledPartyNumberCap forwardingDestinationNumber;
+    @JacksonXmlProperty(localName = "msClassmark2")
     private MSClassmark2 msClassmark2;
+    @JacksonXmlProperty(localName = "imei")
     private IMEI imei;
+    @JacksonXmlProperty(localName = "supportedCamelPhases")
     private SupportedCamelPhases supportedCamelPhases;
+    @JacksonXmlProperty(localName = "offeredCamel4Functionalities")
     private OfferedCamel4Functionalities offeredCamel4Functionalities;
+    @JacksonXmlProperty(localName = "bearerCapability2")
     private BearerCapability bearerCapability2;
+    @JacksonXmlProperty(localName = "extBasicServiceCode2")
     private ExtBasicServiceCode extBasicServiceCode2;
+    @JacksonXmlProperty(localName = "highLayerCompatibility2")
     private HighLayerCompatibilityInap highLayerCompatibility2;
+    @JacksonXmlProperty(localName = "lowLayerCompatibility")
     private LowLayerCompatibility lowLayerCompatibility;
+    @JacksonXmlProperty(localName = "lowLayerCompatibility2")
     private LowLayerCompatibility lowLayerCompatibility2;
+    @JacksonXmlProperty(localName = "enhancedDialledServicesAllowed")
     private boolean enhancedDialledServicesAllowed;
+    @JacksonXmlProperty(localName = "uuData")
     private UUData uuData;
+    @JacksonXmlProperty(localName = "collectInformationAllowed")
     private boolean collectInformationAllowed;
+    @JacksonXmlProperty(localName = "releaseCallArgExtensionAllowed")
     private boolean releaseCallArgExtensionAllowed;
 
     protected boolean isCAPVersion3orLater;
@@ -142,76 +158,91 @@ public class InitialDPArgExtensionImpl extends SequenceBase implements InitialDP
         this.isCAPVersion3orLater = isCAPVersion3orLater;
     }
 
+    @JsonIgnore
     @Override
     public ISDNAddressString getGmscAddress() {
         return gmscAddress;
     }
 
+    @JsonIgnore
     @Override
     public CalledPartyNumberCap getForwardingDestinationNumber() {
         return forwardingDestinationNumber;
     }
 
+    @JsonIgnore
     @Override
     public MSClassmark2 getMSClassmark2() {
         return msClassmark2;
     }
 
+    @JsonIgnore
     @Override
     public IMEI getIMEI() {
         return imei;
     }
 
+    @JsonIgnore
     @Override
     public SupportedCamelPhases getSupportedCamelPhases() {
         return supportedCamelPhases;
     }
 
+    @JsonIgnore
     @Override
     public OfferedCamel4Functionalities getOfferedCamel4Functionalities() {
         return offeredCamel4Functionalities;
     }
 
+    @JsonIgnore
     @Override
     public BearerCapability getBearerCapability2() {
         return bearerCapability2;
     }
 
+    @JsonIgnore
     @Override
     public ExtBasicServiceCode getExtBasicServiceCode2() {
         return extBasicServiceCode2;
     }
 
+    @JsonIgnore
     @Override
     public HighLayerCompatibilityInap getHighLayerCompatibility2() {
         return highLayerCompatibility2;
     }
 
+    @JsonIgnore
     @Override
     public LowLayerCompatibility getLowLayerCompatibility() {
         return lowLayerCompatibility;
     }
 
+    @JsonIgnore
     @Override
     public LowLayerCompatibility getLowLayerCompatibility2() {
         return lowLayerCompatibility2;
     }
 
+    @JsonIgnore
     @Override
     public boolean getEnhancedDialledServicesAllowed() {
         return enhancedDialledServicesAllowed;
     }
 
+    @JsonIgnore
     @Override
     public UUData getUUData() {
         return uuData;
     }
 
+    @JsonIgnore
     @Override
     public boolean getCollectInformationAllowed() {
         return collectInformationAllowed;
     }
 
+    @JsonIgnore
     @Override
     public boolean getReleaseCallArgExtensionAllowed() {
         return releaseCallArgExtensionAllowed;

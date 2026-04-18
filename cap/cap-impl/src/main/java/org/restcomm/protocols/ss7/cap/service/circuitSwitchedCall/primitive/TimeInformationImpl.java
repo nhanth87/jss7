@@ -36,7 +36,9 @@ public class TimeInformationImpl implements TimeInformation, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "TimeInformation";
 
+    @JacksonXmlProperty(localName = "timeIfNoTariffSwitch")
     private Integer timeIfNoTariffSwitch;
+    @JacksonXmlProperty(localName = "timeIfTariffSwitch")
     private TimeIfTariffSwitch timeIfTariffSwitch;
 
     public TimeInformationImpl() {

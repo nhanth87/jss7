@@ -1,4 +1,5 @@
 package org.restcomm.protocols.ss7.cap.errors;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
@@ -44,6 +45,7 @@ public class CAPErrorMessageSystemFailureImpl extends CAPErrorMessageImpl implem
         return true;
     }
 
+    @JsonIgnore
     public CAPErrorMessageSystemFailure getEmSystemFailure() {
         return this;
     }

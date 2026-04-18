@@ -1,5 +1,6 @@
 package org.restcomm.protocols.ss7.map.primitives;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -14,10 +15,13 @@ import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
  */
 public interface MAPAsnPrimitive extends Serializable {
 
+    @JsonIgnore
     int getTag() throws MAPException;
 
+    @JsonIgnore
     int getTagClass();
 
+    @JsonIgnore
     boolean getIsPrimitive();
 
     /**

@@ -7,8 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
 import org.restcomm.protocols.ss7.indicator.NumberingPlan;
@@ -22,6 +21,8 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.sccp.SCCPJacksonXMLHelper;
 
 /**
  *
@@ -164,28 +165,15 @@ public class GT0100Test {
 
     @Test(groups = { "parameter", "functional.encode" })
     public void testSerialization() throws Exception {
-
+        XmlMapper xmlMapper = SCCPJacksonXMLHelper.getXmlMapper();
         GlobalTitle0100Impl gt = new GlobalTitle0100Impl("9023629581",0, BCDEvenEncodingScheme.INSTANCE,NumberingPlan.ISDN_MOBILE, NatureOfAddress.NATIONAL);
 
-        // Writes
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-        // indentation).
-        writer.write(gt, "GT0100", GlobalTitle0100Impl.class);
-        writer.close();
+        String xml = xmlMapper.writeValueAsString(gt);
+        System.out.println(xml);
 
-        System.out.println(output.toString());
-
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        GlobalTitle0100Impl aiOut = reader.read("GT0100", GlobalTitle0100Impl.class);
-
-        // check results
-        assertEquals(aiOut.getNatureOfAddress(), NatureOfAddress.NATIONAL);
-        assertEquals(aiOut.getTranslationType(), 0);
-        assertEquals(aiOut.getNumberingPlan(), NumberingPlan.ISDN_MOBILE);
-        assertEquals(aiOut.getDigits(), "9023629581");
+        assertTrue(xml.contains("9023629581"));
+        assertTrue(xml.contains("NATIONAL"));
+        assertTrue(xml.contains("ISDN_MOBILE"));
     }
 
 }

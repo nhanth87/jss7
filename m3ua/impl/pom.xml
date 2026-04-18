@@ -1,10 +1,10 @@
-﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <artifactId>m3ua</artifactId>
         <groupId>org.restcomm.protocols.ss7.m3ua</groupId>
-        <version>9.2.9</version>
+        <version>9.2.10</version>
     </parent>
 
     <artifactId>m3ua-impl</artifactId>
@@ -119,10 +119,6 @@
                 </version>
 
                 <configuration>
-                    <suiteXmlFiles>
-                        <suiteXmlFile>testng-methods.xml</suiteXmlFile>
-                        <suiteXmlFile>testng-classes.xml</suiteXmlFile>
-                    </suiteXmlFiles>
                 </configuration>
             </plugin>
             <plugin>

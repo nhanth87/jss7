@@ -8,18 +8,23 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.StringReader;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.jctools.maps.NonBlockingHashMap;
-import javolution.xml.XMLBinding;
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.indicator.AddressIndicator;
@@ -67,10 +72,6 @@ public class RouterExtImpl implements RouterExt {
 
     private final StringBuilder persistFile = new StringBuilder();
 
-    protected static final SccpRouterXMLBindingExt binding = new SccpRouterXMLBindingExt();
-    private static final String TAB_INDENT = "\t";
-    private static final String CLASS_ATTRIBUTE = "type";
-
     private String persistDir = null;
 
     private RuleComparatorFactory ruleComparatorFactory = null;
@@ -87,15 +88,6 @@ public class RouterExtImpl implements RouterExt {
         this.sccpStack = sccpStack;
         this.router = router;
         this.ruleComparatorFactory = RuleComparatorFactory.getInstance("RuleComparatorFactory");
-
-        binding.setAlias(RuleImpl.class, RULE);
-        binding.setClassAttribute(CLASS_ATTRIBUTE);
-
-        binding.setAlias(GlobalTitle0001Impl.class, "GT0001");
-        binding.setAlias(GlobalTitle0010Impl.class, "GT0010");
-        binding.setAlias(GlobalTitle0011Impl.class, "GT0011");
-        binding.setAlias(GlobalTitle0100Impl.class, "GT0100");
-        binding.setAlias(NoGlobalTitle.class, "NoGlobalTitle");
     }
 
     public String getName() {
@@ -749,77 +741,81 @@ public class RouterExtImpl implements RouterExt {
      * Persist
      */
     public void store() {
+        try (FileWriter fw = new FileWriter(this.persistFile.toString())) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
 
-        // TODO : Should we keep reference to Objects rather than recreating
-        // everytime?
-        try {
-            XMLObjectWriter writer = XMLObjectWriter.newInstance(new FileOutputStream(persistFile.toString()));
-            writer.setBinding(binding);
-            writer.setIndentation(TAB_INDENT);
+            // Write rulesMap
+            sb.append("<rule>\n");
+            for (Map.Entry<Integer, Rule> e : this.rulesMap.entrySet()) {
+                sb.append("  <id value=\"").append(e.getKey()).append("\"/>\n");
+                RuleImpl rule = (RuleImpl) e.getValue();
+                sb.append("  <value ruleType=\"").append(escapeXml(rule.getRuleType().getValue())).append("\"");
+                sb.append(" loadSharingAlgo=\"").append(escapeXml(rule.getLoadSharingAlgorithm().getValue())).append("\"");
+                sb.append(" originatingType=\"").append(escapeXml(rule.getOriginationType().getValue())).append("\"");
+                sb.append(" mask=\"").append(escapeXml(rule.getMask())).append("\"");
+                sb.append(" paddress=\"").append(rule.getPrimaryAddressId()).append("\"");
+                sb.append(" saddress=\"").append(rule.getSecondaryAddressId()).append("\"");
+                sb.append(" networkId=\"").append(rule.getNetworkId()).append("\"");
+                if (rule.getNewCallingPartyAddressId() != null) {
+                    sb.append(" ncpaddress=\"").append(rule.getNewCallingPartyAddressId()).append("\"");
+                }
+                sb.append(">\n");
 
-            writer.write(rulesMap, RULE, RuleMap.class);
-            writer.write(routingAddresses, ROUTING_ADDRESS, SccpAddressMap.class);
+                writeSccpAddress(sb, (SccpAddressImpl) rule.getPattern(), "patternSccpAddress", "    ");
 
-            writer.close();
+                if (rule.getPatternCallingAddress() != null) {
+                    writeSccpAddress(sb, (SccpAddressImpl) rule.getPatternCallingAddress(), "patternCallingAddress", "    ");
+                }
+
+                sb.append("  </value>\n");
+            }
+            sb.append("</rule>\n");
+
+            // Write routingAddresses
+            sb.append("<routingAddress>\n");
+            for (Map.Entry<Integer, SccpAddressImpl> e : this.routingAddresses.entrySet()) {
+                sb.append("  <id value=\"").append(e.getKey()).append("\"/>\n");
+                writeSccpAddress(sb, e.getValue(), "sccpAddress", "    ");
+            }
+            sb.append("</routingAddress>\n");
+
+            fw.write(sb.toString());
         } catch (Exception e) {
             logger.error("Error while persisting the Rule state in file", e);
         }
     }
 
+    private String escapeXml(String s) {
+        if (s == null) return "";
+        return s.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&apos;");
+    }
+
     /**
      * Load and create LinkSets and Link from persisted file
-     *
-     * @throws Exception
      */
     protected void load() {
-
         try {
             File f = new File(persistFile.toString());
             if (f.exists()) {
-                loadVer34(persistFile.toString());
+                loadVer4(persistFile.toString());
             } else {
                 String s1 = persistFile.toString().replace("3_ext.xml", "2_ext.xml");
                 f = new File(s1);
-
                 if (f.exists()) {
-                    loadVer34(s1);
-                    this.store();
-                    f.delete();
+                    logger.warn("Legacy SCCP RouterExt config format v2 not supported, using defaults");
                 } else {
                     s1 = persistFile.toString().replace("3_ext.xml", "_ext.xml");
                     f = new File(s1);
-
                     if (f.exists()) {
-                        if (!loadVer1(s1)) {
-                            loadVer2(s1);
-                        }
+                        logger.warn("Legacy SCCP RouterExt config format v1 not supported, using defaults");
                     }
-
-                    this.store();
-                    f.delete();
                 }
             }
-
-//            File f = new File(persistFile.toString());
-//            if (f.exists()) {
-//                // we have V3 config
-//                loadVer3(persistFile.toString());
-//            } else {
-//                String s1 = persistFile.toString().replace("2.xml", ".xml");
-//                f = new File(s1);
-//
-//                if (f.exists()) {
-//                    if (!loadVer1(s1)) {
-//                        loadVer2(s1);
-//                    }
-//                }
-//
-//                this.store();
-//                f.delete();
-//            }
-        } catch (XMLStreamException ex) {
-            ex.printStackTrace();
-            logger.error(String.format("Failed to load the SS7 configuration file. \n%s", ex.getMessage()));
         } catch (FileNotFoundException e) {
             logger.warn(String.format("Failed to load the SS7 configuration file. \n%s", e.getMessage()));
         } catch (IOException e) {
@@ -850,121 +846,242 @@ public class RouterExtImpl implements RouterExt {
         }
     }
 
-    private boolean loadVer1(String fn) throws XMLStreamException, IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fn)));
-        StringBuilder sb = new StringBuilder();
-        while (true) {
-            String s1 = br.readLine();
-            if (s1 == null)
-                break;
-            sb.append(s1);
-            sb.append("\n");
-        }
-        br.close();
-        String s2 = sb.toString();
-        s2 = s2.replace("type=\"org.restcomm.protocols.ss7.sccp.parameter.NoGlobalTitle\"", "type=\"NoGlobalTitle\"");
-
-        s2 = s2.replace("type=\"rule\"", "");
-        s2 = s2.replace("pattern type=\"org.restcomm.protocols.ss7.sccp.parameter.SccpAddress\"", "patternSccpAddress");
-        s2 = s2.replace("ai type=\"org.restcomm.protocols.ss7.indicator.AddressIndicator\" ai=", "ai value=");
-        s2 = s2.replace("gt type=\"org.restcomm.protocols.ss7.sccp.parameter.", "gt type=\"");
-        s2 = s2.replace("Key type=\"java.lang.Integer\"", "id");
-        s2 = s2.replace("Value", "value");
-        s2 = s2.replace("/pattern", "/patternSccpAddress");
-        s2 = s2.replace("value type=\"org.restcomm.protocols.ss7.sccp.parameter.SccpAddress\"", "sccpAddress");
-        s2 = s2.replace("</value>\r\n</primaryAddress>", "</sccpAddress>\r\n</primaryAddress>");
-        s2 = s2.replace("</value>\n</primaryAddress>", "</sccpAddress>\n</primaryAddress>");
-        s2 = s2.replace("</value>\r\n</backupAddress>", "</sccpAddress>\r\n</backupAddress>");
-        s2 = s2.replace("</value>\n</backupAddress>", "</sccpAddress>\n</backupAddress>");
-        s2 = s2.replace("type=\"org.restcomm.protocols.ss7.sccp.parameter.", "type=\"");
-        s2 = s2.replace("type=\"org.restcomm.protocols.ss7.sccp.impl.router.Mtp3ServiceAccessPoint\"", "");
-        s2 = s2.replace("javolution.util.FastMap", "mtp3DestinationMap");
-        s2 = s2.replace("type=\"org.restcomm.protocols.ss7.sccp.impl.router.Mtp3Destination\"", "");
-
-        StringReader sr = new StringReader(s2);
-        XMLObjectReader reader = XMLObjectReader.newInstance(sr);
-
-        reader.setBinding(binding);
-
-        XMLBinding binding2 = new XMLBinding();
-        binding2.setClassAttribute(CLASS_ATTRIBUTE);
-
-        String BACKUP_ADDRESS_V2 = "backupAddress";
-        String ROUTING_ADDRESS_V2 = "primaryAddress";
-
+    protected void loadVer4(String fn) throws FileNotFoundException {
         try {
-            rulesMap = reader.read(RULE, RuleMap.class);
-        } catch (XMLStreamException e) {
-            return false;
+            String content = new String(Files.readAllBytes(new File(fn).toPath()));
+            // Javolution may produce multiple root elements; wrap to make valid XML
+            if (!content.trim().startsWith("<?xml")) {
+                content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<root>" + content + "</root>";
+            } else {
+                int idx = content.indexOf("?>");
+                if (idx != -1) {
+                    content = content.substring(0, idx + 2) + "\n<root>" + content.substring(idx + 2) + "</root>";
+                } else {
+                    content = "<root>" + content + "</root>";
+                }
+            }
+            XMLInputFactory factory = XMLInputFactory.newInstance();
+            factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+            XMLStreamReader reader = factory.createXMLStreamReader(new StringReader(content));
+            loadVer4(reader);
+            reader.close();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse RouterConfig from XML for " + fn, e);
         }
-        routingAddresses = reader.read(ROUTING_ADDRESS_V2, SccpAddressMap.class);
-        SccpAddressMap<Integer, SccpAddress> backupAddresses = reader.read(BACKUP_ADDRESS_V2, SccpAddressMap.class);
-
-//        longMessageRules = reader.read(LONG_MESSAGE_RULE, LongMessageRuleMap.class);
-//        saps = reader.read(MTP3_SERVICE_ACCESS_POINT, Mtp3ServiceAccessPointMap.class);
-
-//        for (FastMap.Entry<Integer, Mtp3ServiceAccessPoint> e = this.saps.head(), end = this.saps.tail(); (e = e.getNext()) != end;) {
-//            Mtp3ServiceAccessPoint sap = e.getValue();
-//            ((Mtp3ServiceAccessPointImpl)sap).setStackName(name);
-//        }
-
-        reader.close();
-
-        moveBackupToRoutingAddress(backupAddresses);
-
-        return true;
     }
 
-    private void loadVer2(String fn) throws XMLStreamException, IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fn)));
-        StringBuilder sb = new StringBuilder();
-        while (true) {
-            String s1 = br.readLine();
-            if (s1 == null)
+    protected void loadVer4(XMLStreamReader reader) throws Exception {
+        rulesMap = new RuleMap<Integer, Rule>();
+        routingAddresses = new SccpAddressMap<Integer, SccpAddressImpl>();
+
+        while (reader.hasNext()) {
+            int event = reader.next();
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                String localName = reader.getLocalName();
+                if ("rule".equals(localName)) {
+                    while (reader.hasNext()) {
+                        event = reader.next();
+                        if (event == XMLStreamConstants.END_ELEMENT && "rule".equals(reader.getLocalName())) {
+                            break;
+                        }
+                        if (event == XMLStreamConstants.START_ELEMENT && "id".equals(reader.getLocalName())) {
+                            Integer id = Integer.valueOf(reader.getAttributeValue(null, "value"));
+                            RuleImpl rule = null;
+                            while (reader.hasNext()) {
+                                event = reader.next();
+                                if (event == XMLStreamConstants.START_ELEMENT && "value".equals(reader.getLocalName())) {
+                                    rule = readRule(reader);
+                                    break;
+                                }
+                            }
+                            if (rule != null) {
+                                rule.setRuleId(id);
+                                rule.configure();
+                                rulesMap.put(id, rule);
+                            }
+                        }
+                    }
+                } else if ("routingAddress".equals(localName)) {
+                    while (reader.hasNext()) {
+                        event = reader.next();
+                        if (event == XMLStreamConstants.END_ELEMENT && "routingAddress".equals(reader.getLocalName())) {
+                            break;
+                        }
+                        if (event == XMLStreamConstants.START_ELEMENT && "id".equals(reader.getLocalName())) {
+                            Integer id = Integer.valueOf(reader.getAttributeValue(null, "value"));
+                            SccpAddressImpl addr = null;
+                            while (reader.hasNext()) {
+                                event = reader.next();
+                                if (event == XMLStreamConstants.START_ELEMENT && "sccpAddress".equals(reader.getLocalName())) {
+                                    addr = readSccpAddress(reader, "sccpAddress");
+                                    break;
+                                }
+                            }
+                            if (addr != null) {
+                                routingAddresses.put(id, addr);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void writeSccpAddress(StringBuilder sb, SccpAddressImpl addr, String tagName, String indent) {
+        sb.append(indent).append("<").append(tagName).append(" pc=\"").append(addr.getSignalingPointCode()).append("\"");
+        sb.append(" ssn=\"").append(addr.getSubsystemNumber()).append("\">\n");
+
+        sb.append(indent).append("  <ai value=\"").append(addr.getAddressIndicator().getValue(SccpProtocolVersion.ITU)).append("\"/>\n");
+
+        GlobalTitle gt = addr.getGlobalTitle();
+        if (gt != null) {
+            sb.append(indent).append("  <gt");
+            String gtType;
+            switch (gt.getGlobalTitleIndicator()) {
+                case GLOBAL_TITLE_INCLUDES_NATURE_OF_ADDRESS_INDICATOR_ONLY:
+                    gtType = "GT0001";
+                    break;
+                case GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_ONLY:
+                    gtType = "GT0010";
+                    break;
+                case GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_AND_ENCODING_SCHEME:
+                    gtType = "GT0011";
+                    break;
+                case GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_ENCODING_SCHEME_AND_NATURE_OF_ADDRESS:
+                    gtType = "GT0100";
+                    break;
+                default:
+                    gtType = "NoGlobalTitle";
+                    break;
+            }
+            sb.append(" type=\"").append(gtType).append("\"");
+            if (gt instanceof org.restcomm.protocols.ss7.sccp.parameter.GlobalTitle0100) {
+                org.restcomm.protocols.ss7.sccp.parameter.GlobalTitle0100 g = (org.restcomm.protocols.ss7.sccp.parameter.GlobalTitle0100) gt;
+                sb.append(" tt=\"").append(g.getTranslationType()).append("\"");
+                sb.append(" es=\"").append(g.getEncodingScheme().getSchemeCode()).append("\"");
+                sb.append(" np=\"").append(g.getNumberingPlan().getValue()).append("\"");
+                sb.append(" nai=\"").append(g.getNatureOfAddress().getValue()).append("\"");
+            } else if (gt instanceof org.restcomm.protocols.ss7.sccp.parameter.GlobalTitle0011) {
+                org.restcomm.protocols.ss7.sccp.parameter.GlobalTitle0011 g = (org.restcomm.protocols.ss7.sccp.parameter.GlobalTitle0011) gt;
+                sb.append(" tt=\"").append(g.getTranslationType()).append("\"");
+                sb.append(" es=\"").append(g.getEncodingScheme().getSchemeCode()).append("\"");
+                sb.append(" np=\"").append(g.getNumberingPlan().getValue()).append("\"");
+            } else if (gt instanceof org.restcomm.protocols.ss7.sccp.parameter.GlobalTitle0010) {
+                org.restcomm.protocols.ss7.sccp.parameter.GlobalTitle0010 g = (org.restcomm.protocols.ss7.sccp.parameter.GlobalTitle0010) gt;
+                sb.append(" tt=\"").append(g.getTranslationType()).append("\"");
+            } else if (gt instanceof org.restcomm.protocols.ss7.sccp.parameter.GlobalTitle0001) {
+                org.restcomm.protocols.ss7.sccp.parameter.GlobalTitle0001 g = (org.restcomm.protocols.ss7.sccp.parameter.GlobalTitle0001) gt;
+                sb.append(" nai=\"").append(g.getNatureOfAddress().getValue()).append("\"");
+            }
+            sb.append(" digits=\"").append(escapeXml(gt.getDigits())).append("\"/>\n");
+        }
+        sb.append(indent).append("</").append(tagName).append(">\n");
+    }
+
+    private SccpAddressImpl readSccpAddress(XMLStreamReader reader, String tagName) throws Exception {
+        int pc = Integer.parseInt(reader.getAttributeValue(null, "pc"));
+        int ssn = Integer.parseInt(reader.getAttributeValue(null, "ssn"));
+        int aiValue = 0;
+        GlobalTitle gt = null;
+
+        while (reader.hasNext()) {
+            int event = reader.next();
+            if (event == XMLStreamConstants.END_ELEMENT && tagName.equals(reader.getLocalName())) {
                 break;
-            sb.append(s1);
-            sb.append("\n");
+            }
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                String name = reader.getLocalName();
+                if ("ai".equals(name)) {
+                    aiValue = Integer.parseInt(reader.getAttributeValue(null, "value"));
+                } else if ("gt".equals(name)) {
+                    gt = readGlobalTitle(reader);
+                }
+            }
         }
-        br.close();
-        String s2 = sb.toString();
-        s2 = s2.replace("type=\"org.restcomm.protocols.ss7.sccp.parameter.NoGlobalTitle\"", "type=\"NoGlobalTitle\"");
 
-        StringReader sr = new StringReader(s2);
-        XMLObjectReader reader = XMLObjectReader.newInstance(sr);
-
-        String ROUTING_ADDRESS_V2 = "primaryAddress";
-        String BACKUP_ADDRESS_V2 = "backupAddress";
-
-        reader.setBinding(binding);
-        rulesMap = reader.read(RULE, RuleMap.class);
-        routingAddresses = reader.read(ROUTING_ADDRESS_V2, SccpAddressMap.class);
-        SccpAddressMap<Integer, SccpAddress> backupAddresses = reader.read(BACKUP_ADDRESS_V2, SccpAddressMap.class);
-
-//        longMessageRules = reader.read(LONG_MESSAGE_RULE, LongMessageRuleMap.class);
-//        saps = reader.read(MTP3_SERVICE_ACCESS_POINT, Mtp3ServiceAccessPointMap.class);
-//
-//        for (FastMap.Entry<Integer, Mtp3ServiceAccessPoint> e = this.saps.head(), end = this.saps.tail(); (e = e.getNext()) != end;) {
-//            Mtp3ServiceAccessPoint sap = e.getValue();
-//            ((Mtp3ServiceAccessPointImpl)sap).setStackName(name);
-//        }
-
-        reader.close();
-
-        moveBackupToRoutingAddress(backupAddresses);
+        AddressIndicator ai = new AddressIndicator((byte) aiValue, SccpProtocolVersion.ITU);
+        SccpAddressImpl addr = new SccpAddressImpl(ai.getRoutingIndicator(), gt, pc, ssn);
+        return addr;
     }
 
-    protected void loadVer34(String fn) throws XMLStreamException, FileNotFoundException {
-        XMLObjectReader reader = XMLObjectReader.newInstance(new FileInputStream(fn));
-
-        reader.setBinding(binding);
-        loadVer4(reader);
+    private org.restcomm.protocols.ss7.sccp.parameter.EncodingScheme encodingSchemeFromCode(int code) {
+        switch (code) {
+            case 1: return org.restcomm.protocols.ss7.sccp.impl.parameter.BCDOddEncodingScheme.INSTANCE;
+            case 2: return org.restcomm.protocols.ss7.sccp.impl.parameter.BCDEvenEncodingScheme.INSTANCE;
+            default: return org.restcomm.protocols.ss7.sccp.impl.parameter.DefaultEncodingScheme.INSTANCE;
+        }
     }
 
-    protected void loadVer4(XMLObjectReader reader) throws XMLStreamException{
-        rulesMap = reader.read(RULE, RuleMap.class);
-        routingAddresses = reader.read(ROUTING_ADDRESS, SccpAddressMap.class);
+    private GlobalTitle readGlobalTitle(XMLStreamReader reader) throws Exception {
+        String type = reader.getAttributeValue(null, "type");
+        String digits = reader.getAttributeValue(null, "digits");
+        if (digits == null) digits = "";
 
-        reader.close();
+        GlobalTitle gt = null;
+        if ("GT0100".equals(type)) {
+            int tt = Integer.parseInt(reader.getAttributeValue(null, "tt"));
+            int es = Integer.parseInt(reader.getAttributeValue(null, "es"));
+            int np = Integer.parseInt(reader.getAttributeValue(null, "np"));
+            int nai = Integer.parseInt(reader.getAttributeValue(null, "nai"));
+            gt = new GlobalTitle0100Impl(digits, tt, encodingSchemeFromCode(es), NumberingPlan.valueOf(np), NatureOfAddress.valueOf(nai));
+        } else if ("GT0011".equals(type)) {
+            int tt = Integer.parseInt(reader.getAttributeValue(null, "tt"));
+            int es = Integer.parseInt(reader.getAttributeValue(null, "es"));
+            int np = Integer.parseInt(reader.getAttributeValue(null, "np"));
+            gt = new GlobalTitle0011Impl(digits, tt, encodingSchemeFromCode(es), NumberingPlan.valueOf(np));
+        } else if ("GT0010".equals(type)) {
+            int tt = Integer.parseInt(reader.getAttributeValue(null, "tt"));
+            gt = new GlobalTitle0010Impl(digits, tt);
+        } else if ("GT0001".equals(type)) {
+            int nai = Integer.parseInt(reader.getAttributeValue(null, "nai"));
+            gt = new GlobalTitle0001Impl(digits, NatureOfAddress.valueOf(nai));
+        } else if ("NoGlobalTitle".equals(type)) {
+            gt = new NoGlobalTitle();
+        }
+
+        while (reader.hasNext()) {
+            int event = reader.next();
+            if (event == XMLStreamConstants.END_ELEMENT && "gt".equals(reader.getLocalName())) {
+                break;
+            }
+        }
+        return gt;
+    }
+
+    private RuleImpl readRule(XMLStreamReader reader) throws Exception {
+        RuleType ruleType = RuleType.getInstance(reader.getAttributeValue(null, "ruleType"));
+        LoadSharingAlgorithm loadSharingAlgo = LoadSharingAlgorithm.getInstance(reader.getAttributeValue(null, "loadSharingAlgo"));
+        OriginationType originationType = OriginationType.getInstance(reader.getAttributeValue(null, "originatingType"));
+        String mask = reader.getAttributeValue(null, "mask");
+        int pAddressId = Integer.parseInt(reader.getAttributeValue(null, "paddress"));
+        int sAddressId = Integer.parseInt(reader.getAttributeValue(null, "saddress"));
+        int networkId = Integer.parseInt(reader.getAttributeValue(null, "networkId"));
+        String ncp = reader.getAttributeValue(null, "ncpaddress");
+        Integer newCallingPartyAddressAddressId = ncp != null ? Integer.valueOf(ncp) : null;
+
+        SccpAddress pattern = null;
+        SccpAddress patternCallingAddress = null;
+
+        while (reader.hasNext()) {
+            int event = reader.next();
+            if (event == XMLStreamConstants.END_ELEMENT && "value".equals(reader.getLocalName())) {
+                break;
+            }
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                String name = reader.getLocalName();
+                if ("patternSccpAddress".equals(name)) {
+                    pattern = readSccpAddress(reader, "patternSccpAddress");
+                } else if ("patternCallingAddress".equals(name)) {
+                    patternCallingAddress = readSccpAddress(reader, "patternCallingAddress");
+                }
+            }
+        }
+
+        RuleImpl rule = new RuleImpl(ruleType, loadSharingAlgo, originationType, pattern, mask, networkId, patternCallingAddress);
+        rule.setPrimaryAddressId(pAddressId);
+        rule.setSecondaryAddressId(sAddressId);
+        rule.setNewCallingPartyAddressId(newCallingPartyAddressAddressId);
+        return rule;
     }
 
     public static void makeOldConfigCopy(String persistDir, String name) {

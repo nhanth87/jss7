@@ -33,7 +33,9 @@ public class CompoundCriteriaImpl extends SequenceBase implements CompoundCriter
     private static final String BASIC_GAP_CRITERIA = "basicGapCriteria";
     private static final String SCF_ID = "scfId";
 
+    @JacksonXmlProperty(localName = "basicGapCriteria")
     private BasicGapCriteria basicGapCriteria;
+    @JacksonXmlProperty(localName = "scfId")
     private ScfID scfId;
 
     public CompoundCriteriaImpl() {
