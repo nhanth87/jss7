@@ -1,5 +1,6 @@
 package org.restcomm.protocols.ss7.cap.service.circuitSwitchedCall;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
@@ -49,10 +50,15 @@ public class CallGapRequestImpl extends CircuitSwitchedCallMessageImpl implement
     private static final String GAP_TREATMENT = "gapTreatment";
     private static final String CAP_EXTENSION = "capExtension";
 
+    @JacksonXmlProperty(localName = "gapCriteria")
     private GapCriteria gapCriteria;
+    @JacksonXmlProperty(localName = "gapIndicators")
     private GapIndicators gapIndicators;
+    @JacksonXmlProperty(localName = "controlType")
     private ControlType controlType;
+    @JacksonXmlProperty(localName = "gapTreatment")
     private GapTreatment gapTreatment;
+    @JacksonXmlProperty(localName = "capExtension")
     private CAPExtensions capExtensions;
 
     public CallGapRequestImpl() {
@@ -250,22 +256,27 @@ public class CallGapRequestImpl extends CircuitSwitchedCallMessageImpl implement
 
     }
 
+    @JsonIgnore
     public GapCriteria getGapCriteria() {
         return gapCriteria;
     }
 
+    @JsonIgnore
     public GapIndicators getGapIndicators() {
         return gapIndicators;
     }
 
+    @JsonIgnore
     public ControlType getControlType() {
         return controlType;
     }
 
+    @JsonIgnore
     public GapTreatment getGapTreatment() {
         return gapTreatment;
     }
 
+    @JsonIgnore
     public CAPExtensions getExtensions() {
         return capExtensions;
     }

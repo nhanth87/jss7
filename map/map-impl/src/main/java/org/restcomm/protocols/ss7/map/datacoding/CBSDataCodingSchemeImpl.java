@@ -16,7 +16,14 @@ public class CBSDataCodingSchemeImpl implements CBSDataCodingScheme {
 
     private int code;
 
+    public CBSDataCodingSchemeImpl() {
+    }
+
     public CBSDataCodingSchemeImpl(int code) {
+        this.code = code;
+    }
+
+    public void setCode(int code) {
         this.code = code;
     }
 

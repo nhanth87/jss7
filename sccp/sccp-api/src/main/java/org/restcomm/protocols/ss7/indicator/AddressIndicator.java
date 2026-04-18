@@ -3,6 +3,7 @@ package org.restcomm.protocols.ss7.indicator;
 
 import org.restcomm.protocols.ss7.sccp.SccpProtocolVersion;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import javolution.xml.XMLFormat;
 import javolution.xml.XMLSerializable;
 import javolution.xml.stream.XMLStreamException;
@@ -79,10 +80,12 @@ public class AddressIndicator implements XMLSerializable {
         return this.globalTitleIndicator;
     }
 
+    @JsonProperty("pcPresent")
     public boolean isPCPresent() {
         return this.pcPresent;
     }
 
+    @JsonProperty("ssnPresent")
     public boolean isSSNPresent() {
         return this.ssnPresent;
     }
@@ -93,6 +96,36 @@ public class AddressIndicator implements XMLSerializable {
 
     public boolean isReservedForNationalUseBit() {
         return this.reservedForNationalUseBit;
+    }
+
+    public void setGlobalTitleIndicator(GlobalTitleIndicator globalTitleIndicator) {
+        this.globalTitleIndicator = globalTitleIndicator;
+    }
+
+    public void setPCPresent(boolean pcPresent) {
+        this.pcPresent = pcPresent;
+    }
+
+    @JsonProperty("pcPresent")
+    public void setPcPresent(boolean pcPresent) {
+        this.pcPresent = pcPresent;
+    }
+
+    public void setSSNPresent(boolean ssnPresent) {
+        this.ssnPresent = ssnPresent;
+    }
+
+    @JsonProperty("ssnPresent")
+    public void setSsnPresent(boolean ssnPresent) {
+        this.ssnPresent = ssnPresent;
+    }
+
+    public void setRoutingIndicator(RoutingIndicator routingIndicator) {
+        this.routingIndicator = routingIndicator;
+    }
+
+    public void setReservedForNationalUseBit(boolean reservedForNationalUseBit) {
+        this.reservedForNationalUseBit = reservedForNationalUseBit;
     }
 
     public byte getValue(SccpProtocolVersion sccpProtocolVersion) {

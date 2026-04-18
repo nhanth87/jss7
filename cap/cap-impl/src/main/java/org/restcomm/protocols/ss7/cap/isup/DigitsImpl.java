@@ -2,6 +2,7 @@ package org.restcomm.protocols.ss7.cap.isup;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.IOException;
 
@@ -32,7 +33,6 @@ public class DigitsImpl implements Digits, CAPAsnPrimitive {
 
     public static final String _PrimitiveName = "Digits";
 
-    @JacksonXmlProperty(localName = "genericDigits")
     private byte[] data;
     private boolean isGenericDigits;
     private boolean isGenericNumber;
@@ -52,11 +52,13 @@ public class DigitsImpl implements Digits, CAPAsnPrimitive {
         this.setGenericNumber(genericNumber);
     }
 
+    @JacksonXmlProperty(localName = "genericDigits")
     @Override
     public byte[] getData() {
         return data;
     }
 
+    @JsonIgnore
     @Override
     public GenericDigits getGenericDigits() throws CAPException {
         if (this.data == null)
@@ -73,6 +75,7 @@ public class DigitsImpl implements Digits, CAPAsnPrimitive {
         }
     }
 
+    @JsonIgnore
     @Override
     public GenericNumber getGenericNumber() throws CAPException {
         if (this.data == null)

@@ -9,13 +9,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.map.primitives.CellGlobalIdOrServiceAreaIdFixedLengthImpl;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
  *
@@ -98,26 +98,15 @@ public class CellGlobalIdOrServiceAreaIdFixedLengthTest {
 
     @Test(groups = { "functional.xml.serialize", "primitives" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         CellGlobalIdOrServiceAreaIdFixedLengthImpl original = new CellGlobalIdOrServiceAreaIdFixedLengthImpl(250, 1, 4444, 3333);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "cellGlobalIdOrServiceAreaIdFixedLength", CellGlobalIdOrServiceAreaIdFixedLengthImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        CellGlobalIdOrServiceAreaIdFixedLengthImpl copy = reader.read("cellGlobalIdOrServiceAreaIdFixedLength",
-                CellGlobalIdOrServiceAreaIdFixedLengthImpl.class);
+        CellGlobalIdOrServiceAreaIdFixedLengthImpl copy = xmlMapper.readValue(serializedEvent, CellGlobalIdOrServiceAreaIdFixedLengthImpl.class);
 
         assertEquals(copy.getMCC(), original.getMCC());
         assertEquals(copy.getMNC(), original.getMNC());

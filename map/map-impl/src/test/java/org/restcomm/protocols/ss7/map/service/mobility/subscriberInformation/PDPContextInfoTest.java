@@ -9,9 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
@@ -32,6 +29,9 @@ import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.ExtQ
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.PDPAddressImpl;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.PDPTypeImpl;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
  *
@@ -243,7 +243,7 @@ public class PDPContextInfoTest {
 
     @Test(groups = { "functional.xml.serialize", "subscriberInformation" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         PDPTypeImpl pdpType = new PDPTypeImpl(PDPTypeValue.PPP);
         PDPAddressImpl pdpAddress = new PDPAddressImpl(getEncodedPDPAddress());
         APNImpl apnSubscribed = new APNImpl("aaa.com");
@@ -281,21 +281,11 @@ public class PDPContextInfoTest {
                 qos3Requested, qos3Negotiated, qos4Subscribed, qos4Requested, qos4Negotiated, extPdpType, extPdpAddress);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "pdpContextInfo", PDPContextInfoImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        PDPContextInfoImpl copy = reader.read("pdpContextInfo", PDPContextInfoImpl.class);
+        PDPContextInfoImpl copy = xmlMapper.readValue(serializedEvent, PDPContextInfoImpl.class);
 
         assertEquals(copy.getPdpContextIdentifier(), original.getPdpContextIdentifier());
         assertEquals(copy.getPdpContextActive(), original.getPdpContextActive());

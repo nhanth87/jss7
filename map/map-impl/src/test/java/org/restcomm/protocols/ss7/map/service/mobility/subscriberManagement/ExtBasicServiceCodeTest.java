@@ -9,9 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.map.api.service.mobility.subscriberManagement.TeleserviceCodeValue;
@@ -19,6 +16,9 @@ import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.ExtB
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.ExtBearerServiceCodeImpl;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberManagement.ExtTeleserviceCodeImpl;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
  *
@@ -111,26 +111,16 @@ public class ExtBasicServiceCodeTest {
 
     @Test(groups = { "functional.xml.serialize", "primitives.extBasic" })
     public void testXMLSerializaionExtBasic() throws Exception {
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         ExtBearerServiceCodeImpl b = new ExtBearerServiceCodeImpl(this.getData1());
         ExtBasicServiceCodeImpl original = new ExtBasicServiceCodeImpl(b);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(original, "extBasicServiceCode", ExtBasicServiceCodeImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        ExtBasicServiceCodeImpl copy = reader.read("extBasicServiceCode", ExtBasicServiceCodeImpl.class);
+        ExtBasicServiceCodeImpl copy = xmlMapper.readValue(serializedEvent, ExtBasicServiceCodeImpl.class);
 
         assertEquals(copy.getExtBearerService().getBearerServiceCodeValue(), original.getExtBearerService()
                 .getBearerServiceCodeValue());
@@ -139,26 +129,16 @@ public class ExtBasicServiceCodeTest {
 
     @Test(groups = { "functional.xml.serialize", "primitives.extTele" })
     public void testXMLSerializaionExtTele() throws Exception {
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         ExtTeleserviceCodeImpl b = new ExtTeleserviceCodeImpl(this.getData2());
         ExtBasicServiceCodeImpl original = new ExtBasicServiceCodeImpl(b);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(original, "extBasicServiceCode", ExtBasicServiceCodeImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        ExtBasicServiceCodeImpl copy = reader.read("extBasicServiceCode", ExtBasicServiceCodeImpl.class);
+        ExtBasicServiceCodeImpl copy = xmlMapper.readValue(serializedEvent, ExtBasicServiceCodeImpl.class);
 
         assertEquals(copy.getExtTeleservice().getTeleserviceCodeValue(), original.getExtTeleservice().getTeleserviceCodeValue());
         assertNull(copy.getExtBearerService());

@@ -9,9 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.CauseIndicatorsImpl;
 import org.restcomm.protocols.ss7.isup.message.parameter.CauseIndicators;
 import org.testng.annotations.AfterClass;
@@ -19,6 +16,9 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.isup.ISUPJacksonXMLHelper;
 
 /**
  *
@@ -104,27 +104,17 @@ public class CauseIndicatorsTest {
 
     @Test(groups = { "functional.xml.serialize", "parameter" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = ISUPJacksonXMLHelper.getXmlMapper();
         CauseIndicatorsImpl original = new CauseIndicatorsImpl(CauseIndicators._CODING_STANDARD_NATIONAL,
                 CauseIndicators._LOCATION_PRIVATE_NSRU, 1, CauseIndicators._CV_CALL_REJECTED, null);
         // int codingStandard, int location, int recommendation, int causeValue, byte[] diagnostics
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "causeIndicators", CauseIndicatorsImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        CauseIndicatorsImpl copy = reader.read("causeIndicators", CauseIndicatorsImpl.class);
+        CauseIndicatorsImpl copy = xmlMapper.readValue(serializedEvent, CauseIndicatorsImpl.class);
 
         assertEquals(copy.getCodingStandard(), original.getCodingStandard());
         assertEquals(copy.getLocation(), original.getLocation());
@@ -136,21 +126,11 @@ public class CauseIndicatorsTest {
                 1, CauseIndicators._CV_CALL_REJECTED, getDiagnosticsData());
 
         // Writes the area to a file.
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "causeIndicators", CauseIndicatorsImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-        copy = reader.read("causeIndicators", CauseIndicatorsImpl.class);
+        copy = xmlMapper.readValue(serializedEvent, CauseIndicatorsImpl.class);
 
         assertEquals(copy.getCodingStandard(), original.getCodingStandard());
         assertEquals(copy.getLocation(), original.getLocation());

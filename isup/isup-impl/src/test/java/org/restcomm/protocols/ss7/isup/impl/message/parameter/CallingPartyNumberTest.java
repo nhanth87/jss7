@@ -9,9 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.CallingPartyNumberImpl;
 import org.restcomm.protocols.ss7.isup.message.parameter.CallingPartyNumber;
 import org.restcomm.protocols.ss7.isup.message.parameter.NAINumber;
@@ -20,6 +17,9 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.isup.ISUPJacksonXMLHelper;
 
 /**
  *
@@ -127,27 +127,17 @@ public class CallingPartyNumberTest {
 
     @Test(groups = { "functional.xml.serialize", "parameter" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = ISUPJacksonXMLHelper.getXmlMapper();
         CallingPartyNumberImpl original = new CallingPartyNumberImpl(NAINumber._NAI_NATIONAL_SN, "12345",
                 CallingPartyNumber._NPI_TELEX, CallingPartyNumber._NI_INCOMPLETE, CallingPartyNumber._APRI_ALLOWED,
                 CallingPartyNumber._SI_USER_PROVIDED_FAILED);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "callingPartyNumber", CallingPartyNumberImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        CallingPartyNumberImpl copy = reader.read("callingPartyNumber", CallingPartyNumberImpl.class);
+        CallingPartyNumberImpl copy = xmlMapper.readValue(serializedEvent, CallingPartyNumberImpl.class);
 
         assertEquals(copy.getNatureOfAddressIndicator(), original.getNatureOfAddressIndicator());
         assertEquals(copy.getAddress(), original.getAddress());

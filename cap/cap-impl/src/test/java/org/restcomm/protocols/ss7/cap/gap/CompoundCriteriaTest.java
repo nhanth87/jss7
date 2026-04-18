@@ -1,9 +1,6 @@
 
 package org.restcomm.protocols.ss7.cap.gap;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.cap.api.gap.*;
@@ -26,6 +23,9 @@ import java.util.Arrays;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.cap.CAPJacksonXMLHelper;
 
 /**
  *
@@ -82,7 +82,7 @@ public class CompoundCriteriaTest {
 
     @Test(groups = { "functional.xml.serialize", "gap" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = CAPJacksonXMLHelper.getXmlMapper();
         GenericNumberImpl gn = new GenericNumberImpl(GenericNumber._NAI_NATIONAL_SN, "12345",
                 GenericNumber._NQIA_CONNECTED_NUMBER, GenericNumber._NPI_TELEX, GenericNumber._APRI_ALLOWED,
                 GenericNumber._NI_INCOMPLETE, GenericNumber._SI_USER_PROVIDED_VERIFIED_FAILED);
@@ -119,26 +119,14 @@ public class CompoundCriteriaTest {
     }
 
     private void test(BasicGapCriteriaImpl basicGapCriteria) throws Exception {
-
+        XmlMapper xmlMapper = CAPJacksonXMLHelper.getXmlMapper();
         ScfID scfId = new ScfIDImpl(getDigitsData1());
         CompoundCriteriaImpl original = new CompoundCriteriaImpl(basicGapCriteria, scfId);
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "compoundCriteriaArg", CompoundCriteriaImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
-
+        String serializedEvent = xmlMapper.writeValueAsString(original);
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-
-        CompoundCriteriaImpl copy = reader.read("compoundCriteriaArg", CompoundCriteriaImpl.class);
+        CompoundCriteriaImpl copy = xmlMapper.readValue(serializedEvent, CompoundCriteriaImpl.class);
 
         assertTrue(isEqual(original, copy));
     }

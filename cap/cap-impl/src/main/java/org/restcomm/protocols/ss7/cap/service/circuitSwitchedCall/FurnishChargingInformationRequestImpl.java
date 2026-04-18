@@ -35,6 +35,7 @@ public class FurnishChargingInformationRequestImpl extends CircuitSwitchedCallMe
 
     private static final String FCIBCC_CAMEL_SEQUENCE1 = "fciBCCCAMELsequence1";
 
+    @JacksonXmlProperty(localName = "fciBCCCAMELsequence1")
     private FCIBCCCAMELsequence1 FCIBCCCAMELsequence1;
 
     public FurnishChargingInformationRequestImpl() {

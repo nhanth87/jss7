@@ -13,6 +13,8 @@ public class ASPIdentifierImpl extends ParameterImpl implements ASPIdentifier {
     private long aspID = 0;
     private byte[] value;
 
+    public ASPIdentifierImpl() {}
+
     protected ASPIdentifierImpl(byte[] value) {
         this.tag = Parameter.ASP_Identifier;
 

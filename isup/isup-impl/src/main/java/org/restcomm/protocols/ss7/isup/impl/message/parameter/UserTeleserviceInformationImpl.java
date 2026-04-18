@@ -170,6 +170,9 @@ public class UserTeleserviceInformationImpl extends AbstractISUPParameter implem
     }
 
     public void setEHighLayerCharIdentification(int highLayerCharIdentification) {
+        if (highLayerCharIdentification == 0) {
+            return;
+        }
 
         if (this.eVideoTelephonyCharIdentificationPresent) {
             throw new IllegalStateException(
@@ -188,6 +191,9 @@ public class UserTeleserviceInformationImpl extends AbstractISUPParameter implem
     }
 
     public void setEVideoTelephonyCharIdentification(int eVidedoTelephonyCharIdentification) {
+        if (eVidedoTelephonyCharIdentification == 0) {
+            return;
+        }
         if (this.eHighLayerCharIdentificationPresent) {
             throw new IllegalStateException(
                     "Either Extended VideoTlephony or Extended HighLayer octet is set. ExtendedHighLayer is already present");

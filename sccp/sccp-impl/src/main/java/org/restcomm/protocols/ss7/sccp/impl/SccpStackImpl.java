@@ -1115,31 +1115,37 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
                 networkId = svcAccessPoint.getNetworkId();
                 ni = svcAccessPoint.getNi();
                 // use opc, networkId and ni to find the the mtp3Id to use
-                Mtp3Destination mtp3Destination = svcAccessPoint.getMtp3Destination(svcAccessPoints.getKey());
-                firstSls = mtp3Destination.getFirstSls();
-                // defensively setting the first SLS value to 0 if wrongly configured as a negative number
-                if (firstSls < 0) {
-                    logger.warn("firstSls wrongly set as a negative number. Setting it back to 0");
-                    firstSls = 0;
+                for (Map.Entry<Integer, Mtp3Destination> destEntry : svcAccessPoint.getMtp3Destinations().entrySet()) {
+                    Mtp3Destination mtp3Destination = destEntry.getValue();
+                    if (mtp3Destination == null) {
+                        continue;
+                    }
+                    firstSls = mtp3Destination.getFirstSls();
+                    // defensively setting the first SLS value to 0 if wrongly configured as a negative number
+                    if (firstSls < 0) {
+                        logger.warn("firstSls wrongly set as a negative number. Setting it back to 0");
+                        firstSls = 0;
+                    }
+                    lastSls = mtp3Destination.getLastSls();
+                    // defensively setting the last SLS value to 255 if wrongly configured higher than 255
+                    if (lastSls > 255) {
+                        logger.warn("lastSls wrongly set higher than 255. Setting it back to 255");
+                        lastSls = 255;
+                    }
+                    // defensively setting the first SLS value if wrongly set higher than the last SLS value
+                    if (firstSls > lastSls) {
+                        logger.warn("firstSls wrongly set higher than lastSls. Setting it back to 0");
+                        firstSls = 0;
+                    }
+                    slsMask = mtp3Destination.getSlsMask();
+                    // defensively setting the SLS mask value if wrongly set higher than 255
+                    if (slsMask > 255) {
+                        logger.warn("slsMask wrongly set higher than 255. Setting it back to 0");
+                        firstSls = 0;
+                    }
+                    // break for now;
+                    break;
                 }
-                lastSls = mtp3Destination.getLastSls();
-                // defensively setting the last SLS value to 255 if wrongly configured higher than 255
-                if (lastSls > 255) {
-                    logger.warn("lastSls wrongly set higher than 255. Setting it back to 255");
-                    lastSls = 255;
-                }
-                // defensively setting the first SLS value if wrongly set higher than the last SLS value
-                if (firstSls > lastSls) {
-                    logger.warn("firstSls wrongly set higher than lastSls. Setting it back to 0");
-                    firstSls = 0;
-                }
-                slsMask = mtp3Destination.getSlsMask();
-                // defensively setting the SLS mask value if wrongly set higher than 255
-                if (slsMask > 255) {
-                    logger.warn("slsMask wrongly set higher than 255. Setting it back to 0");
-                    firstSls = 0;
-                }
-                // break for now;
                 break;
             }
             logger.info("MTP3 destination SLS values from the SccpStack configuration file for SAP (" + networkId + "): " +

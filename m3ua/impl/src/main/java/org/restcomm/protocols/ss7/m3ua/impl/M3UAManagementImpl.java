@@ -1,6 +1,7 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -634,7 +635,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
             }
         }
 
-        List<Asp> aspImplList = aspFactory.aspList;
+        List<Asp> aspImplList = new java.util.ArrayList<>(aspFactory.aspList);
 
         // Checks for RoutingContext. We know that for null RC there will always
         // be a single ASP assigned to AS and ASP cannot be shared
@@ -771,7 +772,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         }
 
         if (!aspFactoryImpl.getStatus()) {
-            List<Asp> listAsp = aspFactoryImpl.aspList;
+            List<Asp> listAsp = new java.util.ArrayList<>(aspFactoryImpl.aspList);
             Iterator<Asp> aspIterator = listAsp.iterator();
             Asp asp;
             As as = null;
@@ -967,9 +968,21 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
             config.statisticsTaskPeriod = this.statisticsTaskPeriod;
             config.routingKeyManagementEnabled = this.routingKeyManagementEnabled;
             config.useLsbForLinksetSelection = this.isUseLsbForLinksetSelection();
-            config.aspFactories = this.aspFactories;
-            config.appServers = this.appServers;
-            config.route = this.routeManagement.route;
+            config.aspFactories = new CopyOnWriteArrayList<>();
+            for (AspFactory af : this.aspFactories) {
+                config.aspFactories.add((AspFactoryImpl) af);
+            }
+            config.appServers = new CopyOnWriteArrayList<>();
+            for (As as : this.appServers) {
+                config.appServers.add((AsImpl) as);
+            }
+            config.routeEntries = new java.util.ArrayList<>();
+            for (java.util.Map.Entry<String, RouteAsImpl> entry : this.routeManagement.route.entrySet()) {
+                RouteEntry re = new RouteEntry();
+                re.key = entry.getKey();
+                re.value = entry.getValue();
+                config.routeEntries.add(re);
+            }
 
             String xml = M3UAJacksonXMLHelper.toXML(config);
             try (FileWriter writer = new FileWriter(persistFile.toString())) {
@@ -980,9 +993,18 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         }
     }
 
+
+    public static class RouteEntry {
+        @com.fasterxml.jackson.annotation.JsonProperty("key")
+        public String key;
+        @com.fasterxml.jackson.annotation.JsonProperty("value")
+        public RouteAsImpl value;
+    }
+
     /**
      * Configuration class for M3UA persistence
      */
+
     @JacksonXmlRootElement(localName = "m3uaConfig")
     public static class M3UAConfig {
         @JsonProperty("timeBetweenHeartbeat")
@@ -999,12 +1021,16 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         public boolean useLsbForLinksetSelection;
         @JsonProperty("aspFactories")
         @JacksonXmlElementWrapper(localName = "aspFactories")
-        public CopyOnWriteArrayList<AspFactory> aspFactories;
+        @com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty(localName = "aspFactory")
+        public CopyOnWriteArrayList<AspFactoryImpl> aspFactories;
         @JsonProperty("appServers")
         @JacksonXmlElementWrapper(localName = "appServers")
-        public CopyOnWriteArrayList<As> appServers;
-        @JsonProperty("route")
-        public RouteMap route;
+        @com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty(localName = "as")
+        public CopyOnWriteArrayList<AsImpl> appServers;
+        @JsonProperty("routeEntries")
+        @com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper(localName = "route")
+        @com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty(localName = "routeEntry")
+        public java.util.ArrayList<RouteEntry> routeEntries;
     }
 
     /**
@@ -1078,15 +1104,30 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         } catch (Exception e) {
         }
 
-        aspFactories = config.aspFactories;
-        appServers = config.appServers;
-        this.routeManagement.route = config.route;
+        if (config.aspFactories != null) {
+            aspFactories = new java.util.concurrent.CopyOnWriteArrayList<AspFactory>((java.util.Collection<? extends AspFactory>) config.aspFactories);
+        } else {
+            aspFactories = new java.util.concurrent.CopyOnWriteArrayList<AspFactory>();
+        }
+        if (config.appServers != null) {
+            appServers = new java.util.concurrent.CopyOnWriteArrayList<As>((java.util.Collection<? extends As>) config.appServers);
+        } else {
+            appServers = new java.util.concurrent.CopyOnWriteArrayList<As>();
+        }
+        RouteMap<String, RouteAsImpl> routeMap = new RouteMap<>();
+        if (config.routeEntries != null) {
+            for (RouteEntry re : config.routeEntries) {
+                routeMap.put(re.key, re.value);
+            }
+        }
+        this.routeManagement.route = routeMap;
 
         this.routeManagement.reset();
 
         // Create Asp's and assign to each of the AS. Schedule the FSMs
         for (As as : appServers) {
             AsImpl asImpl = (AsImpl) as;
+            asImpl.init();
             asImpl.setM3UAManagement(this);
             FSM asLocalFSM = asImpl.getLocalFSM();
             m3uaScheduler.execute(asLocalFSM);
@@ -1120,7 +1161,10 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
             factory.setTransportManagement(this.transportManagement);
             factory.setM3UAManagement(this);
             try {
-                factory.setAssociation(this.transportManagement.getAssociation(factory.associationName));
+                Association association = this.transportManagement.getAssociation(factory.associationName);
+                if (association != null) {
+                    factory.setAssociation(association);
+                }
             } catch (Throwable e1) {
                 logger.error(String.format("Error setting Association=%s for the AspFactory=%s while loading from XML",
                         factory.associationName, factory.getName()), e1);
@@ -1144,7 +1188,15 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
     protected void loadVer2(String fn) throws IOException {
         try (FileReader reader = new FileReader(fn)) {
             M3UAConfig config = M3UAJacksonXMLHelper.fromXML(reader, M3UAConfig.class);
+            if (config.aspFactories != null) {
+                for (AspFactoryImpl factory : config.aspFactories) {
+                    factory.aspList.clear();
+                }
+            }
             this.loadActualData(config);
+        } catch (Exception e) {
+            logger.error("Failed to parse M3UA config from XML: " + e.getMessage(), e);
+            throw new IOException("Failed to parse M3UA config", e);
         }
     }
 

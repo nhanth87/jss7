@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>sccp-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7.sccp</groupId>
-		<version>9.2.9</version>
+		<version>9.2.10</version>
 	</parent>
 
 	<artifactId>sccp-impl-ext</artifactId>
@@ -75,6 +75,16 @@
 			<artifactId>concurrent</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>2.15.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.15.2</version>
+		</dependency>
 
 	</dependencies>
 
@@ -101,6 +111,9 @@
 				<configuration>
 					<archive>
 						<addMavenDescriptor>false</addMavenDescriptor>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
 					</archive>
 				</configuration>
 				<executions>

@@ -8,9 +8,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.UserServiceInformationImpl;
 import org.restcomm.protocols.ss7.isup.message.parameter.UserServiceInformation;
 import org.testng.annotations.AfterClass;
@@ -18,6 +15,9 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.isup.ISUPJacksonXMLHelper;
 
 /**
  *
@@ -285,7 +285,7 @@ public class UserServiceInformationTest {
 
     @Test(groups = { "functional.xml.serialize", "parameter" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = ISUPJacksonXMLHelper.getXmlMapper();
         UserServiceInformationImpl original = new UserServiceInformationImpl();
         original.setCodingStandart(UserServiceInformation._CS_INTERNATIONAL);
         original.setInformationTransferCapability(UserServiceInformation._ITS_VIDEO);
@@ -293,21 +293,11 @@ public class UserServiceInformationTest {
         original.setInformationTransferRate(UserServiceInformation._ITR_64x2);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "userServiceInformation", UserServiceInformationImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        UserServiceInformationImpl copy = reader.read("userServiceInformation", UserServiceInformationImpl.class);
+        UserServiceInformationImpl copy = xmlMapper.readValue(serializedEvent, UserServiceInformationImpl.class);
 
         assertEquals(copy.getCodingStandart(), original.getCodingStandart());
         assertEquals(copy.getInformationTransferCapability(), original.getInformationTransferCapability());
@@ -370,21 +360,11 @@ public class UserServiceInformationTest {
         original.setL3Protocol(UserServiceInformation._L3_PROT_P2P);
 
         // Writes the area to a file.
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "userServiceInformation", UserServiceInformationImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-        copy = reader.read("userServiceInformation", UserServiceInformationImpl.class);
+        copy = xmlMapper.readValue(serializedEvent, UserServiceInformationImpl.class);
 
         assertEquals(copy.getCodingStandart(), original.getCodingStandart());
         assertEquals(copy.getInformationTransferCapability(), original.getInformationTransferCapability());

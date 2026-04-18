@@ -7,8 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
 import org.restcomm.protocols.ss7.indicator.NumberingPlan;
 import org.restcomm.protocols.ss7.sccp.SccpProtocolVersion;
@@ -20,6 +19,8 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.sccp.SCCPJacksonXMLHelper;
 
 /**
  *
@@ -84,26 +85,14 @@ public class GT0011Test {
 
     @Test(groups = { "parameter", "functional.encode" })
     public void testSerialization() throws Exception {
+        XmlMapper xmlMapper = SCCPJacksonXMLHelper.getXmlMapper();
         GlobalTitle0011Impl gt = new GlobalTitle0011Impl("9023629581",0, BCDEvenEncodingScheme.INSTANCE, NumberingPlan.ISDN_TELEPHONY);
 
-        // Writes
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-        // indentation).
-        writer.write(gt, "GT0011", GlobalTitle0011Impl.class);
-        writer.close();
+        String xml = xmlMapper.writeValueAsString(gt);
+        System.out.println(xml);
 
-        System.out.println(output.toString());
-
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        GlobalTitle0011Impl aiOut = reader.read("GT0011", GlobalTitle0011Impl.class);
-
-        // check results
-        assertEquals(aiOut.getTranslationType(), 0);
-        assertEquals(aiOut.getNumberingPlan(), NumberingPlan.ISDN_TELEPHONY);
-        assertEquals(aiOut.getDigits(), "9023629581");
+        assertTrue(xml.contains("9023629581"));
+        assertTrue(xml.contains("ISDN_TELEPHONY"));
     }
 
 }

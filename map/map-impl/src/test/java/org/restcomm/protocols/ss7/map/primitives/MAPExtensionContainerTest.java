@@ -12,9 +12,6 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
@@ -28,6 +25,9 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
  * @author sergey vetyutnev
@@ -141,6 +141,7 @@ public class MAPExtensionContainerTest {
 
     @Test(groups = { "functional.serialize", "primitives" })
     public void testSerialization() throws Exception {
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         MAPExtensionContainerImpl original = (MAPExtensionContainerImpl) GetTestExtensionContainer();
         // serialize
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -197,25 +198,15 @@ public class MAPExtensionContainerTest {
 
     @Test(groups = { "functional.xml.serialize", "primitives" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         MAPExtensionContainerImpl original = (MAPExtensionContainerImpl) MAPExtensionContainerTest.GetTestExtensionContainer();
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "mapExtensionContainer", MAPExtensionContainerImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        MAPExtensionContainerImpl copy = reader.read("mapExtensionContainer", MAPExtensionContainerImpl.class);
+        MAPExtensionContainerImpl copy = xmlMapper.readValue(serializedEvent, MAPExtensionContainerImpl.class);
 
         MAPExtensionContainerTest.CheckTestExtensionContainer(copy);
 

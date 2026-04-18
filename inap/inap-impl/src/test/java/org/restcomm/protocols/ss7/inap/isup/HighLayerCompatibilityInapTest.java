@@ -7,9 +7,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
@@ -17,6 +14,9 @@ import org.restcomm.protocols.ss7.inap.isup.HighLayerCompatibilityInapImpl;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.UserTeleserviceInformationImpl;
 import org.restcomm.protocols.ss7.isup.message.parameter.UserTeleserviceInformation;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.inap.INAPJacksonXMLHelper;
 
 /**
  *
@@ -70,28 +70,18 @@ public class HighLayerCompatibilityInapTest {
 
     @Test(groups = { "functional.xml.serialize", "isup" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = INAPJacksonXMLHelper.getXmlMapper();
         UserTeleserviceInformationImpl prim = new UserTeleserviceInformationImpl(
                 UserTeleserviceInformation._CODING_STANDARD_NATIONAL, UserTeleserviceInformation._INTERPRETATION_FHGCI,
                 UserTeleserviceInformation._PRESENTATION_METHOD_HLPP, UserTeleserviceInformation._HLCI_IVTI);
         HighLayerCompatibilityInapImpl original = new HighLayerCompatibilityInapImpl(prim);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "highLayerCompatibilityInap", HighLayerCompatibilityInapImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        HighLayerCompatibilityInapImpl copy = reader.read("highLayerCompatibilityInap", HighLayerCompatibilityInapImpl.class);
+        HighLayerCompatibilityInapImpl copy = xmlMapper.readValue(serializedEvent, HighLayerCompatibilityInapImpl.class);
 
         assertEquals(copy.getHighLayerCompatibility().getCodingStandard(), original.getHighLayerCompatibility()
                 .getCodingStandard());

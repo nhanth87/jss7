@@ -9,9 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
@@ -19,6 +16,9 @@ import org.restcomm.protocols.ss7.inap.api.primitives.MiscCallInfoDpAssignment;
 import org.restcomm.protocols.ss7.inap.api.primitives.MiscCallInfoMessageType;
 import org.restcomm.protocols.ss7.inap.primitives.MiscCallInfoImpl;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.inap.INAPJacksonXMLHelper;
 
 /**
  *
@@ -76,25 +76,15 @@ public class MiscCallInfoTest {
 
     @Test(groups = { "functional.xml.serialize", "circuitSwitchedCall.primitive" })
     public void testXMLSerializaion() throws Exception {
+        XmlMapper xmlMapper = INAPJacksonXMLHelper.getXmlMapper();
         MiscCallInfoImpl original = new MiscCallInfoImpl(MiscCallInfoMessageType.notification, null);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(original, "miscCallInfo", MiscCallInfoImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        MiscCallInfoImpl copy = reader.read("miscCallInfo", MiscCallInfoImpl.class);
+        MiscCallInfoImpl copy = xmlMapper.readValue(serializedEvent, MiscCallInfoImpl.class);
 
         assertEquals(copy.getMessageType(), original.getMessageType());
         assertNull(copy.getDpAssignment());
@@ -103,22 +93,11 @@ public class MiscCallInfoTest {
         original = new MiscCallInfoImpl(MiscCallInfoMessageType.request, MiscCallInfoDpAssignment.individualLine);
 
         // Writes the area to a file.
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(original, "miscCallInfo", MiscCallInfoImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-        copy = reader.read("miscCallInfo", MiscCallInfoImpl.class);
+        copy = xmlMapper.readValue(serializedEvent, MiscCallInfoImpl.class);
 
         assertEquals(copy.getMessageType(), original.getMessageType());
         assertEquals(copy.getDpAssignment(), original.getDpAssignment());

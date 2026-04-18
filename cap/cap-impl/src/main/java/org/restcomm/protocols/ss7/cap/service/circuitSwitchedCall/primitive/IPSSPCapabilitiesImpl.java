@@ -26,7 +26,7 @@ import org.restcomm.protocols.ss7.isup.impl.message.parameter.ByteArrayContainer
 @JacksonXmlRootElement(localName = "iPSSPCapabilities")
 public class IPSSPCapabilitiesImpl implements IPSSPCapabilities, CAPAsnPrimitive {
 
-    public static int _Mask_IPRoutingAddress = 0;
+    public static int _Mask_IPRoutingAddress = 0x01;
     public static int _Mask_VoiceBack = 0x02;
     public static int _Mask_VoiceInformation_SpeechRecognition = 0x04;
     public static int _Mask_VoiceInformation_VoiceRecognition = 0x08;

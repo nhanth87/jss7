@@ -54,6 +54,10 @@ public abstract class AbstractNAINumber extends AbstractNumber implements NAINum
         this.natureOfAddresIndicator = natureOfAddresIndicator;
     }
 
+    public void setNatureOfAddressIndicator(int natureOfAddressIndicator) {
+        this.natureOfAddresIndicator = natureOfAddressIndicator;
+    }
+
     /**
      * This method is used in encode method. It encodes header part (1 or 2 bytes usually.)
      *

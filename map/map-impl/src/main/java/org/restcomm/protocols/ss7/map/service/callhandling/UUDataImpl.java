@@ -54,9 +54,17 @@ public class UUDataImpl extends SequenceBase implements UUData {
         return uuIndicator;
     }
 
+    public void setUUIndicator(UUIndicator uuIndicator) {
+        this.uuIndicator = uuIndicator;
+    }
+
     @Override
     public UUI getUUI() {
         return uuI;
+    }
+
+    public void setUUI(UUI uuI) {
+        this.uuI = uuI;
     }
 
     @Override

@@ -1,15 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.mobicents</groupId>
 		<artifactId>restcomm-parent</artifactId>
-		<version>2.27.32</version> <!-- parent pom version -->
+		<version>2.27.32</version> 
 	</parent>
 
 	<artifactId>ss7-parent</artifactId>
 	<groupId>org.restcomm.protocols.ss7</groupId>
-	<version>9.2.9</version>
+	<version>9.2.10</version>
 
 	<packaging>pom</packaging>
 
@@ -18,14 +19,14 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<!-- maven.test.skip>false</maven.test.skip -->
+		
 		<restcomm.tools.mavenplugin.eclipse.version>
 			1.0.0.FINAL
 		</restcomm.tools.mavenplugin.eclipse.version>
-		<!-- <maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version> -->
+		
 		<telscale.checkstyle.version>1.0.0.FINAL</telscale.checkstyle.version>
-		<checkstyle.plugin.version>2.9.1</checkstyle.plugin.version> <!-- 2.17 -->
-		<maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version> <!-- 2.4.2 -->
+		<checkstyle.plugin.version>2.9.1</checkstyle.plugin.version> 
+		<maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version> 
 		<maven-bundle-plugin.skip>true</maven-bundle-plugin.skip>
 		<concurrent.version>1.3.4</concurrent.version>
 		<log4j.version>1.2.14</log4j.version>
@@ -37,7 +38,7 @@
 		<compile.source>11</compile.source>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
-		<!-- restcomm but not strictly ss7 -->
+		
 		<asn.version>2.2.0-143</asn.version>
 		<stream.version>1.0.0.CR1</stream.version>
 		<sctp.version>2.0.13</sctp.version>
@@ -48,7 +49,7 @@
 		<version.wildfly.as>24.0.1.Final</version.wildfly.as>
 		<version.wildfly.core>16.0.1.Final</version.wildfly.core>
 		<dialogic.version>6.7.1</dialogic.version>
-		<!-- lic dep -->
+		
 	</properties>
 
 	<modules>
@@ -73,28 +74,28 @@
 		<module>tools</module>
 	</modules>
 
-	<!-- declare our babies -->
+	
 	<dependencyManagement>
 		<dependencies>
-			<!-- ASN -->
+			
 			<dependency>
 				<groupId>org.mobicents.protocols.asn</groupId>
 				<artifactId>asn</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<!-- STREAM -->
+			
 			<dependency>
 				<groupId>org.mobicents.protocols.stream</groupId>
 				<artifactId>stream</artifactId>
 				<version>${stream.version}</version>
 			</dependency>
-			<!-- utils -->
+			
 			<dependency>
 				<groupId>org.mobicents.commons</groupId>
 				<artifactId>commons</artifactId>
 				<version>${commons.version}</version>
 			</dependency>
-			<!-- SCTP -->
+			
 			<dependency>
 				<groupId>org.mobicents.protocols.sctp</groupId>
 				<artifactId>sctp-api</artifactId>
@@ -106,7 +107,7 @@
 				<artifactId>sctp-impl</artifactId>
 				<version>${sctp.version}</version>
 			</dependency>
-			<!-- Netty SCTP Transport -->
+			
 			<dependency>
 				<groupId>io.netty</groupId>
 				<artifactId>netty-transport-sctp</artifactId>
@@ -117,19 +118,19 @@
 				<artifactId>netty-codec-base</artifactId>
 				<version>${netty.version}</version>
 			</dependency>
-			<!-- Scheduler -->
+			
 			<dependency>
 				<groupId>org.restcomm.protocols.ss7.scheduler</groupId>
 				<artifactId>scheduler</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<!-- Clock -->
+			
 			<dependency>
 				<groupId>org.restcomm.protocols.ss7.clock</groupId>
 				<artifactId>clock</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<!-- Management Shell -->
+			
 			<dependency>
 				<artifactId>shell-transport</artifactId>
 				<groupId>org.restcomm.protocols.ss7.management</groupId>
@@ -151,7 +152,7 @@
 				<version>${project.version}</version>
 			</dependency>
 
-			<!-- MTP -->
+			
 			<dependency>
 				<artifactId>mtp</artifactId>
 				<groupId>org.restcomm.protocols.ss7.mtp</groupId>
@@ -163,7 +164,7 @@
 				<version>${project.version}</version>
 			</dependency>
 
-			<!-- M3UA -->
+			
 			<dependency>
 				<artifactId>m3ua-api</artifactId>
 				<groupId>org.restcomm.protocols.ss7.m3ua</groupId>
@@ -175,7 +176,7 @@
 				<version>${project.version}</version>
 			</dependency>
 
-			<!-- ISUP -->
+			
 			<dependency>
 				<artifactId>isup-api</artifactId>
 				<groupId>org.restcomm.protocols.ss7.isup</groupId>
@@ -187,7 +188,7 @@
 				<version>${project.version}</version>
 			</dependency>
 
-			<!-- SCCP -->
+			
 			<dependency>
 				<artifactId>sccp-api</artifactId>
 				<groupId>org.restcomm.protocols.ss7.sccp</groupId>
@@ -199,7 +200,7 @@
 				<version>${project.version}</version>
 			</dependency>
 
-			<!-- TCAP -->
+			
 			<dependency>
 				<artifactId>tcap-api</artifactId>
 				<groupId>org.restcomm.protocols.ss7.tcap</groupId>
@@ -211,7 +212,7 @@
 				<version>${project.version}</version>
 			</dependency>
 
-			<!-- MAP -->
+			
 			<dependency>
 				<artifactId>map-api</artifactId>
 				<groupId>org.restcomm.protocols.ss7.map</groupId>
@@ -223,7 +224,7 @@
 				<version>${project.version}</version>
 			</dependency>
 
-			<!-- INAP -->
+			
 			<dependency>
 				<artifactId>inap-api</artifactId>
 				<groupId>org.restcomm.protocols.ss7.inap</groupId>
@@ -235,7 +236,7 @@
 				<version>${project.version}</version>
 			</dependency>
 
-			<!-- CAP -->
+			
 			<dependency>
 				<artifactId>cap-api</artifactId>
 				<groupId>org.restcomm.protocols.ss7.cap</groupId>
@@ -247,7 +248,7 @@
 				<version>${project.version}</version>
 			</dependency>
 
-			<!-- Statistics -->
+			
 			<dependency>
 				<groupId>org.restcomm.protocols.ss7.statistics</groupId>
 				<artifactId>statistics-api</artifactId>
@@ -259,7 +260,7 @@
 				<version>${project.version}</version>
 			</dependency>
 			
-			<!-- Congestion -->
+			
 			<dependency>
 				<groupId>org.restcomm.protocols.ss7.congestion</groupId>
 				<artifactId>congestion</artifactId>
@@ -267,7 +268,7 @@
 			</dependency>
 
 
-			<!-- 3rd PARTY -->
+			
 			<dependency>
 				<groupId>log4j</groupId>
 				<artifactId>log4j</artifactId>
@@ -327,46 +328,7 @@
 				<module>docs</module>
 			</modules>
 		</profile>
-		<!--profile>
-			<id>release-sign-artifacts</id>
-			<activation>
-				<property>
-					<name>performRelease</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>install</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>2.1.2</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile-->
+		
 	</profiles>
 	<developers>
 		<developer>
@@ -446,6 +408,20 @@
 	</licenses>
 
 	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.felix</groupId>
+					<artifactId>maven-bundle-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>bundle-manifest</id>
+							<phase>none</phase>
+						</execution>
+					</executions>
+				</plugin>
+			<plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-jar-plugin</artifactId><version>3.3.0</version><configuration><archive><manifest><addDefaultImplementationEntries>true</addDefaultImplementationEntries></manifest></archive></configuration></plugin></plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -467,7 +443,7 @@
 				<executions>
 					<execution>
 						<id>check-style</id>
-						<phase>compile</phase>
+						<phase>none</phase>
 						<goals>
 							<goal>checkstyle</goal>
 						</goals>
@@ -475,15 +451,7 @@
 				</executions>
 			</plugin>
 
-<!--
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>
-					${maven-checkstyle-plugin.version}
-				</version>
-			</plugin>
--->
+
 
 			<plugin>
 				<artifactId>maven-eclipse-plugin</artifactId>
@@ -532,6 +500,16 @@
 				<configuration combine.self="override">
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>bundle-manifest</id>
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -540,7 +518,7 @@
 		<developerConnection>scm:git:https://github.com/Restcomm/jss7/</developerConnection>
 		<url>https://github.com/Restcomm/jss7/</url>
 	</scm>
-	<!-- repositories -->
+	
 	<repositories>
 		<repository>
 			<id>restcomm-public-repository-group</id>
@@ -569,7 +547,7 @@
 				<updatePolicy>never</updatePolicy>
 			</snapshots>
 		</repository>
-		<!-- for com.sun.jdmk.jmxtools jar -->
+		
 		<repository>
 			<id>datanucleus</id>
 			<name>DataNucleus Releases</name>
@@ -584,8 +562,6 @@
 			</snapshots>
 		</repository>
 
-		<!-- the place to extra repos -->
+		
 	</repositories>
 </project>
-
-

@@ -8,9 +8,6 @@ import static org.testng.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
@@ -22,6 +19,9 @@ import org.restcomm.protocols.ss7.map.primitives.ISDNAddressStringImpl;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation.MNPInfoResImpl;
 import org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation.RouteingNumberImpl;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
  *
@@ -77,6 +77,7 @@ public class MNPInfoResTest {
 
     @Test(groups = { "functional.xml.serialize", "subscriberInformation" })
     public void testXMLSerialize() throws Exception {
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         RouteingNumberImpl rn = new RouteingNumberImpl("09876");
         IMSIImpl imsi = new IMSIImpl("25033012345");
         ISDNAddressStringImpl isdn = new ISDNAddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN,
@@ -85,21 +86,11 @@ public class MNPInfoResTest {
         MNPInfoResImpl original = new MNPInfoResImpl(rn, imsi, isdn, NumberPortabilityStatus.foreignNumberPortedIn, null);
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "mnpInfoRes", MNPInfoResImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        MNPInfoResImpl copy = reader.read("mnpInfoRes", MNPInfoResImpl.class);
+        MNPInfoResImpl copy = xmlMapper.readValue(serializedEvent, MNPInfoResImpl.class);
 
         assertEquals(copy.getRouteingNumber().getRouteingNumber(), original.getRouteingNumber().getRouteingNumber());
         assertEquals(copy.getIMSI().getData(), original.getIMSI().getData());

@@ -11,10 +11,6 @@ import org.restcomm.protocols.ss7.sccp.RemoteSubSystem;
 import org.restcomm.protocols.ss7.sccp.SccpResource;
 import org.restcomm.protocols.ss7.sccp.impl.oam.SccpOAMMessage;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-
 /**
  * @author amit bhayani
  */
@@ -332,32 +328,72 @@ public class SccpResourceImpl implements SccpResource {
         }
 
         /**
-         * Configuration class for Jackson persistence
-         */
-        @JacksonXmlRootElement(localName = "ResourcesConfig")
-        @JsonIgnoreProperties(ignoreUnknown = true)
-        public static class ResourcesConfig {
-            @JacksonXmlProperty public RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsns;
-            @JacksonXmlProperty public RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcs;
-            @JacksonXmlProperty public ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode> concernedSpcs;
-        }
-
-        /**
          * Persist
          */
-        private void store(RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcs, 
-                          RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsns, 
+        private void store(RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcs,
+                          RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsns,
                           ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode> concernedSpcs) {
             try {
-                ResourcesConfig config = new ResourcesConfig();
-                config.remoteSsns = remoteSsns;
-                config.remoteSpcs = remoteSpcs;
-                config.concernedSpcs = concernedSpcs;
+                javax.xml.stream.XMLOutputFactory factory = javax.xml.stream.XMLOutputFactory.newInstance();
+                javax.xml.stream.XMLStreamWriter writer = factory.createXMLStreamWriter(new FileWriter(this.persistFile));
+                writer.writeStartDocument("UTF-8", "1.0");
+                writer.writeCharacters("\n");
+                writer.writeStartElement("ResourcesConfig");
+                writer.writeCharacters("\n");
 
-                String xml = SCCPJacksonXMLHelper.toXML(config);
-                try (FileWriter writer = new FileWriter(this.persistFile)) {
-                    writer.write(xml);
+                writer.writeStartElement("remoteSpcs");
+                writer.writeCharacters("\n");
+                for (Map.Entry<Integer, RemoteSignalingPointCode> e : remoteSpcs.entrySet()) {
+                    RemoteSignalingPointCodeImpl v = (RemoteSignalingPointCodeImpl) e.getValue();
+                    writer.writeStartElement("remoteSignalingPointCode");
+                    writer.writeAttribute("id", String.valueOf(e.getKey()));
+                    writer.writeAttribute("remoteSpc", String.valueOf(v.getRemoteSpc()));
+                    writer.writeAttribute("remoteSpcFlag", String.valueOf(v.getRemoteSpcFlag()));
+                    writer.writeAttribute("mask", String.valueOf(v.getMask()));
+                    writer.writeAttribute("remoteSpcProhibited", String.valueOf(v.isRemoteSpcProhibited()));
+                    writer.writeAttribute("remoteSccpProhibited", String.valueOf(v.isRemoteSccpProhibited()));
+                    writer.writeAttribute("rl", String.valueOf(v.getCurrentRestrictionLevel()));
+                    writer.writeAttribute("rsl", String.valueOf(v.getCurrentRestrictionSubLevel()));
+                    writer.writeEndElement();
+                    writer.writeCharacters("\n");
                 }
+                writer.writeEndElement();
+                writer.writeCharacters("\n");
+
+                writer.writeStartElement("remoteSsns");
+                writer.writeCharacters("\n");
+                for (Map.Entry<Integer, RemoteSubSystem> e : remoteSsns.entrySet()) {
+                    RemoteSubSystemImpl v = (RemoteSubSystemImpl) e.getValue();
+                    writer.writeStartElement("remoteSubSystem");
+                    writer.writeAttribute("id", String.valueOf(e.getKey()));
+                    writer.writeAttribute("remoteSpc", String.valueOf(v.getRemoteSpc()));
+                    writer.writeAttribute("remoteSsn", String.valueOf(v.getRemoteSsn()));
+                    writer.writeAttribute("remoteSsnFlag", String.valueOf(v.getRemoteSsnFlag()));
+                    writer.writeAttribute("markProhibitedWhenSpcResuming", String.valueOf(v.getMarkProhibitedWhenSpcResuming()));
+                    writer.writeAttribute("remoteSsnProhibited", String.valueOf(v.isRemoteSsnProhibited()));
+                    writer.writeEndElement();
+                    writer.writeCharacters("\n");
+                }
+                writer.writeEndElement();
+                writer.writeCharacters("\n");
+
+                writer.writeStartElement("concernedSpcs");
+                writer.writeCharacters("\n");
+                for (Map.Entry<Integer, ConcernedSignalingPointCode> e : concernedSpcs.entrySet()) {
+                    ConcernedSignalingPointCodeImpl v = (ConcernedSignalingPointCodeImpl) e.getValue();
+                    writer.writeStartElement("concernedSignalingPointCode");
+                    writer.writeAttribute("id", String.valueOf(e.getKey()));
+                    writer.writeAttribute("remoteSpc", String.valueOf(v.getRemoteSpc()));
+                    writer.writeEndElement();
+                    writer.writeCharacters("\n");
+                }
+                writer.writeEndElement();
+                writer.writeCharacters("\n");
+
+                writer.writeEndElement();
+                writer.writeCharacters("\n");
+                writer.writeEndDocument();
+                writer.close();
             } catch (Exception e) {
                 logger.error("Error while persisting the Sccp Resource state in file", e);
             }
@@ -371,16 +407,13 @@ public class SccpResourceImpl implements SccpResource {
             try {
                 File f = new File(this.persistFile);
                 if (f.exists()) {
-                    // we have V3 config (Jackson format)
                     resources = loadVer3(this.persistFile);
                 } else {
-                    // Try legacy format (sccpresource2.xml)
                     String s1 = this.persistFile.replace("3.xml", "2.xml");
                     f = new File(s1);
                     if (f.exists()) {
                         logger.warn("Legacy SCCP Resource config format (v2) not supported, using defaults");
                     } else {
-                        // Try legacy format (sccpresource.xml)
                         s1 = this.persistFile.replace("3.xml", ".xml");
                         f = new File(s1);
                         if (f.exists()) {
@@ -410,15 +443,74 @@ public class SccpResourceImpl implements SccpResource {
         }
 
         protected ResourcesSet loadVer3(String fn) throws FileNotFoundException {
-            try (FileReader reader = new FileReader(fn)) {
-                ResourcesConfig config = SCCPJacksonXMLHelper.fromXML(reader, ResourcesConfig.class);
-                if (config != null) {
-                    return new ResourcesSet(config.remoteSpcs, config.remoteSsns, config.concernedSpcs);
+            try {
+                javax.xml.stream.XMLInputFactory factory = javax.xml.stream.XMLInputFactory.newInstance();
+                factory.setProperty(javax.xml.stream.XMLInputFactory.SUPPORT_DTD, false);
+                javax.xml.stream.XMLStreamReader reader = factory.createXMLStreamReader(new FileReader(fn));
+                RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcs = new RemoteSignalingPointCodeMap<>();
+                RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsns = new RemoteSubSystemMap<>();
+                ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode> concernedSpcs = new ConcernedSignalingPointCodeMap<>();
+
+                while (reader.hasNext()) {
+                    int event = reader.next();
+                    if (event == javax.xml.stream.XMLStreamConstants.START_ELEMENT) {
+                        String name = reader.getLocalName();
+                        if ("remoteSpcs".equals(name)) {
+                            while (reader.hasNext()) {
+                                event = reader.next();
+                                if (event == javax.xml.stream.XMLStreamConstants.END_ELEMENT && "remoteSpcs".equals(reader.getLocalName())) break;
+                                if (event == javax.xml.stream.XMLStreamConstants.START_ELEMENT && "remoteSignalingPointCode".equals(reader.getLocalName())) {
+                                    int id = Integer.parseInt(reader.getAttributeValue(null, "id"));
+                                    int remoteSpc = Integer.parseInt(reader.getAttributeValue(null, "remoteSpc"));
+                                    int remoteSpcFlag = Integer.parseInt(reader.getAttributeValue(null, "remoteSpcFlag"));
+                                    int mask = Integer.parseInt(reader.getAttributeValue(null, "mask"));
+                                    boolean remoteSpcProhibited = Boolean.parseBoolean(reader.getAttributeValue(null, "remoteSpcProhibited"));
+                                    boolean remoteSccpProhibited = Boolean.parseBoolean(reader.getAttributeValue(null, "remoteSccpProhibited"));
+                                    int rl = Integer.parseInt(reader.getAttributeValue(null, "rl"));
+                                    int rsl = Integer.parseInt(reader.getAttributeValue(null, "rsl"));
+                                    RemoteSignalingPointCodeImpl v = new RemoteSignalingPointCodeImpl(remoteSpc, remoteSpcFlag, mask, remoteSpcProhibited);
+                                    v.setRemoteSccpProhibited(remoteSccpProhibited);
+                                    v.setRl(rl);
+                                    v.setRsl(rsl);
+                                    remoteSpcs.put(id, v);
+                                }
+                            }
+                        } else if ("remoteSsns".equals(name)) {
+                            while (reader.hasNext()) {
+                                event = reader.next();
+                                if (event == javax.xml.stream.XMLStreamConstants.END_ELEMENT && "remoteSsns".equals(reader.getLocalName())) break;
+                                if (event == javax.xml.stream.XMLStreamConstants.START_ELEMENT && "remoteSubSystem".equals(reader.getLocalName())) {
+                                    int id = Integer.parseInt(reader.getAttributeValue(null, "id"));
+                                    int remoteSpc = Integer.parseInt(reader.getAttributeValue(null, "remoteSpc"));
+                                    int remoteSsn = Integer.parseInt(reader.getAttributeValue(null, "remoteSsn"));
+                                    int remoteSsnFlag = Integer.parseInt(reader.getAttributeValue(null, "remoteSsnFlag"));
+                                    boolean markProhibitedWhenSpcResuming = Boolean.parseBoolean(reader.getAttributeValue(null, "markProhibitedWhenSpcResuming"));
+                                    boolean remoteSsnProhibited = Boolean.parseBoolean(reader.getAttributeValue(null, "remoteSsnProhibited"));
+                                    RemoteSubSystemImpl v = new RemoteSubSystemImpl(remoteSpc, remoteSsn, remoteSsnFlag, markProhibitedWhenSpcResuming);
+                                    v.setRemoteSsnProhibited(remoteSsnProhibited);
+                                    remoteSsns.put(id, v);
+                                }
+                            }
+                        } else if ("concernedSpcs".equals(name)) {
+                            while (reader.hasNext()) {
+                                event = reader.next();
+                                if (event == javax.xml.stream.XMLStreamConstants.END_ELEMENT && "concernedSpcs".equals(reader.getLocalName())) break;
+                                if (event == javax.xml.stream.XMLStreamConstants.START_ELEMENT && "concernedSignalingPointCode".equals(reader.getLocalName())) {
+                                    int id = Integer.parseInt(reader.getAttributeValue(null, "id"));
+                                    int remoteSpc = Integer.parseInt(reader.getAttributeValue(null, "remoteSpc"));
+                                    ConcernedSignalingPointCodeImpl v = new ConcernedSignalingPointCodeImpl(remoteSpc);
+                                    concernedSpcs.put(id, v);
+                                }
+                            }
+                        }
+                    }
                 }
-            } catch (IOException e) {
-                logger.error(String.format("Failed to close FileReader for %s", fn), e);
+                reader.close();
+                return new ResourcesSet(remoteSpcs, remoteSsns, concernedSpcs);
+            } catch (Exception e) {
+                logger.error("Failed to parse SccpResource config from XML", e);
+                return null;
             }
-            return null;
         }
 
         static class ResourcesSet {

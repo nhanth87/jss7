@@ -3,6 +3,7 @@ package org.restcomm.protocols.ss7.map.primitives;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
@@ -25,8 +26,11 @@ import org.restcomm.protocols.ss7.map.api.MAPParsingComponentExceptionReason;
 @JacksonXmlRootElement(localName = "bitStringBase")
 public abstract class BitStringBase implements MAPAsnPrimitive {
 
-    @JacksonXmlProperty(isAttribute = true)
     protected BitSetStrictLength bitString;
+    @JsonProperty
+    public BitSetStrictLength getBitString() {
+        return bitString;
+    }
 
     protected int minLength;
     protected int maxLength;

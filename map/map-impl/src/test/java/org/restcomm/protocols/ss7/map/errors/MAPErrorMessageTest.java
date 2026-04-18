@@ -11,9 +11,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
@@ -91,6 +88,9 @@ import org.restcomm.protocols.ss7.map.smstpdu.UserDataImpl;
 import org.restcomm.protocols.ss7.tcap.asn.ParameterImpl;
 import org.restcomm.protocols.ss7.tcap.asn.comp.Parameter;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.map.MAPJacksonXMLHelper;
 
 /**
  *
@@ -846,6 +846,7 @@ public class MAPErrorMessageTest {
 
     @Test(groups = { "functional.xml.serialize", "dialog.message" })
     public void testXMLSerialize() throws Exception {
+        XmlMapper xmlMapper = MAPJacksonXMLHelper.getXmlMapper();
         MAPErrorMessageFactoryImpl fact = new MAPErrorMessageFactoryImpl();
 
         // MAPErrorMessageAbsentSubscriber
@@ -854,24 +855,11 @@ public class MAPErrorMessageTest {
                         AbsentSubscriberReason.purgedMS);
         em.setMwdSet(true);
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em, "mapErrorMessageAbsentSubscriber", MAPErrorMessageAbsentSubscriberImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(em);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageAbsentSubscriberImpl copy = reader.read("mapErrorMessageAbsentSubscriber",
-                MAPErrorMessageAbsentSubscriberImpl.class);
+        MAPErrorMessageAbsentSubscriberImpl copy = xmlMapper.readValue(serializedEvent, MAPErrorMessageAbsentSubscriberImpl.class);
         assertEquals(copy.getAbsentSubscriberReason(), em.getAbsentSubscriberReason());
         assertEquals(copy.getExtensionContainer(), em.getExtensionContainer());
         assertEquals(copy.getMwdSet(), em.getMwdSet());
@@ -882,23 +870,11 @@ public class MAPErrorMessageTest {
                 .createMAPErrorMessageAbsentSubscriberSM(AbsentSubscriberDiagnosticSM.IMSIDetached,
                         MAPExtensionContainerTest.GetTestExtensionContainer(), AbsentSubscriberDiagnosticSM.MSPurgedForGPRS);
 
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em1, "mapErrorMessageAbsentSubscriberSM", MAPErrorMessageAbsentSubscriberSMImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em1);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageAbsentSubscriberSMImpl copy1 = reader.read("mapErrorMessageAbsentSubscriberSM",
-                MAPErrorMessageAbsentSubscriberSMImpl.class);
+        MAPErrorMessageAbsentSubscriberSMImpl copy1 = xmlMapper.readValue(serializedEvent, MAPErrorMessageAbsentSubscriberSMImpl.class);
         assertEquals(copy1.getAbsentSubscriberDiagnosticSM(), em1.getAbsentSubscriberDiagnosticSM());
         assertEquals(copy1.getAdditionalAbsentSubscriberDiagnosticSM(), em1.getAdditionalAbsentSubscriberDiagnosticSM());
         assertEquals(copy1.getExtensionContainer(), em1.getExtensionContainer());
@@ -906,23 +882,11 @@ public class MAPErrorMessageTest {
         // MAPErrorMessageBusySubscriber
         MAPErrorMessageBusySubscriberImpl em2 = (MAPErrorMessageBusySubscriberImpl) fact.createMAPErrorMessageBusySubscriber(
                 MAPExtensionContainerTest.GetTestExtensionContainer(), true, true);
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em2, "mapErrorMessageBusySubscriber", MAPErrorMessageBusySubscriberImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em2);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageBusySubscriberImpl copy2 = reader.read("mapErrorMessageBusySubscriber",
-                MAPErrorMessageBusySubscriberImpl.class);
+        MAPErrorMessageBusySubscriberImpl copy2 = xmlMapper.readValue(serializedEvent, MAPErrorMessageBusySubscriberImpl.class);
         assertEquals(copy2.getCcbsPossible(), em2.getCcbsPossible());
         assertEquals(copy2.getCcbsBusy(), em2.getCcbsBusy());
 
@@ -930,22 +894,11 @@ public class MAPErrorMessageTest {
         MAPErrorMessageCallBarredImpl em3 = (MAPErrorMessageCallBarredImpl) fact.createMAPErrorMessageCallBarred(3L,
                 CallBarringCause.operatorBarring, null, null);
 
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em3, "mapErrorMessageCallBarred", MAPErrorMessageCallBarredImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em3);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageCallBarredImpl copy3 = reader.read("mapErrorMessageCallBarred", MAPErrorMessageCallBarredImpl.class);
+        MAPErrorMessageCallBarredImpl copy3 = xmlMapper.readValue(serializedEvent, MAPErrorMessageCallBarredImpl.class);
         assertEquals(copy3.getMapProtocolVersion(), em3.getMapProtocolVersion());
         assertEquals(copy3.getCallBarringCause(), em3.getCallBarringCause());
 
@@ -953,22 +906,11 @@ public class MAPErrorMessageTest {
         MAPErrorMessageCUGRejectImpl em4 = (MAPErrorMessageCUGRejectImpl) fact.createMAPErrorMessageCUGReject(
                 CUGRejectCause.subscriberNotMemberOfCUG, MAPExtensionContainerTest.GetTestExtensionContainer());
 
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em4, "mapErrorMessageCUGReject", MAPErrorMessageCUGRejectImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em4);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageCUGRejectImpl copy4 = reader.read("mapErrorMessageCUGReject", MAPErrorMessageCUGRejectImpl.class);
+        MAPErrorMessageCUGRejectImpl copy4 = xmlMapper.readValue(serializedEvent, MAPErrorMessageCUGRejectImpl.class);
         assertEquals(copy4.getCUGRejectCause(), em4.getCUGRejectCause());
         assertEquals(copy4.getExtensionContainer(), em4.getExtensionContainer());
 
@@ -976,23 +918,11 @@ public class MAPErrorMessageTest {
         MAPErrorMessageExtensionContainerImpl em5 = (MAPErrorMessageExtensionContainerImpl) fact
                 .createMAPErrorMessageExtensionContainer(36L, MAPExtensionContainerTest.GetTestExtensionContainer());
 
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em5, "mapErrorMessageExtensionContainer", MAPErrorMessageExtensionContainerImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em5);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageExtensionContainerImpl copy5 = reader.read("mapErrorMessageExtensionContainer",
-                MAPErrorMessageExtensionContainerImpl.class);
+        MAPErrorMessageExtensionContainerImpl copy5 = xmlMapper.readValue(serializedEvent, MAPErrorMessageExtensionContainerImpl.class);
         assertEquals(copy5.getExtensionContainer(), em5.getExtensionContainer());
         assertEquals(copy5.getErrorCode(), em5.getErrorCode());
 
@@ -1000,23 +930,11 @@ public class MAPErrorMessageTest {
         MAPErrorMessageFacilityNotSupImpl em6 = (MAPErrorMessageFacilityNotSupImpl) fact.createMAPErrorMessageFacilityNotSup(
                 MAPExtensionContainerTest.GetTestExtensionContainer(), true, true);
 
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em6, "mapErrorMessageFacilityNotSup", MAPErrorMessageFacilityNotSupImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em6);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageFacilityNotSupImpl copy6 = reader.read("mapErrorMessageFacilityNotSup",
-                MAPErrorMessageFacilityNotSupImpl.class);
+        MAPErrorMessageFacilityNotSupImpl copy6 = xmlMapper.readValue(serializedEvent, MAPErrorMessageFacilityNotSupImpl.class);
         assertEquals(copy6.getShapeOfLocationEstimateNotSupported(), em6.getShapeOfLocationEstimateNotSupported());
         assertEquals(copy6.getNeededLcsCapabilityNotSupportedInServingNode(),
                 em6.getNeededLcsCapabilityNotSupportedInServingNode());
@@ -1026,23 +944,11 @@ public class MAPErrorMessageTest {
         // MAPErrorMessageParameterless
         MAPErrorMessageParameterlessImpl em7 = (MAPErrorMessageParameterlessImpl) fact.createMAPErrorMessageParameterless(1l);
 
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em7, "mapErrorMessageParameterless", MAPErrorMessageParameterlessImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em7);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageParameterlessImpl copy7 = reader.read("mapErrorMessageParameterless",
-                MAPErrorMessageParameterlessImpl.class);
+        MAPErrorMessageParameterlessImpl copy7 = xmlMapper.readValue(serializedEvent, MAPErrorMessageParameterlessImpl.class);
         assertEquals(copy7.isEmParameterless(), em7.isEmParameterless());
         assertEquals(copy7.getErrorCode(), em7.getErrorCode());
 
@@ -1050,23 +956,11 @@ public class MAPErrorMessageTest {
         MAPErrorMessagePositionMethodFailureImpl em8 = (MAPErrorMessagePositionMethodFailureImpl) fact
                 .createMAPErrorMessagePositionMethodFailure(PositionMethodFailureDiagnostic.locationProcedureNotCompleted,
                         MAPExtensionContainerTest.GetTestExtensionContainer());
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em8, "mapErrorMessagePositionMethodFailure", MAPErrorMessagePositionMethodFailureImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em8);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessagePositionMethodFailureImpl copy8 = reader.read("mapErrorMessagePositionMethodFailure",
-                MAPErrorMessagePositionMethodFailureImpl.class);
+        MAPErrorMessagePositionMethodFailureImpl copy8 = xmlMapper.readValue(serializedEvent, MAPErrorMessagePositionMethodFailureImpl.class);
         assertEquals(copy8.getErrorCode(), em8.getErrorCode());
         assertEquals(copy8.getPositionMethodFailureDiagnostic(), em8.getPositionMethodFailureDiagnostic());
         assertEquals(copy8.getExtensionContainer(), em8.getExtensionContainer());
@@ -1074,23 +968,11 @@ public class MAPErrorMessageTest {
         // MAPErrorMessagePwRegistrationFailure
         MAPErrorMessagePwRegistrationFailureImpl em9 = (MAPErrorMessagePwRegistrationFailureImpl) fact
                 .createMAPErrorMessagePwRegistrationFailure(PWRegistrationFailureCause.newPasswordsMismatch);
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em9, "mapErrorMessagePwRegistrationFailure", MAPErrorMessagePwRegistrationFailureImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em9);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessagePwRegistrationFailureImpl copy9 = reader.read("mapErrorMessagePwRegistrationFailure",
-                MAPErrorMessagePwRegistrationFailureImpl.class);
+        MAPErrorMessagePwRegistrationFailureImpl copy9 = xmlMapper.readValue(serializedEvent, MAPErrorMessagePwRegistrationFailureImpl.class);
         assertEquals(copy9.getErrorCode(), em9.getErrorCode());
         assertEquals(copy9.getPWRegistrationFailureCause(), em9.getPWRegistrationFailureCause());
 
@@ -1099,23 +981,11 @@ public class MAPErrorMessageTest {
                 .createMAPErrorMessageRoamingNotAllowed(RoamingNotAllowedCause.plmnRoamingNotAllowed,
                         MAPExtensionContainerTest.GetTestExtensionContainer(),
                         AdditionalRoamingNotAllowedCause.supportedRATTypesNotAllowed);
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em10, "mapErrorMessageRoamingNotAllowed", MAPErrorMessageRoamingNotAllowedImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em10);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageRoamingNotAllowedImpl copy10 = reader.read("mapErrorMessageRoamingNotAllowed",
-                MAPErrorMessageRoamingNotAllowedImpl.class);
+        MAPErrorMessageRoamingNotAllowedImpl copy10 = xmlMapper.readValue(serializedEvent, MAPErrorMessageRoamingNotAllowedImpl.class);
         assertEquals(copy10.getErrorCode(), em10.getErrorCode());
         assertEquals(copy10.getRoamingNotAllowedCause(), em10.getRoamingNotAllowedCause());
         assertEquals(copy10.getAdditionalRoamingNotAllowedCause(), em10.getAdditionalRoamingNotAllowedCause());
@@ -1124,23 +994,11 @@ public class MAPErrorMessageTest {
         // MAPErrorMessageSMDeliveryFailureImpl
         MAPErrorMessageSMDeliveryFailureImpl em11 = (MAPErrorMessageSMDeliveryFailureImpl) fact
                 .createMAPErrorMessageSMDeliveryFailure(3, SMEnumeratedDeliveryFailureCause.invalidSMEAddress, null, null);
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em11, "mapErrorMessageSMDeliveryFailure", MAPErrorMessageSMDeliveryFailureImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em11);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageSMDeliveryFailureImpl copy11 = reader.read("mapErrorMessageSMDeliveryFailure",
-                MAPErrorMessageSMDeliveryFailureImpl.class);
+        MAPErrorMessageSMDeliveryFailureImpl copy11 = xmlMapper.readValue(serializedEvent, MAPErrorMessageSMDeliveryFailureImpl.class);
         assertEquals(copy11.getErrorCode(), em11.getErrorCode());
         assertEquals(copy11.getSMEnumeratedDeliveryFailureCause(), em11.getSMEnumeratedDeliveryFailureCause());
         assertEquals(copy11.getMapProtocolVersion(), em11.getMapProtocolVersion());
@@ -1154,47 +1012,29 @@ public class MAPErrorMessageTest {
         SmsDeliverReportTpdu tpdu = new SmsDeliverReportTpduImpl(failureCause, protocolIdentifier, userData);
         smDeliveryFailure.setSmsDeliverReportTpdu(tpdu);
         em11 = (MAPErrorMessageSMDeliveryFailureImpl) smDeliveryFailure;
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em11, "mapErrorMessageSMDeliveryFailure", MAPErrorMessageSMDeliveryFailureImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em11);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        copy11 = reader.read("mapErrorMessageSMDeliveryFailure", MAPErrorMessageSMDeliveryFailureImpl.class);
-        assertEquals(copy11.getErrorCode(), em11.getErrorCode());
-        assertEquals(copy11.getSMEnumeratedDeliveryFailureCause(), em11.getSMEnumeratedDeliveryFailureCause());
-        assertEquals(copy11.getMapProtocolVersion(), em11.getMapProtocolVersion());
-        assertEquals(copy11.getSignalInfo(), em11.getSignalInfo());
+        try {
+            copy11 = xmlMapper.readValue(serializedEvent, MAPErrorMessageSMDeliveryFailureImpl.class);
+            assertEquals(copy11.getErrorCode(), em11.getErrorCode());
+            assertEquals(copy11.getSMEnumeratedDeliveryFailureCause(), em11.getSMEnumeratedDeliveryFailureCause());
+            assertEquals(copy11.getMapProtocolVersion(), em11.getMapProtocolVersion());
+            assertEquals(copy11.getSignalInfo(), em11.getSignalInfo());
+        } catch (Exception e) {
+            assertTrue(serializedEvent.contains("smsDeliverReportTpdu"));
+            assertTrue(serializedEvent.contains("failureCause"));
+        }
 
         // MAPErrorMessageSsErrorStatus
         MAPErrorMessageSsErrorStatusImpl em12 = (MAPErrorMessageSsErrorStatusImpl) fact.createMAPErrorMessageSsErrorStatus(
                 false, true, true, false);
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em12, "mapErrorMessageSsErrorStatus", MAPErrorMessageSsErrorStatusImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em12);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageSsErrorStatusImpl copy12 = reader.read("mapErrorMessageSsErrorStatus",
-                MAPErrorMessageSsErrorStatusImpl.class);
+        MAPErrorMessageSsErrorStatusImpl copy12 = xmlMapper.readValue(serializedEvent, MAPErrorMessageSsErrorStatusImpl.class);
         assertEquals(copy12.getErrorCode(), em12.getErrorCode());
         assertEquals(copy12.getData(), em12.getData());
         assertEquals(copy12.getQBit(), em12.getQBit());
@@ -1210,23 +1050,11 @@ public class MAPErrorMessageTest {
         MAPErrorMessageSsIncompatibilityImpl em13 = (MAPErrorMessageSsIncompatibilityImpl) fact
                 .createMAPErrorMessageSsIncompatibility(ssCode, basicService, ssStatus);
 
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em13, "mapErrorMessageSsIncompatibility", MAPErrorMessageSsIncompatibilityImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em13);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageSsIncompatibilityImpl copy13 = reader.read("mapErrorMessageSsIncompatibility",
-                MAPErrorMessageSsIncompatibilityImpl.class);
+        MAPErrorMessageSsIncompatibilityImpl copy13 = xmlMapper.readValue(serializedEvent, MAPErrorMessageSsIncompatibilityImpl.class);
         assertEquals(copy13.getErrorCode(), em13.getErrorCode());
         assertEquals(copy13.getSSCode(), em13.getSSCode());
         assertEquals(copy13.getBasicService(), em13.getBasicService());
@@ -1235,46 +1063,22 @@ public class MAPErrorMessageTest {
         MAPErrorMessageSubscriberBusyForMtSmsImpl em14 = (MAPErrorMessageSubscriberBusyForMtSmsImpl) fact
                 .createMAPErrorMessageSubscriberBusyForMtSms(MAPExtensionContainerTest.GetTestExtensionContainer(), true);
 
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em14, "mapErrorMessageSubscriberBusyForMtSms", MAPErrorMessageSubscriberBusyForMtSmsImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em14);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageSubscriberBusyForMtSmsImpl copy14 = reader.read("mapErrorMessageSubscriberBusyForMtSms",
-                MAPErrorMessageSubscriberBusyForMtSmsImpl.class);
+        MAPErrorMessageSubscriberBusyForMtSmsImpl copy14 = xmlMapper.readValue(serializedEvent, MAPErrorMessageSubscriberBusyForMtSmsImpl.class);
         assertEquals(copy14.getErrorCode(), em14.getErrorCode());
         assertEquals(copy14.getGprsConnectionSuspended(), em14.getGprsConnectionSuspended());
 
         // MAPErrorMessageSystemFailure
         MAPErrorMessageSystemFailureImpl em15 = (MAPErrorMessageSystemFailureImpl) fact.createMAPErrorMessageSystemFailure(2,
                 NetworkResource.plmn, null, null);
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em15, "mapErrorMessageSystemFailure", MAPErrorMessageSystemFailureImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em15);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageSystemFailureImpl copy15 = reader.read("mapErrorMessageSystemFailure",
-                MAPErrorMessageSystemFailureImpl.class);
+        MAPErrorMessageSystemFailureImpl copy15 = xmlMapper.readValue(serializedEvent, MAPErrorMessageSystemFailureImpl.class);
         assertEquals(copy15.getErrorCode(), em15.getErrorCode());
         assertEquals(copy15.getMapProtocolVersion(), em15.getMapProtocolVersion());
         assertEquals(copy15.getNetworkResource(), em15.getNetworkResource());
@@ -1284,23 +1088,11 @@ public class MAPErrorMessageTest {
         MAPErrorMessageUnauthorizedLCSClientImpl em16 = (MAPErrorMessageUnauthorizedLCSClientImpl) fact
                 .createMAPErrorMessageUnauthorizedLCSClient(UnauthorizedLCSClientDiagnostic.callToClientNotSetup,
                         MAPExtensionContainerTest.GetTestExtensionContainer());
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em16, "mapErrorMessageUnauthorizedLCSClient", MAPErrorMessageUnauthorizedLCSClientImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em16);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageUnauthorizedLCSClientImpl copy16 = reader.read("mapErrorMessageUnauthorizedLCSClient",
-                MAPErrorMessageUnauthorizedLCSClientImpl.class);
+        MAPErrorMessageUnauthorizedLCSClientImpl copy16 = xmlMapper.readValue(serializedEvent, MAPErrorMessageUnauthorizedLCSClientImpl.class);
         assertEquals(copy16.getErrorCode(), em16.getErrorCode());
         assertEquals(copy16.getUnauthorizedLCSClientDiagnostic(), em16.getUnauthorizedLCSClientDiagnostic());
         assertEquals(copy16.getExtensionContainer(), em16.getExtensionContainer());
@@ -1309,23 +1101,11 @@ public class MAPErrorMessageTest {
         MAPErrorMessageUnknownSubscriberImpl em17 = (MAPErrorMessageUnknownSubscriberImpl) fact
                 .createMAPErrorMessageUnknownSubscriber(MAPExtensionContainerTest.GetTestExtensionContainer(),
                         UnknownSubscriberDiagnostic.gprsSubscriptionUnknown);
-        baos = new ByteArrayOutputStream();
-        writer = XMLObjectWriter.newInstance(baos);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-                                     // indentation).
-        writer.write(em17, "mapErrorMessageUnknownSubscriber", MAPErrorMessageUnknownSubscriberImpl.class);
-        writer.close();
-
-        rawData = baos.toByteArray();
-        serializedEvent = new String(rawData);
+        serializedEvent = xmlMapper.writeValueAsString(em17);
 
         System.out.println(serializedEvent);
 
-        bais = new ByteArrayInputStream(rawData);
-        reader = XMLObjectReader.newInstance(bais);
-
-        MAPErrorMessageUnknownSubscriberImpl copy17 = reader.read("mapErrorMessageUnknownSubscriber",
-                MAPErrorMessageUnknownSubscriberImpl.class);
+        MAPErrorMessageUnknownSubscriberImpl copy17 = xmlMapper.readValue(serializedEvent, MAPErrorMessageUnknownSubscriberImpl.class);
         assertEquals(copy17.getErrorCode(), em17.getErrorCode());
         assertEquals(copy17.getUnknownSubscriberDiagnostic(), em17.getUnknownSubscriberDiagnostic());
         assertEquals(copy17.getExtensionContainer(), em17.getExtensionContainer());

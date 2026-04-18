@@ -1,4 +1,5 @@
 package org.restcomm.protocols.ss7.cap.errors;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
@@ -44,6 +45,7 @@ public class CAPErrorMessageRequestedInfoErrorImpl extends CAPErrorMessageImpl i
         return true;
     }
 
+    @JsonIgnore
     public CAPErrorMessageRequestedInfoError getEmRequestedInfoError() {
         return this;
     }

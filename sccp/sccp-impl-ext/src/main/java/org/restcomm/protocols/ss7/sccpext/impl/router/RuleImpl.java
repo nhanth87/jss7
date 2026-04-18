@@ -1,9 +1,11 @@
 
 package org.restcomm.protocols.ss7.sccpext.impl.router;
 
-import javolution.text.CharArray;
-import javolution.xml.XMLFormat;
-import javolution.xml.stream.XMLStreamException;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
@@ -34,6 +36,9 @@ import java.io.Serializable;
  * @author amit bhayani
  * @author sergey vetyutnev
  */
+@JacksonXmlRootElement(localName = "rule")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 public class RuleImpl implements Rule, Serializable {
 
     private static final char CHAR_WILD_CARD_ALL = '*';
@@ -69,25 +74,43 @@ public class RuleImpl implements Rule, Serializable {
 
     private static final String SEPARATOR = ";";
 
+    @JsonProperty("ruleType")
     private RuleType ruleType = RuleType.SOLITARY;
+    
+    @JsonProperty("loadSharingAlgo")
     private LoadSharingAlgorithm loadSharingAlgo = LoadSharingAlgorithm.Undefined;
+    
+    @JsonProperty("originatingType")
     private OriginationType originationType = OriginationType.ALL;
 
     /** Pattern used for selecting rule */
+    @JsonProperty("pattern")
     private SccpAddress pattern;
+    
+    @JsonProperty("patternCallingAddress")
     private SccpAddress patternCallingAddress;
 
+    @JsonProperty("ruleId")
     private int ruleId;
 
     /** Translation method */
+    @JsonProperty("paddress")
     private int primaryAddressId = 0;
+    
+    @JsonProperty("saddress")
     private int secondaryAddressId = 0;
+    
+    @JsonProperty("ncpaddress")
     private Integer newCallingPartyAddressId = null;
+    
+    @JsonProperty("networkId")
     private int networkId;
 
+    @JsonProperty("mask")
     private String mask = null;
 
-    private String[] maskPattern = null;
+    @JsonIgnore
+    private transient String[] maskPattern = null;
 
 
 
@@ -169,7 +192,7 @@ public class RuleImpl implements Rule, Serializable {
         return pattern;
     }
 
-    private void configure() {
+    void configure() {
         this.maskPattern = this.mask.split("/");
     }
 
@@ -636,47 +659,6 @@ public class RuleImpl implements Rule, Serializable {
 
         return false;
     }
-
-    /**
-     * XML Serialization/Deserialization
-     */
-    protected static final XMLFormat<RuleImpl> RULE_XML = new XMLFormat<>(RuleImpl.class) {
-
-        public void read(javolution.xml.XMLFormat.InputElement xml, RuleImpl rule) throws XMLStreamException {
-            rule.ruleType = RuleType.getInstance(xml.getAttribute(RULETYPE, RuleType.SOLITARY.getValue()));
-            rule.loadSharingAlgo = LoadSharingAlgorithm.getInstance(xml.getAttribute(LS_ALGO,
-                    LoadSharingAlgorithm.Undefined.getValue()));
-            rule.originationType = OriginationType
-                    .getInstance(xml.getAttribute(ORIGINATING_TYPE, OriginationType.ALL.getValue()));
-            rule.mask = xml.getAttribute(MASK).toString();
-            rule.primaryAddressId = xml.getAttribute(PRIMARY_ADDRESS).toInt();
-            rule.secondaryAddressId = xml.getAttribute(SECONDARY_ADDRESS).toInt();
-            rule.networkId = xml.getAttribute(NETWORK_ID, 0);
-            CharArray cha = xml.getAttribute(NEW_CALLING_PARTY_ADDRESS);
-            if (cha != null)
-                rule.newCallingPartyAddressId = cha.toInt();
-            else
-                rule.newCallingPartyAddressId = null;
-            rule.pattern = xml.get(PATTERN, SccpAddressImpl.class);
-            rule.patternCallingAddress = xml.get(PATTERN_CALLING_ADDRESS, SccpAddressImpl.class);
-            rule.configure();
-        }
-
-        public void write(RuleImpl rule, javolution.xml.XMLFormat.OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(RULETYPE, rule.ruleType.getValue());
-            xml.setAttribute(LS_ALGO, rule.loadSharingAlgo.getValue());
-            xml.setAttribute(ORIGINATING_TYPE, rule.originationType.getValue());
-            xml.setAttribute(MASK, rule.mask);
-            xml.setAttribute(PRIMARY_ADDRESS, rule.primaryAddressId);
-            xml.setAttribute(SECONDARY_ADDRESS, rule.secondaryAddressId);
-            xml.setAttribute(NETWORK_ID, rule.networkId);
-            if (rule.newCallingPartyAddressId != null)
-                xml.setAttribute(NEW_CALLING_PARTY_ADDRESS, rule.newCallingPartyAddressId);
-            xml.add((SccpAddressImpl)rule.pattern, PATTERN, SccpAddressImpl.class);
-            if ( rule.patternCallingAddress != null )
-                xml.add( ( SccpAddressImpl ) rule.patternCallingAddress, PATTERN_CALLING_ADDRESS, SccpAddressImpl.class );
-        }
-    };
 
     public String toString() {
         StringBuffer buff = new StringBuffer();

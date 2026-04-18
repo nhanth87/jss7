@@ -1,6 +1,7 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
@@ -14,6 +15,8 @@ import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSM;
 import org.restcomm.protocols.ss7.m3ua.impl.message.MessageFactoryImpl;
 import org.restcomm.protocols.ss7.m3ua.message.MessageFactory;
 import org.restcomm.protocols.ss7.m3ua.parameter.ASPIdentifier;
+import org.restcomm.protocols.ss7.m3ua.impl.parameter.ASPIdentifierImpl;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  *
@@ -33,11 +36,13 @@ public class AspImpl implements Asp {
     /**
      * Local FSM is such that it sends ASP_UP to other side
      **/
+    @JsonIgnore
     protected FSM localFSM;
 
     /**
      * Peer FSM is such that it receives ASP_UP from other side
      **/
+    @JsonIgnore
     protected FSM peerFSM;
 
     @JsonProperty("aspFactoryName")
@@ -46,15 +51,19 @@ public class AspImpl implements Asp {
     @JsonProperty("asName")
     protected String asName;
 
+    @JsonIgnore
     protected transient AspFactoryImpl aspFactoryImpl;
 
+    @JsonIgnore
     protected transient AsImpl asImpl;
 
     @JsonProperty("aspIdentifier")
+    @JsonDeserialize(as = ASPIdentifierImpl.class)
     protected ASPIdentifier aspIdentifier;
 
     private MessageFactory messageFactory = new MessageFactoryImpl();
 
+    @JsonIgnore
     protected State state = AspState.DOWN;
 
     public AspImpl() {
@@ -317,6 +326,7 @@ public class AspImpl implements Asp {
         return peerFSM;
     }
 
+    @JsonIgnore
     public As getAs() {
         return asImpl;
     }
@@ -325,6 +335,7 @@ public class AspImpl implements Asp {
         this.asImpl = asImpl;
     }
 
+    @JsonIgnore
     public AspFactoryImpl getAspFactory() {
         return this.aspFactoryImpl;
     }
@@ -363,6 +374,7 @@ public class AspImpl implements Asp {
         this.aspIdentifier = aspIdentifier;
     }
 
+    @JsonIgnore
     public MessageFactory getMessageFactory() {
         return messageFactory;
     }

@@ -1,49 +1,74 @@
 package org.restcomm.protocols.ss7.inap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.AbstractTypeResolver;
+import com.fasterxml.jackson.databind.DeserializationConfig;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.Module.SetupContext;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import java.lang.reflect.Modifier;
 
-/**
- * Jackson XML helper for INAP module XML serialization.
- * Replaces XStream XML serialization.
- */
 public class INAPJacksonXMLHelper {
-    private static final XmlMapper xmlMapper = new XmlMapper();
-    
+    private static final XmlMapper XML_MAPPER = new XmlMapper();
     static {
-        // Configure XML mapper
-        xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
-        xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        XML_MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
+        XML_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        XML_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        SimpleModule module = new SimpleModule("inapjacksonxml-module") {
+            @Override
+            public void setupModule(SetupContext context) {
+                super.setupModule(context);
+                context.addAbstractTypeResolver(new AutoImplAbstractTypeResolver());
+            }
+        };
+        module.addAbstractTypeMapping(org.restcomm.protocols.ss7.isup.message.parameter.CallingPartyCategory.class,
+                org.restcomm.protocols.ss7.isup.impl.message.parameter.CallingPartyCategoryImpl.class);
+        module.addAbstractTypeMapping(org.restcomm.protocols.ss7.isup.message.parameter.UserTeleserviceInformation.class,
+                org.restcomm.protocols.ss7.isup.impl.message.parameter.UserTeleserviceInformationImpl.class);
+        module.addAbstractTypeMapping(org.restcomm.protocols.ss7.isup.message.parameter.RedirectionInformation.class,
+                org.restcomm.protocols.ss7.isup.impl.message.parameter.RedirectionInformationImpl.class);
+        XML_MAPPER.registerModule(module);
     }
-    
+
     public static XmlMapper getXmlMapper() {
-        return xmlMapper;
+        return XML_MAPPER;
     }
-    
-    public static String toXML(Object obj) {
-        try {
-            return xmlMapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error serializing to XML", e);
-        }
-    }
-    
-    public static <T> T fromXML(String xml, Class<T> clazz) {
-        try {
-            return xmlMapper.readValue(xml, clazz);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error deserializing from XML", e);
-        }
-    }
-    
-    public static Object fromXML(String xml) {
-        try {
-            return xmlMapper.readValue(xml, Object.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error deserializing from XML", e);
+
+    private static class AutoImplAbstractTypeResolver extends AbstractTypeResolver {
+        @Override
+        public JavaType findTypeMapping(DeserializationConfig config, JavaType type) {
+            Class<?> raw = type.getRawClass();
+            if (!raw.isInterface() && !Modifier.isAbstract(raw.getModifiers())) {
+                return null;
+            }
+            Package pkgObj = raw.getPackage();
+            if (pkgObj == null) {
+                return null;
+            }
+            String simple = raw.getSimpleName();
+            String pkg = pkgObj.getName();
+
+            String[] candidates = new String[] {
+                pkg + "." + simple + "Impl",
+                pkg.replace(".api.", ".") + "." + simple + "Impl",
+                pkg + ".impl." + simple + "Impl",
+            };
+
+            for (String candidate : candidates) {
+                if (candidate.equals(raw.getName())) continue;
+                try {
+                    Class<?> impl = Class.forName(candidate);
+                    if (raw.isAssignableFrom(impl)) {
+                        return config.constructType(impl);
+                    }
+                } catch (ClassNotFoundException e) {
+                    // ignore
+                }
+            }
+            return null;
         }
     }
 }

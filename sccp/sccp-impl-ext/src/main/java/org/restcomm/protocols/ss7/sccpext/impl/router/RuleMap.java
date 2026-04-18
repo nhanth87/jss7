@@ -1,12 +1,17 @@
-
 package org.restcomm.protocols.ss7.sccpext.impl.router;
 
-import org.jctools.maps.NonBlockingHashMap;
+import java.util.HashMap;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
- * @author amit bhayani
- *
+ * Wrapper class for Rule map to support Jackson serialization
  */
-public class RuleMap<Integer, Rule> extends NonBlockingHashMap<Integer, Rule> {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class RuleMap<Integer, Rule> extends HashMap<Integer, Rule> {
+    private static final long serialVersionUID = 1L;
 
+    public RuleMap() {
+        super();
+    }
 }

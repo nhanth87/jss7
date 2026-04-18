@@ -1,6 +1,7 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.subscriberInformation;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.restcomm.protocols.ss7.isup.ParameterException;
@@ -44,6 +45,7 @@ public class LocationNumberMapImpl extends OctetStringBase implements LocationNu
         return data;
     }
 
+    @JsonDeserialize(as = LocationNumberImpl.class)
     public LocationNumber getLocationNumber() throws MAPException {
         if (this.data == null)
             throw new MAPException("The data has not been filled");

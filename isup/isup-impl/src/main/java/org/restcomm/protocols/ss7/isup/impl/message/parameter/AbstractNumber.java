@@ -1,6 +1,9 @@
 
 package org.restcomm.protocols.ss7.isup.impl.message.parameter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,6 +43,7 @@ public abstract class AbstractNumber extends AbstractISUPParameter implements Nu
     /**
      * Holds odd flag, it can have either value: 10000000(x80) or 00000000. For each it takes value 1 and 0;
      */
+    @JsonIgnore
     protected int oddFlag;
 
     /**
@@ -358,8 +362,14 @@ public abstract class AbstractNumber extends AbstractISUPParameter implements Nu
         return bytesCount;
     }
 
+    @JsonProperty
     public boolean isOddFlag() {
         return oddFlag == _FLAG_ODD;
+    }
+
+    @JsonProperty
+    public void setOddFlag(boolean oddFlag) {
+        this.oddFlag = oddFlag ? _FLAG_ODD : 0;
     }
 
     public String getAddress() {

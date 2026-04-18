@@ -158,6 +158,39 @@ public class LocationInformationEPSImpl extends SequenceBase implements Location
         return this.mmeName;
     }
 
+
+    public void setEUtranCellGlobalIdentity(EUtranCgi eUtranCellGlobalIdentity) {
+        this.eUtranCellGlobalIdentity = eUtranCellGlobalIdentity;
+    }
+
+    public void setTrackingAreaIdentity(TAId trackingAreaIdentity) {
+        this.trackingAreaIdentity = trackingAreaIdentity;
+    }
+
+    public void setExtensionContainer(MAPExtensionContainer extensionContainer) {
+        this.extensionContainer = extensionContainer;
+    }
+
+    public void setGeographicalInformation(GeographicalInformation geographicalInformation) {
+        this.geographicalInformation = geographicalInformation;
+    }
+
+    public void setGeodeticInformation(GeodeticInformation geodeticInformation) {
+        this.geodeticInformation = geodeticInformation;
+    }
+
+    public void setCurrentLocationRetrieved(boolean currentLocationRetrieved) {
+        this.currentLocationRetrieved = currentLocationRetrieved;
+    }
+
+    public void setAgeOfLocationInformation(Integer ageOfLocationInformation) {
+        this.ageOfLocationInformation = ageOfLocationInformation;
+    }
+
+    public void setMmeName(DiameterIdentity mmeName) {
+        this.mmeName = mmeName;
+    }
+
     protected void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
         this.eUtranCellGlobalIdentity = null;
         this.trackingAreaIdentity = null;

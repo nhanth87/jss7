@@ -47,8 +47,16 @@ public abstract class SupplementaryMessageImpl extends MessageImpl implements Su
         return ussdDataCodingSch;
     }
 
+    public void setDataCodingScheme(CBSDataCodingScheme ussdDataCodingSch) {
+        this.ussdDataCodingSch = ussdDataCodingSch;
+    }
+
     public USSDString getUSSDString() {
         return this.ussdString;
+    }
+
+    public void setUSSDString(USSDString ussdString) {
+        this.ussdString = ussdString;
     }
 
     @Override

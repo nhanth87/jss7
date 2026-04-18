@@ -7,9 +7,6 @@ import static org.testng.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.restcomm.protocols.ss7.indicator.AddressIndicator;
 import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
 import org.restcomm.protocols.ss7.indicator.RoutingIndicator;
@@ -19,6 +16,9 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.sccp.SCCPJacksonXMLHelper;
 
 /**
  * @author amit bhayani
@@ -106,22 +106,16 @@ public class AddressIndicatorTest {
 
     @Test(groups = { "functional.encode", "indicator" })
     public void testSerialize() throws Exception {
+        XmlMapper xmlMapper = SCCPJacksonXMLHelper.getXmlMapper();
         AddressIndicator ai = new AddressIndicator(false, true, RoutingIndicator.ROUTING_BASED_ON_DPC_AND_SSN,
                 GlobalTitleIndicator.NO_GLOBAL_TITLE_INCLUDED);
 
         // Writes
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-        // indentation).
-        writer.write(ai, "AddressIndicator", AddressIndicator.class);
-        writer.close();
+        String serializedEvent = xmlMapper.writeValueAsString(ai);
 
-        System.out.println(output.toString());
+        System.out.println(serializedEvent);
 
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        AddressIndicator aiOut = reader.read("AddressIndicator", AddressIndicator.class);
+        AddressIndicator aiOut = xmlMapper.readValue(serializedEvent, AddressIndicator.class);
 
         assertFalse(aiOut.isPCPresent());
         assertTrue(aiOut.isSSNPresent());

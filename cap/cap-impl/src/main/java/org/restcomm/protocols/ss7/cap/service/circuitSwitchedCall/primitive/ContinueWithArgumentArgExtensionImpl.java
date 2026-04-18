@@ -36,9 +36,13 @@ public class ContinueWithArgumentArgExtensionImpl extends SequenceBase implement
     public static final int _ID_suppressOutgoingCallBarring = 2;
     public static final int _ID_legOrCallSegment = 3;
 
+    @JacksonXmlProperty(localName = "suppressDCSI")
     private boolean suppressDCSI;
+    @JacksonXmlProperty(localName = "suppressNCSI")
     private boolean suppressNCSI;
+    @JacksonXmlProperty(localName = "suppressOutgoingCallBarring")
     private boolean suppressOutgoingCallBarring;
+    @JacksonXmlProperty(localName = "legOrCallSegment")
     private LegOrCallSegment legOrCallSegment;
 
     public ContinueWithArgumentArgExtensionImpl() {

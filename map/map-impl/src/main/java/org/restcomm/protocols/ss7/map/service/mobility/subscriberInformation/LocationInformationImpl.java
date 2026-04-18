@@ -94,52 +94,104 @@ public class LocationInformationImpl extends SequenceBase implements LocationInf
         return this.ageOfLocationInformation;
     }
 
+    public void setAgeOfLocationInformation(Integer ageOfLocationInformation) {
+        this.ageOfLocationInformation = ageOfLocationInformation;
+    }
+
     public GeographicalInformation getGeographicalInformation() {
         return this.geographicalInformation;
+    }
+
+    public void setGeographicalInformation(GeographicalInformation geographicalInformation) {
+        this.geographicalInformation = geographicalInformation;
     }
 
     public ISDNAddressString getVlrNumber() {
         return this.vlrNumber;
     }
 
+    public void setVlrNumber(ISDNAddressString vlrNumber) {
+        this.vlrNumber = vlrNumber;
+    }
+
     public LocationNumberMap getLocationNumber() {
         return locationNumber;
+    }
+
+    public void setLocationNumber(LocationNumberMap locationNumber) {
+        this.locationNumber = locationNumber;
     }
 
     public CellGlobalIdOrServiceAreaIdOrLAI getCellGlobalIdOrServiceAreaIdOrLAI() {
         return cellGlobalIdOrServiceAreaIdOrLAI;
     }
 
+    public void setCellGlobalIdOrServiceAreaIdOrLAI(CellGlobalIdOrServiceAreaIdOrLAI cellGlobalIdOrServiceAreaIdOrLAI) {
+        this.cellGlobalIdOrServiceAreaIdOrLAI = cellGlobalIdOrServiceAreaIdOrLAI;
+    }
+
     public MAPExtensionContainer getExtensionContainer() {
         return extensionContainer;
+    }
+
+    public void setExtensionContainer(MAPExtensionContainer extensionContainer) {
+        this.extensionContainer = extensionContainer;
     }
 
     public LSAIdentity getSelectedLSAId() {
         return selectedLSAId;
     }
 
+    public void setSelectedLSAId(LSAIdentity selectedLSAId) {
+        this.selectedLSAId = selectedLSAId;
+    }
+
     public ISDNAddressString getMscNumber() {
         return mscNumber;
+    }
+
+    public void setMscNumber(ISDNAddressString mscNumber) {
+        this.mscNumber = mscNumber;
     }
 
     public GeodeticInformation getGeodeticInformation() {
         return geodeticInformation;
     }
 
+    public void setGeodeticInformation(GeodeticInformation geodeticInformation) {
+        this.geodeticInformation = geodeticInformation;
+    }
+
     public boolean getCurrentLocationRetrieved() {
         return currentLocationRetrieved;
+    }
+
+    public void setCurrentLocationRetrieved(boolean currentLocationRetrieved) {
+        this.currentLocationRetrieved = currentLocationRetrieved;
     }
 
     public boolean getSaiPresent() {
         return saiPresent;
     }
 
+    public void setSaiPresent(boolean saiPresent) {
+        this.saiPresent = saiPresent;
+    }
+
     public LocationInformationEPS getLocationInformationEPS() {
         return locationInformationEPS;
     }
 
+    public void setLocationInformationEPS(LocationInformationEPS locationInformationEPS) {
+        this.locationInformationEPS = locationInformationEPS;
+    }
+
     public UserCSGInformation getUserCSGInformation() {
         return userCSGInformation;
+    }
+
+    public void setUserCSGInformation(UserCSGInformation userCSGInformation) {
+        this.userCSGInformation = userCSGInformation;
     }
 
     protected void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {

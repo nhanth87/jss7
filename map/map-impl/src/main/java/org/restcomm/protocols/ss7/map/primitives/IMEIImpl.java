@@ -29,6 +29,10 @@ public class IMEIImpl extends TbcdString implements IMEI {
         return this.data;
     }
 
+    public void setIMEI(String imei) {
+        this.data = imei;
+    }
+
     @Override
     public void encodeData(AsnOutputStream asnOutputStream) throws MAPException {
         if (this.data == null)

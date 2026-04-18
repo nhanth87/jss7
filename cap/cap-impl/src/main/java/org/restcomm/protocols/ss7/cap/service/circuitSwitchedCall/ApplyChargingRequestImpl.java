@@ -47,9 +47,13 @@ public class ApplyChargingRequestImpl extends CircuitSwitchedCallMessageImpl imp
 
     public static final String _PrimitiveName = "ApplyChargingRequestIndication";
 
+    @JacksonXmlProperty(localName = "aChBillingChargingCharacteristics")
     private CAMELAChBillingChargingCharacteristics aChBillingChargingCharacteristics;
+    @JacksonXmlProperty(localName = "partyToCharge")
     private SendingSideID partyToCharge;
+    @JacksonXmlProperty(localName = "extensions")
     private CAPExtensions extensions;
+    @JacksonXmlProperty(localName = "aChChargingAddress")
     private AChChargingAddress aChChargingAddress;
 
     public ApplyChargingRequestImpl() {

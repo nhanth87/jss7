@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>sccp-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7.sccp</groupId>
-		<version>9.2.9</version>
+		<version>9.2.10</version>
 	</parent>
 
 	<artifactId>sccp-api</artifactId>
@@ -35,6 +35,12 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.15.2</version>
 			<scope>provided</scope>
 		</dependency>
 		

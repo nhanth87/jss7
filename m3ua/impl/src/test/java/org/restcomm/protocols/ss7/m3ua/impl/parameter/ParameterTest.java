@@ -11,8 +11,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
 import javolution.xml.stream.XMLStreamException;
 
 import org.restcomm.protocols.ss7.m3ua.impl.parameter.ASPIdentifierImpl;
@@ -54,6 +52,8 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * @author amit bhayani
@@ -195,17 +195,11 @@ public class ParameterTest {
         assertEquals(123, (int) np2.getNetApp());
 
         // Test Serialization
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t");
-        writer.write(np, "NetworkAppearanceImpl", NetworkAppearanceImpl.class);
-        writer.close();
+        serializedEvent = xmlMapper.writeValueAsString(np);
 
-        System.out.println(output.toString());
+        System.out.println(serializedEvent);
 
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        NetworkAppearanceImpl np3 = reader.read("NetworkAppearanceImpl", NetworkAppearanceImpl.class);
+        NetworkAppearanceImpl np3 = xmlMapper.readValue(serializedEvent, NetworkAppearanceImpl.class);
 
         assertEquals(123, (int) np3.getNetApp());
         assertEquals(Parameter.Network_Appearance, np3.getTag());
@@ -225,17 +219,11 @@ public class ParameterTest {
         assertTrue(Arrays.equals(new long[] { 4294967295l }, rc2.getRoutingContexts()));
 
         // Test Serialization
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t");
-        writer.write(rc, "RoutingContextImpl", RoutingContextImpl.class);
-        writer.close();
+        serializedEvent = xmlMapper.writeValueAsString(rc);
 
-        System.out.println(output.toString());
+        System.out.println(serializedEvent);
 
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        RoutingContextImpl rc3 = reader.read("RoutingContextImpl", RoutingContextImpl.class);
+        RoutingContextImpl rc3 = xmlMapper.readValue(serializedEvent, RoutingContextImpl.class);
 
         assertTrue(Arrays.equals(new long[] { 4294967295l }, rc3.getRoutingContexts()));
         assertEquals(Parameter.Routing_Context, rc3.getTag());
@@ -255,17 +243,11 @@ public class ParameterTest {
         assertTrue(Arrays.equals(new long[] { 123l, 4294967295l }, rc2.getRoutingContexts()));
 
         // Test Serialization
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t");
-        writer.write(rc, "RoutingContextImpl", RoutingContextImpl.class);
-        writer.close();
+        serializedEvent = xmlMapper.writeValueAsString(rc);
 
-        System.out.println(output.toString());
+        System.out.println(serializedEvent);
 
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        RoutingContextImpl rc3 = reader.read("RoutingContextImpl", RoutingContextImpl.class);
+        RoutingContextImpl rc3 = xmlMapper.readValue(serializedEvent, RoutingContextImpl.class);
 
         assertTrue(Arrays.equals(new long[] { 123l, 4294967295l }, rc3.getRoutingContexts()));
         assertEquals(Parameter.Routing_Context, rc3.getTag());
@@ -410,17 +392,11 @@ public class ParameterTest {
         assertEquals((short) 0, affectedPc2.getMask());
 
         // Test Serialization
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t");
-        writer.write(affectedPc, "DestinationPointCodeImpl", DestinationPointCodeImpl.class);
-        writer.close();
+        serializedEvent = xmlMapper.writeValueAsString(affectedPc);
 
-        System.out.println(output.toString());
+        System.out.println(serializedEvent);
 
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        DestinationPointCodeImpl affectedPc3 = reader.read("DestinationPointCodeImpl", DestinationPointCodeImpl.class);
+        DestinationPointCodeImpl affectedPc3 = xmlMapper.readValue(serializedEvent, DestinationPointCodeImpl.class);
 
         assertEquals(123, affectedPc3.getPointCode());
         assertEquals((short) 0, affectedPc3.getMask());
@@ -441,17 +417,11 @@ public class ParameterTest {
         assertEquals(4294967295l, crrId2.getId());
 
         // Test Serialization
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t");
-        writer.write(crrId, "LocalRKIdentifierImpl", LocalRKIdentifierImpl.class);
-        writer.close();
+        serializedEvent = xmlMapper.writeValueAsString(crrId);
 
-        System.out.println(output.toString());
+        System.out.println(serializedEvent);
 
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        LocalRKIdentifierImpl crrId3 = reader.read("LocalRKIdentifierImpl", LocalRKIdentifierImpl.class);
+        LocalRKIdentifierImpl crrId3 = xmlMapper.readValue(serializedEvent, LocalRKIdentifierImpl.class);
 
         assertEquals(4294967295l, crrId3.getId());
         assertEquals(Parameter.Local_Routing_Key_Identifier, crrId3.getTag());
@@ -472,17 +442,11 @@ public class ParameterTest {
         assertTrue(Arrays.equals(new short[] { 0, 1 }, opcList1.getMasks()));
 
         // Test Serialization
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t");
-        writer.write(opcList, "OPCListImpl", OPCListImpl.class);
-        writer.close();
+        serializedEvent = xmlMapper.writeValueAsString(opcList);
 
-        System.out.println(output.toString());
+        System.out.println(serializedEvent);
 
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        OPCListImpl opcList3 = reader.read("OPCListImpl", OPCListImpl.class);
+        OPCListImpl opcList3 = xmlMapper.readValue(serializedEvent, OPCListImpl.class);
 
         assertTrue(Arrays.equals(new int[] { 123, 456 }, opcList3.getPointCodes()));
         assertTrue(Arrays.equals(new short[] { 0, 1 }, opcList3.getMasks()));
@@ -503,17 +467,11 @@ public class ParameterTest {
         assertTrue(Arrays.equals(new short[] { 1, 2, 3, 4 }, siList1.getIndicators()));
 
         // Test Serialization
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t");
-        writer.write(siList, "ServiceIndicatorsImpl", ServiceIndicatorsImpl.class);
-        writer.close();
+        serializedEvent = xmlMapper.writeValueAsString(siList);
 
-        System.out.println(output.toString());
+        System.out.println(serializedEvent);
 
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        ServiceIndicatorsImpl siList3 = reader.read("ServiceIndicatorsImpl", ServiceIndicatorsImpl.class);
+        ServiceIndicatorsImpl siList3 = xmlMapper.readValue(serializedEvent, ServiceIndicatorsImpl.class);
 
         assertTrue(Arrays.equals(new short[] { 1, 2, 3, 4 }, siList3.getIndicators()));
         assertEquals(Parameter.Service_Indicators, siList3.getTag());
@@ -533,17 +491,11 @@ public class ParameterTest {
         assertEquals(1, rc2.getMode());
 
         // Test Serialization
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t");
-        writer.write(rc, "TrafficModeTypeImpl", TrafficModeTypeImpl.class);
-        writer.close();
+        serializedEvent = xmlMapper.writeValueAsString(rc);
 
-        System.out.println(output.toString());
+        System.out.println(serializedEvent);
 
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        TrafficModeTypeImpl crrId3 = reader.read("TrafficModeTypeImpl", TrafficModeTypeImpl.class);
+        TrafficModeTypeImpl crrId3 = xmlMapper.readValue(serializedEvent, TrafficModeTypeImpl.class);
 
         assertEquals(1, crrId3.getMode());
         assertEquals(Parameter.Traffic_Mode_Type, crrId3.getTag());
@@ -575,17 +527,11 @@ public class ParameterTest {
                 .getRoutingContexts()));
 
         // Test Serialization
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t");
-        writer.write(routKey, "RoutingKeyImpl", RoutingKeyImpl.class);
-        writer.close();
+        serializedEvent = xmlMapper.writeValueAsString(routKey);
 
-        System.out.println(output.toString());
+        System.out.println(serializedEvent);
 
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        RoutingKeyImpl routeKey3 = reader.read("RoutingKeyImpl", RoutingKeyImpl.class);
+        RoutingKeyImpl routeKey3 = xmlMapper.readValue(serializedEvent, RoutingKeyImpl.class);
 
         assertEquals(localRkId.getId(), routeKey3.getLocalRKIdentifier().getId());
         assertTrue(Arrays.equals(routKey.getRoutingContext().getRoutingContexts(), routeKey3.getRoutingContext()
@@ -620,17 +566,11 @@ public class ParameterTest {
                 .getRoutingContexts()));
 
         // Test Serialization
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t");
-        writer.write(routKey, "RoutingKeyImpl", RoutingKeyImpl.class);
-        writer.close();
+        serializedEvent = xmlMapper.writeValueAsString(routKey);
 
-        System.out.println(output.toString());
+        System.out.println(serializedEvent);
 
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        RoutingKeyImpl routeKey3 = reader.read("RoutingKeyImpl", RoutingKeyImpl.class);
+        RoutingKeyImpl routeKey3 = xmlMapper.readValue(serializedEvent, RoutingKeyImpl.class);
 
         assertNull(routeKey3.getLocalRKIdentifier());
         assertTrue(Arrays.equals(routKey.getRoutingContext().getRoutingContexts(), routeKey3.getRoutingContext()

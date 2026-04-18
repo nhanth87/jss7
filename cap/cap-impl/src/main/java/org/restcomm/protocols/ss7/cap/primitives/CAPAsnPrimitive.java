@@ -1,6 +1,7 @@
 package org.restcomm.protocols.ss7.cap.primitives;
 
 import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
@@ -14,10 +15,13 @@ import org.restcomm.protocols.ss7.cap.api.CAPParsingComponentException;
  */
 public interface CAPAsnPrimitive extends Serializable {
 
+    @JsonIgnore
     int getTag() throws CAPException;
 
+    @JsonIgnore
     int getTagClass();
 
+    @JsonIgnore
     boolean getIsPrimitive();
 
     /**

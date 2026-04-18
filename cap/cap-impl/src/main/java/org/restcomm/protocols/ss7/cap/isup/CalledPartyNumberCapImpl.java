@@ -2,6 +2,7 @@ package org.restcomm.protocols.ss7.cap.isup;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.IOException;
 
@@ -30,7 +31,6 @@ public class CalledPartyNumberCapImpl implements CalledPartyNumberCap, CAPAsnPri
 
     public static final String _PrimitiveName = "CalledPartyNumberCap";
 
-    @JacksonXmlProperty(localName = "isupCalledPartyNumber")
     private byte[] data;
 
     public CalledPartyNumberCapImpl() {
@@ -54,11 +54,13 @@ public class CalledPartyNumberCapImpl implements CalledPartyNumberCap, CAPAsnPri
         }
     }
 
+    @JacksonXmlProperty(localName = "isupCalledPartyNumber")
     @Override
     public byte[] getData() {
         return data;
     }
 
+    @JsonIgnore
     @Override
     public CalledPartyNumber getCalledPartyNumber() throws CAPException {
         if (this.data == null)

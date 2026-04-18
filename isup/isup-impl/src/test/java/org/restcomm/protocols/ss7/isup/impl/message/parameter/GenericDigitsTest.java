@@ -1,9 +1,6 @@
 
 package org.restcomm.protocols.ss7.isup.impl.message.parameter;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.GenericDigitsImpl;
 import org.restcomm.protocols.ss7.isup.message.parameter.GenericDigits;
 import org.restcomm.protocols.ss7.isup.util.BcdHelper;
@@ -19,6 +16,9 @@ import java.util.Arrays;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.restcomm.protocols.ss7.isup.ISUPJacksonXMLHelper;
 
 /**
  *
@@ -184,26 +184,16 @@ public class GenericDigitsTest {
 
     @Test(groups = { "functional.xml.serialize", "parameter" })
     public void testXMLSerialize() throws Exception {
-
+        XmlMapper xmlMapper = ISUPJacksonXMLHelper.getXmlMapper();
         GenericDigitsImpl original = new GenericDigitsImpl(GenericDigits._ENCODING_SCHEME_BCD_EVEN, GenericDigits._TOD_BGCI,
                                                            getEncodedEvenData());
 
         // Writes the area to a file.
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(baos);
-        // writer.setBinding(binding); // Optional.
-        writer.setIndentation("\t"); // Optional (use tabulation for indentation).
-        writer.write(original, "genericDigits", GenericDigitsImpl.class);
-        writer.close();
-
-        byte[] rawData = baos.toByteArray();
-        String serializedEvent = new String(rawData);
+        String serializedEvent = xmlMapper.writeValueAsString(original);
 
         System.out.println(serializedEvent);
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(rawData);
-        XMLObjectReader reader = XMLObjectReader.newInstance(bais);
-        GenericDigitsImpl copy = reader.read("genericDigits", GenericDigitsImpl.class);
+        GenericDigitsImpl copy = xmlMapper.readValue(serializedEvent, GenericDigitsImpl.class);
 
         assertEquals(copy.getEncodingScheme(), original.getEncodingScheme());
         assertEquals(copy.getTypeOfDigits(), original.getTypeOfDigits());
