@@ -3,6 +3,7 @@ package org.restcomm.protocols.ss7.map;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 
@@ -17,16 +18,25 @@ import java.io.Writer;
  * Replaces XStream for better performance and security.
  */
 public class MAPJacksonHelper {
-    private static final XmlMapper xmlMapper = new XmlMapper();
+    private static final XmlMapper xmlMapper;
 
     static {
+        XmlFactory factory = new XmlFactory(
+            new com.ctc.wstx.stax.WstxInputFactory(),
+            new com.ctc.wstx.stax.WstxOutputFactory()
+        );
+        xmlMapper = new XmlMapper(factory);
         // Configure XML mapper
-        xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        // INDENT_OUTPUT disabled to avoid Stax2WriterAdapter.writeRaw() UnsupportedOperationException
+        // with Jackson-dataformat-xml 2.15.2 + StAX on WildFly 10
+        // xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, false);
         // Allow unknown properties during deserialization (backward compatibility)
         xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // Allow empty beans during serialization
         xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        // Remove default pretty printer to prevent Stax2WriterAdapter.writeRaw() exception on WildFly 10
+        xmlMapper.setDefaultPrettyPrinter(null);
     }
 
     public static XmlMapper getXmlMapper() {

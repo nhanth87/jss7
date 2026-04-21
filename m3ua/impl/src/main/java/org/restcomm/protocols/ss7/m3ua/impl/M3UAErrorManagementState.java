@@ -1,6 +1,7 @@
 package org.restcomm.protocols.ss7.m3ua.impl;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -115,6 +116,8 @@ public class M3UAErrorManagementState {
             } else {
                 saveConfiguration();
             }
+        } catch (FileNotFoundException e) {
+            logger.info("No error management config found. Using defaults.");
         } catch (Exception e) {
             logger.error("Error loading configuration for error management. Error: ", e);
         }
@@ -136,6 +139,8 @@ public class M3UAErrorManagementState {
                     readXmlTag(node);
                 }
             }
+        } catch (FileNotFoundException e) {
+            logger.info("Error management config file not found. Using defaults.");
         } catch (Exception e) {
             logger.error("Error reading configuration file. Error: ", e);
         }

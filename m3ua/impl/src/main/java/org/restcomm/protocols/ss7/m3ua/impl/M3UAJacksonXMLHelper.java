@@ -54,6 +54,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.fasterxml.jackson.dataformat.xml.ser.XmlBeanSerializer;
@@ -73,11 +74,18 @@ import org.restcomm.protocols.ss7.m3ua.As;
  * Replaces XStream to avoid Java module system issues.
  */
 public class M3UAJacksonXMLHelper {
-    private static final XmlMapper xmlMapper = new XmlMapper();
+    private static final XmlMapper xmlMapper;
 
     static {
+        XmlFactory factory = new XmlFactory(
+            new com.ctc.wstx.stax.WstxInputFactory(),
+            new com.ctc.wstx.stax.WstxOutputFactory()
+        );
+        xmlMapper = new XmlMapper(factory);
         // Configure for pretty printing
-        xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        // INDENT_OUTPUT disabled to avoid Stax2WriterAdapter.writeRaw() UnsupportedOperationException
+        // with Jackson-dataformat-xml 2.15.2 + StAX on WildFly 10
+        // xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
         xmlMapper.enable(ToXmlGenerator.Feature.WRITE_XML_DECLARATION);
 
         // Configure to allow deserialization of unknown properties
@@ -116,6 +124,8 @@ public class M3UAJacksonXMLHelper {
         m3uaModule.addAbstractTypeMapping(TrafficModeType.class, TrafficModeTypeImpl.class);
         m3uaModule.addAbstractTypeMapping(UserCause.class, UserCauseImpl.class);
         xmlMapper.registerModule(m3uaModule);
+        // Remove default pretty printer to prevent Stax2WriterAdapter.writeRaw() exception on WildFly 10
+        xmlMapper.setDefaultPrettyPrinter(null);
     }
 
     public static XmlMapper getXmlMapper() {
@@ -130,8 +140,8 @@ public class M3UAJacksonXMLHelper {
         try {
             xmlMapper.writeValue(writer, obj);
         } catch (Exception e) {
-            // Log warning but don't fail completely
-            writer.write("<!-- Serialization error: " + e.getMessage() + " -->");
+            // Log warning but don't fail completely - write valid XML document
+            writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- Serialization error: " + e.getMessage() + " -->\n<m3uaConfig/>");
         }
     }
 
@@ -144,7 +154,7 @@ public class M3UAJacksonXMLHelper {
             xmlMapper.writeValue(writer, obj);
             return writer.toString();
         } catch (Exception e) {
-            return "<!-- Serialization error: " + e.getMessage() + " -->";
+            return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- Serialization error: " + e.getMessage() + " -->\n<m3uaConfig/>";
         }
     }
 

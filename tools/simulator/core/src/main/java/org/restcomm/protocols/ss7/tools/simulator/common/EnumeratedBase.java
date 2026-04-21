@@ -9,6 +9,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.sun.jdmk.Enumerated;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  *
@@ -63,6 +64,7 @@ public abstract class EnumeratedBase extends Enumerated {
         return null;
     }
 
+    @JsonIgnore
     public EnumeratedBase[] getList() {
         Method[] mm = this.getClass().getMethods();
         Method mt = null;

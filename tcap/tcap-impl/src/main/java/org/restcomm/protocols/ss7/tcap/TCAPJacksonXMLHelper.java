@@ -1,6 +1,8 @@
 package org.restcomm.protocols.ss7.tcap;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import java.io.IOException;
@@ -15,10 +17,19 @@ public class TCAPJacksonXMLHelper {
     private static final XmlMapper xmlMapper;
 
     static {
-        xmlMapper = new XmlMapper();
-        xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        XmlFactory factory = new XmlFactory(
+            new com.ctc.wstx.stax.WstxInputFactory(),
+            new com.ctc.wstx.stax.WstxOutputFactory()
+        );
+        xmlMapper = new XmlMapper(factory);
+        // INDENT_OUTPUT disabled to avoid Stax2WriterAdapter.writeRaw() UnsupportedOperationException
+        // with Jackson-dataformat-xml 2.15.2 + StAX on WildFly 10
+        // xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
         xmlMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
+        // Remove default pretty printer to prevent Stax2WriterAdapter.writeRaw() exception on WildFly 10
+        xmlMapper.setDefaultPrettyPrinter(null);
     }
 
     public static XmlMapper getXmlMapper() {

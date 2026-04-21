@@ -51,6 +51,14 @@
         <resource-root path="tcap-oam-${project.version}.jar"/>
         <resource-root path="sccp-api-ext-${project.version}.jar"/>
         <resource-root path="sccp-impl-ext-${project.version}.jar"/>
+        <resource-root path="jctools-core-4.0.5.jar"/>
+        <resource-root path="jackson-core-2.15.2.jar"/>
+        <resource-root path="jackson-databind-2.15.2.jar"/>
+        <resource-root path="jackson-annotations-2.15.2.jar"/>
+        <resource-root path="jackson-dataformat-xml-2.15.2.jar"/>
+        <resource-root path="woodstox-core-6.5.1.jar"/>
+        <resource-root path="stax2-api-4.2.1.jar"/>
+        <resource-root path="log4j-api-2.19.0.jar"/>
         
     </resources>
 
@@ -61,6 +69,8 @@
         <module name="org.apache.commons.logging"/>
         <module name="org.apache.commons.pool"/>
         <module name="org.apache.log4j"/>
+        <module name="javax.mail.api"/>
+        <module name="javax.activation.api"/>
         <module name="org.apache.xerces"/>
 
         <module name="org.jboss.staxmapper"/>
@@ -75,6 +85,7 @@
         <module name="org.jboss.msc"/>
         <module name="org.jboss.jts"/>
         <module name="org.jboss.logging"/>
+        <module name="org.slf4j"/>
 	    <module name="org.restcomm.ss7.commons"/>
         
     </dependencies>

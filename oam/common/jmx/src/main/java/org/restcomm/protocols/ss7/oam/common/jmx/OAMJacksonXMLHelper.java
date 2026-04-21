@@ -15,10 +15,14 @@ public class OAMJacksonXMLHelper {
     static {
         xmlMapper = new XmlMapper();
         xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
-        xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        // INDENT_OUTPUT disabled to avoid Stax2WriterAdapter.writeRaw() UnsupportedOperationException
+        // with Jackson-dataformat-xml 2.15.2 + StAX on WildFly 10
+        // xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         // Allow unknown properties during deserialization (backward compatibility)
         xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        // Remove default pretty printer to prevent Stax2WriterAdapter.writeRaw() exception on WildFly 10
+        xmlMapper.setDefaultPrettyPrinter(null);
     }
 
     public static XmlMapper getXmlMapper() {
