@@ -24,6 +24,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
@@ -1006,6 +1007,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
      */
 
     @JacksonXmlRootElement(localName = "m3uaConfig")
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class M3UAConfig {
         @JsonProperty("timeBetweenHeartbeat")
         public int timeBetweenHeartbeat;

@@ -1,0 +1,65 @@
+org.restcomm.protocols.ss7.tools.simulator:simulator-bootstrap:jar:9.2.10
++- org.restcomm.protocols.ss7.tools.simulator:simulator-core:jar:9.2.10:compile
+|  +- org.restcomm.protocols.ss7.sccp:sccp-api-ext:jar:9.2.10:compile
+|  \- org.restcomm.protocols.ss7.sccp:sccp-impl-ext:jar:9.2.10:compile
++- org.restcomm.protocols.ss7.tools.simulator:simulator-gui:jar:9.2.10:compile
++- urbanophile:java-getopt:jar:1.0.9:compile
++- log4j:log4j:jar:1.2.14:compile
++- com.sun.jdmk:jmxtools:jar:1.2.1:compile
++- org.restcomm.protocols.ss7.ss7ext:ss7-ext-api:jar:9.2.10:compile
++- org.restcomm.protocols.ss7.ss7ext:ss7-ext-impl:jar:9.2.10:compile
++- org.mobicents.protocols.asn:asn:jar:9.2.10:compile
++- org.restcomm.protocols.ss7.statistics:statistics-api:jar:9.2.10:compile
++- org.restcomm.protocols.ss7.statistics:statistics-impl:jar:9.2.10:compile
+|  \- org.jctools:jctools-core:jar:4.0.3:compile
++- org.restcomm.protocols.ss7.sccp:sccp-api:jar:9.2.10:compile
++- org.restcomm.protocols.ss7.sccp:sccp-impl:jar:9.2.10:compile
+|  +- org.restcomm.protocols.ss7.management:shell-server-api:jar:9.2.10:compile
+|  +- com.fasterxml.jackson.dataformat:jackson-dataformat-xml:jar:2.15.2:compile
+|  |  +- org.codehaus.woodstox:stax2-api:jar:4.2.1:compile
+|  |  \- com.fasterxml.woodstox:woodstox-core:jar:6.5.1:compile
+|  \- com.fasterxml.jackson.core:jackson-databind:jar:2.15.2:compile
++- org.restcomm.protocols.ss7.tcap:tcap-impl:jar:9.2.10:compile
+|  +- io.netty:netty-common:jar:4.2.11.Final:compile
+|  +- io.netty:netty-buffer:jar:4.2.11.Final:compile
+|  +- io.netty:netty-transport:jar:4.2.11.Final:compile
+|  |  \- io.netty:netty-resolver:jar:4.2.11.Final:compile
+|  +- io.netty:netty-transport-sctp:jar:4.2.11.Final:compile
+|  +- io.netty:netty-handler:jar:4.2.11.Final:compile
+|  |  \- io.netty:netty-transport-native-unix-common:jar:4.2.11.Final:compile
+|  +- io.netty:netty-codec:jar:4.2.11.Final:compile
+|  |  +- io.netty:netty-codec-compression:jar:4.2.11.Final:compile
+|  |  +- io.netty:netty-codec-protobuf:jar:4.2.11.Final:compile
+|  |  \- io.netty:netty-codec-marshalling:jar:4.2.11.Final:compile
+|  +- io.netty:netty-codec-base:jar:4.2.11.Final:compile
+|  +- com.fasterxml.jackson.core:jackson-core:jar:2.15.2:compile
+|  \- com.fasterxml.jackson.core:jackson-annotations:jar:2.15.2:compile
++- org.restcomm.protocols.ss7.tcap:tcap-api:jar:9.2.10:compile
++- org.restcomm.protocols.ss7.map:map-api:jar:9.2.10:compile
+|  \- org.restcomm.protocols.ss7.congestion:congestion:jar:9.2.10:compile
++- org.restcomm.protocols.ss7.map:map-impl:jar:9.2.10:compile
++- org.restcomm.protocols.ss7.cap:cap-api:jar:9.2.10:compile
++- org.restcomm.protocols.ss7.cap:cap-impl:jar:9.2.10:compile
++- org.restcomm.protocols.ss7.isup:isup-api:jar:9.2.10:compile
++- org.restcomm.protocols.ss7.isup:isup-impl:jar:9.2.10:compile
++- org.restcomm.protocols.ss7.inap:inap-api:jar:9.2.10:compile
++- org.restcomm.protocols.ss7.inap:inap-impl:jar:9.2.10:compile
++- org.mobicents.protocols.sctp:sctp-api:jar:2.0.13:compile
+|  \- org.mobicents.commons:commons:jar:1.0.0.CR1:compile
++- org.mobicents.protocols.sctp:sctp-impl:jar:2.0.13:compile
+|  +- com.fasterxml.jackson.module:jackson-module-parameter-names:jar:2.15.2:compile
+|  \- org.testng:testng:jar:6.2:test
+|     +- junit:junit:jar:3.8.1:test
+|     +- org.beanshell:bsh:jar:1.3.0:test
+|     +- com.beust:jcommander:jar:1.12:test
+|     \- org.yaml:snakeyaml:jar:1.6:test
++- org.restcomm.protocols.ss7.m3ua:m3ua-api:jar:9.2.10:compile
++- org.restcomm.protocols.ss7.m3ua:m3ua-impl:jar:9.2.10:compile
++- org.restcomm.protocols.ss7.mtp:mtp-api:jar:9.2.10:compile
+|  \- org.mobicents.protocols.stream:stream:jar:1.0.0.CR1:compile
+|     \- javolution:javolution:jar:5.5.1:compile
+\- org.restcomm.protocols.ss7.mtp:mtp:jar:9.2.10:compile
+   +- org.apache.commons:commons-email:jar:1.3.2:compile
+   |  +- javax.mail:mail:jar:1.4:compile
+   |  \- javax.activation:activation:jar:1.1:compile
+   \- org.restcomm.protocols.ss7.scheduler:scheduler:jar:9.2.10:compile

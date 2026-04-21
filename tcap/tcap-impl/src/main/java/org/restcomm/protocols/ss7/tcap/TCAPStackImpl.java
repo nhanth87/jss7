@@ -10,6 +10,7 @@ import java.util.List;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
@@ -725,6 +726,7 @@ public class TCAPStackImpl implements TCAPStack {
      * Configuration class for TCAP persistence
      */
     @JsonRootName("TCAPConfig")
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TCAPConfig {
         @JsonProperty("dialogTimeout")
         public long dialogTimeout;
