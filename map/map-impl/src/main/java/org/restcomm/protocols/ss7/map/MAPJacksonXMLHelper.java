@@ -22,7 +22,9 @@ import org.mobicents.protocols.asn.BitSetStrictLength;
 public class MAPJacksonXMLHelper {
     private static final XmlMapper XML_MAPPER = new XmlMapper();
     static {
-        XML_MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
+        // INDENT_OUTPUT disabled to avoid Stax2WriterAdapter.writeRaw() UnsupportedOperationException
+        // with Jackson-dataformat-xml 2.15.2 + StAX on WildFly 10
+        // XML_MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
         XML_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         XML_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         SimpleModule module = new SimpleModule("mapjacksonxml-module") {

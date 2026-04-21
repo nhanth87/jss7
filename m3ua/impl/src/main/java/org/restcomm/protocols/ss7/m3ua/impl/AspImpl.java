@@ -318,10 +318,12 @@ public class AspImpl implements Asp {
         return this.state;
     }
 
+    @JsonIgnore
     public FSM getLocalFSM() {
         return localFSM;
     }
 
+    @JsonIgnore
     public FSM getPeerFSM() {
         return peerFSM;
     }

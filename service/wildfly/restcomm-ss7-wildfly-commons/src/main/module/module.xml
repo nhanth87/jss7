@@ -31,4 +31,7 @@
         <module name="org.jboss.logging"/>
 
     </dependencies>
+    <exports>
+        <include path="**"/>
+    </exports>
 </module>

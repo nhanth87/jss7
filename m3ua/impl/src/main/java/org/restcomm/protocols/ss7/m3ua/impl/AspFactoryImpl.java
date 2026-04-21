@@ -295,6 +295,7 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
         this.transportManagement = transportManagement;
     }
 
+    @JsonIgnore
     public Association getAssociation() {
         return this.association;
     }
@@ -675,6 +676,7 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
         return this.aspList.remove(aspImpl);
     }
 
+    @JsonIgnore
     public List<Asp> getAspList() {
         return new CopyOnWriteArrayList<Asp>(this.aspList);
     }

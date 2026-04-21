@@ -89,8 +89,7 @@ public class MAPStackConfigurationManagement {
                 this.longTimer = loaded.longTimer;
             }
         } catch (FileNotFoundException e) {
-            // File not found, use defaults
-            System.err.println(String.format("MAP Resource state file not found=%s, using defaults", persistFile));
+            // File not found, use defaults - this is normal on first startup
         } catch (Exception e) {
             System.err.println(String.format("Error while loading the MAP Resource state from file=%s", persistFile));
             e.printStackTrace();
@@ -115,16 +114,22 @@ public class MAPStackConfigurationManagement {
 
     public void setShortTimer(int shortTimer) {
         this.shortTimer = shortTimer;
-        this.store();
+        if (this.persistFile != null) {
+            this.store();
+        }
     }
 
     public void setMediumTimer(int mediumTimer) {
         this.mediumTimer = mediumTimer;
-        this.store();
+        if (this.persistFile != null) {
+            this.store();
+        }
     }
 
     public void setLongTimer(int longTimer) {
         this.longTimer = longTimer;
-        this.store();
+        if (this.persistFile != null) {
+            this.store();
+        }
     }
 }

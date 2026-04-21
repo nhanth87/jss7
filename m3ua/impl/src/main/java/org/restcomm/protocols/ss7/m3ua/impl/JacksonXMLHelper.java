@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
+import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 
@@ -18,11 +19,18 @@ import java.io.Writer;
  */
 @Deprecated
 public class JacksonXMLHelper {
-    private static final XmlMapper xmlMapper = new XmlMapper();
+    private static final XmlMapper xmlMapper;
 
     static {
+        XmlFactory factory = new XmlFactory(
+            new com.ctc.wstx.stax.WstxInputFactory(),
+            new com.ctc.wstx.stax.WstxOutputFactory()
+        );
+        xmlMapper = new XmlMapper(factory);
         // Configure for pretty printing
-        xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        // INDENT_OUTPUT disabled to avoid Stax2WriterAdapter.writeRaw() UnsupportedOperationException
+        // with Jackson-dataformat-xml 2.15.2 + StAX on WildFly 10
+        // xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
         xmlMapper.enable(ToXmlGenerator.Feature.WRITE_XML_DECLARATION);
 
         // Configure to allow deserialization of generic types
@@ -33,6 +41,8 @@ public class JacksonXMLHelper {
                 .allowIfBaseType("org.restcomm.protocols.ss7.m3ua")
                 .build();
         xmlMapper.activateDefaultTyping(ptv, com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.NON_FINAL);
+        // Remove default pretty printer to prevent Stax2WriterAdapter.writeRaw() exception on WildFly 10
+        xmlMapper.setDefaultPrettyPrinter(null);
     }
 
     public static XmlMapper getXmlMapper() {

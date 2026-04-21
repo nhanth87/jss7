@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import java.io.*;
@@ -28,12 +29,19 @@ import org.restcomm.protocols.ss7.sccp.impl.router.RouterImpl;
  * Replaces XStream for better performance and security.
  */
 public class SCCPJacksonXMLHelper {
-    private static final XmlMapper xmlMapper = new XmlMapper();
+    private static final XmlMapper xmlMapper;
     
     static {
+        XmlFactory factory = new XmlFactory(
+            new com.ctc.wstx.stax.WstxInputFactory(),
+            new com.ctc.wstx.stax.WstxOutputFactory()
+        );
+        xmlMapper = new XmlMapper(factory);
         // Configure XmlMapper
         xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
-        xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        // INDENT_OUTPUT disabled to avoid Stax2WriterAdapter.writeRaw() UnsupportedOperationException
+        // with Jackson-dataformat-xml 2.15.2 + StAX on WildFly 10
+        // xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         
         // Register custom module to handle Map<Integer, V> serialization
@@ -48,6 +56,8 @@ public class SCCPJacksonXMLHelper {
         module.addDeserializer(RemoteSignalingPointCodeMap.class, new SccpMapDeserializer<>(RemoteSignalingPointCodeMap.class));
         module.addDeserializer(ConcernedSignalingPointCodeMap.class, new SccpMapDeserializer<>(ConcernedSignalingPointCodeMap.class));
         xmlMapper.registerModule(module);
+        // Remove default pretty printer to prevent Stax2WriterAdapter.writeRaw() exception on WildFly 10
+        xmlMapper.setDefaultPrettyPrinter(null);
     }
     
     public static XmlMapper getXmlMapper() {

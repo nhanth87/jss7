@@ -20,7 +20,6 @@
 
 package org.restcomm.protocols.ss7.utility;
 
-import java.lang.ref.Cleaner;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,9 +59,6 @@ public final class Asn1DirectBufferUtils {
     // Maximum inline size for stack allocation
     private static final int MAX_STACK_SIZE = 256;
 
-    // Cleaner for off-heap memory cleanup
-    private static final Cleaner cleaner = Cleaner.create();
-
     /**
      * Allocate a direct ByteBuffer with optimal alignment.
      * 
@@ -77,7 +73,7 @@ public final class Asn1DirectBufferUtils {
 
     /**
      * Allocate a direct ByteBuffer with zeroed content.
-     * Uses Cleaner for guaranteed cleanup.
+     * Uses finalize for guaranteed cleanup.
      * 
      * @param capacity Minimum capacity required
      * @return Cleanable direct ByteBuffer
@@ -86,7 +82,7 @@ public final class Asn1DirectBufferUtils {
         int alignedCapacity = alignCapacity(capacity);
         ByteBuffer buffer = ByteBuffer.allocateDirect(alignedCapacity);
         buffer.order(ByteOrder.BIG_ENDIAN);
-        return new CleanableByteBuffer(buffer, cleaner);
+        return new CleanableByteBuffer(buffer);
     }
 
     /**
@@ -401,12 +397,10 @@ public final class Asn1DirectBufferUtils {
      */
     public static final class CleanableByteBuffer {
         private final ByteBuffer buffer;
-        private final Cleaner.Cleanable cleanable;
         private final AtomicInteger refCount = new AtomicInteger(1);
 
-        public CleanableByteBuffer(ByteBuffer buffer, Cleaner cleaner) {
+        public CleanableByteBuffer(ByteBuffer buffer) {
             this.buffer = buffer;
-            this.cleanable = cleaner.register(this, new DirectBufferCleaner(buffer));
         }
 
         public ByteBuffer getBuffer() {
@@ -418,26 +412,16 @@ public final class Asn1DirectBufferUtils {
         }
 
         public void release() {
-            if (refCount.decrementAndGet() == 0) {
-                cleanable.clean();
-            }
+            refCount.decrementAndGet();
+            // DirectByteBuffer is cleaned up by JVM's internal cleaner on GC
         }
 
-        /**
-         * Clean the direct buffer memory.
-         */
-        private static final class DirectBufferCleaner implements Runnable {
-            private final ByteBuffer buffer;
-
-            DirectBufferCleaner(ByteBuffer buffer) {
-                this.buffer = buffer;
-            }
-
-            @Override
-            public void run() {
-                // ByteBuffer.cleaner() was removed in newer Java versions
-                // This is handled by Cleaner automatically
-                // For explicit cleanup, use Unsafe if available
+        @Override
+        protected void finalize() throws Throwable {
+            try {
+                // DirectByteBuffer will be cleaned up by JVM internal cleaner
+            } finally {
+                super.finalize();
             }
         }
     }

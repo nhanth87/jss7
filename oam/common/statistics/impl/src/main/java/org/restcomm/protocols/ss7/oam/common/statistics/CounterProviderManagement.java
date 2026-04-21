@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.jctools.maps.NonBlockingHashMap;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.restcomm.protocols.ss7.oam.common.jmx.OAMJacksonXMLHelper;
 
@@ -456,7 +457,11 @@ public class CounterProviderManagement implements CounterProviderManagementMBean
             if (f.exists()) {
                 XmlMapper xmlMapper = OAMJacksonXMLHelper.getXmlMapper();
                 FileInputStream fis = new FileInputStream(persistFile.toString());
-                this.lstCounterCampaign = xmlMapper.readValue(fis, CounterCampaignMap.class);
+                Map<String, CounterCampaignImpl> tempCampaignMap = xmlMapper.readValue(fis, new TypeReference<Map<String, CounterCampaignImpl>>() {});
+                this.lstCounterCampaign = new CounterCampaignMap<>();
+                if (tempCampaignMap != null) {
+                    this.lstCounterCampaign.putAll(tempCampaignMap);
+                }
                 fis.close();
             }
         } catch (FileNotFoundException e) {

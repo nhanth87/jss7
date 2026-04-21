@@ -332,6 +332,7 @@ public class AsImpl implements As {
         return this.name;
     }
 
+    @JsonIgnore
     public AspTrafficListener getAspTrafficListener() {
         return aspTrafficListener;
     }
@@ -437,6 +438,7 @@ public class AsImpl implements As {
      *
      * @return
      */
+    @JsonIgnore
     public List<Asp> getAspList() {
         return new CopyOnWriteArrayList<Asp>(this.appServerProcs);
     }
@@ -450,10 +452,12 @@ public class AsImpl implements As {
     // return AsState.getState(this.peerFSM.getState().getName());
     // }
 
+    @JsonIgnore
     public FSM getPeerFSM() {
         return peerFSM;
     }
 
+    @JsonIgnore
     public FSM getLocalFSM() {
         return localFSM;
     }
@@ -777,6 +781,7 @@ public class AsImpl implements As {
         this.asStateListeners.remove(listener);
     }
 
+    @JsonIgnore
     public Set<AsStateListener> getAsStateListeners() {
         return asStateListeners;
     }
