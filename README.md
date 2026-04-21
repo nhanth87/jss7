@@ -1,8 +1,8 @@
-﻿# 🚀 jSS7-NG 9.2.8 - Next Generation SS7 Stack
+# 🚀 jSS7-NG 9.2.10 - Next Generation SS7 Stack
 
 > **JCTools Powered | ASN-Optimized | Netty Zero-GC | 84 Modules**
 
-[![jSS7-NG](https://img.shields.io/badge/jSS7--NG-9.2.8-blue.svg)](https://github.com/nhanth87/jSS7)
+[![jSS7-NG](https://img.shields.io/badge/jSS7--NG-9.2.10-blue.svg)](https://github.com/nhanth87/jSS7)
 [![JCTools](https://img.shields.io/badge/Javolution--%3E%3E-JCTools-orange.svg)](https://github.com/JCTools/JCTools)
 [![ASN](https://img.shields.io/badge/ASN-Internalized-green.svg)](https://github.com/nhanth87/jSS7)
 [![Modules](https://img.shields.io/badge/Modules-84-brightgreen.svg)](https://github.com/nhanth87/jSS7)
@@ -11,7 +11,7 @@
 
 ## 💡 The Evolution: Javolution → JCTools
 
-**jSS7-NG** represents a paradigm shift from legacy Javolution to modern, high-performance JCTools collections and XStream serialization.
+**jSS7-NG** represents a paradigm shift from legacy Javolution to modern, high-performance JCTools collections and Jackson XML serialization.
 
 ### The Old World (v9.0.0)
 ```java
@@ -28,17 +28,17 @@ protected static final XMLFormat<CounterCampaignImpl> XML =
     };
 ```
 
-### The New World (v9.2.8)
+### The New World (v9.2.10)
 ```java
 // JCTools - Lock-free, modern, fast
 MpscArrayQueue<Dialog> dialogs = new MpscArrayQueue<>(1024);
 NonBlockingHashMap<String, Association> assocMap = 
     new NonBlockingHashMap<>(); // Thread-safe by default
 
-// XStream - Clean annotations
-@XStreamAlias("counterCampaign")
+// Jackson XML - Clean annotations
+@JsonRootName("counterCampaign")
 public class CounterCampaignImpl {
-    @XStreamAsAttribute
+    @JacksonXmlProperty(isAttribute = true)
     private String name;
 }
 ```
@@ -57,8 +57,8 @@ public class CounterCampaignImpl {
 
 ### Serialization Overhaul (105+ Files)
 
-| Module | XMLFormat Lines | XStream Lines | Reduction |
-|--------|-----------------|---------------|-----------|
+| Module | XMLFormat Lines | Jackson XML Lines | Reduction |
+|--------|-----------------|-------------------|-----------|
 | TCAP | 150 | 10 | **93%** |
 | MAP | 280 | 15 | **95%** |
 | CAP | 450 | 20 | **96%** |
@@ -132,9 +132,9 @@ XMLObjectWriter writer = XMLObjectWriter.newInstance(...);
 writer.write(campaigns, "counterCampaigns", 
     CounterCampaignImpl.class);
 
-// After: XStream simplicity
-XStream xstream = new XStream(new DomDriver());
-xstream.toXML(lstCounterCampaign, writer); // One line! ✅
+// After: Jackson XML simplicity
+XmlMapper xmlMapper = new XmlMapper();
+xmlMapper.writeValue(writer, lstCounterCampaign); // One line! ✅
 ```
 
 ---
@@ -143,8 +143,8 @@ xstream.toXML(lstCounterCampaign, writer); // One line! ✅
 
 ### Production Benchmarks
 
-| Metric | jSS7 9.0.0 | jSS7-NG 9.2.8 | Improvement |
-|--------|------------|---------------|-------------|
+| Metric | jSS7 9.0.0 | jSS7-NG 9.2.10 | Improvement |
+|--------|------------|----------------|-------------|
 | MAP TPS | 12K/sec | 45K/sec | **275%** |
 | SCCP Throughput | 8K/sec | 35K/sec | **337%** |
 | GC Pauses | 200ms | <10ms | **95%** |
@@ -158,7 +158,7 @@ jSS7 9.0.0 (Javolution):
   99th: 45ms  ← GC spikes
   99.9th: 180ms
 
-jSS7-NG 9.2.8 (JCTools):
+jSS7-NG 9.2.10 (JCTools):
   50th: 0.8ms  ✅
   99th: 3.2ms  ✅ No GC spikes
   99.9th: 8ms  ✅
@@ -173,7 +173,7 @@ jSS7-NG 9.2.8 (JCTools):
 <dependency>
     <groupId>org.restcomm.protocols.ss7</groupId>
     <artifactId>ss7-parent</artifactId>
-    <version>9.2.8</version>
+    <version>9.2.10</version>
 </dependency>
 ```
 
@@ -183,21 +183,28 @@ jSS7-NG 9.2.8 (JCTools):
 <dependency>
     <groupId>org.jctools</groupId>
     <artifactId>jctools-core</artifactId>
-    <version>4.0.3</version>
+    <version>4.0.5</version>
 </dependency>
 
-<!-- XStream - Modern XML serialization -->
+<!-- Jackson XML - Modern XML serialization -->
 <dependency>
-    <groupId>com.thoughtworks.xstream</groupId>
-    <artifactId>xstream</artifactId>
-    <version>1.4.20</version>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-xml</artifactId>
+    <version>2.15.2</version>
+</dependency>
+
+<!-- Woodstox - High-performance StAX implementation -->
+<dependency>
+    <groupId>com.fasterxml.woodstox</groupId>
+    <artifactId>woodstox-core</artifactId>
+    <version>6.5.1</version>
 </dependency>
 
 <!-- SCTP-NG - Zero-GC transport -->
 <dependency>
     <groupId>org.mobicents.protocols.sctp</groupId>
     <artifactId>sctp-impl</artifactId>
-    <version>2.0.8</version>
+    <version>2.0.13</version>
 </dependency>
 ```
 
@@ -215,10 +222,52 @@ mvn clean install -DskipTests -Dcheckstyle.skip=true
 
 ---
 
+## 🦎 WildFly 10 Deployment Fixes
+
+### Woodstox Explicit StAX Configuration
+WildFly 10 ships with a StAX implementation that is incompatible with Jackson XML's default auto-detection. Explicit Woodstox factory configuration is required:
+
+```java
+XmlMapper xmlMapper = new XmlMapper(
+    new XmlFactory(
+        new WstxInputFactory(),
+        new WstxOutputFactory()
+    )
+);
+```
+
+This resolves `Stax2WriterAdapter UnsupportedOperationException` during XML serialization.
+
+### FAIL_ON_UNKNOWN_PROPERTIES for Backward Compatibility
+To safely load XML state files from older versions without field mapping errors:
+
+```java
+xmlMapper.configure(
+    DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false
+);
+```
+
+### log4j2-api Dependency for Netty 4.2.x
+Netty 4.2.x requires `log4j-api` at runtime. Ensure `module.xml` includes:
+
+```xml
+<module name="org.apache.logging.log4j.api" />
+<module name="javax.mail.api" />
+```
+
+---
+
 ## 📝 Changelog
 
+### v9.2.10 - "Jackson XML Stabilization"
+- 🔧 Fixed: Explicit Woodstox WstxInputFactory/WstxOutputFactory for WildFly 10 StAX compatibility
+- 🔧 Fixed: NPE in MAPStackConfigurationManagement during Jackson deserialization
+- 🔧 Added: woodstox-core 6.5.1 dependency across 9+ modules
+- 🔧 Added: log4j-api and javax.mail.api module dependencies
+- 🔧 Updated: Jackson XML serialization fixes across TCAP, CAP, INAP, ISUP, SCCP, MAP, OAM
+
 ### v9.2.8 - "SCTP-NG Integration"
-- 🔧 Updated: SCTP 2.0.8 (PayloadDataPool fixes)
+- 🔧 Updated: SCTP 2.0.13 (PayloadDataPool fixes)
 
 ### v9.2.3 - "API Alignment"
 - ✅ Fixed: SctpAssociationJmx for SCTP-NG API
@@ -229,7 +278,7 @@ mvn clean install -DskipTests -Dcheckstyle.skip=true
 ### v9.2.1 - "The Great Migration"
 - 🎯 **127 files**: FastList → MpscArrayQueue
 - 🎯 **127 files**: FastMap → NonBlockingHashMap  
-- 🎯 **105 files**: XMLFormat → XStream
+- 🎯 **105 files**: XMLFormat → Jackson XML
 - 🎯 **Total**: 359+ file changes
 - ❌ Removed: All Javolution dependencies
 
@@ -239,7 +288,7 @@ mvn clean install -DskipTests -Dcheckstyle.skip=true
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    jSS7-NG 9.2.8                             │
+│                    jSS7-NG 9.2.10                            │
 ├─────────────────────────────────────────────────────────────┤
 │  TCAP-NG    MAP-NG    CAP-NG    INAP-NG    ISUP-NG          │
 │     │          │         │         │         │              │
@@ -247,10 +296,10 @@ mvn clean install -DskipTests -Dcheckstyle.skip=true
 │                      │                                       │
 │              SCCP-NG │ M3UA-NG                               │
 │                      │                                       │
-│              SCTP-NG 2.0.8 (Zero-GC)                        │
+│              SCTP-NG 2.0.13 (Zero-GC)                        │
 ├─────────────────────────────────────────────────────────────┤
 │  Collections: JCTools MpscArrayQueue / NonBlockingHashMap   │
-│  Serialization: XStream Annotations                          │
+│  Serialization: Jackson XML Dataformat + Woodstox StAX      │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -262,8 +311,8 @@ mvn clean install -DskipTests -Dcheckstyle.skip=true
 
 1. **Collections**: Replace `FastMap` → `NonBlockingHashMap`
 2. **Return Types**: `Map` interface instead of `FastMap`
-3. **XML**: Remove XMLFormat inner classes, add XStream annotations
-4. **Dependencies**: Exclude Javolution, include JCTools
+3. **XML**: Remove XMLFormat inner classes, add Jackson XML annotations
+4. **Dependencies**: Exclude Javolution, include JCTools and Jackson XML
 
 ### API Compatibility
 ```java
@@ -281,8 +330,8 @@ GNU Lesser General Public License v2.1
 ---
 
 **Architected by:** nhanth87  
-**Performance by:** JCTools 4.0.3  
-**Serialization by:** XStream 1.4.20  
+**Performance by:** JCTools 4.0.5  
+**Serialization by:** Jackson XML Dataformat 2.15.2 / Woodstox 6.5.1  
 **Vision:** Zero-GC, Lock-Free, Modern SS7
 
 ```
