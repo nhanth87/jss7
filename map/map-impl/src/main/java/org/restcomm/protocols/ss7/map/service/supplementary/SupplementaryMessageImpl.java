@@ -1,6 +1,7 @@
 
 package org.restcomm.protocols.ss7.map.service.supplementary;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.apache.log4j.Logger;
@@ -19,6 +20,7 @@ import org.restcomm.protocols.ss7.map.primitives.USSDStringImpl;
  *
  */
 @JacksonXmlRootElement(localName = "supplementaryMessageImpl")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class SupplementaryMessageImpl extends MessageImpl implements SupplementaryMessage, MAPAsnPrimitive {
 
     private static final Logger logger = Logger.getLogger(SupplementaryMessageImpl.class);

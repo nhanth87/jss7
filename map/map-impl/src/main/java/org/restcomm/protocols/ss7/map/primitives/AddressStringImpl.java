@@ -2,7 +2,10 @@ package org.restcomm.protocols.ss7.map.primitives;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -21,6 +24,9 @@ import org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan;
  * @author sergey vetyutnev
  *
  */
+@JacksonXmlRootElement(localName = "AddressString")
+@JsonTypeName("AddressString")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AddressStringImpl implements AddressString, MAPAsnPrimitive {
 
     protected int NO_EXTENSION_MASK = 0x80;
@@ -70,6 +76,22 @@ public class AddressStringImpl implements AddressString, MAPAsnPrimitive {
 
     public boolean isExtension() {
         return isExtension;
+    }
+
+    public void setAddressNature(AddressNature addressNature) {
+        this.addressNature = addressNature;
+    }
+
+    public void setNumberingPlan(NumberingPlan numberingPlan) {
+        this.numberingPlan = numberingPlan;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setExtension(boolean extension) {
+        this.isExtension = extension;
     }
 
     public int getTag() throws MAPException {

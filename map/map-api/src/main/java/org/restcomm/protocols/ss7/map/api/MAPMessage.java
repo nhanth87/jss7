@@ -3,6 +3,7 @@ package org.restcomm.protocols.ss7.map.api;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * This is super interface for all service message in MAP
@@ -10,6 +11,7 @@ import java.io.Serializable;
  * @author amit bhayani
  *
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 public interface MAPMessage extends Serializable {
 
     long getInvokeId();

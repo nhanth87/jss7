@@ -3,6 +3,8 @@ package org.restcomm.protocols.ss7.map.service.supplementary;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.AsnException;
@@ -25,7 +27,9 @@ import org.restcomm.protocols.ss7.map.primitives.USSDStringImpl;
  * @author amit bhayani
  *
  */
-@JacksonXmlRootElement(localName = "processUnstructuredSSResponseImpl")
+@JacksonXmlRootElement(localName = "processUnstructuredSSRequest_Response")
+@JsonTypeName("processUnstructuredSSRequest_Response")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProcessUnstructuredSSResponseImpl extends SupplementaryMessageImpl implements ProcessUnstructuredSSResponse {
 
     public ProcessUnstructuredSSResponseImpl() {

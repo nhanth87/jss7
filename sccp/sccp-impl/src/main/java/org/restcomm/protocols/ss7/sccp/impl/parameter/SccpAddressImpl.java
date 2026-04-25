@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 import org.restcomm.protocols.ss7.indicator.AddressIndicator;
@@ -24,6 +26,7 @@ import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
  *
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonTypeName("SccpAddress")
 public class SccpAddressImpl extends AbstractParameter implements SccpAddress {
 
     private static final byte ROUTE_ON_PC_FLAG = 0x40;
@@ -50,7 +53,9 @@ public class SccpAddressImpl extends AbstractParameter implements SccpAddress {
     @JacksonXmlProperty(localName = "networkId")
     private int networkId = 0;
 
+    @JsonProperty("addressIndicator")
     private AddressIndicator ai;
+    @JsonProperty
     private boolean translated; // If this SccpAddress is translated address
 
     public SccpAddressImpl() {
@@ -79,6 +84,10 @@ public class SccpAddressImpl extends AbstractParameter implements SccpAddress {
 
     public void setTranslated(boolean translated) {
         this.translated = translated;
+    }
+
+    public void setAddressIndicator(AddressIndicator ai) {
+        this.ai = ai;
     }
 
     public AddressIndicator getAddressIndicator() {

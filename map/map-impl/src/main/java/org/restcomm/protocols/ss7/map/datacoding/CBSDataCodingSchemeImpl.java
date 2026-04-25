@@ -1,6 +1,10 @@
 
 package org.restcomm.protocols.ss7.map.datacoding;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
 import org.restcomm.protocols.ss7.map.api.datacoding.CBSDataCodingGroup;
 import org.restcomm.protocols.ss7.map.api.datacoding.CBSDataCodingScheme;
 import org.restcomm.protocols.ss7.map.api.datacoding.CBSNationalLanguage;
@@ -12,6 +16,9 @@ import org.restcomm.protocols.ss7.map.api.smstpdu.DataCodingSchemaMessageClass;
  * @author sergey vetyutnev
  *
  */
+@JacksonXmlRootElement(localName = "CBSDataCodingScheme")
+@JsonTypeName("CBSDataCodingScheme")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CBSDataCodingSchemeImpl implements CBSDataCodingScheme {
 
     private int code;

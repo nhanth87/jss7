@@ -1,5 +1,6 @@
 package org.restcomm.protocols.ss7.map.errors;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -14,7 +15,8 @@ import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessageParameterless;
  * @author sergey vetyutnev
  * @author amit bhayani
  */
-@JacksonXmlRootElement(localName = "mAPErrorMessageParameterlessImpl")
+@JsonTypeName("MAPErrorMessageParameterless")
+@JacksonXmlRootElement(localName = "MAPErrorMessageParameterless")
 public class MAPErrorMessageParameterlessImpl extends MAPErrorMessageImpl implements MAPErrorMessageParameterless {
 
     public MAPErrorMessageParameterlessImpl() {

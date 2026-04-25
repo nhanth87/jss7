@@ -3,6 +3,8 @@ package org.restcomm.protocols.ss7.map.api.primitives;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * <code>
 AddressString ::= OCTET STRING (SIZE (1..maxAddressLength))
@@ -52,6 +54,7 @@ TBCD-STRING ::= OCTET STRING
  * @author amit bhayani
  *
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public interface AddressString extends Serializable {
 
     AddressNature getAddressNature();

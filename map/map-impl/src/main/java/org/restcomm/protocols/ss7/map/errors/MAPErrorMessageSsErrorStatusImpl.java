@@ -3,6 +3,7 @@ package org.restcomm.protocols.ss7.map.errors;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.AsnException;
@@ -20,7 +21,8 @@ import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessageSsErrorStatus;
  * @author sergey vetyutnev
  * @author amit bhayani
  */
-@JacksonXmlRootElement(localName = "mAPErrorMessageSsErrorStatusImpl")
+@JsonTypeName("MAPErrorMessageSsErrorStatus")
+@JacksonXmlRootElement(localName = "MAPErrorMessageSsErrorStatus")
 public class MAPErrorMessageSsErrorStatusImpl extends MAPErrorMessageImpl implements MAPErrorMessageSsErrorStatus {
 
     public static final int _mask_QBit = 0x08;
