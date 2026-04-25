@@ -1,6 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.primitives;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.restcomm.protocols.ss7.map.api.MAPException;
@@ -15,7 +17,9 @@ import org.restcomm.protocols.ss7.map.api.primitives.NumberingPlan;
  * @author sergey vetyutnev
  *
  */
-@JacksonXmlRootElement(localName = "isdnAddressString")
+@JacksonXmlRootElement(localName = "ISDNAddressString")
+@JsonTypeName("ISDNAddressString")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ISDNAddressStringImpl extends AddressStringImpl implements ISDNAddressString {
 
     public ISDNAddressStringImpl() {

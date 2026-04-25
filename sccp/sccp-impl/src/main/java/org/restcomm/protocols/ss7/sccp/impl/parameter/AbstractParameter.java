@@ -9,10 +9,13 @@ import org.restcomm.protocols.ss7.sccp.message.ParseException;
 import org.restcomm.protocols.ss7.sccp.parameter.Parameter;
 import org.restcomm.protocols.ss7.sccp.parameter.ParameterFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * @author baranowb
  */
 @SuppressWarnings("serial")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class AbstractParameter implements Parameter {
 
     //NOTE: decode methods take ParameterFactory to allow custom EncodingScheme

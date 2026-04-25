@@ -2,6 +2,10 @@
 package org.restcomm.protocols.ss7.map.primitives;
 
 import java.nio.ByteBuffer;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
@@ -25,6 +29,9 @@ import org.restcomm.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
  * @author sergey vetyutnev
  *
  */
+@JacksonXmlRootElement(localName = "USSDString")
+@JsonTypeName("USSDString")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class USSDStringImpl extends OctetStringBase implements USSDString {
 
     private CBSDataCodingScheme dataCodingScheme;
@@ -147,6 +154,14 @@ public class USSDStringImpl extends OctetStringBase implements USSDString {
 
     public void setEncodedString(byte[] data) {
         this.data = data;
+    }
+
+    public CBSDataCodingScheme getDataCodingScheme() {
+        return this.dataCodingScheme;
+    }
+
+    public void setDataCodingScheme(CBSDataCodingScheme dataCodingScheme) {
+        this.dataCodingScheme = dataCodingScheme;
     }
 
     public byte[] getEncodedString() {

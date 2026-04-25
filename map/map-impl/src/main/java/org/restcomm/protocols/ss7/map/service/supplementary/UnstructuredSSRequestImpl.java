@@ -3,6 +3,8 @@ package org.restcomm.protocols.ss7.map.service.supplementary;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.AsnException;
@@ -29,7 +31,9 @@ import org.restcomm.protocols.ss7.map.primitives.USSDStringImpl;
  * @author amit bhayani
  *
  */
-@JacksonXmlRootElement(localName = "unstructuredSSRequestImpl")
+@JacksonXmlRootElement(localName = "unstructuredSSRequest_Request")
+@JsonTypeName("unstructuredSSRequest_Request")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UnstructuredSSRequestImpl extends SupplementaryMessageImpl implements UnstructuredSSRequest {
 
     private static final int _TAG_MSISDN = 0;
@@ -80,6 +84,14 @@ public class UnstructuredSSRequestImpl extends SupplementaryMessageImpl implemen
      */
     public AlertingPattern getAlertingPattern() {
         return this.alertingPattern;
+    }
+
+    public void setMSISDNAddressString(ISDNAddressString msisdnAddressString) {
+        this.msisdnAddressString = msisdnAddressString;
+    }
+
+    public void setAlertingPattern(AlertingPattern alertingPattern) {
+        this.alertingPattern = alertingPattern;
     }
 
     public int getTag() throws MAPException {

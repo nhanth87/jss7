@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.map.dialog;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import org.restcomm.protocols.ss7.map.api.dialog.MAPUserAbortChoice;
 import org.restcomm.protocols.ss7.map.api.dialog.ProcedureCancellationReason;
 import org.restcomm.protocols.ss7.map.api.dialog.ResourceUnavailableReason;
@@ -11,6 +14,7 @@ import org.restcomm.protocols.ss7.map.api.dialog.ResourceUnavailableReason;
  * @author amit bhayani
  *
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MAPUserAbortChoiceImpl implements MAPUserAbortChoice {
 
     protected static final int USER_SPECIFIC_REASON_TAG = 0;
@@ -62,10 +66,12 @@ public class MAPUserAbortChoiceImpl implements MAPUserAbortChoice {
         this.isResourceUnavailableReason = true;
     }
 
+    @JsonIgnore
     public void setUserResourceLimitation() {
         this.isUserResourceLimitation = true;
     }
 
+    @JsonIgnore
     public void setUserSpecificReason() {
         this.isUserSpecificReason = true;
     }

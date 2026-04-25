@@ -3,6 +3,7 @@ package org.restcomm.protocols.ss7.map.errors;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.AsnException;
@@ -21,7 +22,8 @@ import org.restcomm.protocols.ss7.map.api.errors.PWRegistrationFailureCause;
  * @author sergey vetyutnev
  * @author amit bhayani
  */
-@JacksonXmlRootElement(localName = "mAPErrorMessagePwRegistrationFailureImpl")
+@JsonTypeName("MAPErrorMessagePwRegistrationFailure")
+@JacksonXmlRootElement(localName = "MAPErrorMessagePwRegistrationFailure")
 public class MAPErrorMessagePwRegistrationFailureImpl extends MAPErrorMessageImpl implements MAPErrorMessagePwRegistrationFailure {
     private PWRegistrationFailureCause pwRegistrationFailureCause;
 

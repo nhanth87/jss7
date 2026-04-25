@@ -1,6 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.primitives;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.restcomm.protocols.ss7.map.api.primitives.AlertingCategory;
@@ -13,7 +15,9 @@ import org.restcomm.protocols.ss7.map.api.primitives.AlertingPattern;
  * @author sergey vetyutnev
  *
  */
-@JacksonXmlRootElement(localName = "alertingPattern")
+@JacksonXmlRootElement(localName = "AlertingPattern")
+@JsonTypeName("AlertingPattern")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AlertingPatternImpl extends OctetStringLength1Base implements AlertingPattern {
 
     public AlertingPatternImpl() {

@@ -1,6 +1,8 @@
 
 package org.restcomm.protocols.ss7.tcap.asn;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 import java.io.IOException;
 
 import org.mobicents.protocols.asn.AsnException;
@@ -19,6 +21,7 @@ import org.restcomm.protocols.ss7.tcap.asn.comp.ReturnResultProblemType;
  * @author sergey vetyutnev
  *
  */
+@JsonTypeName("Problem")
 public class ProblemImpl implements Problem {
 
     private ProblemType type;

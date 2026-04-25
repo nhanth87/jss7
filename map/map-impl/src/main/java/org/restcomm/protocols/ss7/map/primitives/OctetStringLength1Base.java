@@ -34,6 +34,10 @@ public abstract class OctetStringLength1Base implements MAPAsnPrimitive {
         this.data = data;
     }
 
+    public void setData(int data) {
+        this.data = data;
+    }
+
     public int getTag() throws MAPException {
         return Tag.STRING_OCTET;
     }

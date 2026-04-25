@@ -7,6 +7,7 @@ import java.io.OutputStream;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
@@ -22,6 +23,7 @@ import org.restcomm.protocols.ss7.sccp.parameter.ParameterFactory;
  * @author baranowb
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonTypeName("GlobalTitle0100")
 public class GlobalTitle0100Impl extends AbstractGlobalTitle implements GlobalTitle0100 {
 
     @JacksonXmlProperty(localName = "natureOfAddress")

@@ -76,6 +76,7 @@ public class AddressIndicator implements XMLSerializable {
         reservedForNationalUseBit = (v & 0x80) == 0x80;
     }
 
+    @JsonProperty("globalTitleIndicator")
     public GlobalTitleIndicator getGlobalTitleIndicator() {
         return this.globalTitleIndicator;
     }
@@ -90,14 +91,17 @@ public class AddressIndicator implements XMLSerializable {
         return this.ssnPresent;
     }
 
+    @JsonProperty("routingIndicator")
     public RoutingIndicator getRoutingIndicator() {
         return this.routingIndicator;
     }
 
+    @JsonProperty("reservedForNationalUseBit")
     public boolean isReservedForNationalUseBit() {
         return this.reservedForNationalUseBit;
     }
 
+    @JsonProperty("globalTitleIndicator")
     public void setGlobalTitleIndicator(GlobalTitleIndicator globalTitleIndicator) {
         this.globalTitleIndicator = globalTitleIndicator;
     }
@@ -120,12 +124,19 @@ public class AddressIndicator implements XMLSerializable {
         this.ssnPresent = ssnPresent;
     }
 
+    @JsonProperty("routingIndicator")
     public void setRoutingIndicator(RoutingIndicator routingIndicator) {
         this.routingIndicator = routingIndicator;
     }
 
+    @JsonProperty("reservedForNationalUseBit")
     public void setReservedForNationalUseBit(boolean reservedForNationalUseBit) {
         this.reservedForNationalUseBit = reservedForNationalUseBit;
+    }
+
+    @JsonProperty("value")
+    public void setValue(int value) {
+        init((byte) value, SccpProtocolVersion.ITU);
     }
 
     public byte getValue(SccpProtocolVersion sccpProtocolVersion) {

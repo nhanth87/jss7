@@ -3,6 +3,7 @@ package org.restcomm.protocols.ss7.map.errors;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.AsnException;
@@ -26,7 +27,8 @@ import org.restcomm.protocols.ss7.map.service.supplementary.SSStatusImpl;
  * @author sergey vetyutnev
  * @author amit bhayani
  */
-@JacksonXmlRootElement(localName = "mAPErrorMessageSsIncompatibilityImpl")
+@JsonTypeName("MAPErrorMessageSsIncompatibility")
+@JacksonXmlRootElement(localName = "MAPErrorMessageSsIncompatibility")
 public class MAPErrorMessageSsIncompatibilityImpl extends MAPErrorMessageImpl implements MAPErrorMessageSsIncompatibility {
 
     public static final int _tag_ss_Code = 1;
