@@ -1,6 +1,6 @@
 package org.restcomm.protocols.ss7.m3ua.impl.router;
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.jctools.collections.MpscArrayQueue;
 
 import org.restcomm.protocols.ss7.m3ua.impl.AsImpl;
 
@@ -16,7 +16,7 @@ public class DPCNode {
 
     int dpc = -1;
 
-    private final CopyOnWriteArrayList<OPCNode> opcList = new CopyOnWriteArrayList<OPCNode>();
+    private final MpscArrayQueue<OPCNode> opcList = new MpscArrayQueue<>(16);
 
     private OPCNode wildCardOpcNode = null;
 

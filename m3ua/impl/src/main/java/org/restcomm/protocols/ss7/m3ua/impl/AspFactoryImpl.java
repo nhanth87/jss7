@@ -13,7 +13,7 @@ import io.netty.util.ReferenceCountUtil;
 
 import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.jctools.collections.MpscArrayQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -96,7 +96,7 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
     protected String associationName = null;
 
     @JsonProperty("aspList")
-    protected final CopyOnWriteArrayList<AspImpl> aspList = new CopyOnWriteArrayList<AspImpl>();
+    protected final MpscArrayQueue<AspImpl> aspList = new MpscArrayQueue<>(32);
 
     @JsonIgnore
     private ByteBuffer txBuffer = ByteBuffer.allocateDirect(8192);

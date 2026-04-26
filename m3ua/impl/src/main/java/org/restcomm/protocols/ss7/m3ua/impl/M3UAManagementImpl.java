@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.jctools.collections.MpscArrayQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -92,8 +92,8 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
 
     protected static final int MAX_SEQUENCE_NUMBER = 256;
 
-    protected CopyOnWriteArrayList<As> appServers = new CopyOnWriteArrayList<As>();
-    protected CopyOnWriteArrayList<AspFactory> aspFactories = new CopyOnWriteArrayList<AspFactory>();
+    protected MpscArrayQueue<As> appServers = new MpscArrayQueue<>(256);
+    protected MpscArrayQueue<AspFactory> aspFactories = new MpscArrayQueue<>(256);
     
     // Congestion tracking per DPC
     private ConcurrentHashMap<Integer, AtomicInteger> congDpcList = new ConcurrentHashMap<Integer, AtomicInteger>();
@@ -126,7 +126,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
     private long statisticsTaskPeriod = 5000;
     private boolean routingKeyManagementEnabled = false;
 
-    protected final CopyOnWriteArrayList<M3UAManagementEventListener> managementEventListeners = new CopyOnWriteArrayList<M3UAManagementEventListener>();
+    protected final MpscArrayQueue<M3UAManagementEventListener> managementEventListeners = new MpscArrayQueue<>(64);
 
     /**
      * Maximum sequence number received from SCTP user. If SCTP users sends seq number greater than max, packet will be

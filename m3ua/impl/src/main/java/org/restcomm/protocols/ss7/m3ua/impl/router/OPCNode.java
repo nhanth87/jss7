@@ -1,6 +1,6 @@
 package org.restcomm.protocols.ss7.m3ua.impl.router;
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.jctools.collections.MpscArrayQueue;
 
 import org.restcomm.protocols.ss7.m3ua.impl.AsImpl;
 
@@ -13,7 +13,7 @@ public class OPCNode {
 
     protected int dpc;
     protected int opc;
-    protected final CopyOnWriteArrayList<SINode> siList = new CopyOnWriteArrayList<SINode>();
+    protected final MpscArrayQueue<SINode> siList = new MpscArrayQueue<>(16);
 
     // Reference to wild card SINode.
     // If no matching SINode found for passed si and wildcard defined, use wildcard one.
