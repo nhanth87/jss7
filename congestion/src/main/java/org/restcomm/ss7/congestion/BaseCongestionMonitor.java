@@ -1,6 +1,6 @@
 package org.restcomm.ss7.congestion;
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.jctools.collections.MpscArrayQueue;
 
 import org.apache.log4j.Logger;
 
@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 public abstract class BaseCongestionMonitor implements CongestionMonitor {
     protected static final Logger logger = Logger.getLogger(BaseCongestionMonitor.class);
 
-    private final CopyOnWriteArrayList<CongestionListener> listeners = new CopyOnWriteArrayList<CongestionListener>();
+    private final MpscArrayQueue<CongestionListener> listeners = new MpscArrayQueue<>(64);
 
     /*
      * (non-Javadoc)

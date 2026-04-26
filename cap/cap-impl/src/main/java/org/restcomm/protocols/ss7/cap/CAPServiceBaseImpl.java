@@ -1,7 +1,7 @@
 package org.restcomm.protocols.ss7.cap;
 
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.jctools.collections.MpscArrayQueue;
 
 import org.restcomm.protocols.ss7.cap.api.CAPApplicationContext;
 import org.restcomm.protocols.ss7.cap.api.CAPDialog;
@@ -29,7 +29,7 @@ import org.restcomm.protocols.ss7.tcap.asn.comp.Problem;
 public abstract class CAPServiceBaseImpl implements CAPServiceBase {
 
     protected Boolean _isActivated = false;
-    protected List<CAPServiceListener> serviceListeners = new CopyOnWriteArrayList<CAPServiceListener>();
+    protected List<CAPServiceListener> serviceListeners = new MpscArrayQueue<>(256);
     protected CAPProviderImpl capProviderImpl;
 
     protected CAPServiceBaseImpl(CAPProviderImpl capProviderImpl) {

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.jctools.collections.MpscArrayQueue;
 
 
 
@@ -59,7 +59,7 @@ public class AsImpl implements As {
 
     // List of all the ASP's for this AS
     @JsonProperty("appServerProcs")
-    protected final CopyOnWriteArrayList<AspImpl> appServerProcs = new CopyOnWriteArrayList<AspImpl>();
+    protected final MpscArrayQueue<AspImpl> appServerProcs = new MpscArrayQueue<>(32);
 
     // List of As state listeners - transient, don't serialize
     @JsonIgnore

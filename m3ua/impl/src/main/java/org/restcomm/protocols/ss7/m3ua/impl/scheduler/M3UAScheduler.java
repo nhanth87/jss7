@@ -1,6 +1,6 @@
 package org.restcomm.protocols.ss7.m3ua.impl.scheduler;
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.jctools.collections.MpscArrayQueue;
 
 import org.apache.log4j.Logger;
 
@@ -13,9 +13,9 @@ public class M3UAScheduler implements Runnable {
     private static final Logger logger = Logger.getLogger(M3UAScheduler.class);
 
     // TODO : Synchronize tasks? Use Iterator?
-    protected final CopyOnWriteArrayList<M3UATask> tasks = new CopyOnWriteArrayList<M3UATask>();
+    protected final MpscArrayQueue<M3UATask> tasks = new MpscArrayQueue<>(256);
 
-    private final CopyOnWriteArrayList<M3UATask> removed = new CopyOnWriteArrayList<M3UATask>();
+    private final MpscArrayQueue<M3UATask> removed = new MpscArrayQueue<>(64);
 
     public void execute(M3UATask task) {
         if (task == null) {

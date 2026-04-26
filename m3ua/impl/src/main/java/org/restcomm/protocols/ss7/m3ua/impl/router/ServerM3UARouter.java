@@ -1,6 +1,6 @@
 package org.restcomm.protocols.ss7.m3ua.impl.router;
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import org.jctools.collections.MpscArrayQueue;
 
 import org.restcomm.protocols.ss7.m3ua.impl.AsImpl;
 import org.restcomm.protocols.ss7.m3ua.parameter.OPCList;
@@ -23,7 +23,7 @@ import org.restcomm.protocols.ss7.m3ua.parameter.ServiceIndicators;
  */
 public class ServerM3UARouter {
 
-    private final CopyOnWriteArrayList<DPCNode> dpcList = new CopyOnWriteArrayList<DPCNode>();
+    private final MpscArrayQueue<DPCNode> dpcList = new MpscArrayQueue<>(32);
 
     public ServerM3UARouter() {
     }
