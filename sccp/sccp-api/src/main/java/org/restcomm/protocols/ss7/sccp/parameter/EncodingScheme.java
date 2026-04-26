@@ -3,8 +3,6 @@ package org.restcomm.protocols.ss7.sccp.parameter;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import org.restcomm.protocols.ss7.sccp.message.ParseException;
 
 /**
@@ -12,7 +10,6 @@ import org.restcomm.protocols.ss7.sccp.message.ParseException;
  *
  * @author baranowb
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public interface EncodingScheme {
 
     EncodingSchemeType getType();

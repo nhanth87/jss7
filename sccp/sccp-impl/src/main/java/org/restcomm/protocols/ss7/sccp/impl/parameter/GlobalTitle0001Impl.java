@@ -23,7 +23,7 @@ import org.restcomm.protocols.ss7.sccp.parameter.ParameterFactory;
 @JsonTypeName("GlobalTitle0001")
 public class GlobalTitle0001Impl extends AbstractGlobalTitle implements GlobalTitle0001 {
 
-    @JacksonXmlProperty(localName = "natureOfAddress")
+    @JacksonXmlProperty(localName = "nai", isAttribute = false)
     private NatureOfAddress natureOfAddress;
 
     public GlobalTitle0001Impl() {

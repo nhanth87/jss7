@@ -1,7 +1,11 @@
 
 package org.restcomm.protocols.ss7.tcap.asn;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import java.io.IOException;
 
@@ -21,14 +25,24 @@ import org.restcomm.protocols.ss7.tcap.asn.comp.ReturnResultProblemType;
  * @author sergey vetyutnev
  *
  */
+@JacksonXmlRootElement(localName = "Problem")
 @JsonTypeName("Problem")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProblemImpl implements Problem {
 
+    @JsonProperty("type")
     private ProblemType type;
 
+    @JsonProperty("generalProblemType")
     private GeneralProblemType generalProblemType;
+    
+    @JsonProperty("invokeProblemType")
     private InvokeProblemType invokeProblemType;
+    
+    @JsonProperty("returnErrorProblemType")
     private ReturnErrorProblemType returnErrorProblemType;
+    
+    @JsonProperty("returnResultProblemType")
     private ReturnResultProblemType returnResultProblemType;
 
     /**
@@ -126,6 +140,11 @@ public class ProblemImpl implements Problem {
             break;
         }
         return sb.toString();
+    }
+    
+    @JsonProperty("stringValue")
+    public String getStringValueForXml() {
+        return getStringValue();
     }
 
     public String toString() {

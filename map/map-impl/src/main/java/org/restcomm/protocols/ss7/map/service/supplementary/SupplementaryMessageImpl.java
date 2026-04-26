@@ -1,7 +1,9 @@
 
 package org.restcomm.protocols.ss7.map.service.supplementary;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.apache.log4j.Logger;
@@ -45,20 +47,64 @@ public abstract class SupplementaryMessageImpl extends MessageImpl implements Su
         return (MAPDialogSupplementary) super.getMAPDialog();
     }
 
+    @JsonIgnore
     public CBSDataCodingScheme getDataCodingScheme() {
         return ussdDataCodingSch;
     }
 
+    @JsonIgnore
     public void setDataCodingScheme(CBSDataCodingScheme ussdDataCodingSch) {
         this.ussdDataCodingSch = ussdDataCodingSch;
     }
 
+    @JsonProperty("dataCodingScheme")
+    @JacksonXmlProperty(localName = "dataCodingScheme", isAttribute = true)
+    public int getDataCodingSchemeValue() {
+        if (ussdDataCodingSch == null) {
+            return DEFAULT_DATA_CODING_SCHEME;
+        }
+        return ((CBSDataCodingSchemeImpl) ussdDataCodingSch).getCode();
+    }
+
+    @JsonProperty("dataCodingScheme")
+    @JacksonXmlProperty(localName = "dataCodingScheme", isAttribute = true)
+    public void setDataCodingSchemeValue(int code) {
+        this.ussdDataCodingSch = new CBSDataCodingSchemeImpl(code);
+    }
+
+    @JsonIgnore
     public USSDString getUSSDString() {
         return this.ussdString;
     }
 
+    @JsonIgnore
     public void setUSSDString(USSDString ussdString) {
         this.ussdString = ussdString;
+    }
+
+    @JsonProperty("string")
+    @JacksonXmlProperty(localName = "string", isAttribute = false)
+    public String getUssdStringValue() {
+        if (ussdString == null) {
+            return null;
+        }
+        try {
+            return ussdString.getString(null);
+        } catch (MAPException e) {
+            return null;
+        }
+    }
+
+    @JsonProperty("string")
+    @JacksonXmlProperty(localName = "string", isAttribute = false)
+    public void setUssdStringValue(String value) {
+        if (value != null) {
+            try {
+                this.ussdString = new USSDStringImpl(value, new CBSDataCodingSchemeImpl(DEFAULT_DATA_CODING_SCHEME), null);
+            } catch (MAPException e) {
+                // ignore
+            }
+        }
     }
 
     @Override

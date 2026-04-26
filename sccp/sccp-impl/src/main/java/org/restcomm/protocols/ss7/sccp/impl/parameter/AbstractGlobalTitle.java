@@ -7,6 +7,8 @@ import java.io.ByteArrayOutputStream;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 import org.restcomm.protocols.ss7.sccp.SccpProtocolVersion;
 import org.restcomm.protocols.ss7.sccp.message.ParseException;
@@ -32,9 +34,11 @@ import org.restcomm.protocols.ss7.sccp.parameter.ParameterFactory;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class AbstractGlobalTitle extends AbstractParameter implements GlobalTitle {
 
+    @JacksonXmlProperty(localName = "digits", isAttribute = false)
     protected String digits;
 
     //not codable, just used to encode/decode digits in a common way.
+    @JsonDeserialize(as = DefaultEncodingScheme.class)
     protected EncodingScheme encodingScheme;
 
     protected static final String GLOBAL_TITLE_INDICATOR = "gti";

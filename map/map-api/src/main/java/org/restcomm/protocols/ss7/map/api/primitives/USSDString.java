@@ -6,9 +6,8 @@ import java.nio.charset.Charset;
 
 import org.restcomm.protocols.ss7.map.api.MAPException;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 /**
+ * 
  * USSD-String ::= OCTET STRING (SIZE (1..maxUSSD-StringLength)) -- The structure of the contents of the USSD-String is
  * dependent -- on the USSD-DataCodingScheme as described in TS 3GPP TS 23.038 [25].
  *
@@ -19,7 +18,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * @author sergey vetyutnev
  *
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public interface USSDString extends Serializable {
 
     /**

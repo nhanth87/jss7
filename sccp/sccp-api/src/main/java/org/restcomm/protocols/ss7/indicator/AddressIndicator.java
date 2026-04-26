@@ -4,6 +4,7 @@ package org.restcomm.protocols.ss7.indicator;
 import org.restcomm.protocols.ss7.sccp.SccpProtocolVersion;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import javolution.xml.XMLFormat;
 import javolution.xml.XMLSerializable;
 import javolution.xml.stream.XMLStreamException;
@@ -135,6 +136,13 @@ public class AddressIndicator implements XMLSerializable {
     }
 
     @JsonProperty("value")
+    @JacksonXmlProperty(isAttribute = true, localName = "value")
+    public int getValue() {
+        return getValue(SccpProtocolVersion.ITU);
+    }
+
+    @JsonProperty("value")
+    @JacksonXmlProperty(isAttribute = true, localName = "value")
     public void setValue(int value) {
         init((byte) value, SccpProtocolVersion.ITU);
     }

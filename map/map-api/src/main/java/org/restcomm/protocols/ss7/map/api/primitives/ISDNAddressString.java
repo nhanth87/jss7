@@ -1,8 +1,7 @@
 package org.restcomm.protocols.ss7.map.api.primitives;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 /**
+ * 
  *
 <code>
 ISDN-AddressString ::= AddressString (SIZE (1..maxISDN-AddressLength))
@@ -13,7 +12,6 @@ ISDN-AddressString ::= AddressString (SIZE (1..maxISDN-AddressLength))
  * @author sergey vetyutnev
  *
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public interface ISDNAddressString extends AddressString {
 
 }

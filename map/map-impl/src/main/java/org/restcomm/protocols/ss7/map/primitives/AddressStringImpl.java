@@ -33,13 +33,13 @@ public class AddressStringImpl implements AddressString, MAPAsnPrimitive {
     protected int NATURE_OF_ADD_IND_MASK = 0x70;
     protected int NUMBERING_PLAN_IND_MASK = 0x0F;
 
-    @JacksonXmlProperty(isAttribute = true)
+    @JacksonXmlProperty(isAttribute = true, localName = "nai")
     protected AddressNature addressNature;
     
-    @JacksonXmlProperty(isAttribute = true)
+    @JacksonXmlProperty(isAttribute = true, localName = "npi")
     protected NumberingPlan numberingPlan;
     
-    @JacksonXmlProperty(isAttribute = true)
+    @JacksonXmlProperty(isAttribute = true, localName = "number")
     protected String address;
 
     private boolean isExtension;
