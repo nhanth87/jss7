@@ -9,6 +9,7 @@ import java.io.OutputStream;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
@@ -41,19 +42,20 @@ public class SccpAddressImpl extends AbstractParameter implements SccpAddress {
     private static final String NETWORK_ID = "networkId";
     private static final String AI = "ai";
 
-    @JacksonXmlProperty(localName = "globalTitle")
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "class")
+    @JacksonXmlProperty(localName = "gt")
     private GlobalTitle gt;
     
-    @JacksonXmlProperty(localName = "pc")
+    @JacksonXmlProperty(localName = "pc", isAttribute = false)
     private int pc = 0;
     
-    @JacksonXmlProperty(localName = "ssn")
+    @JacksonXmlProperty(localName = "ssn", isAttribute = false)
     private int ssn = -1;
     
-    @JacksonXmlProperty(localName = "networkId")
+    @JacksonXmlProperty(localName = "networkId", isAttribute = false)
     private int networkId = 0;
 
-    @JsonProperty("addressIndicator")
+    @JacksonXmlProperty(localName = "ai")
     private AddressIndicator ai;
     @JsonProperty
     private boolean translated; // If this SccpAddress is translated address

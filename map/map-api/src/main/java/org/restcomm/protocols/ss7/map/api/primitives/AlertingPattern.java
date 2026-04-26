@@ -3,9 +3,8 @@ package org.restcomm.protocols.ss7.map.api.primitives;
 
 import java.io.Serializable;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 /**
+ * 
  * AlertingPattern ::= OCTET STRING (SIZE (1) ) -- This type is used to represent Alerting Pattern -- bits 8765 : 0000 (unused)
  * -- bits 43 : type of Pattern -- 00 level -- 01 category -- 10 category -- all other values are reserved. -- bits 21 : type of
  * alerting alertingLevel-0 AlertingPattern ::= '00000000'B alertingLevel-1 AlertingPattern ::= '00000001'B alertingLevel-2 AlertingPattern ::= '00000010'B -- all other values of Alerting level are reserved -- Alerting Levels are defined in GSM
@@ -17,7 +16,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * @author sergey vetyutnev
  *
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public interface AlertingPattern extends Serializable {
 
     int getData();

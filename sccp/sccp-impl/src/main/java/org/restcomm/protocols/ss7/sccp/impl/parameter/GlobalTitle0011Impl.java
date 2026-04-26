@@ -26,10 +26,10 @@ import org.restcomm.protocols.ss7.sccp.parameter.ParameterFactory;
 @JsonTypeName("GlobalTitle0011")
 public class GlobalTitle0011Impl extends AbstractGlobalTitle implements GlobalTitle0011 {
 
-    @JacksonXmlProperty(localName = "numberingPlan")
+    @JacksonXmlProperty(isAttribute = true, localName = "np")
     private NumberingPlan numberingPlan;
     
-    @JacksonXmlProperty(localName = "translationType")
+    @JacksonXmlProperty(isAttribute = true, localName = "tt")
     private int translationType;
 
     public GlobalTitle0011Impl() {

@@ -3,8 +3,11 @@ package org.restcomm.protocols.ss7.map.service.supplementary;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.mobicents.protocols.asn.AsnException;
@@ -39,7 +42,11 @@ public class ProcessUnstructuredSSRequestImpl extends SupplementaryMessageImpl i
 
     private static final int _TAG_MSISDN = 0;
 
+    @JsonProperty("msisdn")
+    @JsonDeserialize(as = ISDNAddressStringImpl.class)
     private ISDNAddressString msisdnAddressString = null;
+    @JsonProperty("alertingPattern")
+    @JsonDeserialize(as = AlertingPatternImpl.class)
     private AlertingPattern alertingPattern = null;
 
     public ProcessUnstructuredSSRequestImpl() {
@@ -65,14 +72,17 @@ public class ProcessUnstructuredSSRequestImpl extends SupplementaryMessageImpl i
      * @see org.restcomm.protocols.ss7.map.api.service.supplementary.
      * ProcessUnstructuredSSRequestIndication#getMSISDNAddressString()
      */
+    @JsonIgnore
     public ISDNAddressString getMSISDNAddressString() {
         return this.msisdnAddressString;
     }
 
+    @JsonIgnore
     public void setMSISDNAddressString(ISDNAddressString msisdnAddressString) {
         this.msisdnAddressString = msisdnAddressString;
     }
 
+    @JsonIgnore
     public void setAlertingPattern(AlertingPattern alertingPattern) {
         this.alertingPattern = alertingPattern;
     }
@@ -83,6 +93,7 @@ public class ProcessUnstructuredSSRequestImpl extends SupplementaryMessageImpl i
      * @see org.restcomm.protocols.ss7.map.api.service.supplementary.
      * ProcessUnstructuredSSRequestIndication#getAlertingPattern()
      */
+    @JsonIgnore
     public AlertingPattern getAlertingPattern() {
         return this.alertingPattern;
     }

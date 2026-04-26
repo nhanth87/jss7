@@ -2,7 +2,9 @@
 package org.restcomm.protocols.ss7.map.primitives;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.restcomm.protocols.ss7.map.api.primitives.AlertingCategory;
@@ -15,7 +17,7 @@ import org.restcomm.protocols.ss7.map.api.primitives.AlertingPattern;
  * @author sergey vetyutnev
  *
  */
-@JacksonXmlRootElement(localName = "AlertingPattern")
+@JacksonXmlRootElement(localName = "alertingPattern")
 @JsonTypeName("AlertingPattern")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AlertingPatternImpl extends OctetStringLength1Base implements AlertingPattern {
@@ -36,6 +38,8 @@ public class AlertingPatternImpl extends OctetStringLength1Base implements Alert
         super("AlertingPattern", alertingCategory.getCategory());
     }
 
+    @JsonProperty("value")
+    @JacksonXmlProperty(isAttribute = true, localName = "value")
     public int getData() {
         return data;
     }
