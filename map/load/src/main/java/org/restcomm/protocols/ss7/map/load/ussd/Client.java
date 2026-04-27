@@ -314,10 +314,10 @@ public class Client extends TestHarnessUssd {
         // impl of Charset
         random = 8000000 + r.nextInt(1000000);
 
-        USSDString ussdString = this.mapProvider.getMAPParameterFactory().createUSSDString("*125*+3162" + random + "#", null, null);
+        USSDString ussdString = this.mapProvider.getMAPParameterFactory().createUSSDString(USSD_MESSAGE, null, null);
 
         ISDNAddressString msisdn = this.mapProvider.getMAPParameterFactory()
-                .createISDNAddressString(AddressNature.international_number, NumberingPlan.ISDN, "3162" + random);
+                .createISDNAddressString(AddressNature.international_number, NumberingPlan.ISDN, "31628839999");
 
         mapDialog.addProcessUnstructuredSSRequest(ussdDataCodingScheme, ussdString, null, msisdn);
 
@@ -348,7 +348,7 @@ public class Client extends TestHarnessUssd {
         int i = 0;
         IpChannelType ipChannelType = IpChannelType.SCTP;
 
-        if (args.length == 23) {
+        if (args.length >= 23 && args.length <= 25) {
             NDIALOGS = Integer.parseInt(args[i++]);
             MAXCONCURRENTDIALOGS = Integer.parseInt(args[i++]);
             if (args[i++].toLowerCase().equals("tcp"))
@@ -374,7 +374,16 @@ public class Client extends TestHarnessUssd {
             DELIVERY_TRANSFER_MESSAGE_THREAD_COUNT = Integer.parseInt(args[i++]);
             RAMP_UP_PERIOD = Integer.parseInt(args[i++]);
 
+            if (args.length >= 24) {
+                DURATION_MINUTES = Integer.parseInt(args[i++]);
+            }
+            if (args.length >= 25) {
+                USSD_MESSAGE = args[i++];
+            }
+
             System.out.println("IpChannelType = " + ipChannelType);
+            System.out.println("DURATION_MINUTES = " + DURATION_MINUTES);
+            System.out.println("USSD_MESSAGE = " + USSD_MESSAGE);
             System.out.println("HOST_IP = " + HOST_IP);
             System.out.println("HOST_PORT = " + HOST_PORT);
             System.out.println("EXTRA_HOST_ADDRESS = " + EXTRA_HOST_ADDRESS);
@@ -405,6 +414,7 @@ public class Client extends TestHarnessUssd {
 
         try {
             client.initializeStack(ipChannelType);
+            client.initDuration();
 
             Thread.sleep(TEST_START_DELAY);
 
@@ -417,7 +427,7 @@ public class Client extends TestHarnessUssd {
                 threads[j].start();
             }
 
-            while (client.endCount < NDIALOGS) {
+            while (client.endCount < NDIALOGS && !client.isDurationExpired()) {
                 Thread.sleep(100);
                 // while (client.nbConcurrentDialogs.intValue() >= MAXCONCURRENTDIALOGS) {
 
@@ -731,7 +741,7 @@ public class Client extends TestHarnessUssd {
         this.csvWriter.incrementCounter(SUCCESSFUL_DIALOGS);
         this.endCount++;
 
-        if (this.endCount < NDIALOGS) {
+        if (this.endCount < NDIALOGS && !isDurationExpired()) {
             if ((this.endCount % 10000) == 0) {
                 long current = System.currentTimeMillis();
                 float sec = (float) (current - prev) / 1000f;
@@ -739,15 +749,21 @@ public class Client extends TestHarnessUssd {
                 logger.warn("Completed 10000 Dialogs, dialogs per second: " + (float) (10000 / sec));
             }
         } else {
-            if (this.endCount >= NDIALOGS && !endReportPrinted) {
+            if ((this.endCount >= NDIALOGS || isDurationExpired()) && !endReportPrinted) {
                 endReportPrinted = true;
                 long current = System.currentTimeMillis();
                 logger.warn("Start Time = " + start);
                 logger.warn("Current Time = " + current);
                 float sec = (float) (current - start) / 1000f;
+                int completedDialogs = this.endCount - (RAMP_UP_PERIOD < 0 ? RAMP_UP_PERIOD : 0);
+                if (completedDialogs < 0) completedDialogs = this.endCount;
 
                 logger.warn("Total time in sec = " + sec);
-                logger.warn("Throughput = " + (float) (NDIALOGS / sec));
+                logger.warn("Total completed dialogs = " + completedDialogs);
+                logger.warn("Throughput = " + (float) (completedDialogs / sec));
+                if (isDurationMode()) {
+                    logger.warn("[DURATION MODE] Test completed after " + DURATION_MINUTES + " minute(s)");
+                }
             }
         }
     }
@@ -864,7 +880,7 @@ public class Client extends TestHarnessUssd {
         @Override
         public void run() {
             try {
-                while (endCount < NDIALOGS) {
+                while (endCount < NDIALOGS && !isDurationExpired()) {
                     // while (client.nbConcurrentDialogs.intValue() >= MAXCONCURRENTDIALOGS) {
 
                     // logger.warn("Number of concurrent MAP dialog's = " +
