@@ -62,6 +62,10 @@ public abstract class TestHarnessUssd implements MAPDialogListener, MAPServiceSu
 
     protected static int RAMP_UP_PERIOD = -100;
 
+    protected static int DURATION_MINUTES = 0;  // 0 = count-based, >0 = time-based mode
+
+    protected static String USSD_MESSAGE = "*509#";  // Default USSD string
+
     protected final String SERVER_ASSOCIATION_NAME = "serverAssociation";
     protected final String CLIENT_ASSOCIATION_NAME = "clientAssociation";
 
@@ -80,6 +84,25 @@ public abstract class TestHarnessUssd implements MAPDialogListener, MAPServiceSu
     protected static int TEST_START_DELAY = 20000;
     protected static int TEST_END_DELAY = 3000;
     protected static int PRINT_WRITER_PERIOD = 2000;
+
+    protected long endTimeMillis = 0;
+
+    protected boolean isDurationMode() {
+        return DURATION_MINUTES > 0;
+    }
+
+    protected boolean isDurationExpired() {
+        if (!isDurationMode()) return false;
+        return System.currentTimeMillis() >= endTimeMillis;
+    }
+
+    protected void initDuration() {
+        if (isDurationMode()) {
+            endTimeMillis = System.currentTimeMillis() + (DURATION_MINUTES * 60L * 1000L);
+            System.out.println("[DURATION MODE] Running for " + DURATION_MINUTES + " minute(s)");
+            System.out.println("[DURATION MODE] Will stop at: " + new java.util.Date(endTimeMillis));
+        }
+    }
 
     protected TestHarnessUssd() {
         init();
