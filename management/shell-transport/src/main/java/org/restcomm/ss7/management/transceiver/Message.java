@@ -1,5 +1,6 @@
 package org.restcomm.ss7.management.transceiver;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -52,7 +53,7 @@ public class Message {
 
         int length = txBuffer.position();
 
-        txBuffer.rewind();
+        ((Buffer) txBuffer).rewind();
 
         txBuffer.putInt(length);
 

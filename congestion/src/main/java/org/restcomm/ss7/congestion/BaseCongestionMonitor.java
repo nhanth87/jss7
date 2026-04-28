@@ -1,6 +1,6 @@
 package org.restcomm.ss7.congestion;
 
-import org.jctools.collections.MpscArrayQueue;
+import org.jctools.queues.MpscArrayQueue;
 
 import org.apache.log4j.Logger;
 
@@ -110,3 +110,4 @@ public abstract class BaseCongestionMonitor implements CongestionMonitor {
             return null;
     }
 }
+

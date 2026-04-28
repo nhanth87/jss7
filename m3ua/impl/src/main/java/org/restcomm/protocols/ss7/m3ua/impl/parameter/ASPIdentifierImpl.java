@@ -54,6 +54,9 @@ public class ASPIdentifierImpl extends ParameterImpl implements ASPIdentifier {
 
     @Override
     protected byte[] getValue() {
+        if (value == null) {
+            encode();
+        }
         return value;
     }
 

@@ -57,6 +57,9 @@ public class UserCauseImpl extends ParameterImpl implements UserCause {
 
     @Override
     protected byte[] getValue() {
+        if (value == null) {
+            encode();
+        }
         return value;
     }
 

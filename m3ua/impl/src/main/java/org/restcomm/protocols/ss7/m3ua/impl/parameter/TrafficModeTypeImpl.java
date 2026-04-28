@@ -61,6 +61,9 @@ public class TrafficModeTypeImpl extends ParameterImpl implements TrafficModeTyp
 
     @Override
     protected byte[] getValue() {
+        if (value == null) {
+            encode();
+        }
         return value;
     }
 

@@ -1,6 +1,6 @@
 package org.restcomm.protocols.ss7.m3ua.impl.router;
 
-import org.jctools.collections.MpscArrayQueue;
+import org.jctools.queues.MpscArrayQueue;
 
 import org.restcomm.protocols.ss7.m3ua.impl.AsImpl;
 import org.restcomm.protocols.ss7.m3ua.parameter.OPCList;
@@ -108,3 +108,4 @@ public class ServerM3UARouter {
         }
     }
 }
+

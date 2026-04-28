@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import org.jctools.collections.MpscArrayQueue;
+import org.jctools.queues.MpscArrayQueue;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -30,7 +30,7 @@ public class ISUPProviderImpl implements ISUPProvider {
 
     protected static final Logger logger = Logger.getLogger(ISUPProviderImpl.class);
 
-    protected final List<ISUPListener> listeners = new MpscArrayQueue<>(256);
+    protected final MpscArrayQueue<ISUPListener> listeners = new MpscArrayQueue<>(256);
 
     protected final transient ISUPStackImpl stack;
     protected final transient ISUPMessageFactory messageFactory;
@@ -225,9 +225,9 @@ public class ISUPProviderImpl implements ISUPProvider {
      * @param request
      */
     public void deliver(ISUPEvent event) {
-        for (int index = 0; index < listeners.size(); index++) {
+        for (ISUPListener listener : listeners) {
             try {
-                listeners.get(index).onEvent(event);
+                listener.onEvent(event);
             } catch (Exception e) {
                 if (logger.isEnabledFor(Level.ERROR)) {
                     logger.error("Exception thrown from listener.", e);
@@ -241,9 +241,9 @@ public class ISUPProviderImpl implements ISUPProvider {
      * @param timeoutEvent
      */
     public void deliver(ISUPTimeoutEvent timeoutEvent) {
-        for (int index = 0; index < listeners.size(); index++) {
+        for (ISUPListener listener : listeners) {
             try {
-                listeners.get(index).onTimeout(timeoutEvent);
+                listener.onTimeout(timeoutEvent);
             } catch (Exception e) {
                 if (logger.isEnabledFor(Level.ERROR)) {
                     logger.error("Exception thrown from listener.", e);
@@ -401,3 +401,4 @@ public class ISUPProviderImpl implements ISUPProvider {
     }
 
 }
+

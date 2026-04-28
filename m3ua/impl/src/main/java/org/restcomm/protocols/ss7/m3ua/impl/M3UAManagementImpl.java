@@ -18,7 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.jctools.collections.MpscArrayQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
+import org.jctools.queues.MpscArrayQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -1022,11 +1023,11 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         @JsonProperty("useLsbForLinksetSelection")
         public boolean useLsbForLinksetSelection;
         @JsonProperty("aspFactories")
-        @JacksonXmlElementWrapper(localName = "aspFactories")
+        @JacksonXmlElementWrapper(localName = "aspFactoryList")
         @com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty(localName = "aspFactory")
         public CopyOnWriteArrayList<AspFactoryImpl> aspFactories;
         @JsonProperty("appServers")
-        @JacksonXmlElementWrapper(localName = "appServers")
+        @JacksonXmlElementWrapper(localName = "asList")
         @com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty(localName = "as")
         public CopyOnWriteArrayList<AsImpl> appServers;
         @JsonProperty("routeEntries")
@@ -1107,14 +1108,20 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         }
 
         if (config.aspFactories != null) {
-            aspFactories = new java.util.concurrent.CopyOnWriteArrayList<AspFactory>((java.util.Collection<? extends AspFactory>) config.aspFactories);
+            aspFactories = new MpscArrayQueue<>(Math.max(256, config.aspFactories.size() * 2));
+            for (AspFactory f : config.aspFactories) {
+                aspFactories.add(f);
+            }
         } else {
-            aspFactories = new java.util.concurrent.CopyOnWriteArrayList<AspFactory>();
+            aspFactories = new MpscArrayQueue<>(256);
         }
         if (config.appServers != null) {
-            appServers = new java.util.concurrent.CopyOnWriteArrayList<As>((java.util.Collection<? extends As>) config.appServers);
+            appServers = new MpscArrayQueue<>(Math.max(256, config.appServers.size() * 2));
+            for (As a : config.appServers) {
+                appServers.add(a);
+            }
         } else {
-            appServers = new java.util.concurrent.CopyOnWriteArrayList<As>();
+            appServers = new MpscArrayQueue<>(256);
         }
         RouteMap<String, RouteAsImpl> routeMap = new RouteMap<>();
         if (config.routeEntries != null) {
@@ -1140,6 +1147,17 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
             // All the Asp's for this As added in temp list
             List<Asp> tempAsp = new ArrayList<Asp>();
             tempAsp.addAll(asImpl.appServerProcs);
+
+            // Also collect from Jackson-deserialized aspFactoryNames
+            if (asImpl.getAspFactoryNames() != null) {
+                for (String aspFactoryName : asImpl.getAspFactoryNames()) {
+                    try {
+                        this.assignAspToAs(asImpl.getName(), aspFactoryName);
+                    } catch (Exception e) {
+                        logger.error("Error while assigning Asp to As on loading from xml file (from aspFactoryNames)", e);
+                    }
+                }
+            }
 
             // Clear Asp's from this As
             asImpl.appServerProcs.clear();
@@ -1305,3 +1323,5 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         M3UAErrorManagementState.getInstance().removeErrorAction(new ErrorRetryActionImpl(errorCode, name, retryCount));
     }
 }
+
+

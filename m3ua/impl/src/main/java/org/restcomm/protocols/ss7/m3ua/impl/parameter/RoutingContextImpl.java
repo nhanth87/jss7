@@ -76,6 +76,9 @@ public class RoutingContextImpl extends ParameterImpl implements RoutingContext 
 
     @Override
     protected byte[] getValue() {
+        if (value == null && rcs != null) {
+            encode();
+        }
         return value;
     }
 

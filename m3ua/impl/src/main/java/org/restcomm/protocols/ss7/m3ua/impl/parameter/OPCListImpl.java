@@ -79,6 +79,9 @@ public class OPCListImpl extends ParameterImpl implements OPCList {
 
     @Override
     protected byte[] getValue() {
+        if (value == null && pointCodes != null && masks != null) {
+            encode();
+        }
         return this.value;
     }
 

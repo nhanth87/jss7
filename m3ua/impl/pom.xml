@@ -111,6 +111,12 @@
             <artifactId>woodstox-core</artifactId>
             <version>6.5.1</version>
         </dependency>
+        <!-- JCTools for high-performance queues -->
+        <dependency>
+            <groupId>org.jctools</groupId>
+            <artifactId>jctools-core</artifactId>
+            <version>4.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>

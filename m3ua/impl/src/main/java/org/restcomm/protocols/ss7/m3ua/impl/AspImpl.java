@@ -3,6 +3,8 @@ package org.restcomm.protocols.ss7.m3ua.impl;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.apache.log4j.Logger;
@@ -30,6 +32,7 @@ public class AspImpl implements Asp {
 
     protected static final String NAME = "name";
 
+    @JacksonXmlProperty(isAttribute = true)
     @JsonProperty("name")
     protected String name;
 
@@ -45,9 +48,11 @@ public class AspImpl implements Asp {
     @JsonIgnore
     protected FSM peerFSM;
 
+    @JacksonXmlProperty(isAttribute = true)
     @JsonProperty("aspFactoryName")
     protected String aspFactoryName;
 
+    @JacksonXmlProperty(isAttribute = true)
     @JsonProperty("asName")
     protected String asName;
 

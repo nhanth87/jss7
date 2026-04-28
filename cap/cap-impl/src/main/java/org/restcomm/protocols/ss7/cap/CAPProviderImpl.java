@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import java.util.Map;
-import org.jctools.collections.MpscArrayQueue;
+import org.jctools.queues.MpscArrayQueue;
 
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.asn.AsnException;
@@ -1312,3 +1312,4 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
     }
 
 }
+

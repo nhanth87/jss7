@@ -67,6 +67,9 @@ public class DestinationPointCodeImpl extends ParameterImpl implements Destinati
 
     @Override
     protected byte[] getValue() {
+        if (value == null) {
+            encode();
+        }
         return value;
     }
 

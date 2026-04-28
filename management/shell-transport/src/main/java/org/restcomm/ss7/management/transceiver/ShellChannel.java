@@ -2,6 +2,7 @@ package org.restcomm.ss7.management.transceiver;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SocketChannel;
@@ -39,14 +40,14 @@ public class ShellChannel extends ShellSelectableChannel {
         this.messageFactory = this.provider.createMessageFactory();
 
         // clean transmission buffer
-        txBuffer.clear();
-        txBuffer.rewind();
-        txBuffer.flip();
+        ((Buffer) txBuffer).clear();
+        ((Buffer) txBuffer).rewind();
+        ((Buffer) txBuffer).flip();
 
         // clean receiver buffer
-        rxBuffer.clear();
-        rxBuffer.rewind();
-        rxBuffer.flip();
+        ((Buffer) rxBuffer).clear();
+        ((Buffer) rxBuffer).rewind();
+        ((Buffer) rxBuffer).flip();
     }
 
     /**
@@ -112,11 +113,11 @@ public class ShellChannel extends ShellSelectableChannel {
     }
 
     public void sendImmediate(Message message) throws IOException {
-        txBuffer.clear();
-        txBuffer.rewind();
+        ((Buffer) txBuffer).clear();
+        ((Buffer) txBuffer).rewind();
 
         message.encode(txBuffer);
-        txBuffer.flip();
+        ((Buffer) txBuffer).flip();
         ((SocketChannel) channel).write(txBuffer);
     }
 
@@ -140,7 +141,7 @@ public class ShellChannel extends ShellSelectableChannel {
 
     public void doRead() throws IOException {
         // clean rx buffer
-        rxBuffer.clear();
+        ((Buffer) rxBuffer).clear();
 
         // reading data from socketChannel
         int len = ((SocketChannel) channel).read(rxBuffer);
@@ -152,7 +153,7 @@ public class ShellChannel extends ShellSelectableChannel {
             return;
         }
 
-        rxBuffer.flip();
+        ((Buffer) rxBuffer).flip();
 
         // split stream on to the messages
         while (rxBuffer.position() < rxBuffer.limit()) {
@@ -175,7 +176,7 @@ public class ShellChannel extends ShellSelectableChannel {
             txBuffer.rewind();
 
             msg.encode(txBuffer);
-            txBuffer.flip();
+            ((Buffer) txBuffer).flip();
             ((SocketChannel) channel).write(txBuffer);
         }
     }

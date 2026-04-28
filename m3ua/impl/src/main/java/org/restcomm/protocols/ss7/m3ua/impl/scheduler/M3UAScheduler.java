@@ -1,6 +1,6 @@
 package org.restcomm.protocols.ss7.m3ua.impl.scheduler;
 
-import org.jctools.collections.MpscArrayQueue;
+import org.jctools.queues.MpscArrayQueue;
 
 import org.apache.log4j.Logger;
 
@@ -54,3 +54,4 @@ public class M3UAScheduler implements Runnable {
         }
     }
 }
+
