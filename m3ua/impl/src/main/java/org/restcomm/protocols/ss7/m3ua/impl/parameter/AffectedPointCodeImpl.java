@@ -70,6 +70,9 @@ public class AffectedPointCodeImpl extends ParameterImpl implements AffectedPoin
 
     @Override
     protected byte[] getValue() {
+        if (value == null && pointCodes != null && masks != null) {
+            encode();
+        }
         return this.value;
     }
 

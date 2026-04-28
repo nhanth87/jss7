@@ -3,6 +3,8 @@ package org.restcomm.protocols.ss7.m3ua.impl;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import java.io.IOException;
@@ -11,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import org.jctools.collections.MpscArrayQueue;
+import org.jctools.queues.MpscArrayQueue;
 
 
 
@@ -55,11 +57,18 @@ public class AsImpl implements As {
     public static final String ATTRIBUTE_ASP = "asp";
 
     @JsonProperty("minAspActiveForLb")
+@JacksonXmlProperty(isAttribute = true)
     protected int minAspActiveForLb = 1;
 
     // List of all the ASP's for this AS
-    @JsonProperty("appServerProcs")
+    @JsonIgnore
     protected final MpscArrayQueue<AspImpl> appServerProcs = new MpscArrayQueue<>(32);
+
+    // Jackson XML serialization support for ASP factory names assigned to this AS
+    @JsonProperty("aspFactoryNames")
+    @JacksonXmlElementWrapper(localName = "aspFactoryNames")
+    @JacksonXmlProperty(localName = "aspFactoryName")
+    private java.util.List<String> aspFactoryNames;
 
     // List of As state listeners - transient, don't serialize
     @JsonIgnore
@@ -102,9 +111,13 @@ public class AsImpl implements As {
     @JsonIgnore
     protected M3UAManagementImpl m3UAManagementImpl = null;
 
+    @JsonProperty("functionality")
     private Functionality functionality = null;
+    @JsonProperty("exchangeType")
     private ExchangeType exchangeType = null;
+    @JsonProperty("ipspType")
     private IPSPType ipspType = null;
+    @JsonProperty("networkAppearance")
     private NetworkAppearance networkAppearance = null;
 
     private final int[] slsVsAspTable = new int[256];
@@ -440,7 +453,15 @@ public class AsImpl implements As {
      */
     @JsonIgnore
     public List<Asp> getAspList() {
-        return new CopyOnWriteArrayList<Asp>(this.appServerProcs);
+        return new java.util.ArrayList<Asp>(this.appServerProcs);
+    }
+
+    public List<String> getAspFactoryNames() {
+        return aspFactoryNames;
+    }
+
+    public void setAspFactoryNames(List<String> aspFactoryNames) {
+        this.aspFactoryNames = aspFactoryNames;
     }
 
     /**
@@ -635,9 +656,7 @@ public class AsImpl implements As {
                 aspIndex = (aspIndex >> this.aspSlsShiftPlaces);
 
                 AspImpl aspCong = null;
-                for (int i = 0; i < this.appServerProcs.size(); i++) {
-
-                    AspImpl aspTemp = (AspImpl) this.appServerProcs.get(this.slsVsAspTable[aspIndex++]);
+                for (AspImpl aspTemp : this.appServerProcs) {
 
                     FSM aspFsm;
 
@@ -796,3 +815,4 @@ public class AsImpl implements As {
         }
     }
 }
+

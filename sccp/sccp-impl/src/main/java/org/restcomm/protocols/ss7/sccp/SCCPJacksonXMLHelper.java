@@ -1,16 +1,27 @@
 package org.restcomm.protocols.ss7.sccp;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.AbstractTypeResolver;
 import com.fasterxml.jackson.databind.DeserializationConfig;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.Module.SetupContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import java.lang.reflect.Modifier;
 
+import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
+import org.restcomm.protocols.ss7.indicator.RoutingIndicator;
+
+import java.io.IOException;
+
+/**
+ * Jackson XML helper for SCCP module XML serialization.
+ * Includes custom deserializers for enums to ensure proper deserialization.
+ */
 public class SCCPJacksonXMLHelper {
     private static final XmlMapper XML_MAPPER = new XmlMapper();
     static {
@@ -26,6 +37,11 @@ public class SCCPJacksonXMLHelper {
                 context.addAbstractTypeResolver(new AutoImplAbstractTypeResolver());
             }
         };
+        
+        // Add enum deserializers
+        module.addDeserializer(GlobalTitleIndicator.class, new GlobalTitleIndicatorDeserializer());
+        module.addDeserializer(RoutingIndicator.class, new RoutingIndicatorDeserializer());
+        
         XML_MAPPER.registerModule(module);
         // Remove default pretty printer to prevent Stax2WriterAdapter.writeRaw() exception on WildFly 10
         XML_MAPPER.setDefaultPrettyPrinter(null);
@@ -33,6 +49,40 @@ public class SCCPJacksonXMLHelper {
 
     public static XmlMapper getXmlMapper() {
         return XML_MAPPER;
+    }
+
+    // ========== Enum Deserializers ==========
+
+    /**
+     * Custom deserializer for GlobalTitleIndicator enum.
+     * Uses integer value from XML to determine the correct enum value.
+     */
+    public static class GlobalTitleIndicatorDeserializer extends JsonDeserializer<GlobalTitleIndicator> {
+        @Override
+        public GlobalTitleIndicator deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            int value = p.getValueAsInt();
+            GlobalTitleIndicator result = GlobalTitleIndicator.valueOf(value);
+            if (result == null) {
+                throw new IOException("Unknown GlobalTitleIndicator value: " + value);
+            }
+            return result;
+        }
+    }
+
+    /**
+     * Custom deserializer for RoutingIndicator enum.
+     * Uses integer value from XML to determine the correct enum value.
+     */
+    public static class RoutingIndicatorDeserializer extends JsonDeserializer<RoutingIndicator> {
+        @Override
+        public RoutingIndicator deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            int value = p.getValueAsInt();
+            RoutingIndicator result = RoutingIndicator.valueOf(value);
+            if (result == null) {
+                throw new IOException("Unknown RoutingIndicator value: " + value);
+            }
+            return result;
+        }
     }
 
     private static class AutoImplAbstractTypeResolver extends AbstractTypeResolver {

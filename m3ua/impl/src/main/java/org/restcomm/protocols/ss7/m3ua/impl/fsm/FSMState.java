@@ -1,7 +1,7 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl.fsm;
 
-import org.jctools.collections.MpscArrayQueue;
+import org.jctools.queues.MpscArrayQueue;
 
 /**
  *
@@ -130,3 +130,4 @@ public class FSMState {
         return name;
     }
 }
+

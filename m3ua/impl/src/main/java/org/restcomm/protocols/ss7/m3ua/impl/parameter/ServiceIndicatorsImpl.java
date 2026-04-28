@@ -56,6 +56,9 @@ public class ServiceIndicatorsImpl extends ParameterImpl implements ServiceIndic
 
     @Override
     protected byte[] getValue() {
+        if (value == null && indicators != null) {
+            encode();
+        }
         return this.value;
     }
 

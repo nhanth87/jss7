@@ -49,9 +49,11 @@ import org.restcomm.protocols.ss7.m3ua.impl.parameter.AffectedPointCodeImpl;
 import org.restcomm.protocols.ss7.m3ua.parameter.AffectedPointCode;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
@@ -68,14 +70,17 @@ import org.restcomm.protocols.ss7.m3ua.parameter.ASPIdentifier;
 import org.restcomm.protocols.ss7.m3ua.impl.parameter.ASPIdentifierImpl;
 import org.restcomm.protocols.ss7.m3ua.Asp;
 import org.restcomm.protocols.ss7.m3ua.As;
+import org.restcomm.protocols.ss7.m3ua.Functionality;
+import org.restcomm.protocols.ss7.m3ua.IPSPType;
+import org.restcomm.protocols.ss7.m3ua.ExchangeType;
 
 /**
  * Jackson XML helper for M3UA module XML serialization.
  * Replaces XStream to avoid Java module system issues.
+ * Includes custom deserializers for enums to ensure proper deserialization.
  */
 public class M3UAJacksonXMLHelper {
     private static final XmlMapper xmlMapper;
-
     static {
         XmlFactory factory = new XmlFactory(
             new com.ctc.wstx.stax.WstxInputFactory(),
@@ -90,16 +95,21 @@ public class M3UAJacksonXMLHelper {
 
         // Configure to allow deserialization of unknown properties
         xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
         // Configure to allow serialization of empty beans (needed for complex objects with no serializable fields)
         xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 
         SimpleModule m3uaModule = new SimpleModule("m3ua-module");
+        
+        // Add enum deserializers
+        m3uaModule.addDeserializer(Functionality.class, new FunctionalityDeserializer());
+        m3uaModule.addDeserializer(IPSPType.class, new IPSPTypeDeserializer());
+        m3uaModule.addDeserializer(ExchangeType.class, new ExchangeTypeDeserializer());
+        
+        // Add abstract type mappings
         m3uaModule.addAbstractTypeMapping(ASPIdentifier.class, ASPIdentifierImpl.class);
         m3uaModule.addAbstractTypeMapping(Asp.class, AspImpl.class);
         m3uaModule.addAbstractTypeMapping(As.class, AsImpl.class);
         m3uaModule.addAbstractTypeMapping(AffectedPointCode.class, AffectedPointCodeImpl.class);
-        m3uaModule.addAbstractTypeMapping(ASPIdentifier.class, ASPIdentifierImpl.class);
         m3uaModule.addAbstractTypeMapping(ConcernedDPC.class, ConcernedDPCImpl.class);
         m3uaModule.addAbstractTypeMapping(CongestedIndication.class, CongestedIndicationImpl.class);
         m3uaModule.addAbstractTypeMapping(CorrelationId.class, CorrelationIdImpl.class);
@@ -145,7 +155,7 @@ public class M3UAJacksonXMLHelper {
         }
     }
 
-    /**
+/**
      * Safely serialize object to XML string, handling circular references.
      */
     public static String toXML(Object obj) throws IOException {
@@ -164,5 +174,72 @@ public class M3UAJacksonXMLHelper {
 
     public static Object fromXML(String xml) throws IOException {
         return xmlMapper.readValue(xml, Object.class);
+    }
+
+    // ========== Enum Deserializers ==========
+
+    /**
+     * Custom deserializer for Functionality enum.
+     */
+    public static class FunctionalityDeserializer extends JsonDeserializer<Functionality> {
+        @Override
+        public Functionality deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            String value = p.getValueAsString();
+            Functionality result = Functionality.getFunctionality(value);
+            if (result == null) {
+                // Fallback: try case-insensitive match
+                if ("AS".equalsIgnoreCase(value)) {
+                    return Functionality.AS;
+                } else if ("IPSP".equalsIgnoreCase(value)) {
+                    return Functionality.IPSP;
+                } else if ("SGW".equalsIgnoreCase(value)) {
+                    return Functionality.SGW;
+                }
+                throw new IOException("Unknown Functionality value: " + value);
+            }
+            return result;
+        }
+    }
+
+    /**
+     * Custom deserializer for IPSPType enum.
+     */
+    public static class IPSPTypeDeserializer extends JsonDeserializer<IPSPType> {
+        @Override
+        public IPSPType deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            String value = p.getValueAsString();
+            IPSPType result = IPSPType.getIPSPType(value);
+            if (result == null) {
+                // Fallback: try case-insensitive match
+                if ("CLIENT".equalsIgnoreCase(value)) {
+                    return IPSPType.CLIENT;
+                } else if ("SERVER".equalsIgnoreCase(value)) {
+                    return IPSPType.SERVER;
+                }
+                throw new IOException("Unknown IPSPType value: " + value);
+            }
+            return result;
+        }
+    }
+
+    /**
+     * Custom deserializer for ExchangeType enum.
+     */
+    public static class ExchangeTypeDeserializer extends JsonDeserializer<ExchangeType> {
+        @Override
+        public ExchangeType deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            String value = p.getValueAsString();
+            ExchangeType result = ExchangeType.getExchangeType(value);
+            if (result == null) {
+                // Fallback: try case-insensitive match
+                if ("SE".equalsIgnoreCase(value)) {
+                    return ExchangeType.SE;
+                } else if ("DE".equalsIgnoreCase(value)) {
+                    return ExchangeType.DE;
+                }
+                throw new IOException("Unknown ExchangeType value: " + value);
+            }
+            return result;
+        }
     }
 }

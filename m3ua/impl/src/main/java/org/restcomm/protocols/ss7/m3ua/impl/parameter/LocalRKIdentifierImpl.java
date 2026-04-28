@@ -60,6 +60,9 @@ public class LocalRKIdentifierImpl extends ParameterImpl implements LocalRKIdent
 
     @Override
     protected byte[] getValue() {
+        if (value == null) {
+            encode();
+        }
         return this.value;
     }
 

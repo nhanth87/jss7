@@ -3,8 +3,10 @@ package org.restcomm.protocols.ss7.m3ua.impl;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
+import java.nio.Buffer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.CompositeByteBuf;
@@ -13,7 +15,8 @@ import io.netty.util.ReferenceCountUtil;
 
 import java.nio.ByteBuffer;
 import java.util.List;
-import org.jctools.collections.MpscArrayQueue;
+import org.jctools.queues.MpscArrayQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -85,17 +88,20 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
     private static final String HEART_BEAT = "heartbeat";
 
     @JsonProperty("name")
+    @JacksonXmlProperty(isAttribute = true)
     protected String name;
 
     @JsonProperty("started")
+    @JacksonXmlProperty(isAttribute = true)
     protected boolean started = false;
 
     @JsonIgnore
     protected Association association = null;
-    @JsonProperty("associationName")
+    @JsonProperty("assocName")
+    @JacksonXmlProperty(isAttribute = true)
     protected String associationName = null;
 
-    @JsonProperty("aspList")
+    @JsonIgnore
     protected final MpscArrayQueue<AspImpl> aspList = new MpscArrayQueue<>(32);
 
     @JsonIgnore
@@ -142,11 +148,12 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
 
     public AspFactoryImpl() {
         // clean transmission buffer
-        txBuffer.clear();
-        txBuffer.rewind();
-        txBuffer.flip();
+        ((Buffer) txBuffer).clear();
+        ((Buffer) txBuffer).rewind();
+        ((Buffer) txBuffer).flip();
 
         this.heartBeatTimer = new HeartBeatTimer(this);
+        this.slsTable = new int[this.maxSequenceNumber];
     }
 
     public AspFactoryImpl(String name, int maxSequenceNumber, long aspId, boolean isHeartBeatEnabled) {
@@ -678,7 +685,7 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
 
     @JsonIgnore
     public List<Asp> getAspList() {
-        return new CopyOnWriteArrayList<Asp>(this.aspList);
+        return new java.util.ArrayList<Asp>(this.aspList);
     }
 
     protected AspImpl getAsp(long rc) {
@@ -1037,3 +1044,6 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
         }
     }
 }
+
+
+
