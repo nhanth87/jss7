@@ -1,5 +1,7 @@
 package org.restcomm.protocols.ss7.map.service.lsm;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.restcomm.protocols.ss7.map.MessageImpl;
 import org.restcomm.protocols.ss7.map.api.service.lsm.LsmMessage;
 import org.restcomm.protocols.ss7.map.api.service.lsm.MAPDialogLsm;
@@ -17,6 +19,7 @@ public abstract class LsmMessageImpl extends MessageImpl implements LsmMessage, 
      * @see org.restcomm.protocols.ss7.map.api.service.lsm.LsmMessage#getMAPDialog()
      */
     @Override
+    @JsonIgnore
     public MAPDialogLsm getMAPDialog() {
         return (MAPDialogLsm) super.getMAPDialog();
     }

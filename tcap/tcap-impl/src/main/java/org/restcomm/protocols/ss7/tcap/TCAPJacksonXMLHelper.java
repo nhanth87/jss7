@@ -22,14 +22,12 @@ public class TCAPJacksonXMLHelper {
             new com.ctc.wstx.stax.WstxOutputFactory()
         );
         xmlMapper = new XmlMapper(factory);
-        // INDENT_OUTPUT disabled to avoid Stax2WriterAdapter.writeRaw() UnsupportedOperationException
-        // with Jackson-dataformat-xml 2.15.2 + StAX on WildFly 10
-        // xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        // Enable pretty printing for XML output
+        xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
         xmlMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
-        // Remove default pretty printer to prevent Stax2WriterAdapter.writeRaw() exception on WildFly 10
-        xmlMapper.setDefaultPrettyPrinter(null);
     }
 
     public static XmlMapper getXmlMapper() {

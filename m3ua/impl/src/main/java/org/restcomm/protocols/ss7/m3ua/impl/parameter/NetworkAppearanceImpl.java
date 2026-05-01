@@ -43,6 +43,7 @@ public class NetworkAppearanceImpl extends ParameterImpl implements NetworkAppea
         this.tag = Parameter.Network_Appearance;
     }
 
+    @JsonProperty("value")
     public long getNetApp() {
         return value;
     }

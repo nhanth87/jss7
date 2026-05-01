@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -20,11 +21,17 @@ import java.lang.reflect.Modifier;
 import org.mobicents.protocols.asn.BitSetStrictLength;
 
 public class MAPJacksonXMLHelper {
-    private static final XmlMapper XML_MAPPER = new XmlMapper();
+    private static final XmlMapper XML_MAPPER;
+    
     static {
-        // INDENT_OUTPUT disabled to avoid Stax2WriterAdapter.writeRaw() UnsupportedOperationException
-        // with Jackson-dataformat-xml 2.15.2 + StAX on WildFly 10
-        // XML_MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
+        XmlFactory factory = new XmlFactory(
+            new com.ctc.wstx.stax.WstxInputFactory(),
+            new com.ctc.wstx.stax.WstxOutputFactory()
+        );
+        XML_MAPPER = new XmlMapper(factory);
+        
+        // Enable pretty printing for XML output
+        XML_MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
         XML_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         XML_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         SimpleModule module = new SimpleModule("mapjacksonxml-module") {

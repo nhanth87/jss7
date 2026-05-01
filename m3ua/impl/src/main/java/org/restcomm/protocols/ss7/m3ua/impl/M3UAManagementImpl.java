@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import org.jctools.queues.MpscArrayQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +33,8 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.api.Association;
 import org.mobicents.protocols.api.Management;
+import org.mobicents.protocols.api.ManagementEventListener;
+import org.mobicents.protocols.api.Server;
 import org.restcomm.protocols.ss7.m3ua.As;
 import org.restcomm.protocols.ss7.m3ua.Asp;
 import org.restcomm.protocols.ss7.m3ua.AspFactory;
@@ -93,8 +95,8 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
 
     protected static final int MAX_SEQUENCE_NUMBER = 256;
 
-    protected MpscArrayQueue<As> appServers = new MpscArrayQueue<>(256);
-    protected MpscArrayQueue<AspFactory> aspFactories = new MpscArrayQueue<>(256);
+    protected ConcurrentLinkedQueue<As> appServers = new ConcurrentLinkedQueue<>();
+    protected ConcurrentLinkedQueue<AspFactory> aspFactories = new ConcurrentLinkedQueue<>();
     
     // Congestion tracking per DPC
     private ConcurrentHashMap<Integer, AtomicInteger> congDpcList = new ConcurrentHashMap<Integer, AtomicInteger>();
@@ -127,7 +129,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
     private long statisticsTaskPeriod = 5000;
     private boolean routingKeyManagementEnabled = false;
 
-    protected final MpscArrayQueue<M3UAManagementEventListener> managementEventListeners = new MpscArrayQueue<>(64);
+    protected final ConcurrentLinkedQueue<M3UAManagementEventListener> managementEventListeners = new ConcurrentLinkedQueue<>();
 
     /**
      * Maximum sequence number received from SCTP user. If SCTP users sends seq number greater than max, packet will be
@@ -281,6 +283,84 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         } catch (FileNotFoundException e) {
             logger.warn(String.format("Failed to load the SS7 configuration file. \n%s", e.getMessage()));
         }
+
+        // Auto-start ASP factories that were marked as started in the persisted config
+        for (AspFactory aspFactory : aspFactories) {
+            AspFactoryImpl factory = (AspFactoryImpl) aspFactory;
+            // Retry setting association if it was not available during load
+            if (factory.getAssociation() == null && factory.associationName != null) {
+                try {
+                    Association association = this.transportManagement.getAssociation(factory.associationName);
+                    if (association != null) {
+                        factory.setAssociation(association);
+                        logger.info(String.format("Deferred association set for AspFactory=%s -> Association=%s", factory.getName(), association.getName()));
+                    }
+                } catch (Exception e) {
+                    logger.warn(String.format("Deferred association lookup failed for AspFactory=%s", factory.getName()), e);
+                }
+            }
+            if (factory.getStatus()) {
+                try {
+                    if (factory.getAssociation() != null && !factory.getAssociation().isStarted()) {
+                        this.transportManagement.startAssociation(factory.getAssociation().getName());
+                    }
+                    factory.start();
+                    logger.info(String.format("Auto-started AspFactory=%s after loading config", factory.getName()));
+                } catch (Exception e) {
+                    logger.error(String.format("Failed to auto-start AspFactory=%s", factory.getName()), e);
+                }
+            }
+        }
+
+        // Register a listener to catch association UP events and bind factories that missed their association during load
+        this.transportManagement.addManagementEventListener(new ManagementEventListener() {
+            @Override
+            public void onServiceStarted() {}
+            @Override
+            public void onServiceStopped() {}
+            @Override
+            public void onRemoveAllResources() {}
+            @Override
+            public void onServerAdded(Server server) {}
+            @Override
+            public void onServerRemoved(Server serverName) {}
+            @Override
+            public void onAssociationAdded(Association association) {}
+            @Override
+            public void onAssociationRemoved(Association association) {}
+            @Override
+            public void onAssociationStarted(Association association) {}
+            @Override
+            public void onAssociationStopped(Association association) {}
+            @Override
+            public void onAssociationUp(Association association) {
+                logger.warn(String.format("JENNY-ON-ASSOC-UP: Association=%s up, checking factories", association.getName()));
+                for (AspFactory aspFactory : aspFactories) {
+                    AspFactoryImpl factory = (AspFactoryImpl) aspFactory;
+                    logger.warn(String.format("JENNY-ON-ASSOC-UP: Factory=%s assoc=%s assocName=%s lookingFor=%s match=%s", 
+                        factory.getName(), factory.getAssociation(), factory.associationName, association.getName(),
+                        factory.associationName != null && factory.associationName.equals(association.getName())));
+                    if (factory.getAssociation() == null && factory.associationName != null
+                            && factory.associationName.equals(association.getName())) {
+                        try {
+                            factory.setAssociation(association);
+                            logger.warn(String.format("Late-bound AspFactory=%s to Association=%s onAssociationUp", factory.getName(), association.getName()));
+                            if (factory.getStatus()) {
+                                factory.start();
+                            }
+                        } catch (Exception e) {
+                            logger.error(String.format("Failed to late-bind AspFactory=%s to Association=%s", factory.getName(), association.getName()), e);
+                        }
+                    }
+                }
+            }
+            @Override
+            public void onAssociationDown(Association association) {}
+            @Override
+            public void onServerModified(Server server) {}
+            @Override
+            public void onAssociationModified(Association association) {}
+        });
 
         fsmTicker = Executors.newSingleThreadScheduledExecutor();
         fsmTicker.scheduleAtFixedRate(m3uaScheduler, 500, 500, TimeUnit.MILLISECONDS);
@@ -1108,20 +1188,20 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         }
 
         if (config.aspFactories != null) {
-            aspFactories = new MpscArrayQueue<>(Math.max(256, config.aspFactories.size() * 2));
+            aspFactories = new ConcurrentLinkedQueue<>();
             for (AspFactory f : config.aspFactories) {
                 aspFactories.add(f);
             }
         } else {
-            aspFactories = new MpscArrayQueue<>(256);
+            aspFactories = new ConcurrentLinkedQueue<>();
         }
         if (config.appServers != null) {
-            appServers = new MpscArrayQueue<>(Math.max(256, config.appServers.size() * 2));
+            appServers = new ConcurrentLinkedQueue<>();
             for (As a : config.appServers) {
                 appServers.add(a);
             }
         } else {
-            appServers = new MpscArrayQueue<>(256);
+            appServers = new ConcurrentLinkedQueue<>();
         }
         RouteMap<String, RouteAsImpl> routeMap = new RouteMap<>();
         if (config.routeEntries != null) {
@@ -1147,17 +1227,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
             // All the Asp's for this As added in temp list
             List<Asp> tempAsp = new ArrayList<Asp>();
             tempAsp.addAll(asImpl.appServerProcs);
-
-            // Also collect from Jackson-deserialized aspFactoryNames
-            if (asImpl.getAspFactoryNames() != null) {
-                for (String aspFactoryName : asImpl.getAspFactoryNames()) {
-                    try {
-                        this.assignAspToAs(asImpl.getName(), aspFactoryName);
-                    } catch (Exception e) {
-                        logger.error("Error while assigning Asp to As on loading from xml file (from aspFactoryNames)", e);
-                    }
-                }
-            }
+            logger.warn(String.format("JENNY-LOAD-AS: as=%s tempAspSize=%s aspFactoryNames=%s", asImpl.getName(), tempAsp.size(), asImpl.getAspFactoryNames()));
 
             // Clear Asp's from this As
             asImpl.appServerProcs.clear();
@@ -1173,30 +1243,45 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
                     logger.error("Error while assigning Asp to As on loading from xml file", e);
                 }
             }
+
+            // Also assign from Jackson-deserialized aspFactoryNames
+            if (asImpl.getAspFactoryNames() != null) {
+                for (String aspFactoryName : asImpl.getAspFactoryNames()) {
+                    try {
+                        this.assignAspToAs(asImpl.getName(), aspFactoryName);
+                    } catch (Exception e) {
+                        logger.error("Error while assigning Asp to As on loading from xml file (from aspFactoryNames)", e);
+                    }
+                }
+            }
         }
 
         // Set the transportManagement
+        // Note: We defer AspFactory.start() until all transportManagement associations are loaded
+        // This prevents "No Association found" errors when M3UA loads before SCTP
         for (AspFactory aspFactory : aspFactories) {
             AspFactoryImpl factory = (AspFactoryImpl) aspFactory;
             factory.setTransportManagement(this.transportManagement);
             factory.setM3UAManagement(this);
+            
+            // Only set association if it exists - don't start factory here
+            // Start will be called explicitly after all configs are loaded
             try {
                 Association association = this.transportManagement.getAssociation(factory.associationName);
                 if (association != null) {
                     factory.setAssociation(association);
+                } else {
+                    // Association not yet available - will be set when SCTP management loads
+                    logger.warn(String.format("Association=%s for AspFactory=%s not yet available during load, will retry on start",
+                            factory.associationName, factory.getName()));
                 }
             } catch (Throwable e1) {
-                logger.error(String.format("Error setting Association=%s for the AspFactory=%s while loading from XML",
-                        factory.associationName, factory.getName()), e1);
+                logger.warn(String.format("Association=%s not available for AspFactory=%s while loading from XML",
+                        factory.associationName, factory.getName()));
             }
-
-            if (factory.getStatus()) {
-                try {
-                    factory.start();
-                } catch (Exception e) {
-                    logger.error(String.format("Error starting the AspFactory=%s while loading from XML", factory.getName()), e);
-                }
-            }
+            
+            // Don't auto-start here - let the caller decide when to start
+            // This allows proper sequencing between SCTP and M3UA loading
         }
     }
 
@@ -1211,6 +1296,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
             if (config.aspFactories != null) {
                 for (AspFactoryImpl factory : config.aspFactories) {
                     factory.aspList.clear();
+                    logger.warn(String.format("JENNY-DESER-FACTORY: name=%s assocName=%s started=%s", factory.name, factory.associationName, factory.started));
                 }
             }
             this.loadActualData(config);
@@ -1230,6 +1316,8 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         payload.setData(data);
 
         AsImpl asImpl = this.routeManagement.getAsForRoute(data.getDpc(), data.getOpc(), data.getSI(), data.getSLS());
+        logger.warn(String.format("JENNY-ROUTE-LOOKUP: dpc=%d opc=%d si=%d sls=%d asImpl=%s", 
+            data.getDpc(), data.getOpc(), data.getSI(), data.getSLS(), asImpl));
         if (asImpl == null) {
             logger.error(String.format("Tx : No AS found for routing message %s", payload));
             throw new IOException(String.format("Tx : No AS found for routing message %s", payload));

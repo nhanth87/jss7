@@ -28,6 +28,7 @@ public abstract class MessageImpl implements MAPMessage {
         return this.invokeId;
     }
 
+    @JsonIgnore
     public MAPDialog getMAPDialog() {
         return this.mapDialog;
     }

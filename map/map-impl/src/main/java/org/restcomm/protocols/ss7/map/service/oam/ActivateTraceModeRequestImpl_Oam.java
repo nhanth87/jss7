@@ -1,6 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.oam;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.restcomm.protocols.ss7.map.api.MAPDialog;
 import org.restcomm.protocols.ss7.map.api.primitives.AddressString;
 import org.restcomm.protocols.ss7.map.api.primitives.GSNAddress;
@@ -36,6 +38,7 @@ public class ActivateTraceModeRequestImpl_Oam extends ActivateTraceModeRequestIm
                 traceCollectionEntity, mdtConfiguration);
     }
 
+    @JsonIgnore
     public MAPDialogOam getMAPDialog() {
         MAPDialog mapDialog = super.getMAPDialog();
         return (MAPDialogOam) mapDialog;

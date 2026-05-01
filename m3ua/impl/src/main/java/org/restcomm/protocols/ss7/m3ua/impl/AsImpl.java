@@ -1,6 +1,7 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
@@ -454,6 +455,37 @@ public class AsImpl implements As {
     @JsonIgnore
     public List<Asp> getAspList() {
         return new java.util.ArrayList<Asp>(this.appServerProcs);
+    }
+
+    @JsonAnySetter
+    public void handleUnknownProperty(String name, Object value) {
+        if ("asps".equals(name) && value instanceof java.util.Map) {
+            java.util.Map<?, ?> aspsMap = (java.util.Map<?, ?>) value;
+            Object aspObj = aspsMap.get("asp");
+            if (aspObj instanceof java.util.Map) {
+                java.util.Map<?, ?> aspMap = (java.util.Map<?, ?>) aspObj;
+                Object n = aspMap.get("name");
+                if (n != null) {
+                    if (this.aspFactoryNames == null) {
+                        this.aspFactoryNames = new java.util.ArrayList<>();
+                    }
+                    this.aspFactoryNames.add(n.toString());
+                }
+            } else if (aspObj instanceof java.util.List) {
+                for (Object item : (java.util.List<?>) aspObj) {
+                    if (item instanceof java.util.Map) {
+                        java.util.Map<?, ?> aspMap = (java.util.Map<?, ?>) item;
+                        Object n = aspMap.get("name");
+                        if (n != null) {
+                            if (this.aspFactoryNames == null) {
+                                this.aspFactoryNames = new java.util.ArrayList<>();
+                            }
+                            this.aspFactoryNames.add(n.toString());
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public List<String> getAspFactoryNames() {

@@ -98,7 +98,7 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
     @JsonIgnore
     protected Association association = null;
     @JsonProperty("assocName")
-    @JacksonXmlProperty(isAttribute = true)
+    @JacksonXmlProperty(localName = "assocName", isAttribute = true)
     protected String associationName = null;
 
     @JsonIgnore
@@ -191,8 +191,16 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
     }
 
     protected void start() throws Exception {
-        this.transportManagement.startAssociation(this.association.getName());
+        if (this.association != null && !this.association.isStarted()) {
+            this.transportManagement.startAssociation(this.association.getName());
+        }
         this.started = true;
+        // If association already exists (e.g. loaded before M3UA), ensure listener is set
+        if (this.association != null) {
+            this.association.setAssociationListener(this);
+            logger.warn(String.format("JENNY-FACTORY-START: AspFactory=%s set listener on existing Association=%s up=%s", 
+                this.name, this.association.getName(), this.association.isUp()));
+        }
     }
 
     protected void stop() throws Exception {
@@ -757,14 +765,23 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
         // TODO : Possibility of race condition?
         long now = System.currentTimeMillis();
         if ((now - aspupSentTime) > 2000) {
+            logger.warn(String.format("JENNY-SEND-ASPUP: AspFactory=%s sending ASP_UP", this.name));
             ASPUp aspUp = (ASPUp) this.messageFactory.createMessage(MessageClass.ASP_STATE_MAINTENANCE, MessageType.ASP_UP);
             aspUp.setASPIdentifier(this.aspId);
             this.write(aspUp);
             aspupSentTime = now;
+        } else {
+            logger.warn(String.format("JENNY-SEND-ASPUP: AspFactory=%s skipping ASP_UP (too soon)", this.name));
         }
     }
 
     private void handleCommUp() {
+        logger.warn(String.format("JENNY-HANDLE-COMMUP: AspFactory=%s func=%s exchange=%s ipspType=%s willSendAspUp=%s", 
+            this.name, this.functionality, this.exchangeType, this.ipspType,
+            (this.functionality == Functionality.AS
+                || (this.functionality == Functionality.SGW && this.exchangeType == ExchangeType.DE)
+                || (this.functionality == Functionality.IPSP && this.exchangeType == ExchangeType.DE)
+                || (this.functionality == Functionality.IPSP && this.exchangeType == ExchangeType.SE && this.ipspType == IPSPType.CLIENT))));
 
         if (this.isHeartBeatEnabled()) {
             this.heartBeatTimer.start();
@@ -889,6 +906,10 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
             try {
                 // TODO where is streamNumber stored?
                 m3UAMessage = this.messageFactory.createMessage(byteBuf);
+                if (m3UAMessage != null) {
+                    logger.warn(String.format("JENNY-RECV-M3UA: AspFactory=%s msgClass=%s msgType=%s", 
+                        this.name, m3UAMessage.getMessageClass(), m3UAMessage.getMessageType()));
+                }
                 if (this.isHeartBeatEnabled()) {
                     this.heartBeatTimer.reset();
                 }

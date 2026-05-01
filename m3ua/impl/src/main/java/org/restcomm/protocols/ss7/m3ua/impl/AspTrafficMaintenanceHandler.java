@@ -31,6 +31,11 @@ public class AspTrafficMaintenanceHandler extends MessageHandler {
     }
 
     protected void handleAspActive(ASPActive aspActive) {
+        logger.warn(String.format("JENNY-HANDLE-ASPACTIVE: AspFactory=%s func=%s exchange=%s ipspType=%s aspListSize=%s",
+                this.aspFactoryImpl.getName(), this.aspFactoryImpl.getFunctionality(),
+                this.aspFactoryImpl.getExchangeType(), this.aspFactoryImpl.getIpspType(),
+                this.aspFactoryImpl.aspList.size()));
+
         if (aspFactoryImpl.getFunctionality() == Functionality.SGW
                 || (aspFactoryImpl.getFunctionality() == Functionality.AS && aspFactoryImpl.getExchangeType() == ExchangeType.DE)
                 || (aspFactoryImpl.getFunctionality() == Functionality.IPSP && aspFactoryImpl.getExchangeType() == ExchangeType.DE)
@@ -45,8 +50,17 @@ public class AspTrafficMaintenanceHandler extends MessageHandler {
             for (Asp asp : this.aspFactoryImpl.aspList) {
                 AspImpl aspImpl = (AspImpl) asp;
 
+                FSM aspPeerFSM = aspImpl.getPeerFSM();
+                String peerFsmState = aspPeerFSM != null ? aspPeerFSM.getState().getName() : "NULL";
+                String asRc = aspImpl.getAs() != null && aspImpl.getAs().getRoutingContext() != null
+                        ? java.util.Arrays.toString(aspImpl.getAs().getRoutingContext().getRoutingContexts()) : "NULL";
+                logger.warn(String.format("JENNY-HANDLE-ASPACTIVE: ASP=%s peerFSM=%s AS=%s AS-RC=%s msgRC=%s",
+                        aspImpl.getName(), peerFsmState,
+                        aspImpl.getAs() != null ? aspImpl.getAs().getName() : "NULL",
+                        asRc, java.util.Arrays.toString(rcs)));
+
                 // We handle this ASPActive only if the RC matches
-                if (rcs != null) {
+                if (rcs != null && rcs.length > 0) {
                     if (aspImpl.getAs().getRoutingContext() == null) {
                         // If there is no RC for this Asp, but ASPActive
                         // contains RC, its error
@@ -58,6 +72,14 @@ public class AspTrafficMaintenanceHandler extends MessageHandler {
                     }
 
                     long[] thisAspRC = aspImpl.getAs().getRoutingContext().getRoutingContexts();
+
+                    if (thisAspRC == null || thisAspRC.length == 0) {
+                        // AS has no RC configured, but ASPActive contains RC
+                        ErrorCode errorCodeObj = this.aspFactoryImpl.parameterFactory
+                                .createErrorCode(ErrorCode.No_Configured_AS_for_ASP);
+                        this.sendError(aspActive.getRoutingContext(), errorCodeObj);
+                        return;
+                    }
 
                     boolean foundRC = false;
                     for (long rcl : rcs) {
@@ -77,7 +99,7 @@ public class AspTrafficMaintenanceHandler extends MessageHandler {
                     }
                 }
 
-                FSM aspPeerFSM = aspImpl.getPeerFSM();
+                aspPeerFSM = aspImpl.getPeerFSM();
                 if (aspPeerFSM == null) {
                     logger.error(String.format("Received ASPACTIVE=%s for ASP=%s. But peer FSM is null.", aspActive,
                             this.aspFactoryImpl.getName()));
@@ -89,6 +111,7 @@ public class AspTrafficMaintenanceHandler extends MessageHandler {
                     this.sendError(aspActive.getRoutingContext(), errorCodeObj);
                 }
 
+                logger.warn(String.format("JENNY-HANDLE-ASPACTIVE: Sending ASP_ACTIVE_ACK for ASP=%s", aspImpl.getName()));
                 ASPActiveAck aspActiveAck = (ASPActiveAck) this.aspFactoryImpl.messageFactory.createMessage(
                         MessageClass.ASP_TRAFFIC_MAINTENANCE, MessageType.ASP_ACTIVE_ACK);
                 aspActiveAck.setRoutingContext(aspActive.getRoutingContext());
@@ -146,6 +169,8 @@ public class AspTrafficMaintenanceHandler extends MessageHandler {
             // TODO : Should we silently drop ASP_ACTIVE?
 
             // ASP_ACTIVE is unexpected in this state
+            logger.warn(String.format("JENNY-HANDLE-ASPACTIVE: Rejecting ASP_ACTIVE - func=%s exchange=%s ipspType=%s not valid for SERVER",
+                    this.aspFactoryImpl.getFunctionality(), this.aspFactoryImpl.getExchangeType(), this.aspFactoryImpl.getIpspType()));
             ErrorCode errorCodeObj = this.aspFactoryImpl.parameterFactory.createErrorCode(ErrorCode.Unexpected_Message);
             sendError(aspActive.getRoutingContext(), errorCodeObj);
         }
@@ -204,7 +229,7 @@ public class AspTrafficMaintenanceHandler extends MessageHandler {
                 AspImpl aspImpl = (AspImpl) asp;
 
                 // We handle this ASPInactive only if the RC matches
-                if (rcs != null) {
+                if (rcs != null && rcs.length > 0) {
                     if (aspImpl.getAs().getRoutingContext() == null) {
                         // If there is no RC for this Asp, but ASPInactive
                         // contains RC, its error
@@ -216,6 +241,14 @@ public class AspTrafficMaintenanceHandler extends MessageHandler {
                     }
 
                     long[] thisAspRC = aspImpl.getAs().getRoutingContext().getRoutingContexts();
+
+                    if (thisAspRC == null || thisAspRC.length == 0) {
+                        // AS has no RC configured, but ASPInactive contains RC
+                        ErrorCode errorCodeObj = this.aspFactoryImpl.parameterFactory
+                                .createErrorCode(ErrorCode.No_Configured_AS_for_ASP);
+                        this.sendError(aspInactive.getRoutingContext(), errorCodeObj);
+                        return;
+                    }
 
                     boolean foundRC = false;
                     for (long rcl : rcs) {
