@@ -41,17 +41,17 @@ public abstract class TestHarnessUssd implements MAPDialogListener, MAPServiceSu
     protected static int DESTINATION_PC = 2;
     protected static int NETWORK_INDICATOR = 2;
     protected static int SERVICE_INDICATOR = 3; // SCCP
-    protected static int USSD_SSN = 147;
+    protected static int USSD_SSN = 8;
     protected static int HLR_SSN = 6;
     protected static int MSC_SSN = 8;
 
     // M3UA details
     protected static String HOST_IP = "127.0.0.1";
-    protected static int HOST_PORT = 2345;
+    protected static int HOST_PORT = 8011;
     protected static String EXTRA_HOST_ADDRESS = "-1";
 
     protected static String PEER_IP = "127.0.0.1";
-    protected static int PEER_PORT = 3434;
+    protected static int PEER_PORT = 8012;
 
     protected static Functionality AS_FUNCTIONALITY = Functionality.valueOf("IPSP");
     protected static int ROUTING_CONTEXT = 101;
@@ -74,8 +74,8 @@ public abstract class TestHarnessUssd implements MAPDialogListener, MAPServiceSu
     // TCAP Details
     protected static final int MAX_DIALOGS = 500000;
 
-    protected static String SCCP_CLIENT_ADDRESS = null;
-    protected static String SCCP_SERVER_ADDRESS = null;
+    protected static String SCCP_CLIENT_ADDRESS = "31628839999";
+    protected static String SCCP_SERVER_ADDRESS = "1234567890";
 
     protected static RoutingIndicator ROUTING_INDICATOR = RoutingIndicator.ROUTING_BASED_ON_DPC_AND_SSN;
 

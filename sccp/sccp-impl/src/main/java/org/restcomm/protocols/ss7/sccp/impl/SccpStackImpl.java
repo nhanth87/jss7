@@ -1318,6 +1318,7 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
         int opc = mtp3Msg.getOpc();
 
         try {
+            logger.warn(String.format("JENNY-MTP3-RECV: dpc=%d opc=%d si=%d router=%s sapsSize=%d", dpc, opc, mtp3Msg.getSi(), this.router, this.router.getMtp3ServiceAccessPoints().size()));
             // checking if incoming dpc is local
             if (!this.isPreviewMode() && !this.router.spcIsLocal(dpc)) {
 

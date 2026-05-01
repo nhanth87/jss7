@@ -43,6 +43,7 @@ public abstract class SupplementaryMessageImpl extends MessageImpl implements Su
         this.ussdString = ussdString;
     }
 
+    @JsonIgnore
     public MAPDialogSupplementary getMAPDialog() {
         return (MAPDialogSupplementary) super.getMAPDialog();
     }

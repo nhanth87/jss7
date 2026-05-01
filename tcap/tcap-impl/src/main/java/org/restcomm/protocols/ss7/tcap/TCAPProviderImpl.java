@@ -583,7 +583,20 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     void stop() {
         stopNetworkIdStateList();
 
-        this._EXECUTOR.shutdown();
+        // Use shutdownAwaitTermination instead of shutdown to wait for pending tasks
+        if (this._EXECUTOR instanceof java.util.concurrent.ScheduledThreadPoolExecutor) {
+            ((java.util.concurrent.ScheduledThreadPoolExecutor) this._EXECUTOR).shutdown();
+            try {
+                if (!this._EXECUTOR.awaitTermination(30, TimeUnit.SECONDS)) {
+                    this._EXECUTOR.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                this._EXECUTOR.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+        } else {
+            this._EXECUTOR.shutdown();
+        }
         this.sccpProvider.deregisterSccpListener(ssn);
 
         List<Integer> extraSsns = this.stack.getExtraSsns();

@@ -49,11 +49,14 @@ import org.restcomm.protocols.ss7.m3ua.impl.parameter.AffectedPointCodeImpl;
 import org.restcomm.protocols.ss7.m3ua.parameter.AffectedPointCode;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.dataformat.xml.XmlFactory;
@@ -87,10 +90,9 @@ public class M3UAJacksonXMLHelper {
             new com.ctc.wstx.stax.WstxOutputFactory()
         );
         xmlMapper = new XmlMapper(factory);
-        // Configure for pretty printing
-        // INDENT_OUTPUT disabled to avoid Stax2WriterAdapter.writeRaw() UnsupportedOperationException
-        // with Jackson-dataformat-xml 2.15.2 + StAX on WildFly 10
-        // xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
+        // Enable pretty printing with proper indentation
+        xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
         xmlMapper.enable(ToXmlGenerator.Feature.WRITE_XML_DECLARATION);
 
         // Configure to allow deserialization of unknown properties
@@ -134,8 +136,8 @@ public class M3UAJacksonXMLHelper {
         m3uaModule.addAbstractTypeMapping(TrafficModeType.class, TrafficModeTypeImpl.class);
         m3uaModule.addAbstractTypeMapping(UserCause.class, UserCauseImpl.class);
         xmlMapper.registerModule(m3uaModule);
-        // Remove default pretty printer to prevent Stax2WriterAdapter.writeRaw() exception on WildFly 10
-        xmlMapper.setDefaultPrettyPrinter(null);
+        // Use pretty printer for XML formatting
+        // xmlMapper.setDefaultPrettyPrinter(null);
     }
 
     public static XmlMapper getXmlMapper() {

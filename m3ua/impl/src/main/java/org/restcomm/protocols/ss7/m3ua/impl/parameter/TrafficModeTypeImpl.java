@@ -1,5 +1,6 @@
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
@@ -72,6 +73,7 @@ public class TrafficModeTypeImpl extends ParameterImpl implements TrafficModeTyp
         return String.format("TrafficModeType mode=%d value=%s", mode, this.getStringRepresentation());
     }
 
+    @JsonIgnore
     public String getStringRepresentation() {
         switch (mode) {
             case 1:

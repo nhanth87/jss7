@@ -281,6 +281,9 @@ public class RouterImpl implements Router {
                 return true;
             }
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug(String.format("JENNY-SPC-IS-LOCAL-FALSE: spc=%d sapsSize=%d saps=%s", spc, this.saps.size(), this.saps));
+        }
         return false;
     }
 

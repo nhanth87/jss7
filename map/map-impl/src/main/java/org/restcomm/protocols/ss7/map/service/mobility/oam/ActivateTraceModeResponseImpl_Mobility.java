@@ -1,6 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.oam;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.restcomm.protocols.ss7.map.api.MAPDialog;
 import org.restcomm.protocols.ss7.map.api.primitives.MAPExtensionContainer;
 import org.restcomm.protocols.ss7.map.api.service.mobility.MAPDialogMobility;
@@ -22,6 +24,7 @@ public class ActivateTraceModeResponseImpl_Mobility extends ActivateTraceModeRes
         super(extensionContainer, traceSupportIndicator);
     }
 
+    @JsonIgnore
     public MAPDialogMobility getMAPDialog() {
         MAPDialog mapDialog = super.getMAPDialog();
         return (MAPDialogMobility) mapDialog;

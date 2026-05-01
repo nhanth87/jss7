@@ -1,6 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.oam;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.restcomm.protocols.ss7.map.MessageImpl;
 import org.restcomm.protocols.ss7.map.api.MAPDialog;
 import org.restcomm.protocols.ss7.map.api.service.oam.MAPDialogOam;
@@ -14,6 +16,7 @@ import org.restcomm.protocols.ss7.map.primitives.MAPAsnPrimitive;
  */
 public abstract class OamMessageImpl extends MessageImpl implements OamMessage, MAPAsnPrimitive {
 
+    @JsonIgnore
     public MAPDialogOam getMAPDialog() {
         MAPDialog mapDialog = super.getMAPDialog();
         return (MAPDialogOam) mapDialog;

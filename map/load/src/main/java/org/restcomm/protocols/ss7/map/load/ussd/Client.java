@@ -161,6 +161,25 @@ public class Client extends TestHarnessUssd {
         // Finally, start the ASP
         this.clientM3UAMgmt.startAsp("ASP1");
 
+        // Wait for AS to become ACTIVE before starting load test
+        logger.info("Waiting for AS1 to become ACTIVE...");
+        int waitCount = 0;
+        java.lang.reflect.Method getAsMethod = org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.class.getDeclaredMethod("getAs", String.class);
+        getAsMethod.setAccessible(true);
+        while (waitCount < 60) {
+            org.restcomm.protocols.ss7.m3ua.As as = (org.restcomm.protocols.ss7.m3ua.As) getAsMethod.invoke(this.clientM3UAMgmt, "AS1");
+            if (as != null && as.getState() != null && "ACTIVE".equals(as.getState().getName())) {
+                logger.info("AS1 is now ACTIVE! Starting load test.");
+                break;
+            }
+            Thread.sleep(1000);
+            waitCount++;
+            logger.info("Waiting for AS1 to become ACTIVE... (" + waitCount + "s)");
+        }
+        if (waitCount >= 60) {
+            logger.warn("Timeout waiting for AS1 to become ACTIVE. Proceeding anyway.");
+        }
+
         this.csvWriter = new CsvWriter("map");
         this.csvWriter.addCounter(CREATED_DIALOGS);
         this.csvWriter.addCounter(SUCCESSFUL_DIALOGS);
@@ -254,8 +273,8 @@ public class Client extends TestHarnessUssd {
     private void initTCAP() throws Exception {
         this.tcapStack = new TCAPStackImpl("Test", this.sccpStack.getSccpProvider(), MSC_SSN);
         this.tcapStack.start();
-        this.tcapStack.setDialogIdleTimeout(60000);
-        this.tcapStack.setInvokeTimeout(30000);
+        this.tcapStack.setDialogIdleTimeout(120000);
+        this.tcapStack.setInvokeTimeout(60000);
         this.tcapStack.setMaxDialogs(MAX_DIALOGS);
     }
 

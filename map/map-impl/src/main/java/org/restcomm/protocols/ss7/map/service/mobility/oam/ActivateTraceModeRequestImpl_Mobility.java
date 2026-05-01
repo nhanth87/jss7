@@ -1,6 +1,8 @@
 
 package org.restcomm.protocols.ss7.map.service.mobility.oam;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.restcomm.protocols.ss7.map.api.MAPDialog;
 import org.restcomm.protocols.ss7.map.api.primitives.AddressString;
 import org.restcomm.protocols.ss7.map.api.primitives.GSNAddress;
@@ -37,6 +39,7 @@ public class ActivateTraceModeRequestImpl_Mobility extends ActivateTraceModeRequ
                 traceCollectionEntity, mdtConfiguration);
     }
 
+    @JsonIgnore
     public MAPDialogMobility getMAPDialog() {
         MAPDialog mapDialog = super.getMAPDialog();
         return (MAPDialogMobility) mapDialog;
