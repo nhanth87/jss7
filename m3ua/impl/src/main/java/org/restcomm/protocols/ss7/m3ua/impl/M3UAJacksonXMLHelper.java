@@ -49,6 +49,7 @@ import org.restcomm.protocols.ss7.m3ua.impl.parameter.AffectedPointCodeImpl;
 import org.restcomm.protocols.ss7.m3ua.parameter.AffectedPointCode;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -99,6 +100,8 @@ public class M3UAJacksonXMLHelper {
         xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // Configure to allow serialization of empty beans (needed for complex objects with no serializable fields)
         xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        // Skip null values in serialization to avoid empty XML elements that break deserialization
+        xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         SimpleModule m3uaModule = new SimpleModule("m3ua-module");
         

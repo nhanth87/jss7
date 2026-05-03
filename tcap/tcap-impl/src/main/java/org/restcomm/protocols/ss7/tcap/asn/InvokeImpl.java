@@ -3,6 +3,7 @@ package org.restcomm.protocols.ss7.tcap.asn;
 
 import java.io.IOException;
 import java.util.concurrent.Future;
+import org.apache.log4j.Logger;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
@@ -26,6 +27,7 @@ import org.restcomm.protocols.ss7.tcap.asn.comp.Parameter;
  *
  */
 public class InvokeImpl implements Invoke {
+    private static final Logger logger = Logger.getLogger(InvokeImpl.class);
 
     // local to stack
     private InvokeClass invokeClass = InvokeClass.Class1;
@@ -180,7 +182,19 @@ public class InvokeImpl implements Invoke {
                         "Error while decoding Invoke: bad tag or tag class for InvokeID: tag=" + tag + ", tagClass = "
                                 + localAis.getTagClass());
             }
-            this.invokeId = localAis.readInteger();
+            int iidLength = localAis.readLength();
+            byte[] iidBytes = new byte[iidLength];
+            localAis.read(iidBytes);
+            long iidValue = 0;
+            for (int i = 0; i < iidLength; i++) {
+                iidValue = (iidValue << 8) | (0x00FF & iidBytes[i]);
+            }
+            this.invokeId = Long.valueOf(iidValue);
+            if (logger.isEnabledFor(org.apache.log4j.Level.WARN)) {
+                StringBuilder sb = new StringBuilder();
+                for (byte b : iidBytes) sb.append(String.format("%02x", b & 0xff));
+                logger.warn("JENNY-INVOKE-DECODE: invokeId=" + this.invokeId + " iidLength=" + iidLength + " iidBytes=" + sb.toString() + " tag=" + tag);
+            }
 
             tag = localAis.readTag();
             if (tag == _TAG_LID && localAis.getTagClass() == Tag.CLASS_CONTEXT_SPECIFIC) {

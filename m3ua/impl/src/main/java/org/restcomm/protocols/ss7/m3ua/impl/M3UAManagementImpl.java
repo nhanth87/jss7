@@ -285,8 +285,10 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         }
 
         // Auto-start ASP factories that were marked as started in the persisted config
+        logger.warn(String.format("JENNY-M3UA-START: aspFactories size=%d transportManagement=%s", aspFactories.size(), this.transportManagement));
         for (AspFactory aspFactory : aspFactories) {
             AspFactoryImpl factory = (AspFactoryImpl) aspFactory;
+            logger.warn(String.format("JENNY-M3UA-START: factory=%s assoc=%s assocName=%s status=%s", factory.getName(), factory.getAssociation(), factory.associationName, factory.getStatus()));
             // Retry setting association if it was not available during load
             if (factory.getAssociation() == null && factory.associationName != null) {
                 try {
@@ -299,16 +301,18 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
                     logger.warn(String.format("Deferred association lookup failed for AspFactory=%s", factory.getName()), e);
                 }
             }
-            if (factory.getStatus()) {
+            if (factory.getAssociation() != null) {
                 try {
-                    if (factory.getAssociation() != null && !factory.getAssociation().isStarted()) {
+                    if (!factory.getAssociation().isStarted()) {
                         this.transportManagement.startAssociation(factory.getAssociation().getName());
                     }
                     factory.start();
-                    logger.info(String.format("Auto-started AspFactory=%s after loading config", factory.getName()));
+                    logger.info(String.format("Auto-started AspFactory=%s after loading config (status=%s)", factory.getName(), factory.getStatus()));
                 } catch (Exception e) {
                     logger.error(String.format("Failed to auto-start AspFactory=%s", factory.getName()), e);
                 }
+            } else if (factory.getStatus()) {
+                logger.warn(String.format("AspFactory=%s marked as started but association not available", factory.getName()));
             }
         }
 

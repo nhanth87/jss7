@@ -151,6 +151,7 @@ public class MAPServiceSupplementaryImpl extends MAPServiceBaseImpl implements M
 
         long operationCodeValueInt = operationCodeValue;
         int operationCodeValueInt2 = (int) operationCodeValueInt;
+        logger.info("JENNY-MAP-SUPP-COMP: processComponent opCode=" + operationCodeValueInt2 + " invokeId=" + invokeId + " componentType=" + componentType + " dialogId=" + mapDialog.getLocalDialogId());
         MAPApplicationContextName mapApplicationContextName = mapDialog.getApplicationContext().getApplicationContextName();
         switch (operationCodeValueInt2) {
             case MAPOperationCode.registerSS:
@@ -766,6 +767,7 @@ public class MAPServiceSupplementaryImpl extends MAPServiceBaseImpl implements M
 
         ProcessUnstructuredSSRequestImpl processUnstructuredSSRequestIndication = new ProcessUnstructuredSSRequestImpl();
         processUnstructuredSSRequestIndication.decodeData(ais, buf.length);
+        logger.info("JENNY-MAP-SUPP: processUnstructuredSSRequest invokeId=" + invokeId + " dialogId=" + mapDialogImpl.getLocalDialogId());
         processUnstructuredSSRequestIndication.setInvokeId(invokeId);
         processUnstructuredSSRequestIndication.setMAPDialog(mapDialogImpl);
 
