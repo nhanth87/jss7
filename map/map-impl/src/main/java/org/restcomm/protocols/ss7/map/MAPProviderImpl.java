@@ -1473,6 +1473,7 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
             ComponentType compType = c.getType();
 
             Long invokeId = c.getInvokeId();
+            loger.info("JENNY-MAP-PROVIDER: compType=" + compType + " invokeId=" + invokeId + " dialogId=" + mapDialogImpl.getLocalDialogId());
 
             Parameter parameter;
             OperationCode oc;
@@ -1589,6 +1590,7 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
             }
 
             try {
+                loger.info("JENNY-MAP-PROVIDER: doProcessComponent invokeId=" + invokeId + " compType=" + compType + " oc=" + oc + " dialogId=" + mapDialogImpl.getLocalDialogId());
 
                 perfSer.processComponent(compType, oc, parameter, mapDialogImpl, invokeId, linkedId, linkedInvoke);
 

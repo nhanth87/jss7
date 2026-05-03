@@ -293,6 +293,7 @@ public class Client extends TestHarnessUssd {
     }
 
     private void initiateUSSD() throws MAPException {
+        System.out.println("[DEBUG] initiateUSSD() called");
         Random r = new Random();
         NetworkIdState networkIdState = this.mapStack.getMAPProvider().getNetworkIdState(0);
         int executorCongestionLevel = this.mapStack.getMAPProvider().getExecutorCongestionLevel();
@@ -305,12 +306,13 @@ public class Client extends TestHarnessUssd {
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
 
+        System.out.println("[DEBUG] Acquiring rate limiter...");
         this.rateLimiterObj.acquire();
+        System.out.println("[DEBUG] Rate limiter acquired");
         // System.out.println("initiateUSSD");
 
         // First create Dialog
@@ -343,7 +345,9 @@ public class Client extends TestHarnessUssd {
         // nbConcurrentDialogs.incrementAndGet();
 
         // This will initiate the TC-BEGIN with INVOKE component
+        System.out.println("[DEBUG] Sending mapDialog...");
         mapDialog.send();
+        System.out.println("[DEBUG] mapDialog sent successfully");
 
         this.csvWriter.incrementCounter(CREATED_DIALOGS);
     }
@@ -898,33 +902,23 @@ public class Client extends TestHarnessUssd {
 
         @Override
         public void run() {
+            System.out.println("[DEBUG] DialogInitiator thread started, endCount=" + endCount + " NDIALOGS=" + NDIALOGS);
             try {
                 while (endCount < NDIALOGS && !isDurationExpired()) {
-                    // while (client.nbConcurrentDialogs.intValue() >= MAXCONCURRENTDIALOGS) {
-
-                    // logger.warn("Number of concurrent MAP dialog's = " +
-                    // client.nbConcurrentDialogs.intValue()
-                    // + " Waiting for max dialog count to go down!");
-
-                    // synchronized (client) {
-                    // try {
-                    // client.wait();
-                    // } catch (Exception ex) {
-                    // }
-                    // }
-                    // }// end of while (client.nbConcurrentDialogs.intValue() >=
-                    // MAXCONCURRENTDIALOGS)
-
                     if (endCount < 0) {
                         start = System.currentTimeMillis();
                         prev = start;
-                        // logger.warn("StartTime = " + client.start);
                     }
-
+                    System.out.println("[DEBUG] Calling initiateUSSD(), endCount=" + endCount);
                     initiateUSSD();
                 }
+                System.out.println("[DEBUG] DialogInitiator loop ended, endCount=" + endCount + " expired=" + isDurationExpired());
             } catch (MAPException ex) {
+                System.err.println("[DEBUG] MAPException in DialogInitiator: " + ex.getMessage());
                 logger.error("Exception when sending a new MAP dialog", ex);
+            } catch (Exception ex) {
+                System.err.println("[DEBUG] Exception in DialogInitiator: " + ex.getMessage());
+                ex.printStackTrace();
             }
         }
 

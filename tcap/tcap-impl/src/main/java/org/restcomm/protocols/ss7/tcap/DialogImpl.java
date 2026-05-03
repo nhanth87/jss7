@@ -1850,6 +1850,9 @@ public class DialogImpl implements Dialog {
 
         List<Component> resultingIndications = new ArrayList<Component>();
         for (Component ci : components) {
+            if (ci.getType() == ComponentType.Invoke && logger.isEnabledFor(Level.WARN)) {
+                logger.warn("JENNY-DIALOG-RCV: Invoke invokeId=" + ci.getInvokeId() + " linkedId=" + ((InvokeImpl)ci).getLinkedId() + " opCode=" + ((InvokeImpl)ci).getOperationCode());
+            }
             Long invokeId;
             if (ci.getType() == ComponentType.Invoke)
                 invokeId = ((InvokeImpl) ci).getLinkedId();

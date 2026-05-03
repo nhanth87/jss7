@@ -638,7 +638,14 @@ public class AsImpl implements As {
             }
         }
 
-        this.appServerProcs.remove(aspImpl);
+        // Fix for JCTools MpscArrayQueue which doesn't support iterator().remove()
+        // AbstractCollection.remove() uses iterator().remove() which throws UnsupportedOperationException
+        java.util.ArrayList<AspImpl> tempList = new java.util.ArrayList<>(this.appServerProcs);
+        tempList.remove(aspImpl);
+        this.appServerProcs.clear();
+        for (AspImpl a : tempList) {
+            this.appServerProcs.add(a);
+        }
         aspImpl.setAs(null);
 
         if (aspLocalFSM != null) {
