@@ -62,7 +62,7 @@ public abstract class MAPDialogImpl implements MAPDialog {
     protected AddressString receivedDestReference;
     protected MAPExtensionContainer receivedExtensionContainer;
 
-    protected MAPDialogState state = MAPDialogState.IDLE;
+    protected volatile MAPDialogState state = MAPDialogState.IDLE;
     private final ReentrantLock stateLock = new ReentrantLock();
 
     // private Set<Long> incomingInvokeList = new HashSet<Long>();

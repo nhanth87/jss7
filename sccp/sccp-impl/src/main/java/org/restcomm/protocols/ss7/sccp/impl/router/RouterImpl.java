@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>
@@ -164,8 +165,8 @@ public class RouterImpl implements Router {
 
     private String persistDir = null;
 
-    private LongMessageRuleMap<Integer, LongMessageRule> longMessageRules = new LongMessageRuleMap<>();
-    private Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> saps = new Mtp3ServiceAccessPointMap<>();
+    private ConcurrentHashMap<Integer, LongMessageRule> longMessageRules = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer, Mtp3ServiceAccessPoint> saps = new ConcurrentHashMap<>();
 
     private final String name;
     private final SccpStack sccpStack;
@@ -318,10 +319,7 @@ public class RouterImpl implements Router {
         LongMessageRuleImpl longMessageRule = new LongMessageRuleImpl(firstSpc, lastSpc, ruleType);
 
         synchronized (this) {
-            LongMessageRuleMap<Integer, LongMessageRule> newLongMessageRule = new LongMessageRuleMap<>();
-            newLongMessageRule.putAll(this.longMessageRules);
-            newLongMessageRule.put(id, longMessageRule);
-            this.longMessageRules = newLongMessageRule;
+            this.longMessageRules.put(id, longMessageRule);
             this.store();
         }
     }
@@ -334,10 +332,7 @@ public class RouterImpl implements Router {
         LongMessageRuleImpl longMessageRule = new LongMessageRuleImpl(firstSpc, lastSpc, ruleType);
 
         synchronized (this) {
-            LongMessageRuleMap<Integer, LongMessageRule> newLongMessageRule = new LongMessageRuleMap<>();
-            newLongMessageRule.putAll(this.longMessageRules);
-            newLongMessageRule.put(id, longMessageRule);
-            this.longMessageRules = newLongMessageRule;
+            this.longMessageRules.put(id, longMessageRule);
             this.store();
         }
     }
@@ -358,10 +353,7 @@ public class RouterImpl implements Router {
         LongMessageRuleImpl longMessageRule = new LongMessageRuleImpl(firstSpc, lastSpc, ruleType);
 
         synchronized (this) {
-            LongMessageRuleMap<Integer, LongMessageRule> newLongMessageRule = new LongMessageRuleMap<>();
-            newLongMessageRule.putAll(this.longMessageRules);
-            newLongMessageRule.put(id, longMessageRule);
-            this.longMessageRules = newLongMessageRule;
+            this.longMessageRules.put(id, longMessageRule);
             this.store();
         }
     }
@@ -372,10 +364,7 @@ public class RouterImpl implements Router {
         }
 
         synchronized (this) {
-            LongMessageRuleMap<Integer, LongMessageRule> newLongMessageRule = new LongMessageRuleMap<>();
-            newLongMessageRule.putAll(this.longMessageRules);
-            newLongMessageRule.remove(id);
-            this.longMessageRules = newLongMessageRule;
+            this.longMessageRules.remove(id);
             this.store();
         }
     }
@@ -443,10 +432,7 @@ public class RouterImpl implements Router {
 
         Mtp3ServiceAccessPointImpl sap = new Mtp3ServiceAccessPointImpl(mtp3Id, opc, ni, this.name, networkId, localGtDigits);
         synchronized (this) {
-            Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> newSap = new Mtp3ServiceAccessPointMap<>();
-            newSap.putAll(this.saps);
-            newSap.put(id, sap);
-            this.saps = newSap;
+            this.saps.put(id, sap);
             this.store();
         }
     }
@@ -477,10 +463,7 @@ public class RouterImpl implements Router {
 
         Mtp3ServiceAccessPointImpl newSap = new Mtp3ServiceAccessPointImpl(mtp3Id, opc, ni, this.name, networkId, localGtDigits);
         synchronized (this) {
-            Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> newSaps = new Mtp3ServiceAccessPointMap<>();
-            newSaps.putAll(this.saps);
-            newSaps.put(id, newSap);
-            this.saps = newSaps;
+            this.saps.put(id, newSap);
             this.store();
         }
     }
@@ -512,11 +495,7 @@ public class RouterImpl implements Router {
         Mtp3ServiceAccessPointImpl newSap = new Mtp3ServiceAccessPointImpl(mtp3Id, opc, ni, this.name, networkId, localGtDigits);
 
         synchronized (this) {
-            Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> newSaps = new Mtp3ServiceAccessPointMap<>();
-            newSaps.putAll(this.saps);
-            newSaps.put(id, newSap);
-            this.saps = newSaps;
-            this.store();
+            this.saps.put(id, newSap);
             this.store();
         }
     }
@@ -528,10 +507,7 @@ public class RouterImpl implements Router {
         }
 
         synchronized (this) {
-            Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> newSap = new Mtp3ServiceAccessPointMap<>();
-            newSap.putAll(this.saps);
-            newSap.remove(id);
-            this.saps = newSap;
+            this.saps.remove(id);
             this.store();
         }
     }
@@ -543,8 +519,8 @@ public class RouterImpl implements Router {
                 // no resources allocated - nothing to do
                 return;
 
-            longMessageRules = new LongMessageRuleMap<>();
-            saps = new Mtp3ServiceAccessPointMap<>();
+            longMessageRules = new ConcurrentHashMap<>();
+            saps = new ConcurrentHashMap<>();
 
             // We store the cleared state
             this.store();
@@ -671,8 +647,8 @@ public class RouterImpl implements Router {
             javax.xml.stream.XMLInputFactory factory = javax.xml.stream.XMLInputFactory.newInstance();
             factory.setProperty(javax.xml.stream.XMLInputFactory.SUPPORT_DTD, false);
             javax.xml.stream.XMLStreamReader r = factory.createXMLStreamReader(reader);
-            LongMessageRuleMap<Integer, LongMessageRule> newLongMessageRules = new LongMessageRuleMap<>();
-            Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> newSaps = new Mtp3ServiceAccessPointMap<>();
+            ConcurrentHashMap<Integer, LongMessageRule> newLongMessageRules = new ConcurrentHashMap<>();
+            ConcurrentHashMap<Integer, Mtp3ServiceAccessPoint> newSaps = new ConcurrentHashMap<>();
 
             while (r.hasNext()) {
                 int event = r.next();
