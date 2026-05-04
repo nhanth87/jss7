@@ -98,7 +98,7 @@ public class DialogImpl implements Dialog {
     private Object userObject;
 
     // lock... ech
-    protected ReentrantLock dialogLock = new ReentrantLock();
+    protected final ReentrantLock dialogLock = new ReentrantLock();
 
     // values for timer timeouts
     private long removeTaskTimeout = _REMOVE_TIMEOUT;
@@ -121,7 +121,7 @@ public class DialogImpl implements Dialog {
     private Future idleTimerFuture;
     private boolean idleTimerActionTaken = false;
     private boolean idleTimerInvoked = false;
-    private TRPseudoState state = TRPseudoState.Idle;
+    private volatile TRPseudoState state = TRPseudoState.Idle;
     private boolean structured = true;
     // invokde ID space :)
     private static final boolean _INVOKEID_TAKEN = true;
@@ -276,23 +276,28 @@ public class DialogImpl implements Dialog {
     }
 
     public void release() {
-        if (!this.previewMode) {
-            for (int i = 0; i < this.operationsSent.length; i++) {
-                InvokeImpl invokeImpl = this.operationsSent[i];
-                if (invokeImpl != null) {
-                    invokeImpl.setState(OperationState.Idle);
-                    // TODO whether to call operationTimedOut or not is still not clear
-                    // operationTimedOut(invokeImpl);
+        this.dialogLock.lock();
+        try {
+            if (!this.previewMode) {
+                for (int i = 0; i < this.operationsSent.length; i++) {
+                    InvokeImpl invokeImpl = this.operationsSent[i];
+                    if (invokeImpl != null) {
+                        invokeImpl.setState(OperationState.Idle);
+                        // TODO whether to call operationTimedOut or not is still not clear
+                        // operationTimedOut(invokeImpl);
+                    }
                 }
             }
-        }
 
-        if (this.isStructured() && this.provider.getStack().getStatisticsEnabled()) {
-            long lg = System.currentTimeMillis() - this.startDialogTime;
-            this.provider.getStack().getCounterProviderImpl().updateAllDialogsDuration(lg);
-        }
+            if (this.isStructured() && this.provider.getStack().getStatisticsEnabled()) {
+                long lg = System.currentTimeMillis() - this.startDialogTime;
+                this.provider.getStack().getCounterProviderImpl().updateAllDialogsDuration(lg);
+            }
 
-        this.setState(TRPseudoState.Expunged);
+            this.setState(TRPseudoState.Expunged);
+        } finally {
+            this.dialogLock.unlock();
+        }
     }
 
     /*
@@ -1102,7 +1107,21 @@ public class DialogImpl implements Dialog {
         return this.provider.getMaxUserDataLength(remoteAddress, localAddress, this.networkId);
     }
 
+    private Component[] copyScheduledComponents() {
+        int size = this.scheduledComponentList.size();
+        if (size == 0) {
+            return null;
+        }
+        Component[] componentsToSend = new Component[size];
+        for (int index = 0; index < size; index++) {
+            componentsToSend[index] = this.scheduledComponentList.get(index);
+        }
+        return componentsToSend;
+    }
+
     public int getDataLength(TCBeginRequest tcapBeginRequest) throws TCAPSendException {
+        Component[] componentsToSend = copyScheduledComponents();
+
         TCBeginMessageImpl tcapBeginMessage = (TCBeginMessageImpl) TcapFactory.createTCBeginMessage();
 
         if (tcapBeginRequest.getApplicationContextName() != null) {
@@ -1120,11 +1139,7 @@ public class DialogImpl implements Dialog {
 
         // now comps
         tcapBeginMessage.setOriginatingTransactionId(Utils.encodeTransactionId(this.localTransactionId, isSwapTcapIdBytes));
-        if (this.scheduledComponentList.size() > 0) {
-            Component[] componentsToSend = new Component[this.scheduledComponentList.size()];
-            for (int index = 0; index < this.scheduledComponentList.size(); index++) {
-                componentsToSend[index] = this.scheduledComponentList.get(index);
-            }
+        if (componentsToSend != null) {
             tcapBeginMessage.setComponent(componentsToSend);
         }
 
@@ -1141,6 +1156,7 @@ public class DialogImpl implements Dialog {
     }
 
     public int getDataLength(TCContinueRequest tcapContinueRequest) throws TCAPSendException {
+        Component[] componentsToSend = copyScheduledComponents();
 
         TCContinueMessageImpl tcapContinueMessage = (TCContinueMessageImpl) TcapFactory.createTCContinueMessage();
 
@@ -1170,11 +1186,7 @@ public class DialogImpl implements Dialog {
 
         tcapContinueMessage.setOriginatingTransactionId(Utils.encodeTransactionId(this.localTransactionId, isSwapTcapIdBytes));
         tcapContinueMessage.setDestinationTransactionId(this.remoteTransactionId);
-        if (this.scheduledComponentList.size() > 0) {
-            Component[] componentsToSend = new Component[this.scheduledComponentList.size()];
-            for (int index = 0; index < this.scheduledComponentList.size(); index++) {
-                componentsToSend[index] = this.scheduledComponentList.get(index);
-            }
+        if (componentsToSend != null) {
             tcapContinueMessage.setComponent(componentsToSend);
         }
 
@@ -1192,17 +1204,14 @@ public class DialogImpl implements Dialog {
     }
 
     public int getDataLength(TCEndRequest tcapEndRequest) throws TCAPSendException {
+        Component[] componentsToSend = copyScheduledComponents();
 
         // TC-END request primitive issued in response to a TC-BEGIN
         // indication primitive
         TCEndMessageImpl tcapEndMessage = (TCEndMessageImpl) TcapFactory.createTCEndMessage();
         tcapEndMessage.setDestinationTransactionId(this.remoteTransactionId);
 
-        if (this.scheduledComponentList.size() > 0) {
-            Component[] componentsToSend = new Component[this.scheduledComponentList.size()];
-            for (int index = 0; index < this.scheduledComponentList.size(); index++) {
-                componentsToSend[index] = this.scheduledComponentList.get(index);
-            }
+        if (componentsToSend != null) {
             tcapEndMessage.setComponent(componentsToSend);
         }
 
@@ -1248,6 +1257,7 @@ public class DialogImpl implements Dialog {
     }
 
     public int getDataLength(TCUniRequest tcapUniRequest) throws TCAPSendException {
+        Component[] componentsToSend = copyScheduledComponents();
 
         TCUniMessageImpl tcapUniMessage = (TCUniMessageImpl) TcapFactory.createTCUniMessage();
 
@@ -1265,11 +1275,7 @@ public class DialogImpl implements Dialog {
 
         }
 
-        if (this.scheduledComponentList.size() > 0) {
-            Component[] componentsToSend = new Component[this.scheduledComponentList.size()];
-            for (int index = 0; index < this.scheduledComponentList.size(); index++) {
-                componentsToSend[index] = this.scheduledComponentList.get(index);
-            }
+        if (componentsToSend != null) {
             tcapUniMessage.setComponent(componentsToSend);
 
         }
