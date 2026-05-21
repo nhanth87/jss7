@@ -84,7 +84,7 @@ public abstract class SupplementaryMessageImpl extends MessageImpl implements Su
     }
 
     @JsonProperty("string")
-    @JacksonXmlProperty(localName = "string", isAttribute = false)
+    @JacksonXmlProperty(localName = "string")
     public String getUssdStringValue() {
         if (ussdString == null) {
             return null;
@@ -97,7 +97,7 @@ public abstract class SupplementaryMessageImpl extends MessageImpl implements Su
     }
 
     @JsonProperty("string")
-    @JacksonXmlProperty(localName = "string", isAttribute = false)
+    @JacksonXmlProperty(localName = "string")
     public void setUssdStringValue(String value) {
         if (value != null) {
             try {
