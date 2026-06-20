@@ -6,8 +6,10 @@
  */
 package org.mobicents.protocols.asn;
 
+import io.netty.buffer.ByteBuf;
+
 /**
- * Flat index of BER/DER TLV tags in a raw byte buffer.
+ * Flat index of BER/DER TLV tags in a raw byte buffer or {@link ByteBuf} slice.
  * Instances are intended for reuse via {@link AsnIndexPool}.
  */
 public class AsnMessageIndex {
@@ -46,7 +48,12 @@ public class AsnMessageIndex {
     public int rootLastChild = -1;
 
     public int tagCount = 0;
+
+    /** Heap backing for legacy paths and tests. */
     public byte[] rawBuffer;
+
+    /** Zero-copy backing; when non-null, {@link #valueOffsets} are absolute indices in this buffer. */
+    private ByteBuf rawBuf;
 
     public AsnMessageIndex() {
         clearLookupArrays();
@@ -54,10 +61,60 @@ public class AsnMessageIndex {
 
     public void reset(byte[] buffer) {
         this.rawBuffer = buffer;
+        this.rawBuf = null;
         this.tagCount = 0;
         this.rootFirstChild = -1;
         this.rootLastChild = -1;
         clearLookupArrays();
+    }
+
+    /**
+     * Bind index to a {@link ByteBuf} region without copying payload bytes.
+     * {@code offset} and indexed TLV coordinates are absolute positions in {@code buffer}.
+     */
+    public void reset(ByteBuf buffer, int offset, int length) {
+        if (buffer == null || !buffer.isReadable()) {
+            throw new IllegalArgumentException("ByteBuf must be non-null and readable");
+        }
+        if (offset < 0 || length < 0 || offset + length > buffer.capacity()) {
+            throw new IllegalArgumentException("Invalid ByteBuf slice bounds");
+        }
+        this.rawBuf = buffer;
+        this.rawBuffer = null;
+        this.tagCount = 0;
+        this.rootFirstChild = -1;
+        this.rootLastChild = -1;
+        clearLookupArrays();
+    }
+
+    public boolean isByteBufBacked() {
+        return this.rawBuf != null;
+    }
+
+    public ByteBuf getRawBuf() {
+        return this.rawBuf;
+    }
+
+    public int byteAt(int absoluteOffset) {
+        if (this.rawBuf != null) {
+            return this.rawBuf.getUnsignedByte(absoluteOffset);
+        }
+        if (this.rawBuffer == null) {
+            throw new IllegalStateException("AsnMessageIndex has no backing buffer");
+        }
+        return this.rawBuffer[absoluteOffset] & 0xFF;
+    }
+
+    /**
+     * Returns a retained slice over the indexed tag value bytes (caller must release).
+     */
+    public ByteBuf valueSlice(int tagIndex) {
+        int off = this.valueOffsets[tagIndex];
+        int len = this.valueLengths[tagIndex];
+        if (this.rawBuf != null) {
+            return this.rawBuf.retainedSlice(off, len);
+        }
+        return io.netty.buffer.Unpooled.wrappedBuffer(this.rawBuffer, off, len);
     }
 
     private void clearLookupArrays() {

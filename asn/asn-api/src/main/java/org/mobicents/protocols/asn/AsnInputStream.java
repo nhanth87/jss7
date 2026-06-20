@@ -30,6 +30,8 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.BitSet;
 
+import io.netty.buffer.ByteBuf;
+
 /**
  * 
  * @author amit bhayani
@@ -42,6 +44,7 @@ public class AsnInputStream extends InputStream {
 	private static final int DATA_BUCKET_SIZE = 1024;
 
 	private byte[] buffer;
+	private ByteBuf byteBuf;
 	
 	private int start;
 	private int length;
@@ -69,6 +72,7 @@ public class AsnInputStream extends InputStream {
 	 */
 	public void reset(byte[] buf) {
 		this.buffer = buf;
+		this.byteBuf = null;
 		this.start = 0;
 		this.length = buf.length;
 		this.pos = 0;
@@ -82,6 +86,21 @@ public class AsnInputStream extends InputStream {
 	 */
 	public void resetSlice(byte[] buffer, int offset, int length) {
 		this.buffer = buffer;
+		this.byteBuf = null;
+		this.start = offset;
+		this.length = length;
+		this.pos = 0;
+		this.tagClass = 0;
+		this.pCBit = 0;
+		this.tag = 0;
+	}
+
+	/**
+	 * Zero-copy view over a {@link ByteBuf} slice for ThreadLocal reuse.
+	 */
+	public void resetByteBufSlice(ByteBuf buffer, int offset, int length) {
+		this.byteBuf = buffer;
+		this.buffer = null;
 		this.start = offset;
 		this.length = length;
 		this.pos = 0;
@@ -107,6 +126,14 @@ public class AsnInputStream extends InputStream {
 		return this.buffer;
 	}
 
+	public ByteBuf getByteBuf() {
+		return this.byteBuf;
+	}
+
+	public boolean isByteBufBacked() {
+		return this.byteBuf != null;
+	}
+
 	public int getStartOffset() {
 		return this.start;
 	}
@@ -128,17 +155,24 @@ public class AsnInputStream extends InputStream {
 	}
 	
 	protected AsnInputStream( AsnInputStream buf, int start, int length ) throws IOException {
-		this.buffer = buf.buffer;
+		if (start < 0 || start > buf.length || length < 0 || start + length > buf.length)
+			throw new IOException("Bad start or length values when creating AsnInputStream");
+
 		this.start = buf.start + start;
 		this.length = length;
-
-		if (start < 0 || start > buf.length || this.start < 0 || this.start > this.buffer.length || this.length < 0
-				|| this.start + this.length > this.buffer.length)
-			throw new IOException("Bad start or length values when creating AsnInputStream");
-		
 		this.tagClass = buf.tagClass;
 		this.pCBit = buf.pCBit;
 		this.tag = buf.tag;
+
+		if (buf.byteBuf != null) {
+			this.byteBuf = buf.byteBuf;
+			this.buffer = null;
+		} else {
+			this.buffer = buf.buffer;
+			this.byteBuf = null;
+			if (this.start < 0 || this.start > this.buffer.length || this.start + this.length > this.buffer.length)
+				throw new IOException("Bad start or length values when creating AsnInputStream");
+		}
 	}
 	
 	@Deprecated
@@ -233,7 +267,10 @@ public class AsnInputStream extends InputStream {
 		if (this.available() == 0)
 			throw new EOFException("AsnInputStream has reached the end");
 		
-		return this.buffer[this.start + this.pos++];
+		if (this.byteBuf != null) {
+			return this.byteBuf.getUnsignedByte(this.start + this.pos++);
+		}
+		return this.buffer[this.start + this.pos++] & 0xFF;
 	}
 
 	/**
@@ -262,7 +299,11 @@ public class AsnInputStream extends InputStream {
 		if (b == null || off < 0 || len < 0 || off + len > b.length)
 			throw new EOFException("Target byte array is null or bad off or len values");
 
-		System.arraycopy(this.buffer, this.start + this.pos, b, off, cnt);
+		if (this.byteBuf != null) {
+			this.byteBuf.getBytes(this.start + this.pos, b, off, cnt);
+		} else {
+			System.arraycopy(this.buffer, this.start + this.pos, b, off, cnt);
+		}
 		this.pos += cnt;
 		
 		return cnt;
@@ -448,7 +489,11 @@ public class AsnInputStream extends InputStream {
 
 		AsnInputStream ais = this.readSequenceStreamData(length);
 		byte[] res = new byte[ais.length];
-		System.arraycopy(ais.buffer, ais.start + ais.pos, res, 0, ais.length);
+		if (ais.byteBuf != null) {
+			ais.byteBuf.getBytes(ais.start + ais.pos, res, 0, ais.length);
+		} else {
+			System.arraycopy(ais.buffer, ais.start + ais.pos, res, 0, ais.length);
+		}
 		return res;
 	}
 
@@ -464,8 +509,13 @@ public class AsnInputStream extends InputStream {
 		int startPos = this.pos;
 		this.advanceIndefiniteLength();
 		
-		byte[] res = new byte[this.pos - startPos - 2];
-		System.arraycopy(this.buffer, this.start + startPos, res, 0, this.pos - startPos - 2);
+		int contentLength = this.pos - startPos - 2;
+		byte[] res = new byte[contentLength];
+		if (this.byteBuf != null) {
+			this.byteBuf.getBytes(this.start + startPos, res, 0, contentLength);
+		} else {
+			System.arraycopy(this.buffer, this.start + startPos, res, 0, contentLength);
+		}
 		return res;
 	
 	}

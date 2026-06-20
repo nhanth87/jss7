@@ -11,6 +11,8 @@ import org.mobicents.protocols.asn.AsnStreamPool;
 import org.mobicents.protocols.asn.FlatAsnParser;
 import org.mobicents.protocols.asn.Jss7AsnConfig;
 import org.mobicents.protocols.asn.Tag;
+
+import io.netty.buffer.ByteBuf;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.map.api.datacoding.CBSDataCodingScheme;
@@ -30,6 +32,8 @@ import org.restcomm.protocols.ss7.map.primitives.IMSIImpl;
 import org.restcomm.protocols.ss7.map.primitives.ISDNAddressStringImpl;
 import org.restcomm.protocols.ss7.map.primitives.LMSIImpl;
 import org.restcomm.protocols.ss7.map.primitives.MAPExtensionContainerImpl;
+import org.restcomm.protocols.ss7.map.primitives.OctetStringLength1Base;
+import org.restcomm.protocols.ss7.map.primitives.TbcdString;
 import org.restcomm.protocols.ss7.map.primitives.USSDStringImpl;
 import org.restcomm.protocols.ss7.map.service.lsm.AdditionalNumberImpl;
 import org.restcomm.protocols.ss7.map.service.sms.IpSmGwGuidanceImpl;
@@ -133,7 +137,18 @@ public final class MapFlatAsnDecoder {
             String messageName) throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
         parseIndex(buffer, offset, length, index, messageName);
+        return fillUssdFields(index, withOptionalFields, messageName);
+    }
 
+    public static UssdFields decodeUssdSequence(ByteBuf buffer, int offset, int length, boolean withOptionalFields,
+            String messageName) throws MAPParsingComponentException {
+        AsnMessageIndex index = AsnIndexPool.get();
+        parseIndex(buffer, offset, length, index, messageName);
+        return fillUssdFields(index, withOptionalFields, messageName);
+    }
+
+    private static UssdFields fillUssdFields(AsnMessageIndex index, boolean withOptionalFields, String messageName)
+            throws MAPParsingComponentException {
         int dcsIdx = AsnReaderHelper.findNthChildTag(index, -1, Tag.STRING_OCTET, 0);
         if (dcsIdx == -1 || index.valueLengths[dcsIdx] != 1) {
             throw mistyped(messageName, "Parameter ussd-DataCodingScheme missing or bad length");
@@ -145,9 +160,9 @@ public final class MapFlatAsnDecoder {
         }
 
         UssdFields fields = new UssdFields();
-        fields.dataCodingScheme = new CBSDataCodingSchemeImpl(index.rawBuffer[index.valueOffsets[dcsIdx]]);
+        fields.dataCodingScheme = new CBSDataCodingSchemeImpl(index.byteAt(index.valueOffsets[dcsIdx]));
         fields.ussdString = new USSDStringImpl(fields.dataCodingScheme);
-        fields.ussdString.setDataView(index.rawBuffer, index.valueOffsets[ussdIdx], index.valueLengths[ussdIdx]);
+        bindOctetStringView(fields.ussdString, index, ussdIdx);
 
         if (withOptionalFields) {
             decodeOptionalUssdFields(index, dcsIdx, ussdIdx, fields, messageName);
@@ -158,7 +173,10 @@ public final class MapFlatAsnDecoder {
 
     public static UssdFields decodeUssdSequence(AsnInputStream asnInputStream, int length, boolean withOptionalFields,
             String messageName) throws MAPParsingComponentException {
-        int offset = asnInputStream.getStartOffset() + asnInputStream.position();
+        int offset = streamValueOffset(asnInputStream);
+        if (asnInputStream.isByteBufBacked()) {
+            return decodeUssdSequence(asnInputStream.getByteBuf(), offset, length, withOptionalFields, messageName);
+        }
         return decodeUssdSequence(asnInputStream.getBuffer(), offset, length, withOptionalFields, messageName);
     }
 
@@ -168,7 +186,11 @@ public final class MapFlatAsnDecoder {
             throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
         parseIndex(buffer, offset, length, index, messageName);
+        return fillMapOpenFields(index, messageName);
+    }
 
+    private static MapOpenFields fillMapOpenFields(AsnMessageIndex index, String messageName)
+            throws MAPParsingComponentException {
         MapOpenFields fields = new MapOpenFields();
         fields.ericssonStyle = hasChildTag(index, -1, TAG_CTX_2);
 
@@ -179,7 +201,7 @@ public final class MapFlatAsnDecoder {
 
             if (tagClass == Tag.CLASS_CONTEXT_SPECIFIC && AsnReaderHelper.isPrimitive(tagByte)) {
                 AddressStringImpl addr = new AddressStringImpl();
-                addr.decodeFromOctetView(index.rawBuffer, index.valueOffsets[i], index.valueLengths[i]);
+                decodeAddressView(addr, index, i);
                 switch (tagNum) {
                     case 0:
                         fields.destReference = addr;
@@ -207,8 +229,18 @@ public final class MapFlatAsnDecoder {
 
     public static MapOpenFields decodeMapOpenInfo(AsnInputStream asnInputStream, int length, String messageName)
             throws MAPParsingComponentException {
-        int offset = asnInputStream.getStartOffset() + asnInputStream.position();
+        int offset = streamValueOffset(asnInputStream);
+        if (asnInputStream.isByteBufBacked()) {
+            return decodeMapOpenInfo(asnInputStream.getByteBuf(), offset, length, messageName);
+        }
         return decodeMapOpenInfo(asnInputStream.getBuffer(), offset, length, messageName);
+    }
+
+    public static MapOpenFields decodeMapOpenInfo(ByteBuf buffer, int offset, int length, String messageName)
+            throws MAPParsingComponentException {
+        AsnMessageIndex index = AsnIndexPool.get();
+        parseIndex(buffer, offset, length, index, messageName);
+        return fillMapOpenFields(index, messageName);
     }
 
     // --- ForwardSM family (ForwardSM / MoForwardSM / MtForwardSM) ---
@@ -217,7 +249,11 @@ public final class MapFlatAsnDecoder {
             boolean allowExtensionContainer, boolean allowImsi) throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
         parseIndex(buffer, offset, length, index, messageName);
+        return fillForwardSmFields(index, messageName, allowExtensionContainer, allowImsi);
+    }
 
+    private static ForwardSmFields fillForwardSmFields(AsnMessageIndex index, String messageName,
+            boolean allowExtensionContainer, boolean allowImsi) throws MAPParsingComponentException {
         int daIdx = AsnReaderHelper.findNthChild(index, -1, 0);
         int oaIdx = AsnReaderHelper.findNthChild(index, -1, 1);
         int uiIdx = AsnReaderHelper.findNthChild(index, -1, 2);
@@ -247,7 +283,7 @@ public final class MapFlatAsnDecoder {
             } else if (allowImsi && tagClass == Tag.CLASS_UNIVERSAL && tagNum == Tag.STRING_OCTET
                     && AsnReaderHelper.isPrimitive(tagByte)) {
                 IMSIImpl imsi = new IMSIImpl();
-                imsi.decodeFromOctetView(index.rawBuffer, index.valueOffsets[i], index.valueLengths[i]);
+                decodeTbcdView(imsi, index, i);
                 fields.imsi = imsi;
             }
         }
@@ -257,9 +293,20 @@ public final class MapFlatAsnDecoder {
 
     public static ForwardSmFields decodeForwardSmSequence(AsnInputStream asnInputStream, int length, String messageName,
             boolean allowExtensionContainer, boolean allowImsi) throws MAPParsingComponentException {
-        int offset = asnInputStream.getStartOffset() + asnInputStream.position();
+        int offset = streamValueOffset(asnInputStream);
+        if (asnInputStream.isByteBufBacked()) {
+            return decodeForwardSmSequence(asnInputStream.getByteBuf(), offset, length, messageName, allowExtensionContainer,
+                    allowImsi);
+        }
         return decodeForwardSmSequence(asnInputStream.getBuffer(), offset, length, messageName, allowExtensionContainer,
                 allowImsi);
+    }
+
+    public static ForwardSmFields decodeForwardSmSequence(ByteBuf buffer, int offset, int length, String messageName,
+            boolean allowExtensionContainer, boolean allowImsi) throws MAPParsingComponentException {
+        AsnMessageIndex index = AsnIndexPool.get();
+        parseIndex(buffer, offset, length, index, messageName);
+        return fillForwardSmFields(index, messageName, allowExtensionContainer, allowImsi);
     }
 
     // --- SendRoutingInfoForSM (SMSC hot path: mandatory msisdn + sm-RP-PRI + SCA) ---
@@ -268,7 +315,10 @@ public final class MapFlatAsnDecoder {
             throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
         parseIndex(buffer, offset, length, index, messageName);
+        return fillSriFields(index, messageName);
+    }
 
+    private static SriFields fillSriFields(AsnMessageIndex index, String messageName) throws MAPParsingComponentException {
         int msisdnIdx = AsnReaderHelper.findNthChild(index, -1, 0);
         int priIdx = AsnReaderHelper.findNthChild(index, -1, 1);
         int scaIdx = AsnReaderHelper.findNthChild(index, -1, 2);
@@ -303,8 +353,18 @@ public final class MapFlatAsnDecoder {
 
     public static SriFields decodeSendRoutingInfoForSm(AsnInputStream asnInputStream, int length, String messageName)
             throws MAPParsingComponentException {
-        int offset = asnInputStream.getStartOffset() + asnInputStream.position();
+        int offset = streamValueOffset(asnInputStream);
+        if (asnInputStream.isByteBufBacked()) {
+            return decodeSendRoutingInfoForSm(asnInputStream.getByteBuf(), offset, length, messageName);
+        }
         return decodeSendRoutingInfoForSm(asnInputStream.getBuffer(), offset, length, messageName);
+    }
+
+    public static SriFields decodeSendRoutingInfoForSm(ByteBuf buffer, int offset, int length, String messageName)
+            throws MAPParsingComponentException {
+        AsnMessageIndex index = AsnIndexPool.get();
+        parseIndex(buffer, offset, length, index, messageName);
+        return fillSriFields(index, messageName);
     }
 
     // --- ReportSMDeliveryStatus (SMSC hot path) ---
@@ -313,7 +373,11 @@ public final class MapFlatAsnDecoder {
             throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
         parseIndex(buffer, offset, length, index, messageName);
+        return fillRsdsFields(index, messageName);
+    }
 
+    private static RsdsFields fillRsdsFields(AsnMessageIndex index, String messageName)
+            throws MAPParsingComponentException {
         int msisdnIdx = AsnReaderHelper.findNthChild(index, -1, 0);
         int scaIdx = AsnReaderHelper.findNthChild(index, -1, 1);
         int outcomeIdx = AsnReaderHelper.findNthChild(index, -1, 2);
@@ -352,8 +416,18 @@ public final class MapFlatAsnDecoder {
 
     public static RsdsFields decodeReportSmDeliveryStatus(AsnInputStream asnInputStream, int length, String messageName)
             throws MAPParsingComponentException {
-        int offset = asnInputStream.getStartOffset() + asnInputStream.position();
+        int offset = streamValueOffset(asnInputStream);
+        if (asnInputStream.isByteBufBacked()) {
+            return decodeReportSmDeliveryStatus(asnInputStream.getByteBuf(), offset, length, messageName);
+        }
         return decodeReportSmDeliveryStatus(asnInputStream.getBuffer(), offset, length, messageName);
+    }
+
+    public static RsdsFields decodeReportSmDeliveryStatus(ByteBuf buffer, int offset, int length, String messageName)
+            throws MAPParsingComponentException {
+        AsnMessageIndex index = AsnIndexPool.get();
+        parseIndex(buffer, offset, length, index, messageName);
+        return fillRsdsFields(index, messageName);
     }
 
     // --- InformServiceCentre (SMSC medium priority) ---
@@ -362,7 +436,11 @@ public final class MapFlatAsnDecoder {
             throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
         parseIndex(buffer, offset, length, index, messageName);
+        return fillInformFields(index, messageName);
+    }
 
+    private static InformFields fillInformFields(AsnMessageIndex index, String messageName)
+            throws MAPParsingComponentException {
         InformFields fields = new InformFields();
         for (int i = index.rootFirstChild; i != -1; i = index.nextSibling[i]) {
             int tagByte = index.tags[i];
@@ -390,8 +468,18 @@ public final class MapFlatAsnDecoder {
 
     public static InformFields decodeInformServiceCentre(AsnInputStream asnInputStream, int length, String messageName)
             throws MAPParsingComponentException {
-        int offset = asnInputStream.getStartOffset() + asnInputStream.position();
+        int offset = streamValueOffset(asnInputStream);
+        if (asnInputStream.isByteBufBacked()) {
+            return decodeInformServiceCentre(asnInputStream.getByteBuf(), offset, length, messageName);
+        }
         return decodeInformServiceCentre(asnInputStream.getBuffer(), offset, length, messageName);
+    }
+
+    public static InformFields decodeInformServiceCentre(ByteBuf buffer, int offset, int length, String messageName)
+            throws MAPParsingComponentException {
+        AsnMessageIndex index = AsnIndexPool.get();
+        parseIndex(buffer, offset, length, index, messageName);
+        return fillInformFields(index, messageName);
     }
 
     // --- AlertServiceCentre (SMSC medium priority) ---
@@ -400,7 +488,11 @@ public final class MapFlatAsnDecoder {
             throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
         parseIndex(buffer, offset, length, index, messageName);
+        return fillAlertFields(index, messageName);
+    }
 
+    private static AlertFields fillAlertFields(AsnMessageIndex index, String messageName)
+            throws MAPParsingComponentException {
         int msisdnIdx = AsnReaderHelper.findNthChild(index, -1, 0);
         int scaIdx = AsnReaderHelper.findNthChild(index, -1, 1);
         if (msisdnIdx == -1 || scaIdx == -1) {
@@ -415,8 +507,18 @@ public final class MapFlatAsnDecoder {
 
     public static AlertFields decodeAlertServiceCentre(AsnInputStream asnInputStream, int length, String messageName)
             throws MAPParsingComponentException {
-        int offset = asnInputStream.getStartOffset() + asnInputStream.position();
+        int offset = streamValueOffset(asnInputStream);
+        if (asnInputStream.isByteBufBacked()) {
+            return decodeAlertServiceCentre(asnInputStream.getByteBuf(), offset, length, messageName);
+        }
         return decodeAlertServiceCentre(asnInputStream.getBuffer(), offset, length, messageName);
+    }
+
+    public static AlertFields decodeAlertServiceCentre(ByteBuf buffer, int offset, int length, String messageName)
+            throws MAPParsingComponentException {
+        AsnMessageIndex index = AsnIndexPool.get();
+        parseIndex(buffer, offset, length, index, messageName);
+        return fillAlertFields(index, messageName);
     }
 
     // --- SendRoutingInfoForSM Response (SMSC hot path) ---
@@ -425,7 +527,11 @@ public final class MapFlatAsnDecoder {
             String messageName) throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
         parseIndex(buffer, offset, length, index, messageName);
+        return fillSriResponseFields(index, messageName);
+    }
 
+    private static SriResponseFields fillSriResponseFields(AsnMessageIndex index, String messageName)
+            throws MAPParsingComponentException {
         int imsiIdx = AsnReaderHelper.findNthChild(index, -1, 0);
         int liIdx = AsnReaderHelper.findNthChild(index, -1, 1);
         if (imsiIdx == -1 || liIdx == -1) {
@@ -440,7 +546,7 @@ public final class MapFlatAsnDecoder {
 
         SriResponseFields fields = new SriResponseFields();
         IMSIImpl imsi = new IMSIImpl();
-        imsi.decodeFromOctetView(index.rawBuffer, index.valueOffsets[imsiIdx], index.valueLengths[imsiIdx]);
+        decodeTbcdView(imsi, index, imsiIdx);
         fields.imsi = imsi;
 
         for (int i = index.rootFirstChild; i != -1; i = index.nextSibling[i]) {
@@ -468,8 +574,18 @@ public final class MapFlatAsnDecoder {
 
     public static SriResponseFields decodeSendRoutingInfoForSmResponse(AsnInputStream asnInputStream, int length,
             String messageName) throws MAPParsingComponentException {
-        int offset = asnInputStream.getStartOffset() + asnInputStream.position();
+        int offset = streamValueOffset(asnInputStream);
+        if (asnInputStream.isByteBufBacked()) {
+            return decodeSendRoutingInfoForSmResponse(asnInputStream.getByteBuf(), offset, length, messageName);
+        }
         return decodeSendRoutingInfoForSmResponse(asnInputStream.getBuffer(), offset, length, messageName);
+    }
+
+    public static SriResponseFields decodeSendRoutingInfoForSmResponse(ByteBuf buffer, int offset, int length,
+            String messageName) throws MAPParsingComponentException {
+        AsnMessageIndex index = AsnIndexPool.get();
+        parseIndex(buffer, offset, length, index, messageName);
+        return fillSriResponseFields(index, messageName);
     }
 
     // --- internal helpers ---
@@ -481,24 +597,20 @@ public final class MapFlatAsnDecoder {
             throw mistyped(messageName, "SM_RP_DA bad tag class or not primitive");
         }
 
-        int off = index.valueOffsets[elemIdx];
-        int len = index.valueLengths[elemIdx];
-        byte[] buf = index.rawBuffer;
-
         switch (AsnReaderHelper.getTagNumber(index, elemIdx)) {
             case 0: {
                 IMSIImpl imsi = new IMSIImpl();
-                imsi.decodeFromOctetView(buf, off, len);
+                decodeTbcdView(imsi, index, elemIdx);
                 return new SM_RP_DAImpl(imsi);
             }
             case 1: {
                 LMSIImpl lmsi = new LMSIImpl();
-                lmsi.decodeFromOctetView(buf, off, len);
+                decodeLmsiView(lmsi, index, elemIdx);
                 return new SM_RP_DAImpl(lmsi);
             }
             case 4: {
                 AddressStringImpl sca = new AddressStringImpl();
-                sca.decodeFromOctetView(buf, off, len);
+                decodeAddressView(sca, index, elemIdx);
                 return new SM_RP_DAImpl(sca);
             }
             case 5:
@@ -515,21 +627,18 @@ public final class MapFlatAsnDecoder {
             throw mistyped(messageName, "SM_RP_OA bad tag class or not primitive");
         }
 
-        int off = index.valueOffsets[elemIdx];
-        int len = index.valueLengths[elemIdx];
-        byte[] buf = index.rawBuffer;
         SM_RP_OAImpl oa = new SM_RP_OAImpl();
 
         switch (AsnReaderHelper.getTagNumber(index, elemIdx)) {
             case 2: {
                 ISDNAddressStringImpl msisdn = new ISDNAddressStringImpl();
-                msisdn.decodeFromOctetView(buf, off, len);
+                decodeAddressView(msisdn, index, elemIdx);
                 oa.setMsisdn(msisdn);
                 return oa;
             }
             case 4: {
                 AddressStringImpl sca = new AddressStringImpl();
-                sca.decodeFromOctetView(buf, off, len);
+                decodeAddressView(sca, index, elemIdx);
                 oa.setServiceCentreAddressOA(sca);
                 return oa;
             }
@@ -548,35 +657,35 @@ public final class MapFlatAsnDecoder {
             throw mistyped(messageName, "sm-RP-UI bad tag class or not STRING_OCTET");
         }
         SmsSignalInfoImpl ui = new SmsSignalInfoImpl();
-        ui.setDataView(index.rawBuffer, index.valueOffsets[elemIdx], index.valueLengths[elemIdx]);
+        bindOctetStringView(ui, index, elemIdx);
         return ui;
     }
 
     private static ISDNAddressStringImpl decodeIsdnAddress(AsnMessageIndex index, int elemIdx, String messageName)
             throws MAPParsingComponentException {
         ISDNAddressStringImpl addr = new ISDNAddressStringImpl();
-        addr.decodeFromOctetView(index.rawBuffer, index.valueOffsets[elemIdx], index.valueLengths[elemIdx]);
+        decodeAddressView(addr, index, elemIdx);
         return addr;
     }
 
     private static AddressStringImpl decodeAddressString(AsnMessageIndex index, int elemIdx, String messageName)
             throws MAPParsingComponentException {
         AddressStringImpl addr = new AddressStringImpl();
-        addr.decodeFromOctetView(index.rawBuffer, index.valueOffsets[elemIdx], index.valueLengths[elemIdx]);
+        decodeAddressView(addr, index, elemIdx);
         return addr;
     }
 
     private static MWStatusImpl decodeMwStatus(AsnMessageIndex index, int elemIdx, String messageName)
             throws MAPParsingComponentException {
         MWStatusImpl mw = new MWStatusImpl();
-        mw.decodeFromBitStringView(index.rawBuffer, index.valueOffsets[elemIdx], index.valueLengths[elemIdx]);
+        decodeBitStringView(mw, index, elemIdx);
         return mw;
     }
 
     private static LocationInfoWithLMSIImpl decodeLocationInfoWithLmsi(AsnMessageIndex index, int elemIdx,
             String messageName) throws MAPParsingComponentException {
         AsnMessageIndex inner = AsnIndexPool.get();
-        parseIndex(index.rawBuffer, index.valueOffsets[elemIdx], index.valueLengths[elemIdx], inner, messageName);
+        parseNestedIndex(index, elemIdx, inner, messageName);
 
         ISDNAddressStringImpl networkNodeNumber = null;
         LMSIImpl lmsi = null;
@@ -594,7 +703,7 @@ public final class MapFlatAsnDecoder {
             } else if (tagClass == Tag.CLASS_UNIVERSAL && tagNum == Tag.STRING_OCTET
                     && AsnReaderHelper.isPrimitive(tagByte)) {
                 lmsi = new LMSIImpl();
-                lmsi.decodeFromOctetView(inner.rawBuffer, inner.valueOffsets[i], inner.valueLengths[i]);
+                decodeLmsiView(lmsi, inner, i);
             } else if (tagClass == Tag.CLASS_UNIVERSAL && tagNum == Tag.SEQUENCE
                     && AsnReaderHelper.isConstructed(tagByte)) {
                 extensionContainer = decodeExtensionContainer(inner, i, messageName);
@@ -618,8 +727,7 @@ public final class MapFlatAsnDecoder {
     private static AdditionalNumber decodeAdditionalNumber(AsnMessageIndex index, int elemIdx, String messageName)
             throws MAPParsingComponentException {
         try {
-            AsnInputStream ais = AsnStreamPool.borrowSlice(index.rawBuffer, index.valueOffsets[elemIdx],
-                    index.valueLengths[elemIdx]);
+            AsnInputStream ais = sliceAsElement(index, elemIdx);
             ais.readTag();
             AdditionalNumberImpl an = new AdditionalNumberImpl();
             an.decodeAll(ais);
@@ -644,7 +752,7 @@ public final class MapFlatAsnDecoder {
     }
 
     private static boolean readBoolean(AsnMessageIndex index, int elemIdx) {
-        return index.rawBuffer[index.valueOffsets[elemIdx]] != 0;
+        return index.byteAt(index.valueOffsets[elemIdx]) != 0;
     }
 
     private static boolean hasChildTag(AsnMessageIndex index, int parentIndex, int targetTagByte) {
@@ -673,11 +781,98 @@ public final class MapFlatAsnDecoder {
             int tagByte = index.tags[i];
             if (tagByte == TAG_MSISDN_CTX) {
                 fields.msisdn = new ISDNAddressStringImpl();
-                fields.msisdn.decodeFromOctetView(index.rawBuffer, index.valueOffsets[i], index.valueLengths[i]);
+                decodeAddressView(fields.msisdn, index, i);
             } else if (tagByte == Tag.STRING_OCTET) {
                 fields.alertingPattern = new AlertingPatternImpl();
-                fields.alertingPattern.decodeFromOctetView(index.rawBuffer, index.valueOffsets[i], index.valueLengths[i]);
+                decodeOctetView(fields.alertingPattern, index, i);
             }
+        }
+    }
+
+    private static int streamValueOffset(AsnInputStream asnInputStream) {
+        return asnInputStream.getStartOffset() + asnInputStream.position();
+    }
+
+    private static int valueOffset(AsnMessageIndex index, int elemIdx) {
+        return index.valueOffsets[elemIdx];
+    }
+
+    private static int valueLength(AsnMessageIndex index, int elemIdx) {
+        return index.valueLengths[elemIdx];
+    }
+
+    private static void decodeTbcdView(TbcdString target, AsnMessageIndex index, int elemIdx)
+            throws MAPParsingComponentException {
+        int off = valueOffset(index, elemIdx);
+        int len = valueLength(index, elemIdx);
+        if (index.isByteBufBacked()) {
+            target.decodeFromByteBufView(index.getRawBuf(), off, len);
+        } else {
+            target.decodeFromOctetView(index.rawBuffer, off, len);
+        }
+    }
+
+    private static void decodeOctetView(OctetStringLength1Base target, AsnMessageIndex index, int elemIdx)
+            throws MAPParsingComponentException {
+        int off = valueOffset(index, elemIdx);
+        int len = valueLength(index, elemIdx);
+        if (index.isByteBufBacked()) {
+            target.decodeFromByteBufView(index.getRawBuf(), off, len);
+        } else {
+            target.decodeFromOctetView(index.rawBuffer, off, len);
+        }
+    }
+
+    private static void decodeLmsiView(LMSIImpl target, AsnMessageIndex index, int elemIdx)
+            throws MAPParsingComponentException {
+        int off = valueOffset(index, elemIdx);
+        int len = valueLength(index, elemIdx);
+        if (index.isByteBufBacked()) {
+            target.decodeFromByteBufView(index.getRawBuf(), off, len);
+        } else {
+            target.decodeFromOctetView(index.rawBuffer, off, len);
+        }
+    }
+
+    private static void decodeAddressView(AddressStringImpl target, AsnMessageIndex index, int elemIdx)
+            throws MAPParsingComponentException {
+        int off = valueOffset(index, elemIdx);
+        int len = valueLength(index, elemIdx);
+        if (index.isByteBufBacked()) {
+            target.decodeFromByteBufView(index.getRawBuf(), off, len);
+        } else {
+            target.decodeFromOctetView(index.rawBuffer, off, len);
+        }
+    }
+
+    private static void decodeBitStringView(MWStatusImpl target, AsnMessageIndex index, int elemIdx)
+            throws MAPParsingComponentException {
+        int off = valueOffset(index, elemIdx);
+        int len = valueLength(index, elemIdx);
+        if (index.isByteBufBacked()) {
+            target.decodeFromBitStringByteBufView(index.getRawBuf(), off, len);
+        } else {
+            target.decodeFromBitStringView(index.rawBuffer, off, len);
+        }
+    }
+
+    private static void bindOctetStringView(USSDStringImpl target, AsnMessageIndex index, int elemIdx) {
+        int off = valueOffset(index, elemIdx);
+        int len = valueLength(index, elemIdx);
+        if (index.isByteBufBacked()) {
+            target.setByteBufView(index.getRawBuf(), off, len);
+        } else {
+            target.setDataView(index.rawBuffer, off, len);
+        }
+    }
+
+    private static void bindOctetStringView(SmsSignalInfoImpl target, AsnMessageIndex index, int elemIdx) {
+        int off = valueOffset(index, elemIdx);
+        int len = valueLength(index, elemIdx);
+        if (index.isByteBufBacked()) {
+            target.setByteBufView(index.getRawBuf(), off, len);
+        } else {
+            target.setDataView(index.rawBuffer, off, len);
         }
     }
 
@@ -691,10 +886,38 @@ public final class MapFlatAsnDecoder {
      * {@link org.restcomm.protocols.ss7.map.primitives.SequenceBase} subclasses.
      */
     private static AsnInputStream sliceAsElement(AsnMessageIndex index, int elemIdx) {
-        return AsnStreamPool.borrowSlice(index.rawBuffer, index.valueOffsets[elemIdx], index.valueLengths[elemIdx]);
+        int off = valueOffset(index, elemIdx);
+        int len = valueLength(index, elemIdx);
+        if (index.isByteBufBacked()) {
+            return AsnStreamPool.borrowByteBufSlice(index.getRawBuf(), off, len);
+        }
+        return AsnStreamPool.borrowSlice(index.rawBuffer, off, len);
+    }
+
+    private static void parseNestedIndex(AsnMessageIndex outer, int elemIdx, AsnMessageIndex inner, String messageName)
+            throws MAPParsingComponentException {
+        parseIndexFromBacking(outer, valueOffset(outer, elemIdx), valueLength(outer, elemIdx), inner, messageName);
+    }
+
+    private static void parseIndexFromBacking(AsnMessageIndex outer, int offset, int length, AsnMessageIndex inner,
+            String messageName) throws MAPParsingComponentException {
+        if (outer.isByteBufBacked()) {
+            parseIndex(outer.getRawBuf(), offset, length, inner, messageName);
+        } else {
+            parseIndex(outer.rawBuffer, offset, length, inner, messageName);
+        }
     }
 
     private static void parseIndex(byte[] buffer, int offset, int length, AsnMessageIndex index, String messageName)
+            throws MAPParsingComponentException {
+        try {
+            FlatAsnParser.parseAll(buffer, offset, length, index);
+        } catch (AsnException e) {
+            throw mistyped(messageName, e.getMessage());
+        }
+    }
+
+    private static void parseIndex(ByteBuf buffer, int offset, int length, AsnMessageIndex index, String messageName)
             throws MAPParsingComponentException {
         try {
             FlatAsnParser.parseAll(buffer, offset, length, index);

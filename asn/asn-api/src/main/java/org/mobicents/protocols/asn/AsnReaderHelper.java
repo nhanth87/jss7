@@ -80,21 +80,20 @@ public final class AsnReaderHelper {
         if (len <= 0) {
             return 0;
         }
-        byte[] buf = index.rawBuffer;
         switch (len) {
             case 1:
-                return buf[offset] & 0xFFL;
+                return index.byteAt(offset);
             case 2:
-                return ((buf[offset] & 0xFFL) << 8) | (buf[offset + 1] & 0xFFL);
+                return ((long) index.byteAt(offset) << 8) | index.byteAt(offset + 1);
             case 4:
-                return ((buf[offset] & 0xFFL) << 24)
-                        | ((buf[offset + 1] & 0xFFL) << 16)
-                        | ((buf[offset + 2] & 0xFFL) << 8)
-                        | (buf[offset + 3] & 0xFFL);
+                return ((long) index.byteAt(offset) << 24)
+                        | ((long) index.byteAt(offset + 1) << 16)
+                        | ((long) index.byteAt(offset + 2) << 8)
+                        | index.byteAt(offset + 3);
             default:
                 long value = 0;
                 for (int i = 0; i < len; i++) {
-                    value = (value << 8) | (buf[offset + i] & 0xFF);
+                    value = (value << 8) | index.byteAt(offset + i);
                 }
                 return value;
         }
@@ -123,6 +122,10 @@ public final class AsnReaderHelper {
 
     @Deprecated
     public static OctetStringView readOctetStringView(AsnMessageIndex index, int tagIndex) {
+        if (index.isByteBufBacked()) {
+            throw new UnsupportedOperationException(
+                    "OctetStringView requires heap byte[] backing; use valueSlice() for ByteBuf");
+        }
         return new OctetStringView(index.rawBuffer, readOctetOffset(index, tagIndex), readOctetLength(index, tagIndex));
     }
 

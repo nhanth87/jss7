@@ -1,6 +1,8 @@
 
 package org.restcomm.protocols.ss7.mtp;
 
+import io.netty.buffer.ByteBuf;
+
 /**
  * @author sergey vetyutnev
  * @author amit bhayani
@@ -15,10 +17,16 @@ public class Mtp3TransferPrimitive {
     protected final int dpc;
     protected final int sls;
     protected final byte[] data;
+    protected final ByteBuf dataBuf;
 
     private final RoutingLabelFormat pointCodeFormat;
 
     protected Mtp3TransferPrimitive(int si, int ni, int mp, int opc, int dpc, int sls, byte[] data,
+            RoutingLabelFormat pointCodeFormat) {
+        this(si, ni, mp, opc, dpc, sls, data, null, pointCodeFormat);
+    }
+
+    protected Mtp3TransferPrimitive(int si, int ni, int mp, int opc, int dpc, int sls, byte[] data, ByteBuf dataBuf,
             RoutingLabelFormat pointCodeFormat) {
         this.si = si;
         this.ni = ni;
@@ -27,8 +35,14 @@ public class Mtp3TransferPrimitive {
         this.dpc = dpc;
         this.sls = sls;
         this.data = data;
+        this.dataBuf = dataBuf;
 
         this.pointCodeFormat = pointCodeFormat;
+    }
+
+    public static Mtp3TransferPrimitive valueOf(int si, int ni, int mp, int opc, int dpc, int sls, ByteBuf dataBuf,
+            RoutingLabelFormat pointCodeFormat) {
+        return new Mtp3TransferPrimitive(si, ni, mp, opc, dpc, sls, null, dataBuf, pointCodeFormat);
     }
 
     public int getSi() {
@@ -56,10 +70,30 @@ public class Mtp3TransferPrimitive {
     }
 
     public byte[] getData() {
-        return this.data;
+        if (this.data != null) {
+            return this.data;
+        }
+        if (this.dataBuf != null && this.dataBuf.isReadable()) {
+            byte[] copy = new byte[this.dataBuf.readableBytes()];
+            this.dataBuf.getBytes(this.dataBuf.readerIndex(), copy);
+            return copy;
+        }
+        return null;
+    }
+
+    /**
+     * Zero-copy MTP user data. When non-null, SCCP always decodes from this buffer
+     * without copying the full payload.
+     */
+    public ByteBuf getDataBuf() {
+        return this.dataBuf;
     }
 
     public byte[] encodeMtp3() {
+        byte[] userData = getData();
+        if (userData == null) {
+            return null;
+        }
 
         byte[] res = null;
         int ssi = 0;
@@ -67,7 +101,7 @@ public class Mtp3TransferPrimitive {
         switch (this.pointCodeFormat) {
             case ITU:
 
-                res = new byte[this.data.length + 5];
+                res = new byte[userData.length + 5];
 
                 // sio
                 ssi = (this.ni & 0x03) << 2 | (this.mp & 0x03);
@@ -80,12 +114,12 @@ public class Mtp3TransferPrimitive {
                 res[4] = (byte) (((this.opc >> 10) & 0x0F) | ((this.sls & 0x0F) << 4));
 
                 // msu data
-                System.arraycopy(this.data, 0, res, 5, this.data.length);
+                System.arraycopy(userData, 0, res, 5, userData.length);
 
                 break;
 
             case ANSI_Sls8Bit:
-                res = new byte[this.data.length + 8];
+                res = new byte[userData.length + 8];
 
                 // sio
                 ssi = (this.ni & 0x03) << 2 | (this.mp & 0x03);
@@ -102,12 +136,12 @@ public class Mtp3TransferPrimitive {
                 res[7] = (byte) this.sls;
 
                 // msu data
-                System.arraycopy(this.data, 0, res, 8, this.data.length);
+                System.arraycopy(userData, 0, res, 8, userData.length);
 
                 break;
 
             case ANSI_Sls5Bit:
-                res = new byte[this.data.length + 8];
+                res = new byte[userData.length + 8];
 
                 // sio
                 ssi = (this.ni & 0x03) << 2 | (this.mp & 0x03);
@@ -124,7 +158,7 @@ public class Mtp3TransferPrimitive {
                 res[7] = (byte) (this.sls & 0x1F);
 
                 // msu data
-                System.arraycopy(this.data, 0, res, 8, this.data.length);
+                System.arraycopy(userData, 0, res, 8, userData.length);
 
                 break;
 
@@ -147,9 +181,13 @@ public class Mtp3TransferPrimitive {
         sb.append(", SLS=");
         sb.append(this.sls);
 
-        if (this.data != null) {
+        byte[] payload = getData();
+        if (payload != null) {
             sb.append(", MsgLen=");
-            sb.append(this.data.length);
+            sb.append(payload.length);
+        } else if (this.dataBuf != null) {
+            sb.append(", MsgLen=");
+            sb.append(this.dataBuf.readableBytes());
         }
 
         sb.append(", NI=");

@@ -386,6 +386,11 @@ public interface SccpStack {
     Mtp3UserPart getMtp3UserPart(int id);
 
     /**
+     * Zero-copy inbound path from M3UA Protocol Data (user bytes after 12-byte routing header).
+     */
+    void receiveM3uaProtocolData(int opc, int dpc, int si, int ni, int mp, int sls, io.netty.buffer.ByteBuf userData);
+
+    /**
      * Returns handle to {@link Router}
      *
      * @return

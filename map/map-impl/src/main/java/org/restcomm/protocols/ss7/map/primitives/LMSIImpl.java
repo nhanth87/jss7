@@ -7,6 +7,8 @@ import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
+
+import io.netty.buffer.ByteBuf;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentExceptionReason;
@@ -23,8 +25,10 @@ public class LMSIImpl implements LMSI, MAPAsnPrimitive {
 
     private boolean dataViewActive;
     private byte[] viewBuffer;
+    private ByteBuf viewByteBuf;
     private int viewOffset;
     private int viewLength;
+    private boolean byteBufViewActive;
 
     public LMSIImpl() {
     }
@@ -60,9 +64,25 @@ public class LMSIImpl implements LMSI, MAPAsnPrimitive {
                     + length, MAPParsingComponentExceptionReason.MistypedParameter);
         }
         this.viewBuffer = buffer;
+        this.viewByteBuf = null;
         this.viewOffset = offset;
         this.viewLength = 4;
         this.dataViewActive = true;
+        this.byteBufViewActive = false;
+        this.data = null;
+    }
+
+    public void decodeFromByteBufView(ByteBuf buffer, int offset, int length) throws MAPParsingComponentException {
+        if (length != 4) {
+            throw new MAPParsingComponentException("Error decoding LMSI: the LMSI field must contain 4 octets. Contains: "
+                    + length, MAPParsingComponentExceptionReason.MistypedParameter);
+        }
+        this.viewByteBuf = buffer;
+        this.viewBuffer = null;
+        this.viewOffset = offset;
+        this.viewLength = 4;
+        this.byteBufViewActive = true;
+        this.dataViewActive = false;
         this.data = null;
     }
 

@@ -1,5 +1,7 @@
 package org.restcomm.protocols.ss7.m3ua.parameter;
 
+import io.netty.buffer.ByteBuf;
+
 /**
  * Protocl data parameter.
  *
@@ -54,4 +56,10 @@ public interface ProtocolData extends Parameter {
      * @return binary message.
      */
     byte[] getData();
+
+    /**
+     * Zero-copy view of the user payload (SCCP/TCAP data). May be {@code null} when the
+     * parameter was decoded into a {@code byte[]}. Caller must {@code release()} when done.
+     */
+    ByteBuf getDataBuf();
 }

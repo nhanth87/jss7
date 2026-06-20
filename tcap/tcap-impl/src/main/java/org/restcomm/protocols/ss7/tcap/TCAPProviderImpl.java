@@ -1,5 +1,6 @@
 package org.restcomm.protocols.ss7.tcap;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.util.concurrent.DefaultThreadFactory;
 
 import java.io.IOException;
@@ -20,7 +21,7 @@ import org.jctools.maps.NonBlockingHashMap;
 
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.asn.AsnInputStream;
-import org.mobicents.protocols.asn.AsnOutputStream;
+import org.mobicents.protocols.asn.AsnStreamPool;
 import org.mobicents.protocols.asn.Tag;
 import org.restcomm.protocols.ss7.sccp.NetworkIdState;
 import org.restcomm.protocols.ss7.sccp.RemoteSccpStatus;
@@ -92,22 +93,16 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 
     private static final Logger logger = Logger.getLogger(TCAPProviderImpl.class); // listeners
 
-    private static final ThreadLocal<AsnInputStream> ASN_INPUT_STREAM_POOL =
-            ThreadLocal.withInitial(() -> new AsnInputStream(new byte[0]));
-
-    private static final ThreadLocal<AsnOutputStream> ASN_OUTPUT_STREAM_POOL =
-            ThreadLocal.withInitial(AsnOutputStream::new);
-
     private static AsnInputStream borrowAsnInputStream(byte[] data) {
-        AsnInputStream ais = ASN_INPUT_STREAM_POOL.get();
-        ais.reset(data);
-        return ais;
+        return AsnStreamPool.borrow(data);
     }
 
-    private static AsnOutputStream borrowAsnOutputStream() {
-        AsnOutputStream aos = ASN_OUTPUT_STREAM_POOL.get();
-        aos.reset();
-        return aos;
+    private static AsnInputStream borrowAsnInputStream(SccpDataMessage sccpDataMessage) {
+        ByteBuf dataBuf = sccpDataMessage.getDataBuf();
+        if (dataBuf != null && dataBuf.isReadable()) {
+            return AsnStreamPool.borrowByteBufSlice(dataBuf, dataBuf.readerIndex(), dataBuf.readableBytes());
+        }
+        return AsnStreamPool.borrow(sccpDataMessage.getData());
     }
 
     private transient List<TCListener> tcListeners = new CopyOnWriteArrayList<>();
@@ -399,6 +394,21 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
         sccpProvider.send(msg);
     }
 
+    /**
+     * Sends a pre-encoded TCAP payload held in a Netty {@link io.netty.buffer.ByteBuf}.
+     * Copies to heap for SCCP until downstream layers accept direct buffers.
+     */
+    public void send(TcapOutboundEncoder.EncodedTcapPayload encoded, boolean returnMessageOnError,
+            SccpAddress destinationAddress, SccpAddress originatingAddress, int seqControl, int networkId, int localSsn,
+            int remotePc) throws IOException {
+        try {
+            send(encoded.toByteArray(), returnMessageOnError, destinationAddress, originatingAddress, seqControl, networkId,
+                    localSsn, remotePc);
+        } finally {
+            encoded.release();
+        }
+    }
+
     public int getMaxUserDataLength(SccpAddress sccpCalledPartyAddress, SccpAddress sccpCallingPartyAddress, int msgNetworkId) {
         return this.sccpProvider.getMaxUserDataLength(sccpCalledPartyAddress, sccpCallingPartyAddress, msgNetworkId);
     }
@@ -647,15 +657,20 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
         tcapAbortMessage.setDestinationTransactionId(remoteTransactionId);
         tcapAbortMessage.setPAbortCause(providerAbortCause);
 
-        AsnOutputStream aos = borrowAsnOutputStream();
+        TcapOutboundEncoder.EncodedTcapPayload encoded = null;
         try {
-            tcapAbortMessage.encode(aos);
+            encoded = TcapOutboundEncoder.encode(tcapAbortMessage);
             if (this.stack.getStatisticsEnabled()) {
                 this.stack.getCounterProviderImpl().updateTcPAbortSentCount(remoteTransactionId, providerAbortCause);
             }
-            this.send(aos.toByteArray(), false, sccpCalledPartyAddress, sccpCallingPartyAddress, seqControl, networkId, sccpCallingPartyAddress.getSubsystemNumber(), remotePc);
+            this.send(encoded.toByteArray(), false, sccpCalledPartyAddress, sccpCallingPartyAddress, seqControl, networkId,
+                    sccpCallingPartyAddress.getSubsystemNumber(), remotePc);
         } catch (Exception e) {
             logger.error("Failed to send message: ", e);
+        } finally {
+            if (encoded != null) {
+                encoded.release();
+            }
         }
     }
 
@@ -683,29 +698,33 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
         msg.setDestinationTransactionId(remoteTransactionId);
         msg.setDialogPortion(dialogPortion);
 
-        AsnOutputStream aos = borrowAsnOutputStream();
+        TcapOutboundEncoder.EncodedTcapPayload encoded = null;
         try {
-            msg.encode(aos);
+            encoded = TcapOutboundEncoder.encode(msg);
             if (this.stack.getStatisticsEnabled()) {
                 this.stack.getCounterProviderImpl().updateTcPAbortSentCount(remoteTransactionId, PAbortCauseType.NoReasonGiven);
             }
-            this.send(aos.toByteArray(), false, sccpCalledPartyAddress, sccpCallingPartyAddress, seqControl, networkId, sccpCallingPartyAddress.getSubsystemNumber(), remotePc);
+            this.send(encoded.toByteArray(), false, sccpCalledPartyAddress, sccpCallingPartyAddress, seqControl, networkId,
+                    sccpCallingPartyAddress.getSubsystemNumber(), remotePc);
         } catch (Exception e) {
             logger.error("Failed to send message: ", e);
+        } finally {
+            if (encoded != null) {
+                encoded.release();
+            }
         }
     }
 
     public void onMessage(SccpDataMessage sccpDataMessage) {
 
         try {
-            byte[] data = sccpDataMessage.getData();
             SccpAddress sccpCallingPartyAddress = sccpDataMessage.getCalledPartyAddress();
             SccpAddress sccpCalledPartyAddress = sccpDataMessage.getCallingPartyAddress();
 
             // FIXME: Qs state that OtxID and DtxID constitute to dialog id.....
 
-            // asnData - it should pass
-            AsnInputStream ais = borrowAsnInputStream(data);
+            // asnData - zero-copy from inbound ByteBuf when SCCP retained the M3UA slice
+            AsnInputStream ais = borrowAsnInputStream(sccpDataMessage);
 
             // this should have TC message tag :)
             int tag = ais.readTag();
@@ -726,7 +745,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                         logger.error("ParseException when parsing TCContinueMessage: " + e, e);
 
                         // parsing OriginatingTransactionId
-                        ais = borrowAsnInputStream(data);
+                        ais = borrowAsnInputStream(sccpDataMessage);
                         tag = ais.readTag();
                         TCUnidentifiedMessage tcapUnidentified = new TCUnidentifiedMessage();
                         tcapUnidentified.decode(ais);
@@ -787,7 +806,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                         logger.error("ParseException when parsing TCBeginMessage: " + e, e);
 
                         // parsing OriginatingTransactionId
-                        ais = borrowAsnInputStream(data);
+                        ais = borrowAsnInputStream(sccpDataMessage);
                         tag = ais.readTag();
                         TCUnidentifiedMessage tcUnidentified = new TCUnidentifiedMessage();
                         tcUnidentified.decode(ais);

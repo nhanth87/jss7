@@ -20,7 +20,12 @@
     </properties>
 
     <dependencies>
-        <!-- No external dependencies - pure Java ASN.1 library -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
+        <!-- No other external dependencies - pure Java ASN.1 library -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>

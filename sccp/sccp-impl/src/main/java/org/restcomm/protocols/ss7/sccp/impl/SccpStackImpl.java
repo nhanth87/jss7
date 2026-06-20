@@ -17,6 +17,7 @@ import org.restcomm.protocols.ss7.mtp.Mtp3StatusPrimitive;
 import org.restcomm.protocols.ss7.mtp.Mtp3TransferPrimitive;
 import org.restcomm.protocols.ss7.mtp.Mtp3UserPart;
 import org.restcomm.protocols.ss7.mtp.Mtp3UserPartListener;
+import org.restcomm.protocols.ss7.mtp.RoutingLabelFormat;
 import org.restcomm.protocols.ss7.sccp.LongMessageRule;
 import org.restcomm.protocols.ss7.sccp.LongMessageRuleType;
 import org.restcomm.protocols.ss7.sccp.MaxConnectionCountReached;
@@ -66,6 +67,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import io.netty.buffer.ByteBuf;
 
 import static org.restcomm.protocols.ss7.sccp.impl.message.MessageUtil.calculateLudtFieldsLengthWithoutData;
 import static org.restcomm.protocols.ss7.sccp.impl.message.MessageUtil.calculateUdtFieldsLengthWithoutData;
@@ -1376,11 +1379,18 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
             }
 
             // decoding of a message
-            ByteArrayInputStream bais = new ByteArrayInputStream(mtp3Msg.getData());
-            DataInputStream in = new DataInputStream(bais);
-            int mt = in.readUnsignedByte();
-            msg = ((MessageFactoryImpl) sccpProvider.getMessageFactory()).createMessage(mt, mtp3Msg.getOpc(), mtp3Msg.getDpc(), mtp3Msg.getSls(), in,
-                    this.sccpProtocolVersion, 0);
+            if (mtp3Msg.getDataBuf() != null && mtp3Msg.getDataBuf().isReadable()) {
+                ByteBuf sccpPdu = mtp3Msg.getDataBuf();
+                int mt = sccpPdu.getUnsignedByte(sccpPdu.readerIndex());
+                msg = ((MessageFactoryImpl) sccpProvider.getMessageFactory()).createMessage(mt, mtp3Msg.getOpc(),
+                        mtp3Msg.getDpc(), mtp3Msg.getSls(), sccpPdu, this.sccpProtocolVersion, 0);
+            } else {
+                ByteArrayInputStream bais = new ByteArrayInputStream(mtp3Msg.getData());
+                DataInputStream in = new DataInputStream(bais);
+                int mt = in.readUnsignedByte();
+                msg = ((MessageFactoryImpl) sccpProvider.getMessageFactory()).createMessage(mt, mtp3Msg.getOpc(), mtp3Msg.getDpc(), mtp3Msg.getSls(), in,
+                        this.sccpProtocolVersion, 0);
+            }
 
             // finding sap and networkId for a message
             dpc = mtp3Msg.getDpc();
@@ -1524,6 +1534,21 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
         } catch (Exception e) {
             logger.error("IOException while handling SCCP message: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Zero-copy inbound entry from M3UA {@code Protocol Data} parameter.
+     */
+    @Override
+    public void receiveM3uaProtocolData(int opc, int dpc, int si, int ni, int mp, int sls, ByteBuf userData) {
+        if (userData == null || !userData.isReadable()) {
+            logger.error(String.format(
+                    "receiveM3uaProtocolData: null or empty ByteBuf from M3UA (opc=%d, dpc=%d, si=%d, sls=%d)",
+                    opc, dpc, si, sls));
+            return;
+        }
+        onMtp3TransferMessage(Mtp3TransferPrimitive.valueOf(si, ni, mp, opc, dpc, sls, userData.retain(),
+                RoutingLabelFormat.ITU));
     }
 
     public class MessageReassemblyProcess implements Runnable {

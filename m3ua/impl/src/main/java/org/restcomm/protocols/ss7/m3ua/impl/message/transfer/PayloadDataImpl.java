@@ -89,6 +89,7 @@ public class PayloadDataImpl extends M3UAMessageImpl implements PayloadData {
      * Clears all parameters.
      */
     public void reset() {
+        releaseAllParameters();
         this.parameters.clear();
     }
 
@@ -96,6 +97,14 @@ public class PayloadDataImpl extends M3UAMessageImpl implements PayloadData {
      * Clear all parameters - alias for reset()
      */
     public void clearParameters() {
-        this.parameters.clear();
+        reset();
+    }
+
+    private void releaseAllParameters() {
+        for (Parameter param : parameters.values()) {
+            if (param instanceof ParameterImpl) {
+                ((ParameterImpl) param).releaseResources();
+            }
+        }
     }
 }

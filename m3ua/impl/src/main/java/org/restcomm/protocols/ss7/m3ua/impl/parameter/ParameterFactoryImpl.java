@@ -1,6 +1,8 @@
 
 package org.restcomm.protocols.ss7.m3ua.impl.parameter;
 
+import io.netty.buffer.ByteBuf;
+
 import org.restcomm.protocols.ss7.m3ua.parameter.ASPIdentifier;
 import org.restcomm.protocols.ss7.m3ua.parameter.AffectedPointCode;
 import org.restcomm.protocols.ss7.m3ua.parameter.ConcernedDPC;
@@ -138,6 +140,14 @@ public class ParameterFactoryImpl implements ParameterFactory {
     }
 
     public Parameter createParameter(int tag, byte[] value) {
+        return createParameter(tag, value, false);
+    }
+
+    public Parameter createParameter(int tag, ByteBuf valueBuf) {
+        return createParameter(tag, valueBuf, true);
+    }
+
+    private Parameter createParameter(int tag, byte[] value, boolean fromByteBuf) {
         ParameterImpl parameter;
         switch (tag) {
             case ParameterImpl.Protocol_Data:
@@ -217,6 +227,94 @@ public class ParameterFactoryImpl implements ParameterFactory {
                 break;
         }
         return parameter;
+    }
+
+    private Parameter createParameter(int tag, ByteBuf valueBuf, boolean fromByteBuf) {
+        ParameterImpl parameter;
+        switch (tag) {
+            case ParameterImpl.Protocol_Data:
+                parameter = new ProtocolDataImpl(valueBuf);
+                break;
+            case ParameterImpl.Traffic_Mode_Type:
+                parameter = new TrafficModeTypeImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Network_Appearance:
+                parameter = new NetworkAppearanceImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Routing_Context:
+                parameter = new RoutingContextImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Correlation_ID:
+                parameter = new CorrelationIdImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Affected_Point_Code:
+                parameter = new AffectedPointCodeImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Originating_Point_Code_List:
+                parameter = new OPCListImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Destination_Point_Code:
+                parameter = new DestinationPointCodeImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.INFO_String:
+                parameter = new InfoStringImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Concerned_Destination:
+                parameter = new ConcernedDPCImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Congestion_Indications:
+                parameter = new CongestedIndicationImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.User_Cause:
+                parameter = new UserCauseImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.ASP_Identifier:
+                parameter = new ASPIdentifierImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Local_Routing_Key_Identifier:
+                parameter = new LocalRKIdentifierImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Service_Indicators:
+                parameter = new ServiceIndicatorsImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Routing_Key:
+                parameter = new RoutingKeyImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Registration_Status:
+                parameter = new RegistrationStatusImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Registration_Result:
+                parameter = new RegistrationResultImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Deregistration_Status:
+                parameter = new DeregistrationStatusImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Deregistration_Result:
+                parameter = new DeregistrationResultImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Diagnostic_Information:
+                parameter = new DiagnosticInfoImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Error_Code:
+                parameter = new ErrorCodeImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Status:
+                parameter = new StatusImpl(readValueBytes(valueBuf));
+                break;
+            case ParameterImpl.Heartbeat_Data:
+                parameter = new HeartbeatDataImpl(readValueBytes(valueBuf));
+                break;
+            default:
+                parameter = new UnknownParameterImpl(tag, valueBuf.readableBytes(), readValueBytes(valueBuf));
+                break;
+        }
+        return parameter;
+    }
+
+    private static byte[] readValueBytes(ByteBuf valueBuf) {
+        byte[] bytes = new byte[valueBuf.readableBytes()];
+        valueBuf.getBytes(valueBuf.readerIndex(), bytes);
+        return bytes;
     }
 
 }

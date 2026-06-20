@@ -1,5 +1,7 @@
 package org.restcomm.protocols.ss7.sccp.message;
 
+import io.netty.buffer.ByteBuf;
+
 import org.restcomm.protocols.ss7.sccp.parameter.HopCounter;
 import org.restcomm.protocols.ss7.sccp.parameter.Importance;
 import org.restcomm.protocols.ss7.sccp.parameter.ProtocolClass;
@@ -19,6 +21,12 @@ public interface SccpDataMessage extends SccpAddressedMessage {
     HopCounter getHopCounter();
 
     byte[] getData();
+
+    /**
+     * Zero-copy user payload (always enabled on inbound path).
+     * May be {@code null}; do not {@code release()} — valid for message lifetime.
+     */
+    ByteBuf getDataBuf();
 
     Segmentation getSegmentation();
 

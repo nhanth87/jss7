@@ -20,6 +20,15 @@ public class Mtp3TransferPrimitiveFactory {
         return mtp3TransferPrimitive;
     }
 
+    /**
+     * Zero-copy variant: {@code dataBuf} holds retained MTP user data (SCCP PDU for SI=3).
+     * {@code data} is not copied; callers that need {@code byte[]} use {@link Mtp3TransferPrimitive#getData()}.
+     */
+    public Mtp3TransferPrimitive createMtp3TransferPrimitive(int si, int ni, int mp, int opc, int dpc, int sls,
+            io.netty.buffer.ByteBuf dataBuf) {
+        return new Mtp3TransferPrimitive(si, ni, mp, opc, dpc, sls, null, dataBuf, this.pointCodeFormat);
+    }
+
     public Mtp3TransferPrimitive createMtp3TransferPrimitive(byte[] msg) {
         Mtp3TransferPrimitive mtp3TransferPrimitive = null;
 

@@ -43,31 +43,43 @@ public class AsnOutputStream extends OutputStream {
 	private static final byte _BOOLEAN_POSITIVE = (byte) 0xFF;
 	private static final byte _BOOLEAN_NEGATIVE = 0x00;
 
-	private byte[] buffer;
-	
-	private int pos;
-	private int length;
-	
-	
+	private final AsnBufferBackend backend;
+
 	public AsnOutputStream() {
-		
-		this.length = 256;
-		this.buffer = new byte[this.length];
+		this(new HeapAsnBufferBackend(256));
 	}
-	
-	
+
+	protected AsnOutputStream(AsnBufferBackend backend) {
+		this.backend = backend;
+	}
+
+	AsnBufferBackend getBackendInternal() {
+		return this.backend;
+	}
+
 	/**
 	 * Returns the internal buffer backing this stream.
 	 */
 	public byte[] getBuffer() {
-		return this.buffer;
+		if (this.backend instanceof HeapAsnBufferBackend) {
+			return ((HeapAsnBufferBackend) this.backend).getBuffer();
+		}
+		throw new UnsupportedOperationException("getBuffer() is only supported for heap-backed AsnOutputStream");
 	}
 
 	/**
 	 * Returns the number of encoded bytes currently written.
 	 */
 	public int getEncodedLength() {
-		return this.pos;
+		return this.backend.getWriterIndex() - this.backend.getPayloadStart();
+	}
+
+	private int pos() {
+		return this.backend.getWriterIndex();
+	}
+
+	private void setPos(int index) {
+		this.backend.setWriterIndex(index);
 	}
 
 	/**
@@ -75,8 +87,13 @@ public class AsnOutputStream extends OutputStream {
 	 * Otherwise copies {@code [0, pos)}. Retained references may be invalidated after {@link #reset()}.
 	 */
 	public byte[] getEncodedBytes() {
-		if (this.pos == this.length) {
-			return this.buffer;
+		int start = this.backend.getPayloadStart();
+		int end = this.backend.getWriterIndex();
+		if (this.backend instanceof HeapAsnBufferBackend) {
+			byte[] buffer = ((HeapAsnBufferBackend) this.backend).getBuffer();
+			if (start == 0 && end == buffer.length) {
+				return buffer;
+			}
 		}
 		return copyEncodedBytes();
 	}
@@ -85,11 +102,15 @@ public class AsnOutputStream extends OutputStream {
 	 * Always copies the encoded region {@code [0, pos)} for safe hand-off (e.g. pooled send paths).
 	 */
 	public byte[] copyEncodedBytes() {
-		if (this.pos == 0) {
+		int length = getEncodedLength();
+		if (length == 0) {
 			return new byte[0];
 		}
-		byte[] res = new byte[this.pos];
-		System.arraycopy(this.buffer, 0, res, 0, this.pos);
+		byte[] res = new byte[length];
+		int start = this.backend.getPayloadStart();
+		for (int i = 0; i < length; i++) {
+			res[i] = this.backend.getByte(start + i);
+		}
 		return res;
 	}
 
@@ -108,28 +129,18 @@ public class AsnOutputStream extends OutputStream {
 	 * @return
 	 */
 	public int size() {
-		return this.pos;
+		return getEncodedLength();
 	}
 	
 	/**
 	 * Clears the data from the stream for reusing it 
 	 */
 	public void reset() {
-		this.pos = 0;
+		this.backend.reset();
 	}
 	
-	private void checkIncreaseArray( int addCount ) {
-		
-		if (this.pos + addCount > this.length) {
-			int newLength = this.length * 2;
-			if (newLength < this.pos + addCount)
-				newLength = this.pos + addCount + this.length;
-			byte[] newBuf = new byte[newLength];
-			System.arraycopy(this.buffer, 0, newBuf, 0, this.buffer.length);
-			
-			this.buffer = newBuf;
-			this.length = newLength;
-		}
+	private void checkIncreaseArray(int addCount) {
+		this.backend.ensureWritable(addCount);
 	}
 	
 	/**
@@ -138,9 +149,8 @@ public class AsnOutputStream extends OutputStream {
 	 * @param b
 	 */
 	@Override
-	public void write( int b ) {
-		this.checkIncreaseArray(1);
-		this.buffer[this.pos++] = (byte)b;
+	public void write(int b) {
+		this.backend.writeByte(b);
 	}
 	
 	/**
@@ -152,9 +162,7 @@ public class AsnOutputStream extends OutputStream {
 	 */
 	@Override
 	public void write(byte[] b, int off, int len) {
-		this.checkIncreaseArray(len);
-		System.arraycopy(b, off, this.buffer, this.pos, len);
-		this.pos += len;
+		this.backend.writeBytes(b, off, len);
 	}
 	
 	/**
@@ -253,16 +261,13 @@ public class AsnOutputStream extends OutputStream {
                 count = 1;
             }
 
-            this.buffer[pos] = (byte) (0x80 | count);
+            int pos = pos();
+            this.checkIncreaseArray(count + 1);
+            this.backend.setByte(pos, (byte) (0x80 | count));
             for (int i1 = 0; i1 < count; i1++) {
-                this.buffer[pos + i1 + 1] = buf[i1];
+                this.backend.setByte(pos + i1 + 1, buf[i1]);
             }
-            this.pos += count + 1;
-
-//			int posLen = this.pos;
-//			this.write(0);
-//			int count = this.writeIntegerData(v);
-//			this.buffer[posLen] = (byte) (count | 0x80);
+            setPos(pos + count + 1);
 		} else { // short
 			
 			this.write(v);
@@ -279,7 +284,7 @@ public class AsnOutputStream extends OutputStream {
 	 */
 	public int StartContentDefiniteLength() {
 
-		int lenPos = this.pos;
+		int lenPos = pos();
 		this.write(0);
 		return lenPos;
 	}
@@ -314,9 +319,9 @@ public class AsnOutputStream extends OutputStream {
 			this.write(0);
 		} else {
 			
-			int length = this.pos - lenPos - 1;
+			int length = pos() - lenPos - 1;
 			if (length <= 0x7F) {
-				this.buffer[lenPos] = (byte) length;
+				this.backend.setByte(lenPos, (byte) length);
 			} else {
 
 				int count;
@@ -342,11 +347,11 @@ public class AsnOutputStream extends OutputStream {
 				}
 				
 				this.checkIncreaseArray(count);
-				System.arraycopy(this.buffer, lenPos + 1, this.buffer, lenPos + 1 + count, length);
-				this.pos += count;
-				this.buffer[lenPos] = (byte) (0x80 | count);
+				this.backend.copyBytes(lenPos + 1, lenPos + 1 + count, length);
+				setPos(pos() + count);
+				this.backend.setByte(lenPos, (byte) (0x80 | count));
 				for (int i1 = 0; i1 < count; i1++) {
-					this.buffer[lenPos + i1 + 1] = buf[i1];
+					this.backend.setByte(lenPos + i1 + 1, buf[i1]);
 				}
 			}
 		}
@@ -467,10 +472,10 @@ public class AsnOutputStream extends OutputStream {
 		
 		this.writeTag(tagClass, true, tag);
 
-		int lenPos = this.pos;
+		int lenPos = pos();
 		this.write(0);
 		int length = this.writeRealData(d, NR);
-		this.buffer[lenPos] = (byte) length;
+		this.backend.setByte(lenPos, (byte) length);
 	}
 
 	public void writeReal(int tagClass, int tag, double d) throws IOException, AsnException {
@@ -917,7 +922,7 @@ public class AsnOutputStream extends OutputStream {
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("Size=");
-		sb.append(this.pos);
+		sb.append(getEncodedLength());
 		sb.append("\n");
 		
 		byte[] bf = this.toByteArray();

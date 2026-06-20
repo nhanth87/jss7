@@ -7,6 +7,8 @@ import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
+
+import io.netty.buffer.ByteBuf;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentExceptionReason;
@@ -77,6 +79,15 @@ public abstract class OctetStringLength1Base implements MAPAsnPrimitive {
                     MAPParsingComponentExceptionReason.MistypedParameter);
         }
         this.data = buffer[offset] & 0xFF;
+    }
+
+    public void decodeFromByteBufView(ByteBuf buffer, int offset, int length) throws MAPParsingComponentException {
+        if (length != 1) {
+            throw new MAPParsingComponentException("Error decoding " + _PrimitiveName
+                    + ": the field must contain 1 octet. Contains: " + length,
+                    MAPParsingComponentExceptionReason.MistypedParameter);
+        }
+        this.data = buffer.getUnsignedByte(offset);
     }
 
     protected void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException {

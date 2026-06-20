@@ -12,6 +12,8 @@ import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
+
+import io.netty.buffer.ByteBuf;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentExceptionReason;
@@ -149,6 +151,20 @@ public class AddressStringImpl implements AddressString, MAPAsnPrimitive {
         }
     }
 
+    public void decodeFromByteBufView(ByteBuf buffer, int offset, int length) throws MAPParsingComponentException {
+        this._testLengthDecode(length);
+        if (length < 1) {
+            throw new MAPParsingComponentException("Error when decoding AddressString: empty value",
+                    MAPParsingComponentExceptionReason.MistypedParameter);
+        }
+        try {
+            decodeAddressOctets(buffer.getUnsignedByte(offset), buffer, offset + 1, length - 1);
+        } catch (IOException e) {
+            throw new MAPParsingComponentException("IOException when decoding AddressString: " + e.getMessage(), e,
+                    MAPParsingComponentExceptionReason.MistypedParameter);
+        }
+    }
+
     protected void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException {
 
         this._testLengthDecode(length);
@@ -161,6 +177,12 @@ public class AddressStringImpl implements AddressString, MAPAsnPrimitive {
     }
 
     private void decodeAddressOctets(int nature, byte[] buffer, int offset, int tbcdLength)
+            throws MAPParsingComponentException, IOException {
+        applyNatureByte(nature);
+        this.address = TbcdString.decodeString(buffer, offset, tbcdLength);
+    }
+
+    private void decodeAddressOctets(int nature, ByteBuf buffer, int offset, int tbcdLength)
             throws MAPParsingComponentException, IOException {
         applyNatureByte(nature);
         this.address = TbcdString.decodeString(buffer, offset, tbcdLength);

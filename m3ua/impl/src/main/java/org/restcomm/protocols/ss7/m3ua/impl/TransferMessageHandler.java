@@ -3,6 +3,7 @@ package org.restcomm.protocols.ss7.m3ua.impl;
 
 import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSM;
+import org.restcomm.protocols.ss7.m3ua.impl.parameter.ProtocolDataImpl;
 import org.restcomm.protocols.ss7.m3ua.message.transfer.PayloadData;
 import org.restcomm.protocols.ss7.m3ua.parameter.ErrorCode;
 import org.restcomm.protocols.ss7.m3ua.parameter.ProtocolData;
@@ -54,6 +55,7 @@ public class TransferMessageHandler extends MessageHandler {
                         protocolData.getDpc(), protocolData.getSLS(), protocolData.getData());
                 ((AsImpl) aspImpl.getAs()).getM3UAManagement().sendTransferMessageToLocalUser(mtp3TransferPrimitive,
                         payload.getData().getSLS());
+                releaseProtocolDataBuf(protocolData);
             } else {
                 logger.error(String.format(
                         "Rx : PayloadData for Aspfactory=%s with null RoutingContext. But ASP State=%s. Message=%s",
@@ -87,11 +89,22 @@ public class TransferMessageHandler extends MessageHandler {
                         protocolData.getDpc(), protocolData.getSLS(), protocolData.getData());
                 ((AsImpl) aspImpl.getAs()).getM3UAManagement().sendTransferMessageToLocalUser(mtp3TransferPrimitive,
                         payload.getData().getSLS());
+                releaseProtocolDataBuf(protocolData);
             } else {
                 logger.error(String.format(
                         "Rx : PayloadData for Aspfactory=%s for RoutingContext=%s. But ASP State=%s. Message=%s",
                         this.aspFactoryImpl.getName(), rc, aspState, payload));
             }
+        }
+    }
+
+    /**
+     * Phase 1: after {@code getData()} copy for async MTP delivery, release zero-copy buffer.
+     * Phase 2 SCCP will retain {@link ProtocolData#getDataBuf()} until SCCP decode completes.
+     */
+    private void releaseProtocolDataBuf(ProtocolData protocolData) {
+        if (protocolData instanceof ProtocolDataImpl) {
+            ((ProtocolDataImpl) protocolData).releaseResources();
         }
     }
 }

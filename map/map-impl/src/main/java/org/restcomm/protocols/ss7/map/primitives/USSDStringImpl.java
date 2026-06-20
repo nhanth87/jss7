@@ -11,6 +11,9 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 
 import org.mobicents.protocols.asn.AsnOutputStream;
+
+import io.netty.buffer.ByteBuf;
+
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.datacoding.CBSDataCodingGroup;
 import org.restcomm.protocols.ss7.map.api.datacoding.CBSDataCodingScheme;
@@ -38,9 +41,11 @@ public class USSDStringImpl extends OctetStringBase implements USSDString {
     private CBSDataCodingScheme dataCodingScheme;
 
     private byte[] viewBuffer;
+    private ByteBuf viewByteBuf;
     private int viewOffset;
     private int viewLength;
     private boolean dataViewActive;
+    private boolean byteBufViewActive;
 
     private static GSMCharset gsm7Charset = new GSMCharset("GSM", new String[] {});
     private static GSMCharset gsm7Charset_Urdu = new GSMCharset("GSM", new String[] {}, GSMCharset.BYTE_TO_CHAR_UrduAlphabet,
@@ -161,6 +166,7 @@ public class USSDStringImpl extends OctetStringBase implements USSDString {
     public void setEncodedString(byte[] data) {
         this.data = data;
         this.dataViewActive = false;
+        this.byteBufViewActive = false;
     }
 
     /**
@@ -169,14 +175,29 @@ public class USSDStringImpl extends OctetStringBase implements USSDString {
      */
     public void setDataView(byte[] buffer, int offset, int length) {
         this.viewBuffer = buffer;
+        this.viewByteBuf = null;
         this.viewOffset = offset;
         this.viewLength = length;
         this.dataViewActive = true;
+        this.byteBufViewActive = false;
+        this.data = null;
+    }
+
+    /**
+     * Bind USSD octets to a {@link ByteBuf} slice (zero-copy inbound path).
+     */
+    public void setByteBufView(ByteBuf buffer, int offset, int length) {
+        this.viewByteBuf = buffer;
+        this.viewBuffer = null;
+        this.viewOffset = offset;
+        this.viewLength = length;
+        this.byteBufViewActive = true;
+        this.dataViewActive = false;
         this.data = null;
     }
 
     public boolean hasDataView() {
-        return this.dataViewActive;
+        return this.dataViewActive || this.byteBufViewActive;
     }
 
     public byte[] getDataViewBuffer() {
@@ -192,6 +213,11 @@ public class USSDStringImpl extends OctetStringBase implements USSDString {
     }
 
     private byte[] activeData() {
+        if (this.byteBufViewActive) {
+            byte[] slice = new byte[this.viewLength];
+            this.viewByteBuf.getBytes(this.viewOffset, slice);
+            return slice;
+        }
         if (this.dataViewActive) {
             byte[] slice = new byte[this.viewLength];
             System.arraycopy(this.viewBuffer, this.viewOffset, slice, 0, this.viewLength);
@@ -206,6 +232,16 @@ public class USSDStringImpl extends OctetStringBase implements USSDString {
 
     @Override
     public void encodeData(AsnOutputStream asnOutputStream) throws MAPException {
+        if (this.byteBufViewActive) {
+            if (this.viewLength < this.minLength || this.viewLength > this.maxLength) {
+                throw new MAPException("Error while encoding the " + _PrimitiveName + ": data field length must be from "
+                        + this.minLength + " to " + this.maxLength + " octets");
+            }
+            byte[] tmp = new byte[this.viewLength];
+            this.viewByteBuf.getBytes(this.viewOffset, tmp);
+            asnOutputStream.write(tmp, 0, this.viewLength);
+            return;
+        }
         if (this.dataViewActive) {
             if (this.viewLength < this.minLength || this.viewLength > this.maxLength) {
                 throw new MAPException("Error while encoding the " + _PrimitiveName + ": data field length must be from "
