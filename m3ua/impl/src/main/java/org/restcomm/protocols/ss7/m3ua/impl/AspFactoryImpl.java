@@ -62,6 +62,7 @@ import org.restcomm.protocols.ss7.m3ua.message.ssnm.SignallingCongestion;
 import org.restcomm.protocols.ss7.m3ua.message.transfer.PayloadData;
 import org.restcomm.protocols.ss7.m3ua.parameter.ASPIdentifier;
 import org.restcomm.protocols.ss7.m3ua.parameter.ParameterFactory;
+import org.restcomm.protocols.ss7.m3ua.parameter.ProtocolData;
 import org.restcomm.protocols.ss7.mtp.Mtp3EndCongestionPrimitive;
 import org.restcomm.protocols.ss7.mtp.Mtp3StatusCause;
 import org.restcomm.protocols.ss7.mtp.Mtp3StatusPrimitive;
@@ -381,6 +382,8 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
                         PayloadDataPool pool = ((MessageFactoryImpl)this.messageFactory).getPayloadDataPool();
                         if (pool != null && payload instanceof PayloadDataImpl) {
                             pool.release((PayloadDataImpl) payload);
+                        } else {
+                            releaseMessageParameters(message);
                         }
                         break;
                     default:
@@ -571,11 +574,12 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
     protected void write(M3UAMessage message) {
         try {
             ByteBufAllocator byteBufAllocator = this.association.getByteBufAllocator();
+            int estimatedSize = estimateEncodedSize(message);
             ByteBuf byteBuf;
             if (byteBufAllocator != null) {
-                byteBuf = byteBufAllocator.buffer();
+                byteBuf = byteBufAllocator.directBuffer(estimatedSize);
             } else {
-                byteBuf = Unpooled.buffer();
+                byteBuf = Unpooled.buffer(estimatedSize);
             }
 
             ((M3UAMessageImpl) message).encode(byteBuf);
@@ -902,18 +906,24 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
 
     private void processPayload(IpChannelType ipChannelType, ByteBuf byteBuf) {
         M3UAMessage m3UAMessage;
+        MessageFactoryImpl messageFactoryImpl = (MessageFactoryImpl) this.messageFactory;
         if (ipChannelType == IpChannelType.SCTP) {
             try {
-                // TODO where is streamNumber stored?
-                m3UAMessage = this.messageFactory.createMessage(byteBuf);
-                if (m3UAMessage != null) {
-                    logger.warn(String.format("JENNY-RECV-M3UA: AspFactory=%s msgClass=%s msgType=%s", 
-                        this.name, m3UAMessage.getMessageClass(), m3UAMessage.getMessageType()));
+                while (byteBuf.isReadable()) {
+                    m3UAMessage = messageFactoryImpl.createMessage(byteBuf);
+                    if (m3UAMessage == null) {
+                        if (byteBuf.isReadable()) {
+                            logger.error(String.format(
+                                    "Partial SCTP M3UA parse: %d unread bytes remain in payload for AspFactory=%s",
+                                    byteBuf.readableBytes(), this.name));
+                        }
+                        break;
+                    }
+                    if (this.isHeartBeatEnabled()) {
+                        this.heartBeatTimer.reset();
+                    }
+                    this.read(m3UAMessage);
                 }
-                if (this.isHeartBeatEnabled()) {
-                    this.heartBeatTimer.reset();
-                }
-                this.read(m3UAMessage);
             } finally {
                 ReferenceCountUtil.release(byteBuf);
             }
@@ -925,9 +935,15 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
             tcpIncBuffer.writerIndex(tcpIncBuffer.capacity());
 
             while (true) {
-                m3UAMessage = this.messageFactory.createMessage(tcpIncBuffer);
-                if (m3UAMessage == null)
+                m3UAMessage = messageFactoryImpl.createMessage(tcpIncBuffer);
+                if (m3UAMessage == null) {
+                    if (tcpIncBuffer.isReadable()) {
+                        logger.error(String.format(
+                                "Partial TCP M3UA parse: %d unread bytes remain in composite buffer for AspFactory=%s",
+                                tcpIncBuffer.readableBytes(), this.name));
+                    }
                     break;
+                }
 
                 if (this.isHeartBeatEnabled()) {
                     this.heartBeatTimer.reset();
@@ -935,6 +951,26 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
                 this.read(m3UAMessage);
             }
             tcpIncBuffer.discardReadBytes();
+        }
+    }
+
+    private static int estimateEncodedSize(M3UAMessage message) {
+        int size = 8;
+        if (message instanceof PayloadData) {
+            ProtocolData protocolData = ((PayloadData) message).getData();
+            if (protocolData != null) {
+                byte[] data = protocolData.getData();
+                if (data != null) {
+                    size += data.length + 32;
+                }
+            }
+        }
+        return Math.max(size, 64);
+    }
+
+    private static void releaseMessageParameters(M3UAMessage message) {
+        if (message instanceof M3UAMessageImpl) {
+            ((M3UAMessageImpl) message).releaseParameters();
         }
     }
 

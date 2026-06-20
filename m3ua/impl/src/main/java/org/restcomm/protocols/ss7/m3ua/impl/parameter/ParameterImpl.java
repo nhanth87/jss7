@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.util.ReferenceCountUtil;
 
 import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
 
@@ -19,11 +20,30 @@ public abstract class ParameterImpl implements Parameter {
     @JsonProperty("length")
     protected volatile short length;
 
+    /** Optional zero-copy backing buffer; released by {@link #releaseResources()}. */
+    protected ByteBuf valueBuf;
+
     public short getTag() {
         return tag;
     }
 
     protected abstract byte[] getValue();
+
+    /**
+     * Releases any retained {@link ByteBuf} owned by this parameter.
+     */
+    public void releaseResources() {
+        if (valueBuf != null) {
+            ReferenceCountUtil.release(valueBuf);
+            valueBuf = null;
+        }
+    }
+
+    protected byte[] readValueBytesFromBuf() {
+        byte[] bytes = new byte[valueBuf.readableBytes()];
+        valueBuf.getBytes(valueBuf.readerIndex(), bytes);
+        return bytes;
+    }
 
     // public void encode(OutputStream out) throws IOException {
     // // obtain encoded value

@@ -5,7 +5,9 @@ import io.netty.buffer.ByteBuf;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.impl.parameter.ParameterFactoryImpl;
+import org.restcomm.protocols.ss7.m3ua.impl.parameter.ParameterImpl;
 import org.restcomm.protocols.ss7.m3ua.message.M3UAMessage;
 import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
 
@@ -15,6 +17,8 @@ import org.restcomm.protocols.ss7.m3ua.parameter.Parameter;
  * @author sergey vetyutnev
  */
 public abstract class M3UAMessageImpl implements M3UAMessage {
+
+    private static final Logger logger = Logger.getLogger(M3UAMessageImpl.class);
 
     // header part
     private int messageClass;
@@ -61,23 +65,34 @@ public abstract class M3UAMessageImpl implements M3UAMessage {
         while (data.readableBytes() >= 4) {
             short tag = (short) ((data.readUnsignedByte() << 8) | (data.readUnsignedByte()));
             short len = (short) ((data.readUnsignedByte() << 8) | (data.readUnsignedByte()));
+            int valueLen = len - 4;
 
-            if (data.readableBytes() < len - 4) {
+            if (valueLen < 0) {
+                logger.error(String.format("Malformed M3UA parameter: tag=0x%04x len=%d", tag & 0xffff, len & 0xffff));
                 return;
             }
 
-            byte[] value = new byte[len - 4];
-            data.readBytes(value);
-            parameters.put(tag, factory.createParameter(tag, value));
+            if (data.readableBytes() < valueLen) {
+                logger.error(String.format(
+                        "Truncated M3UA parameter: tag=0x%04x declaredValueLen=%d readableBytes=%d",
+                        tag & 0xffff, valueLen, data.readableBytes()));
+                return;
+            }
+
+            ByteBuf valueBuf = data.readSlice(valueLen).retain();
+            parameters.put(tag, factory.createParameter(tag, valueBuf));
 
             // The Parameter Length does not include any padding octets. We have
             // to consider padding here
             int padding = 4 - (len % 4);
             if (padding < 4) {
-                if (data.readableBytes() < padding)
+                if (data.readableBytes() < padding) {
+                    logger.error(String.format(
+                            "Malformed M3UA parameter padding: tag=0x%04x padding=%d readableBytes=%d",
+                            tag & 0xffff, padding, data.readableBytes()));
                     return;
-                else
-                    data.skipBytes(padding);
+                }
+                data.skipBytes(padding);
             }
         }
     }
@@ -88,6 +103,17 @@ public abstract class M3UAMessageImpl implements M3UAMessage {
 
     public int getMessageType() {
         return messageType;
+    }
+
+    /**
+     * Releases any zero-copy {@link io.netty.buffer.ByteBuf} resources held by message parameters.
+     */
+    public void releaseParameters() {
+        for (Parameter param : parameters.values()) {
+            if (param instanceof ParameterImpl) {
+                ((ParameterImpl) param).releaseResources();
+            }
+        }
     }
 
     @Override

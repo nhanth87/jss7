@@ -15,6 +15,8 @@ import org.restcomm.protocols.ss7.map.api.smstpdu.SmsTpdu;
 import org.restcomm.protocols.ss7.map.primitives.MAPAsnPrimitive;
 import org.restcomm.protocols.ss7.map.smstpdu.SmsTpduImpl;
 
+import io.netty.buffer.ByteBuf;
+
 /**
  *
  * @author sergey vetyutnev
@@ -29,8 +31,10 @@ public class SmsSignalInfoImpl implements SmsSignalInfo, MAPAsnPrimitive {
 
     private boolean dataViewActive;
     private byte[] viewBuffer;
+    private ByteBuf viewByteBuf;
     private int viewOffset;
     private int viewLength;
+    private boolean byteBufViewActive;
 
     public SmsSignalInfoImpl() {
     }
@@ -49,6 +53,11 @@ public class SmsSignalInfoImpl implements SmsSignalInfo, MAPAsnPrimitive {
     }
 
     public byte[] getData() {
+        if (this.byteBufViewActive) {
+            byte[] copy = new byte[this.viewLength];
+            this.viewByteBuf.getBytes(this.viewOffset, copy);
+            return copy;
+        }
         if (this.dataViewActive) {
             byte[] copy = new byte[this.viewLength];
             System.arraycopy(this.viewBuffer, this.viewOffset, copy, 0, this.viewLength);
@@ -59,13 +68,30 @@ public class SmsSignalInfoImpl implements SmsSignalInfo, MAPAsnPrimitive {
 
     public void setDataView(byte[] buffer, int offset, int length) {
         this.viewBuffer = buffer;
+        this.viewByteBuf = null;
         this.viewOffset = offset;
         this.viewLength = length;
         this.dataViewActive = true;
+        this.byteBufViewActive = false;
+        this.data = null;
+    }
+
+    public void setByteBufView(ByteBuf buffer, int offset, int length) {
+        this.viewByteBuf = buffer;
+        this.viewBuffer = null;
+        this.viewOffset = offset;
+        this.viewLength = length;
+        this.byteBufViewActive = true;
+        this.dataViewActive = false;
         this.data = null;
     }
 
     private byte[] activeData() {
+        if (this.byteBufViewActive) {
+            byte[] copy = new byte[this.viewLength];
+            this.viewByteBuf.getBytes(this.viewOffset, copy);
+            return copy;
+        }
         if (this.dataViewActive) {
             byte[] copy = new byte[this.viewLength];
             System.arraycopy(this.viewBuffer, this.viewOffset, copy, 0, this.viewLength);

@@ -17,7 +17,10 @@ import org.restcomm.protocols.ss7.sccp.parameter.Importance;
 import org.restcomm.protocols.ss7.sccp.parameter.ReturnCause;
 import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+
+import io.netty.buffer.ByteBuf;
 
 /**
  *
@@ -156,6 +159,51 @@ public class MessageFactoryImpl implements MessageFactory {
             msg.decode(in, sccpStackImpl.getSccpProvider().getParameterFactory(), sccpProtocolVersion);
         } else if (logger.isEnabledFor(Level.WARN)) {
             logger.warn("No message implementation for MT: " + type);
+        }
+        return msg;
+    }
+
+    public SccpMessageImpl createMessage(int type, int opc, int dpc, int sls, ByteBuf byteBuf,
+            final SccpProtocolVersion sccpProtocolVersion, int networkId) throws ParseException {
+        if (!byteBuf.isReadable()) {
+            return null;
+        }
+
+        int mt = byteBuf.getUnsignedByte(byteBuf.readerIndex());
+        SccpMessageImpl msg = null;
+        switch (mt) {
+            case SccpMessage.MESSAGE_TYPE_UDT:
+            case SccpMessage.MESSAGE_TYPE_XUDT:
+            case SccpMessage.MESSAGE_TYPE_LUDT:
+                msg = new SccpDataMessageImpl(this.sccpStackImpl.getMaxDataMessage(), mt, opc, dpc, sls, networkId);
+                break;
+
+            case SccpMessage.MESSAGE_TYPE_UDTS:
+            case SccpMessage.MESSAGE_TYPE_XUDTS:
+            case SccpMessage.MESSAGE_TYPE_LUDTS:
+                msg = new SccpNoticeMessageImpl(this.sccpStackImpl.getMaxDataMessage(), mt, opc, dpc, sls, networkId);
+                break;
+
+            default:
+                byte[] copied = new byte[byteBuf.readableBytes()];
+                byteBuf.getBytes(byteBuf.readerIndex(), copied);
+                return createMessage(mt, opc, dpc, sls, new ByteArrayInputStream(copied), sccpProtocolVersion, networkId);
+        }
+
+        if (msg != null) {
+            try {
+                SccpByteBufDecodeReader reader = new SccpByteBufDecodeReader(byteBuf);
+                reader.read(); // message type already consumed by switch
+                ((SccpDataNoticeTemplateMessageImpl) msg).decodeFromByteBuf(reader,
+                        sccpStackImpl.getSccpProvider().getParameterFactory(), sccpProtocolVersion);
+            } catch (java.io.IOException e) {
+                if (logger.isEnabledFor(Level.ERROR)) {
+                    logger.error("Failed to decode SCCP message from ByteBuf", e);
+                }
+                throw new ParseException(e.getMessage(), e);
+            }
+        } else if (logger.isEnabledFor(Level.WARN)) {
+            logger.warn("No message implementation for MT: " + mt);
         }
         return msg;
     }

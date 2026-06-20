@@ -9,6 +9,8 @@ import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
+
+import io.netty.buffer.ByteBuf;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentExceptionReason;
@@ -101,6 +103,15 @@ public abstract class TbcdString implements MAPAsnPrimitive {
         this.data = decodeString(buffer, offset, length);
     }
 
+    public void decodeFromByteBufView(ByteBuf buffer, int offset, int length) throws MAPParsingComponentException {
+        if (length < this.minLength || length > this.maxLength) {
+            throw new MAPParsingComponentException("Error decoding " + _PrimitiveName + ": the field must contain from "
+                    + this.minLength + " to " + this.maxLength + " octets. Contains: " + length,
+                    MAPParsingComponentExceptionReason.MistypedParameter);
+        }
+        this.data = decodeString(buffer, offset, length);
+    }
+
     public void encodeAll(AsnOutputStream asnOutputStream) throws MAPException {
 
         this.encodeAll(asnOutputStream, this.getTagClass(), this.getTag());
@@ -128,6 +139,29 @@ public abstract class TbcdString implements MAPAsnPrimitive {
         StringBuilder s = new StringBuilder();
         for (int i1 = 0; i1 < length; i1++) {
             int b = buffer[offset + i1] & 0xFF;
+
+            int digit1 = (b & DIGIT_1_MASK);
+            if (digit1 == 15) {
+                // this is mask
+            } else {
+                s.append(decodeNumber(digit1));
+            }
+
+            int digit2 = ((b & DIGIT_2_MASK) >> 4);
+            if (digit2 == 15) {
+                // this is mask
+            } else {
+                s.append(decodeNumber(digit2));
+            }
+        }
+
+        return s.toString();
+    }
+
+    public static String decodeString(ByteBuf buffer, int offset, int length) throws MAPParsingComponentException {
+        StringBuilder s = new StringBuilder();
+        for (int i1 = 0; i1 < length; i1++) {
+            int b = buffer.getUnsignedByte(offset + i1);
 
             int digit1 = (b & DIGIT_1_MASK);
             if (digit1 == 15) {

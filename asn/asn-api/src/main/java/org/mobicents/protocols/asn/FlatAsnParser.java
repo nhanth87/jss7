@@ -6,6 +6,8 @@
  */
 package org.mobicents.protocols.asn;
 
+import io.netty.buffer.ByteBuf;
+
 /**
  * Global zero-GC ASN.1 indexer: one linear pass populates an {@link AsnMessageIndex}.
  */
@@ -16,6 +18,18 @@ public final class FlatAsnParser {
 
     public static void parseAll(byte[] buffer, int offset, int length, AsnMessageIndex index) throws AsnException {
         index.reset(buffer);
+        parseAllIndexed(index, offset, length);
+    }
+
+    /**
+     * Zero-copy parse over a {@link ByteBuf} slice. {@code offset} is an absolute index in {@code buffer}.
+     */
+    public static void parseAll(ByteBuf buffer, int offset, int length, AsnMessageIndex index) throws AsnException {
+        index.reset(buffer, offset, length);
+        parseAllIndexed(index, offset, length);
+    }
+
+    private static void parseAllIndexed(AsnMessageIndex index, int offset, int length) throws AsnException {
         int limit = offset + length;
         int cursor = offset;
 
@@ -26,7 +40,7 @@ public final class FlatAsnParser {
             // EOC (0x00 0x00) is only valid inside indefinite-length constructed values.
             // Primitive octet strings (e.g. ISDN addresses) may contain 0x00 0x00 bytes.
             if (stackPointer > 0 && index.valueLengths[parentStack[stackPointer - 1]] == Tag.Indefinite_Length
-                    && isEndOfContents(buffer, cursor, limit)) {
+                    && isEndOfContents(index, cursor, limit)) {
                 cursor += 2;
                 stackPointer = popIndefiniteParents(index, parentStack, stackPointer, cursor);
                 continue;
@@ -41,7 +55,7 @@ public final class FlatAsnParser {
                 throw new AsnException("Truncated ASN.1 buffer reading tag");
             }
 
-            int firstTagByte = buffer[cursor++] & 0xFF;
+            int firstTagByte = index.byteAt(cursor++);
             boolean isConstructed = (firstTagByte & Tag.PC_MASK) != 0;
 
             int tagNum = firstTagByte & Tag.TAG_MASK;
@@ -52,7 +66,7 @@ public final class FlatAsnParser {
                     if (cursor >= limit) {
                         throw new AsnException("Truncated ASN.1 buffer reading multibyte tag");
                     }
-                    temp = buffer[cursor++] & 0xFF;
+                    temp = index.byteAt(cursor++);
                     tagNum = (tagNum << 7) | (temp & 0x7F);
                 } while ((temp & 0x80) != 0);
             }
@@ -61,7 +75,7 @@ public final class FlatAsnParser {
                 throw new AsnException("Truncated ASN.1 buffer reading length");
             }
 
-            long lenPacked = readLengthAndSize(buffer, cursor, limit);
+            long lenPacked = readLengthAndSize(index, cursor, limit);
             int lengthFieldSize = (int) (lenPacked & 0xFFFFFFFFL);
             int valueLength = (int) (lenPacked >>> 32);
             boolean indefinite = valueLength == Tag.Indefinite_Length;
@@ -168,8 +182,8 @@ public final class FlatAsnParser {
         return cursor;
     }
 
-    private static boolean isEndOfContents(byte[] buffer, int cursor, int limit) {
-        return cursor + 1 < limit && buffer[cursor] == 0 && buffer[cursor + 1] == 0;
+    private static boolean isEndOfContents(AsnMessageIndex index, int cursor, int limit) {
+        return cursor + 1 < limit && index.byteAt(cursor) == 0 && index.byteAt(cursor + 1) == 0;
     }
 
     private static int popIndefiniteParents(AsnMessageIndex index, int[] parentStack, int stackPointer, int cursor) {
@@ -209,8 +223,8 @@ public final class FlatAsnParser {
      * @return packed long: value length in high 32 bits, length-field size in low 32 bits.
      *         High 32 bits are {@link Tag#Indefinite_Length} for indefinite form.
      */
-    private static long readLengthAndSize(byte[] buffer, int offset, int limit) throws AsnException {
-        int b = buffer[offset] & 0xFF;
+    private static long readLengthAndSize(AsnMessageIndex index, int offset, int limit) throws AsnException {
+        int b = index.byteAt(offset);
         if ((b & 0x80) == 0) {
             return ((long) b << 32) | 1L;
         }
@@ -223,7 +237,7 @@ public final class FlatAsnParser {
         }
         int valueLength = 0;
         for (int i = 0; i < numLengthBytes; i++) {
-            valueLength = (valueLength << 8) | (buffer[offset + 1 + i] & 0xFF);
+            valueLength = (valueLength << 8) | index.byteAt(offset + 1 + i);
         }
         return ((long) valueLength << 32) | (1L + numLengthBytes);
     }

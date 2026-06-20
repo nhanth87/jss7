@@ -3,6 +3,7 @@ package org.restcomm.protocols.ss7.m3ua.impl.message;
 
 import io.netty.buffer.ByteBuf;
 
+import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.m3ua.impl.message.aspsm.ASPDownAckImpl;
 import org.restcomm.protocols.ss7.m3ua.impl.message.aspsm.ASPDownImpl;
 import org.restcomm.protocols.ss7.m3ua.impl.message.aspsm.ASPUpAckImpl;
@@ -37,6 +38,8 @@ import org.restcomm.protocols.ss7.m3ua.message.MessageType;
  * @author sergey vetyutnev
  */
 public class MessageFactoryImpl implements MessageFactory {
+
+    private static final Logger logger = Logger.getLogger(MessageFactoryImpl.class);
 
     private final PayloadDataPool payloadDataPool;
     
@@ -135,8 +138,8 @@ public class MessageFactoryImpl implements MessageFactory {
     }
 
     public M3UAMessageImpl createMessage(ByteBuf byteBuf) {
-        int dataLen;
         if (byteBuf.readableBytes() < 8) {
+            logger.error(String.format("Truncated M3UA message header: readableBytes=%d", byteBuf.readableBytes()));
             return null;
         }
 
@@ -147,14 +150,30 @@ public class MessageFactoryImpl implements MessageFactory {
         int messageType = byteBuf.readUnsignedByte();
 
         // obtain remaining length of the message and prepare buffer
-        dataLen = byteBuf.readInt() - 8;
+        int dataLen = byteBuf.readInt() - 8;
+        if (dataLen < 0) {
+            logger.error(String.format(
+                    "Malformed M3UA message length: messageClass=%d messageType=%d dataLen=%d",
+                    messageClass, messageType, dataLen));
+            byteBuf.resetReaderIndex();
+            return null;
+        }
         if (byteBuf.readableBytes() < dataLen) {
+            logger.error(String.format(
+                    "Truncated M3UA message: messageClass=%d messageType=%d declaredLen=%d readableBytes=%d",
+                    messageClass, messageType, dataLen, byteBuf.readableBytes()));
             byteBuf.resetReaderIndex();
             return null;
         }
 
         // construct new message instance
         M3UAMessageImpl messageTemp = this.createMessage(messageClass, messageType);
+        if (messageTemp == null) {
+            logger.error(String.format(
+                    "Unknown M3UA message: messageClass=%d messageType=%d", messageClass, messageType));
+            byteBuf.resetReaderIndex();
+            return null;
+        }
 
         // parsing params of this message
         byteBuf.markWriterIndex();

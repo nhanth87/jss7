@@ -2,7 +2,10 @@ package org.restcomm.protocols.ss7.map.service.sms;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
+import org.mobicents.protocols.asn.AsnStreamPool;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
+
+import io.netty.buffer.ByteBuf;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.map.api.service.sms.MWStatus;
 import org.restcomm.protocols.ss7.map.primitives.BitStringBase;
@@ -56,9 +59,20 @@ public class MWStatusImpl extends BitStringBase implements MWStatus {
 
     public void decodeFromBitStringView(byte[] buf, int off, int len) throws MAPParsingComponentException {
         try {
-            byte[] slice = new byte[len];
-            System.arraycopy(buf, off, slice, 0, len);
-            AsnInputStream ais = new AsnInputStream(slice);
+            AsnInputStream ais = AsnStreamPool.borrowSlice(buf, off, len);
+            this._decode(ais, len);
+        } catch (IOException e) {
+            throw new MAPParsingComponentException("IOException when decoding MWStatus view: " + e.getMessage(), e,
+                    MAPParsingComponentExceptionReason.MistypedParameter);
+        } catch (AsnException e) {
+            throw new MAPParsingComponentException("AsnException when decoding MWStatus view: " + e.getMessage(), e,
+                    MAPParsingComponentExceptionReason.MistypedParameter);
+        }
+    }
+
+    public void decodeFromBitStringByteBufView(ByteBuf buf, int off, int len) throws MAPParsingComponentException {
+        try {
+            AsnInputStream ais = AsnStreamPool.borrowByteBufSlice(buf, off, len);
             this._decode(ais, len);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding MWStatus view: " + e.getMessage(), e,

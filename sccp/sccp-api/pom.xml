@@ -49,6 +49,10 @@
 			<version>2.15.2</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-buffer</artifactId>
+		</dependency>
 		
 	</dependencies>
 

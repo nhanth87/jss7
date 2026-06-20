@@ -1,8 +1,8 @@
-# 🚀 jSS7-NG 9.2.10 - Next Generation SS7 Stack
+# 🚀 jSS7-NG 9.2.12 - Next Generation SS7 Stack
 
-> **JCTools Powered | ASN-Optimized | Netty Zero-GC | 84 Modules**
+> **JCTools Powered | Zero-Copy ByteBuf | Flat ASN | Netty Encode | 84 Modules**
 
-[![jSS7-NG](https://img.shields.io/badge/jSS7--NG-9.2.10-blue.svg)](https://github.com/nhanth87/jSS7)
+[![jSS7-NG](https://img.shields.io/badge/jSS7--NG-9.2.12-blue.svg)](https://github.com/nhanth87/jSS7)
 [![JCTools](https://img.shields.io/badge/Javolution--%3E%3E-JCTools-orange.svg)](https://github.com/JCTools/JCTools)
 [![ASN](https://img.shields.io/badge/ASN-Internalized-green.svg)](https://github.com/nhanth87/jSS7)
 [![Modules](https://img.shields.io/badge/Modules-84-brightgreen.svg)](https://github.com/nhanth87/jSS7)
@@ -136,6 +136,34 @@ writer.write(campaigns, "counterCampaigns",
 XmlMapper xmlMapper = new XmlMapper();
 xmlMapper.writeValue(writer, lstCounterCampaign); // One line! ✅
 ```
+
+---
+
+## ⚡ Zero-Copy SS7 Pipeline (9.2.12+)
+
+Inbound SIGTRAN traffic stays on **Netty direct buffers** from SCTP through M3UA and SCCP. No feature flags — always on.
+
+```
+SCTP PayloadData(ByteBuf)
+  → M3UA readSlice() parameters
+  → ProtocolDataImpl.dataBuf (SCCP PDU)
+  → SccpByteBufDecodeReader / CompositeByteBuf (XUDT)
+  → MapFlatAsnDecoder (inbound MAP)
+  → NettyAsnOutputStream (outbound TCAP)
+```
+
+| Layer | Zero-copy inbound | Outbound |
+|-------|-------------------|----------|
+| M3UA | `M3UAMessageImpl.decode()` slice | `encode(ByteBuf)` |
+| SCCP | `receiveM3uaProtocolData(ByteBuf)` | `getData()` copy for legacy send |
+| TCAP | BER heap (inbound) | `TcapOutboundEncoder` direct buffer |
+| MAP | Flat ASN index | Via TCAP |
+
+**Docs:** [../sctp/optimizesctpjss7zerocopy.md](../sctp/optimizesctpjss7zerocopy.md)
+
+**Staging:** `-Dio.netty.leakDetectionLevel=simple`
+
+**Tests:** `M3uaInboundZeroCopyTest`, `SccpByteBufReassemblyTest`, `NettyAsnOutputStreamTest`, `TcapOutboundEncoderTest`
 
 ---
 

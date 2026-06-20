@@ -1,6 +1,7 @@
 
 package org.restcomm.protocols.ss7.tcap;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -12,7 +13,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
 import org.restcomm.protocols.ss7.tcap.api.TCAPException;
 import org.restcomm.protocols.ss7.tcap.api.TCAPSendException;
@@ -95,13 +95,26 @@ public class DialogImpl implements Dialog {
 
     private static final Logger logger = Logger.getLogger(DialogImpl.class);
 
-    private static final ThreadLocal<AsnOutputStream> ASN_OUTPUT_STREAM_POOL =
-            ThreadLocal.withInitial(AsnOutputStream::new);
+    private int encodedPayloadLength(org.restcomm.protocols.ss7.tcap.asn.Encodable message) {
+        TcapOutboundEncoder.EncodedTcapPayload encoded = TcapOutboundEncoder.encode(message);
+        try {
+            return encoded.toByteArray().length;
+        } finally {
+            encoded.release();
+        }
+    }
 
-    private static AsnOutputStream borrowAsnOutputStream() {
-        AsnOutputStream aos = ASN_OUTPUT_STREAM_POOL.get();
-        aos.reset();
-        return aos;
+    private void sendTcapPayload(TcapOutboundEncoder.EncodedTcapPayload encoded, boolean returnMessageOnError)
+            throws IOException {
+        try {
+            this.provider.send(encoded, returnMessageOnError, this.remoteAddress, this.localAddress, this.seqControl,
+                    this.networkId, this.localSsn, this.remotePc);
+        } catch (IOException e) {
+            if (logger.isEnabledFor(Level.ERROR)) {
+                logger.error("Failed to send TCAP payload", e);
+            }
+            throw e;
+        }
     }
 
     private Object userObject;
@@ -574,15 +587,13 @@ public class DialogImpl implements Dialog {
                 tcapBeginMessage.setComponent(componentsToSend);
             }
 
-            AsnOutputStream aos = borrowAsnOutputStream();
+            TcapOutboundEncoder.EncodedTcapPayload encoded = TcapOutboundEncoder.encode(tcapBeginMessage);
             try {
-                tcapBeginMessage.encode(aos);
                 this.setState(TRPseudoState.InitialSent);
                 if (this.provider.getStack().getStatisticsEnabled()) {
                     this.provider.getStack().getCounterProviderImpl().updateTcBeginSentCount(this);
                 }
-                this.provider.send(aos.copyEncodedBytes(), tcapBeginRequest.getReturnMessageOnError(), this.remoteAddress, this.localAddress,
-                        this.seqControl, this.networkId, this.localSsn, this.remotePc);
+                sendTcapPayload(encoded, tcapBeginRequest.getReturnMessageOnError());
                 this.scheduledComponentList.clear();
             } catch (Throwable e) {
                 // FIXME: remove freshly added invokes to free invoke ID??
@@ -655,14 +666,12 @@ public class DialogImpl implements Dialog {
                 if (tcapContinueRequest.getOriginatingAddress() != null && !tcapContinueRequest.getOriginatingAddress().equals(this.localAddress)) {
                     this.localAddress = tcapContinueRequest.getOriginatingAddress();
                 }
-                AsnOutputStream aos = borrowAsnOutputStream();
+                TcapOutboundEncoder.EncodedTcapPayload encoded = TcapOutboundEncoder.encode(tcapContinueMessage);
                 try {
-                    tcapContinueMessage.encode(aos);
                     if (this.provider.getStack().getStatisticsEnabled()) {
                         this.provider.getStack().getCounterProviderImpl().updateTcContinueSentCount(this);
                     }
-                    this.provider.send(aos.copyEncodedBytes(), tcapContinueRequest.getReturnMessageOnError(), this.remoteAddress,
-                            this.localAddress, this.seqControl, this.networkId, this.localSsn, this.remotePc);
+                    sendTcapPayload(encoded, tcapContinueRequest.getReturnMessageOnError());
                     this.setState(TRPseudoState.Active);
                     this.scheduledComponentList.clear();
                 } catch (Exception e) {
@@ -688,12 +697,10 @@ public class DialogImpl implements Dialog {
 
                 }
 
-                AsnOutputStream aos = borrowAsnOutputStream();
+                TcapOutboundEncoder.EncodedTcapPayload encoded = TcapOutboundEncoder.encode(tcapContinueMessage);
                 try {
-                    tcapContinueMessage.encode(aos);
                     this.provider.getStack().getCounterProviderImpl().updateTcContinueSentCount(this);
-                    this.provider.send(aos.copyEncodedBytes(), tcapContinueRequest.getReturnMessageOnError(), this.remoteAddress,
-                            this.localAddress, this.seqControl, this.networkId, this.localSsn, this.remotePc);
+                    sendTcapPayload(encoded, tcapContinueRequest.getReturnMessageOnError());
                     this.scheduledComponentList.clear();
                 } catch (Exception e) {
                     // FIXME: remove freshly added invokes to free invoke ID??
@@ -811,14 +818,12 @@ public class DialogImpl implements Dialog {
                         TRPseudoState.InitialReceived, this.state));
             }
 
-            AsnOutputStream aos = borrowAsnOutputStream();
+            TcapOutboundEncoder.EncodedTcapPayload encoded = TcapOutboundEncoder.encode(tcapEndMessage);
             try {
-                tcapEndMessage.encode(aos);
                 if (this.provider.getStack().getStatisticsEnabled()) {
                     this.provider.getStack().getCounterProviderImpl().updateTcEndSentCount(this);
                 }
-                this.provider.send(aos.copyEncodedBytes(), tcapEndRequest.getReturnMessageOnError(), this.remoteAddress, this.localAddress,
-                        this.seqControl, this.networkId, this.localSsn, this.remotePc);
+                sendTcapPayload(encoded, tcapEndRequest.getReturnMessageOnError());
 
                 this.scheduledComponentList.clear();
             } catch (Exception e) {
@@ -876,14 +881,12 @@ public class DialogImpl implements Dialog {
 
             }
 
-            AsnOutputStream aos = borrowAsnOutputStream();
+            TcapOutboundEncoder.EncodedTcapPayload encoded = TcapOutboundEncoder.encode(tcapUniMessage);
             try {
-                tcapUniMessage.encode(aos);
                 if (this.provider.getStack().getStatisticsEnabled()) {
                     this.provider.getStack().getCounterProviderImpl().updateTcUniSentCount(this);
                 }
-                this.provider.send(aos.copyEncodedBytes(), tcapUniRequest.getReturnMessageOnError(), this.remoteAddress, this.localAddress,
-                        this.seqControl, this.networkId, this.localSsn, this.remotePc);
+                sendTcapPayload(encoded, tcapUniRequest.getReturnMessageOnError());
                 this.scheduledComponentList.clear();
             } catch (Exception e) {
                 if (logger.isEnabledFor(Level.ERROR)) {
@@ -982,14 +985,12 @@ public class DialogImpl implements Dialog {
                 }
 
                 // no components
-                AsnOutputStream aos = borrowAsnOutputStream();
+                TcapOutboundEncoder.EncodedTcapPayload encoded = TcapOutboundEncoder.encode(tcapAbortMessage);
                 try {
-                    tcapAbortMessage.encode(aos);
                     if (this.provider.getStack().getStatisticsEnabled()) {
                         this.provider.getStack().getCounterProviderImpl().updateTcUserAbortSentCount(this);
                     }
-                    this.provider.send(aos.copyEncodedBytes(), tcapUserAbortRequest.getReturnMessageOnError(), this.remoteAddress,
-                            this.localAddress, this.seqControl, this.networkId, this.localSsn, this.remotePc);
+                    sendTcapPayload(encoded, tcapUserAbortRequest.getReturnMessageOnError());
 
                     this.scheduledComponentList.clear();
                 } catch (Exception e) {
@@ -1153,16 +1154,7 @@ public class DialogImpl implements Dialog {
             tcapBeginMessage.setComponent(componentsToSend);
         }
 
-        AsnOutputStream aos = borrowAsnOutputStream();
-        try {
-            tcapBeginMessage.encode(aos);
-        } catch (EncodeException e) {
-            if (logger.isEnabledFor(Level.ERROR)) {
-                logger.error("Failed to encode message while length testing: ", e);
-            }
-            throw new TCAPSendException("Error encoding TCBeginRequest", e);
-        }
-        return aos.size();
+        return encodedPayloadLength(tcapBeginMessage);
     }
 
     public int getDataLength(TCContinueRequest tcapContinueRequest) throws TCAPSendException {
@@ -1200,17 +1192,7 @@ public class DialogImpl implements Dialog {
             tcapContinueMessage.setComponent(componentsToSend);
         }
 
-        AsnOutputStream aos = borrowAsnOutputStream();
-        try {
-            tcapContinueMessage.encode(aos);
-        } catch (Exception e) {
-            if (logger.isEnabledFor(Level.ERROR)) {
-                logger.error("Failed to encode message while length testing: ", e);
-            }
-            throw new TCAPSendException("Error encoding TCContinueRequest", e);
-        }
-
-        return aos.size();
+        return encodedPayloadLength(tcapContinueMessage);
     }
 
     public int getDataLength(TCEndRequest tcapEndRequest) throws TCAPSendException {
@@ -1253,17 +1235,7 @@ public class DialogImpl implements Dialog {
             }
         }
 
-        AsnOutputStream aos = borrowAsnOutputStream();
-        try {
-            tcapEndMessage.encode(aos);
-        } catch (Exception e) {
-            if (logger.isEnabledFor(Level.ERROR)) {
-                logger.error("Failed to encode message while length testing: ", e);
-            }
-            throw new TCAPSendException("Error encoding TCEndRequest", e);
-        }
-
-        return aos.size();
+        return encodedPayloadLength(tcapEndMessage);
     }
 
     public int getDataLength(TCUniRequest tcapUniRequest) throws TCAPSendException {
@@ -1290,17 +1262,7 @@ public class DialogImpl implements Dialog {
 
         }
 
-        AsnOutputStream aos = borrowAsnOutputStream();
-        try {
-            tcapUniMessage.encode(aos);
-        } catch (Exception e) {
-            if (logger.isEnabledFor(Level.ERROR)) {
-                logger.error("Failed to encode message while length testing: ", e);
-            }
-            throw new TCAPSendException("Error encoding TCUniRequest", e);
-        }
-
-        return aos.size();
+        return encodedPayloadLength(tcapUniMessage);
     }
 
     // /////////////////
@@ -1828,15 +1790,13 @@ public class DialogImpl implements Dialog {
                 tcapAbortMessage.setDestinationTransactionId(this.remoteTransactionId);
                 tcapAbortMessage.setDialogPortion(dialogPortion);
 
-                AsnOutputStream aos = borrowAsnOutputStream();
+                TcapOutboundEncoder.EncodedTcapPayload encoded = TcapOutboundEncoder.encode(tcapAbortMessage);
                 try {
-                    tcapAbortMessage.encode(aos);
                     if (this.provider.getStack().getStatisticsEnabled()) {
                         this.provider.getStack().getCounterProviderImpl().updateTcPAbortSentCount(this.remoteTransactionId,
                                 PAbortCauseType.NoReasonGiven);
                     }
-                    this.provider.send(aos.copyEncodedBytes(), false, this.remoteAddress, this.localAddress, this.seqControl,
-                            this.networkId, this.localSsn, this.remotePc);
+                    sendTcapPayload(encoded, false);
                 } catch (Exception e) {
                     if (logger.isEnabledFor(Level.ERROR)) {
                         logger.error("Failed to send message: ", e);

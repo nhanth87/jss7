@@ -248,6 +248,153 @@ public abstract class SccpDataNoticeTemplateMessageImpl extends SccpSegmentableM
         }
     }
 
+    /**
+     * Zero-copy decode for connectionless SCCP messages (UDT/XUDT/LUDT).
+     * User-data fields are retained as {@link io.netty.buffer.ByteBuf} slices.
+     */
+    public void decodeFromByteBuf(SccpByteBufDecodeReader in, ParameterFactory factory,
+            SccpProtocolVersion sccpProtocolVersion) throws ParseException {
+        try {
+            switch (this.type) {
+                case SccpMessage.MESSAGE_TYPE_UDT:
+                case SccpMessage.MESSAGE_TYPE_UDTS: {
+                    this.setSecondParameterData(in.read(), sccpProtocolVersion);
+
+                    int cpaPointer = in.read() & 0xff;
+                    in.mark();
+                    in.skip(cpaPointer - 1);
+                    int len = in.read() & 0xff;
+                    byte[] buffer = new byte[len];
+                    in.readBytes(buffer);
+                    super.calledParty = createAddress(buffer, factory, sccpProtocolVersion);
+
+                    in.reset();
+                    cpaPointer = in.read() & 0xff;
+                    in.mark();
+                    in.skip(cpaPointer - 1);
+                    len = in.read() & 0xff;
+                    buffer = new byte[len];
+                    in.readBytes(buffer);
+                    super.callingParty = createAddress(buffer, factory, sccpProtocolVersion);
+
+                    in.reset();
+                    cpaPointer = in.read() & 0xff;
+                    in.mark();
+                    in.skip(cpaPointer - 1);
+                    len = in.read() & 0xff;
+                    this.setDataBuf(in.readDataSlice(len));
+                }
+                    break;
+
+                case SccpMessage.MESSAGE_TYPE_XUDT:
+                case SccpMessage.MESSAGE_TYPE_XUDTS: {
+                    this.setSecondParameterData(in.read(), sccpProtocolVersion);
+
+                    this.hopCounter = new HopCounterImpl((byte) in.read());
+                    if (this.hopCounter.getValue() > HopCounter.COUNT_HIGH
+                            || this.hopCounter.getValue() <= HopCounter.COUNT_LOW) {
+                        throw new IOException("Hop Counter must be between 1 and 15, it is: " + this.hopCounter);
+                    }
+
+                    int pointer = in.read() & 0xff;
+                    in.mark();
+                    in.skip(pointer - 1);
+                    int len = in.read() & 0xff;
+                    byte[] buffer = new byte[len];
+                    in.readBytes(buffer);
+                    calledParty = createAddress(buffer, factory, sccpProtocolVersion);
+
+                    in.reset();
+                    pointer = in.read() & 0xff;
+                    in.mark();
+                    in.skip(pointer - 1);
+                    len = in.read() & 0xff;
+                    buffer = new byte[len];
+                    in.readBytes(buffer);
+                    callingParty = createAddress(buffer, factory, sccpProtocolVersion);
+
+                    in.reset();
+                    pointer = in.read() & 0xff;
+                    in.mark();
+                    in.skip(pointer - 1);
+                    len = in.read() & 0xff;
+                    this.setDataBuf(in.readDataSlice(len));
+
+                    in.reset();
+                    pointer = in.read() & 0xff;
+                    in.mark();
+                    if (pointer == 0) {
+                        return;
+                    }
+                    in.skip(pointer - 1);
+
+                    int paramCode = 0;
+                    while ((paramCode = in.read() & 0xFF) != 0) {
+                        len = in.read() & 0xff;
+                        buffer = new byte[len];
+                        in.readBytes(buffer);
+                        this.decodeOptional(paramCode, buffer, sccpProtocolVersion);
+                    }
+                }
+                    break;
+
+                case SccpMessage.MESSAGE_TYPE_LUDT:
+                case SccpMessage.MESSAGE_TYPE_LUDTS: {
+                    this.setSecondParameterData(in.read(), sccpProtocolVersion);
+
+                    this.hopCounter = new HopCounterImpl((byte) in.read());
+                    if (this.hopCounter.getValue() > HopCounter.COUNT_HIGH
+                            || this.hopCounter.getValue() <= HopCounter.COUNT_LOW) {
+                        throw new IOException("Hop Counter must be between 1 and 15, it is: " + this.hopCounter);
+                    }
+
+                    int pointer = (in.read() & 0xff) + ((in.read() & 0xff) << 8);
+                    in.mark();
+                    in.skip(pointer - 1);
+                    int len = in.read() & 0xff;
+                    byte[] buffer = new byte[len];
+                    in.readBytes(buffer);
+                    calledParty = createAddress(buffer, factory, sccpProtocolVersion);
+
+                    in.reset();
+                    pointer = (in.read() & 0xff) + ((in.read() & 0xff) << 8);
+                    in.mark();
+                    in.skip(pointer - 1);
+                    len = in.read() & 0xff;
+                    buffer = new byte[len];
+                    in.readBytes(buffer);
+                    callingParty = createAddress(buffer, factory, sccpProtocolVersion);
+
+                    in.reset();
+                    pointer = (in.read() & 0xff) + ((in.read() & 0xff) << 8);
+                    in.mark();
+                    in.skip(pointer - 1);
+                    len = (in.read() & 0xff) + ((in.read() & 0xff) << 8);
+                    this.setDataBuf(in.readDataSlice(len));
+
+                    in.reset();
+                    pointer = (in.read() & 0xff) + ((in.read() & 0xff) << 8);
+                    in.mark();
+                    if (pointer == 0) {
+                        return;
+                    }
+                    in.skip(pointer - 1);
+
+                    int paramCode = 0;
+                    while ((paramCode = in.read() & 0xFF) != 0) {
+                        len = in.read() & 0xff;
+                        buffer = new byte[len];
+                        in.readBytes(buffer);
+                        this.decodeOptional(paramCode, buffer, sccpProtocolVersion);
+                    }
+                }
+                    break;
+            }
+        } catch (IOException e) {
+            throw new ParseException(e);
+        }
+    }
+
     private void decodeOptional(int code, byte[] buffer, final SccpProtocolVersion sccpProtocolVersion) throws ParseException {
 
         switch (code) {

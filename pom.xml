@@ -50,6 +50,10 @@
 		<version.wildfly.as>10.1.0.Final</version.wildfly.as>
 		<version.wildfly.core>2.2.0.Final</version.wildfly.core>
 		<dialogic.version>6.7.1</dialogic.version>
+
+		<!-- MAP flat-index decode (see MapFlatAsnDecoder); zero-copy paths are always enabled -->
+		<jss7.asn.flatIndexEnabled>true</jss7.asn.flatIndexEnabled>
+		<io.netty.leakDetectionLevel>simple</io.netty.leakDetectionLevel>
 		
 	</properties>
 
@@ -117,6 +121,11 @@
 			<dependency>
 				<groupId>io.netty</groupId>
 				<artifactId>netty-codec-base</artifactId>
+				<version>${netty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-buffer</artifactId>
 				<version>${netty.version}</version>
 			</dependency>
 			
