@@ -12,6 +12,7 @@ import org.jctools.queues.MpscArrayQueue;
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
+import org.mobicents.protocols.asn.AsnStreamPool;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
 import org.restcomm.protocols.ss7.cap.api.CAPApplicationContext;
@@ -253,7 +254,7 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
             referenceNumber = new CAPGprsReferenceNumberImpl();
             byte[] asnData = userInfo.getEncodeType();
 
-            AsnInputStream ais = new AsnInputStream(asnData);
+            AsnInputStream ais = AsnStreamPool.borrow(asnData);
 
             int tag = ais.readTag();
             // It should be SEQUENCE Tag
@@ -787,7 +788,7 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
                             try {
                                 byte[] asnData = userInfo.getEncodeType();
 
-                                AsnInputStream ais = new AsnInputStream(asnData);
+                                AsnInputStream ais = AsnStreamPool.borrow(asnData);
 
                                 int tag = ais.readTag();
                                 if (tag != Tag.ENUMERATED || ais.getTagClass() != Tag.CLASS_UNIVERSAL || !ais.isTagPrimitive()) {
@@ -959,7 +960,7 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
                         Parameter p = comp.getParameter();
                         if (p != null && p.getData() != null) {
                             byte[] data = p.getData();
-                            AsnInputStream ais = new AsnInputStream(data, p.getTagClass(), p.isPrimitive(), p.getTag());
+                            AsnInputStream ais = AsnStreamPool.borrowTagged(data, p.getTagClass(), p.isPrimitive(), p.getTag());
                             ((CAPErrorMessageImpl) msgErr).decodeData(ais, data.length);
                         }
                     } catch (CAPParsingComponentException e) {

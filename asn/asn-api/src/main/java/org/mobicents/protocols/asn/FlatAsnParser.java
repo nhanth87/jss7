@@ -11,17 +11,15 @@ package org.mobicents.protocols.asn;
  */
 public final class FlatAsnParser {
 
-    private static final int MAX_DEPTH = 16;
-
     private FlatAsnParser() {
     }
 
-    public static void parseAll(byte[] buffer, int offset, int length, AsnMessageIndex index) {
+    public static void parseAll(byte[] buffer, int offset, int length, AsnMessageIndex index) throws AsnException {
         index.reset(buffer);
         int limit = offset + length;
         int cursor = offset;
 
-        int[] parentStack = new int[MAX_DEPTH];
+        int[] parentStack = index.parentStack;
         int stackPointer = 0;
 
         while (cursor < limit) {
@@ -35,10 +33,14 @@ public final class FlatAsnParser {
             }
 
             if (index.tagCount >= AsnMessageIndex.MAX_TAGS) {
-                return;
+                throw new AsnException("ASN.1 tag count exceeds MAX_TAGS (" + AsnMessageIndex.MAX_TAGS + ")");
             }
 
             int currentTagIndex = index.tagCount;
+            if (cursor >= limit) {
+                throw new AsnException("Truncated ASN.1 buffer reading tag");
+            }
+
             int firstTagByte = buffer[cursor++] & 0xFF;
             boolean isConstructed = (firstTagByte & Tag.PC_MASK) != 0;
 
@@ -48,7 +50,7 @@ public final class FlatAsnParser {
                 tagNum = 0;
                 do {
                     if (cursor >= limit) {
-                        return;
+                        throw new AsnException("Truncated ASN.1 buffer reading multibyte tag");
                     }
                     temp = buffer[cursor++] & 0xFF;
                     tagNum = (tagNum << 7) | (temp & 0x7F);
@@ -56,41 +58,93 @@ public final class FlatAsnParser {
             }
 
             if (cursor >= limit) {
-                return;
+                throw new AsnException("Truncated ASN.1 buffer reading length");
             }
 
-            int lenResult = readLength(buffer, cursor, limit);
-            int valueLength = lenResult & 0x7FFFFFFF;
-            boolean indefinite = (lenResult & 0x80000000) != 0;
-            cursor += lengthFieldSize(buffer, cursor, limit);
+            long lenPacked = readLengthAndSize(buffer, cursor, limit);
+            int lengthFieldSize = (int) (lenPacked & 0xFFFFFFFFL);
+            int valueLength = (int) (lenPacked >>> 32);
+            boolean indefinite = valueLength == Tag.Indefinite_Length;
+            cursor += lengthFieldSize;
 
-            index.tags[currentTagIndex] = firstTagByte;
-            index.valueOffsets[currentTagIndex] = cursor;
-            index.valueLengths[currentTagIndex] = indefinite ? Tag.Indefinite_Length : valueLength;
-
+            int parent;
+            int depth;
             if (stackPointer == 0) {
-                index.parents[currentTagIndex] = -1;
-                index.depths[currentTagIndex] = 0;
+                parent = -1;
+                depth = 0;
             } else {
-                index.parents[currentTagIndex] = parentStack[stackPointer - 1];
-                index.depths[currentTagIndex] = stackPointer;
+                parent = parentStack[stackPointer - 1];
+                depth = stackPointer;
             }
+
+            writeTagEntry(index, currentTagIndex, firstTagByte, tagNum, cursor,
+                    indefinite ? Tag.Indefinite_Length : valueLength, parent, depth);
+            linkChild(index, currentTagIndex, parent);
             index.tagCount++;
 
             if (indefinite) {
                 if (isConstructed) {
-                    parentStack[stackPointer++] = currentTagIndex;
+                    pushParent(parentStack, stackPointer++, currentTagIndex);
                 }
             } else if (isConstructed && valueLength > 0) {
-                parentStack[stackPointer++] = currentTagIndex;
+                pushParent(parentStack, stackPointer++, currentTagIndex);
             } else {
                 cursor += valueLength;
             }
 
             cursor = clampCursorToDefiniteParents(index, parentStack, stackPointer, cursor);
-
             stackPointer = popDefiniteParents(index, parentStack, stackPointer, cursor);
         }
+    }
+
+    private static void writeTagEntry(AsnMessageIndex index, int tagIndex, int firstTagByte, int tagNum,
+            int valueOffset, int valueLength, int parent, int depth) {
+        int base = tagIndex * AsnMessageIndex.STRIDE;
+        index.entries[base + AsnMessageIndex.E_TAG] = firstTagByte;
+        index.entries[base + AsnMessageIndex.E_TAG_NUM] = tagNum;
+        index.entries[base + AsnMessageIndex.E_OFF] = valueOffset;
+        index.entries[base + AsnMessageIndex.E_LEN] = valueLength;
+        index.entries[base + AsnMessageIndex.E_PARENT] = parent;
+        index.entries[base + AsnMessageIndex.E_DEPTH] = depth;
+
+        index.tags[tagIndex] = firstTagByte;
+        index.tagNumbers[tagIndex] = tagNum;
+        index.valueOffsets[tagIndex] = valueOffset;
+        index.valueLengths[tagIndex] = valueLength;
+        index.parents[tagIndex] = parent;
+        index.depths[tagIndex] = depth;
+
+        int firstByte = firstTagByte & 0xFF;
+        if (index.firstOccurrence[firstByte] < 0) {
+            index.firstOccurrence[firstByte] = tagIndex;
+        }
+    }
+
+    private static void linkChild(AsnMessageIndex index, int tagIndex, int parent) {
+        if (parent >= 0) {
+            int prev = index.lastChild[parent];
+            if (prev < 0) {
+                index.firstChild[parent] = tagIndex;
+            } else {
+                index.nextSibling[prev] = tagIndex;
+            }
+            index.lastChild[parent] = tagIndex;
+            return;
+        }
+
+        if (index.rootFirstChild < 0) {
+            index.rootFirstChild = tagIndex;
+        } else {
+            index.nextSibling[index.rootLastChild] = tagIndex;
+        }
+        index.rootLastChild = tagIndex;
+    }
+
+    private static void pushParent(int[] parentStack, int stackPointer, int tagIndex) throws AsnException {
+        if (stackPointer >= AsnMessageIndex.MAX_DEPTH) {
+            throw new AsnException("ASN.1 nesting depth exceeds MAX_DEPTH (" + AsnMessageIndex.MAX_DEPTH + ")");
+        }
+        parentStack[stackPointer] = tagIndex;
     }
 
     /**
@@ -152,42 +206,25 @@ public final class FlatAsnParser {
     }
 
     /**
-     * @return length in low 31 bits; bit 31 set for indefinite form
+     * @return packed long: value length in high 32 bits, length-field size in low 32 bits.
+     *         High 32 bits are {@link Tag#Indefinite_Length} for indefinite form.
      */
-    private static int readLength(byte[] buffer, int offset, int limit) {
-        if (offset >= limit) {
-            return 0;
-        }
+    private static long readLengthAndSize(byte[] buffer, int offset, int limit) throws AsnException {
         int b = buffer[offset] & 0xFF;
         if ((b & 0x80) == 0) {
-            return b;
+            return ((long) b << 32) | 1L;
         }
         int numLengthBytes = b & 0x7F;
         if (numLengthBytes == 0) {
-            return 0x80000000;
+            return ((long) Tag.Indefinite_Length << 32) | 1L;
+        }
+        if (offset + numLengthBytes >= limit) {
+            throw new AsnException("Truncated ASN.1 buffer reading long length");
         }
         int valueLength = 0;
         for (int i = 0; i < numLengthBytes; i++) {
-            if (offset + 1 + i >= limit) {
-                return 0;
-            }
             valueLength = (valueLength << 8) | (buffer[offset + 1 + i] & 0xFF);
         }
-        return valueLength;
-    }
-
-    private static int lengthFieldSize(byte[] buffer, int offset, int limit) {
-        if (offset >= limit) {
-            return 0;
-        }
-        int b = buffer[offset] & 0xFF;
-        if ((b & 0x80) == 0) {
-            return 1;
-        }
-        int numLengthBytes = b & 0x7F;
-        if (numLengthBytes == 0) {
-            return 1;
-        }
-        return 1 + numLengthBytes;
+        return ((long) valueLength << 32) | (1L + numLengthBytes);
     }
 }

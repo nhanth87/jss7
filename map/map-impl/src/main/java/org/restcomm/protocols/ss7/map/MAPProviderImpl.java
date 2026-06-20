@@ -11,6 +11,7 @@ import org.jctools.queues.MpscArrayQueue;
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
+import org.mobicents.protocols.asn.AsnStreamPool;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.map.api.MAPApplicationContext;
 import org.restcomm.protocols.ss7.map.api.MAPApplicationContextName;
@@ -468,7 +469,7 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
             try {
                 byte[] asnData = userInfo.getEncodeType();
 
-                AsnInputStream ais = new AsnInputStream(asnData);
+                AsnInputStream ais = AsnStreamPool.borrow(asnData);
 
                 int tag = ais.readTag();
 
@@ -698,7 +699,7 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
                             try {
                                 byte[] asnData = userInfo.getEncodeType();
 
-                                AsnInputStream ais = new AsnInputStream(asnData);
+                                AsnInputStream ais = AsnStreamPool.borrow(asnData);
 
                                 int tag = ais.readTag();
 
@@ -809,7 +810,7 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
                                 try {
                                     byte[] asnData = userInfo.getEncodeType();
 
-                                    AsnInputStream ais = new AsnInputStream(asnData);
+                                    AsnInputStream ais = AsnStreamPool.borrow(asnData);
 
                                     int tag = ais.readTag();
 
@@ -902,7 +903,7 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
                             try {
                                 byte[] asnData = userInfo.getEncodeType();
 
-                                AsnInputStream ais = new AsnInputStream(asnData);
+                                AsnInputStream ais = AsnStreamPool.borrow(asnData);
 
                                 int tag = ais.readTag();
 
@@ -1022,7 +1023,7 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
                                 try {
                                     byte[] asnData = userInfo.getEncodeType();
 
-                                    AsnInputStream ais = new AsnInputStream(asnData);
+                                    AsnInputStream ais = AsnStreamPool.borrow(asnData);
 
                                     int tag = ais.readTag();
 
@@ -1267,7 +1268,7 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
                         try {
                             byte[] asnData = userInfo.getEncodeType();
 
-                            AsnInputStream ais = new AsnInputStream(asnData);
+                            AsnInputStream ais = AsnStreamPool.borrow(asnData);
 
                             int tag = ais.readTag();
 
@@ -1539,7 +1540,7 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
                         Parameter p = comp.getParameter();
                         if (p != null && p.getData() != null) {
                             byte[] data = p.getData();
-                            AsnInputStream ais = new AsnInputStream(data, p.getTagClass(), p.isPrimitive(), p.getTag());
+                            AsnInputStream ais = AsnStreamPool.borrowTagged(data, p.getTagClass(), p.isPrimitive(), p.getTag());
                             ((MAPErrorMessageImpl) msgErr).decodeData(ais, data.length);
                         }
                     } catch (MAPParsingComponentException e) {
