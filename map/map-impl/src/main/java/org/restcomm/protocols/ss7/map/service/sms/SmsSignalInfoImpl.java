@@ -27,6 +27,11 @@ public class SmsSignalInfoImpl implements SmsSignalInfo, MAPAsnPrimitive {
     private byte[] data;
     private Charset gsm8Charset;
 
+    private boolean dataViewActive;
+    private byte[] viewBuffer;
+    private int viewOffset;
+    private int viewLength;
+
     public SmsSignalInfoImpl() {
     }
 
@@ -44,6 +49,28 @@ public class SmsSignalInfoImpl implements SmsSignalInfo, MAPAsnPrimitive {
     }
 
     public byte[] getData() {
+        if (this.dataViewActive) {
+            byte[] copy = new byte[this.viewLength];
+            System.arraycopy(this.viewBuffer, this.viewOffset, copy, 0, this.viewLength);
+            return copy;
+        }
+        return this.data;
+    }
+
+    public void setDataView(byte[] buffer, int offset, int length) {
+        this.viewBuffer = buffer;
+        this.viewOffset = offset;
+        this.viewLength = length;
+        this.dataViewActive = true;
+        this.data = null;
+    }
+
+    private byte[] activeData() {
+        if (this.dataViewActive) {
+            byte[] copy = new byte[this.viewLength];
+            System.arraycopy(this.viewBuffer, this.viewOffset, copy, 0, this.viewLength);
+            return copy;
+        }
         return this.data;
     }
 
@@ -56,7 +83,8 @@ public class SmsSignalInfoImpl implements SmsSignalInfo, MAPAsnPrimitive {
     }
 
     public SmsTpdu decodeTpdu(boolean mobileOriginatedMessage) throws MAPException {
-        return SmsTpduImpl.createInstance(this.data, mobileOriginatedMessage, this.getGsm8Charset());
+        byte[] payload = activeData();
+        return SmsTpduImpl.createInstance(payload, mobileOriginatedMessage, this.getGsm8Charset());
     }
 
     public int getTag() throws MAPException {
@@ -117,6 +145,13 @@ public class SmsSignalInfoImpl implements SmsSignalInfo, MAPAsnPrimitive {
     }
 
     public void encodeData(AsnOutputStream asnOutputStream) throws MAPException {
+        if (this.dataViewActive) {
+            if (this.viewLength == 0) {
+                throw new MAPException("Error when encoding " + _PrimitiveName + ": data is empty");
+            }
+            asnOutputStream.write(this.viewBuffer, this.viewOffset, this.viewLength);
+            return;
+        }
 
         if (this.data == null || this.data.length == 0)
             throw new MAPException("Error when encoding " + _PrimitiveName + ": data is empty");
@@ -131,8 +166,9 @@ public class SmsSignalInfoImpl implements SmsSignalInfo, MAPAsnPrimitive {
         sb.append("SmsSignalInfo [");
 
         boolean moExists = false;
+        byte[] payload = activeData();
         try {
-            SmsTpdu tpdu = SmsTpduImpl.createInstance(this.data, true, getGsm8Charset());
+            SmsTpdu tpdu = SmsTpduImpl.createInstance(payload, true, getGsm8Charset());
             sb.append("MO case: ");
             sb.append(tpdu.toString());
             moExists = true;
@@ -141,7 +177,7 @@ public class SmsSignalInfoImpl implements SmsSignalInfo, MAPAsnPrimitive {
         try {
             if (moExists)
                 sb.append("\n");
-            SmsTpdu tpdu = SmsTpduImpl.createInstance(this.data, false, getGsm8Charset());
+            SmsTpdu tpdu = SmsTpduImpl.createInstance(payload, false, getGsm8Charset());
             sb.append("MT case: ");
             sb.append(tpdu.toString());
         } catch (MAPException e) {

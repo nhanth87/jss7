@@ -2396,7 +2396,7 @@ public class SgFSMTest {
 
         public boolean validateEvent(TestEvent testEventExpected) {
 
-            TestEvent testEventActual = this.testEvents.removeFirst();
+            TestEvent testEventActual = this.testEvents.remove(0);
 
             if (testEventActual == null) {
                 return false;

@@ -1,7 +1,7 @@
 <?xml version='1.1' encoding='UTF-8'?>
 <TCAPConfig>
-  <dialogTimeout>300000</dialogTimeout>
-  <invokeTimeout>120000</invokeTimeout>
+  <dialogTimeout>120000</dialogTimeout>
+  <invokeTimeout>60000</invokeTimeout>
   <maxDialogs>500000</maxDialogs>
   <dialogIdRangeStart>1</dialogIdRangeStart>
   <dialogIdRangeEnd>2147483647</dialogIdRangeEnd>

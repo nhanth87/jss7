@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite verbose="2" name="Failed suite [Command line suite]">
+  <test name="Command line test(failed)">
+    <classes>
+      <class name="org.restcomm.protocols.ss7.tcap.DialogIdAllocatorTest">
+        <methods>
+          <include name="setUp"/>
+          <include name="allocateAndRelease"/>
+        </methods>
+      </class> <!-- org.restcomm.protocols.ss7.tcap.DialogIdAllocatorTest -->
+    </classes>
+  </test> <!-- Command line test(failed) -->
+</suite> <!-- Failed suite [Command line suite] -->

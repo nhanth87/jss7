@@ -13,9 +13,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import java.io.*;
 import java.util.Map;
 
@@ -23,6 +21,7 @@ import org.restcomm.protocols.ss7.sccp.impl.router.LongMessageRuleMap;
 import org.restcomm.protocols.ss7.sccp.impl.router.Mtp3DestinationMap;
 import org.restcomm.protocols.ss7.sccp.impl.router.Mtp3ServiceAccessPointMap;
 import org.restcomm.protocols.ss7.sccp.impl.router.RouterImpl;
+import org.restcomm.protocols.ss7.utility.SS7XmlMapperFactory;
 
 /**
  * Jackson XML helper for SCCP module XML serialization.
@@ -32,17 +31,7 @@ public class SCCPJacksonXMLHelper {
     private static final XmlMapper xmlMapper;
     
     static {
-        XmlFactory factory = new XmlFactory(
-            new com.ctc.wstx.stax.WstxInputFactory(),
-            new com.ctc.wstx.stax.WstxOutputFactory()
-        );
-        xmlMapper = new XmlMapper(factory);
-        // Configure XmlMapper
-        xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
-        // INDENT_OUTPUT disabled to avoid Stax2WriterAdapter.writeRaw() UnsupportedOperationException
-        // with Jackson-dataformat-xml 2.15.2 + StAX on WildFly 10
-        // xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        xmlMapper = SS7XmlMapperFactory.createSccpStackConfigMapper();
         
         // Register custom module to handle Map<Integer, V> serialization
         // Jackson XML default behavior uses numeric keys as element names, which is invalid XML.

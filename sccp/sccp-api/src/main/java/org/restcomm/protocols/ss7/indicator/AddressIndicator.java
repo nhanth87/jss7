@@ -5,9 +5,6 @@ import org.restcomm.protocols.ss7.sccp.SccpProtocolVersion;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import javolution.xml.XMLFormat;
-import javolution.xml.XMLSerializable;
-import javolution.xml.stream.XMLStreamException;
 
 /**
  * The AI is the first field within Calling Party Address (CgPA) and Called Party Address (CdPA) and is one octet in length. Its
@@ -19,9 +16,7 @@ import javolution.xml.stream.XMLStreamException;
  * @author kulikov
  * @author sergey vetyutnev
  */
-public class AddressIndicator implements XMLSerializable {
-
-    private static final String VALUE = "value";
+public class AddressIndicator {
 
     // Global title indicator
     private GlobalTitleIndicator globalTitleIndicator;
@@ -187,19 +182,6 @@ public class AddressIndicator implements XMLSerializable {
 
         return (byte) b;
     }
-
-    // default XML representation.
-    protected static final XMLFormat<AddressIndicator> XML = new XMLFormat<AddressIndicator>(AddressIndicator.class) {
-
-        public void write(AddressIndicator ai, OutputElement xml) throws XMLStreamException {
-            xml.setAttribute(VALUE, ai.getValue(SccpProtocolVersion.ITU));
-        }
-
-        public void read(InputElement xml, AddressIndicator ai) throws XMLStreamException {
-            byte b = (byte) xml.getAttribute(VALUE).toInt();
-            ai.init(b, SccpProtocolVersion.ITU);
-        }
-    };
 
     @Override
     public int hashCode() {

@@ -14,6 +14,7 @@ import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
+import org.restcomm.protocols.ss7.map.MapFlatAsnDecoder;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.MAPMessageType;
 import org.restcomm.protocols.ss7.map.api.MAPOperationCode;
@@ -120,6 +121,11 @@ public class UnstructuredSSRequestImpl extends SupplementaryMessageImpl implemen
     public void decodeAll(AsnInputStream asnInputStream) throws MAPParsingComponentException {
         try {
             int length = asnInputStream.readLength();
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applyUssdFields(MapFlatAsnDecoder.decodeUssdSequence(asnInputStream, length, true,
+                        "UnstructuredSSRequestIndication"));
+                return;
+            }
             this._decode(asnInputStream, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding UnstructuredSSRequestIndication: "
@@ -132,6 +138,11 @@ public class UnstructuredSSRequestImpl extends SupplementaryMessageImpl implemen
 
     public void decodeData(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException {
         try {
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applyUssdFields(MapFlatAsnDecoder.decodeUssdSequence(asnInputStream, length, true,
+                        "UnstructuredSSRequestIndication"));
+                return;
+            }
             this._decode(asnInputStream, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding UnstructuredSSRequestIndication: "
@@ -140,6 +151,13 @@ public class UnstructuredSSRequestImpl extends SupplementaryMessageImpl implemen
             throw new MAPParsingComponentException("AsnException when decoding UnstructuredSSRequestIndication: "
                     + e.getMessage(), e, MAPParsingComponentExceptionReason.MistypedParameter);
         }
+    }
+
+    private void applyUssdFields(MapFlatAsnDecoder.UssdFields fields) {
+        this.ussdDataCodingSch = fields.dataCodingScheme;
+        this.ussdString = fields.ussdString;
+        this.msisdnAddressString = fields.msisdn;
+        this.alertingPattern = fields.alertingPattern;
     }
 
     private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {

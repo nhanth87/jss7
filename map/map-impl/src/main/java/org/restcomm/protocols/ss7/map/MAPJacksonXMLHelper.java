@@ -1,6 +1,5 @@
 package org.restcomm.protocols.ss7.map;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.AbstractTypeResolver;
@@ -12,28 +11,17 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import org.mobicents.protocols.asn.BitSetStrictLength;
+import org.restcomm.protocols.ss7.utility.SS7XmlMapperFactory;
 
 public class MAPJacksonXMLHelper {
     private static final XmlMapper XML_MAPPER;
     
     static {
-        XmlFactory factory = new XmlFactory(
-            new com.ctc.wstx.stax.WstxInputFactory(),
-            new com.ctc.wstx.stax.WstxOutputFactory()
-        );
-        XML_MAPPER = new XmlMapper(factory);
-        
-        // Enable pretty printing for XML output
-        XML_MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
-        XML_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        XML_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        XML_MAPPER = SS7XmlMapperFactory.createProtocolMapper();
         SimpleModule module = new SimpleModule("mapjacksonxml-module") {
             @Override
             public void setupModule(SetupContext context) {

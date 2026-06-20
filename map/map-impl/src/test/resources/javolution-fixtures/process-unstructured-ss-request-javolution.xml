@@ -1,0 +1,5 @@
+<processUnstructuredSSRequest_Request dataCodingScheme="15">
+  <string>*234#</string>
+  <msisdn number="79273605819" NAI="international_number" NPI="ISDN"/>
+  <alertingPattern value="6"/>
+</processUnstructuredSSRequest_Request>

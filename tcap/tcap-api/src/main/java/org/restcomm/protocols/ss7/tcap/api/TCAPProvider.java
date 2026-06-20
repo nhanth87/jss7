@@ -118,6 +118,14 @@ public interface TCAPProvider extends Serializable {
     int getCurrentDialogsCount();
 
     /**
+     * Returns the TCAP dialog for the given local transaction id, or null if not found.
+     *
+     * @param localDialogId local transaction id
+     * @return active TCAP dialog or null
+     */
+    Dialog getDialog(Long localDialogId);
+
+    /**
      * Parsing of encoded TCAP message for getting only message type, origination/destination dialogId
      *
      * @param data

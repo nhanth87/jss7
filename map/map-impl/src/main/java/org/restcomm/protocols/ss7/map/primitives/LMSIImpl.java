@@ -21,6 +21,11 @@ public class LMSIImpl implements LMSI, MAPAsnPrimitive {
 
     private byte[] data;
 
+    private boolean dataViewActive;
+    private byte[] viewBuffer;
+    private int viewOffset;
+    private int viewLength;
+
     public LMSIImpl() {
     }
 
@@ -41,7 +46,24 @@ public class LMSIImpl implements LMSI, MAPAsnPrimitive {
     }
 
     public byte[] getData() {
+        if (this.dataViewActive) {
+            byte[] copy = new byte[4];
+            System.arraycopy(this.viewBuffer, this.viewOffset, copy, 0, 4);
+            return copy;
+        }
         return this.data;
+    }
+
+    public void decodeFromOctetView(byte[] buffer, int offset, int length) throws MAPParsingComponentException {
+        if (length != 4) {
+            throw new MAPParsingComponentException("Error decoding LMSI: the LMSI field must contain 4 octets. Contains: "
+                    + length, MAPParsingComponentExceptionReason.MistypedParameter);
+        }
+        this.viewBuffer = buffer;
+        this.viewOffset = offset;
+        this.viewLength = 4;
+        this.dataViewActive = true;
+        this.data = null;
     }
 
     public void decodeAll(AsnInputStream asnInputStream) throws MAPParsingComponentException {
@@ -69,6 +91,7 @@ public class LMSIImpl implements LMSI, MAPAsnPrimitive {
                     + length, MAPParsingComponentExceptionReason.MistypedParameter);
 
         try {
+            this.dataViewActive = false;
             this.data = new byte[4];
             asnInputStream.read(this.data);
         } catch (IOException e) {
@@ -93,6 +116,10 @@ public class LMSIImpl implements LMSI, MAPAsnPrimitive {
     }
 
     public void encodeData(AsnOutputStream asnOutputStream) throws MAPException {
+        if (this.dataViewActive) {
+            asnOutputStream.write(this.viewBuffer, this.viewOffset, this.viewLength);
+            return;
+        }
         if (this.data == null)
             throw new MAPException("Error while encoding the LMSI: data is not defined");
 

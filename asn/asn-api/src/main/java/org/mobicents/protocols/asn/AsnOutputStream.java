@@ -57,19 +57,49 @@ public class AsnOutputStream extends OutputStream {
 	
 	
 	/**
+	 * Returns the internal buffer backing this stream.
+	 */
+	public byte[] getBuffer() {
+		return this.buffer;
+	}
+
+	/**
+	 * Returns the number of encoded bytes currently written.
+	 */
+	public int getEncodedLength() {
+		return this.pos;
+	}
+
+	/**
+	 * Returns encoded bytes without copying when the buffer is exactly filled ({@code pos == capacity}).
+	 * Otherwise copies {@code [0, pos)}. Retained references may be invalidated after {@link #reset()}.
+	 */
+	public byte[] getEncodedBytes() {
+		if (this.pos == this.length) {
+			return this.buffer;
+		}
+		return copyEncodedBytes();
+	}
+
+	/**
+	 * Always copies the encoded region {@code [0, pos)} for safe hand-off (e.g. pooled send paths).
+	 */
+	public byte[] copyEncodedBytes() {
+		if (this.pos == 0) {
+			return new byte[0];
+		}
+		byte[] res = new byte[this.pos];
+		System.arraycopy(this.buffer, 0, res, 0, this.pos);
+		return res;
+	}
+
+	/**
 	 * Returns the written to the stream data as a byte array
 	 * 
 	 * @return
 	 */
 	public byte[] toByteArray() {
-		
-		if (this.pos == this.length)
-			return this.buffer;
-		else {
-			byte[] res = new byte[this.pos];
-			System.arraycopy(this.buffer, 0, res, 0, this.pos);
-			return res;
-		}
+		return getEncodedBytes();
 	}
 	
 	/**

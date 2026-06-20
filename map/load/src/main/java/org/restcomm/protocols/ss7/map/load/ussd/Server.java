@@ -196,6 +196,7 @@ public class Server extends TestHarnessUssd {
         // Step 1 : Create AS
         As as = this.serverM3UAMgmt.createAs("AS1", AS_FUNCTIONALITY, ExchangeType.SE, ipspType, rc, trafficModeType,1, na);
         // Step 2 : Create ASP
+        this.sctpManagement.stopAssociation(SERVER_ASSOCIATION_NAME);
         AspFactory aspFactor = this.serverM3UAMgmt.createAspFactory("ASP1", SERVER_ASSOCIATION_NAME);
         // Step 3 : Assign ASP to AS
         Asp asp = this.serverM3UAMgmt.assignAspToAs("AS1", "ASP1");

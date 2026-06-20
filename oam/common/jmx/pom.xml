@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.restcomm.protocols.ss7.oam.common</groupId>
 		<artifactId>restcomm-ss7-oam-common</artifactId>
-		<version>9.2.11</version>
+		<version>9.2.12</version>
 	</parent>
 
 	<artifactId>jmx</artifactId>
@@ -46,6 +46,11 @@
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-xml</artifactId>
 			<version>2.15.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.ss7ext</groupId>
+			<artifactId>ss7-ext-api</artifactId>
+			<version>${project.version}</version>
 		</dependency>
     </dependencies>
 

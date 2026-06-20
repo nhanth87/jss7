@@ -92,6 +92,15 @@ public abstract class TbcdString implements MAPAsnPrimitive {
         }
     }
 
+    public void decodeFromOctetView(byte[] buffer, int offset, int length) throws MAPParsingComponentException {
+        if (length < this.minLength || length > this.maxLength) {
+            throw new MAPParsingComponentException("Error decoding " + _PrimitiveName + ": the field must contain from "
+                    + this.minLength + " to " + this.maxLength + " octets. Contains: " + length,
+                    MAPParsingComponentExceptionReason.MistypedParameter);
+        }
+        this.data = decodeString(buffer, offset, length);
+    }
+
     public void encodeAll(AsnOutputStream asnOutputStream) throws MAPException {
 
         this.encodeAll(asnOutputStream, this.getTagClass(), this.getTag());
@@ -113,6 +122,29 @@ public abstract class TbcdString implements MAPAsnPrimitive {
             throw new MAPException("Error while encoding the " + _PrimitiveName + ": data is not defined");
 
         encodeString(asnOutputStream, this.data);
+    }
+
+    public static String decodeString(byte[] buffer, int offset, int length) throws MAPParsingComponentException {
+        StringBuilder s = new StringBuilder();
+        for (int i1 = 0; i1 < length; i1++) {
+            int b = buffer[offset + i1] & 0xFF;
+
+            int digit1 = (b & DIGIT_1_MASK);
+            if (digit1 == 15) {
+                // this is mask
+            } else {
+                s.append(decodeNumber(digit1));
+            }
+
+            int digit2 = ((b & DIGIT_2_MASK) >> 4);
+            if (digit2 == 15) {
+                // this is mask
+            } else {
+                s.append(decodeNumber(digit2));
+            }
+        }
+
+        return s.toString();
     }
 
     public static String decodeString(InputStream inputStream, int length) throws IOException, MAPParsingComponentException {

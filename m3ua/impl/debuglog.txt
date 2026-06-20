@@ -4023,3 +4023,765 @@ java.lang.UnsupportedOperationException: remove
 [2026-04-16 21:32:39,987] INFO  2477[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:837) - Removing allocated resources: AppServers=1, AspFactories=1
 [2026-04-16 21:32:40,073] INFO  2563[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:273) - M3UA configuration file path /mnt/c/Users/Windows/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/M3UAManagementTest_m3ua1.xml
 [2026-04-16 21:32:40,112] INFO  2602[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:294) - Started M3UAManagement
+[2026-06-20 21:11:36,150] WARN     0[main] - org.restcomm.protocols.ss7.m3ua.impl.AspFactoryImpl.processPayload(AspFactoryImpl.java:910) - JENNY-RECV-M3UA: AspFactory=M3uaAspFact msgClass=1 msgType=1
+[2026-06-20 21:11:36,157] WARN     7[main] - org.restcomm.protocols.ss7.m3ua.impl.AspFactoryImpl.processPayload(AspFactoryImpl.java:910) - JENNY-RECV-M3UA: AspFactory=M3uaAspFact msgClass=1 msgType=1
+[2026-06-20 21:11:36,177] WARN    27[main] - org.restcomm.ss7.congestion.BaseCongestionMonitor.applyNewValue(BaseCongestionMonitor.java:89) - CongestionMonitor-TestMonitor: congestion increase up to level 1, counter value=5.5, description=Test error description
+[2026-06-20 21:11:36,179] WARN    29[main] - org.restcomm.ss7.congestion.BaseCongestionMonitor.applyNewValue(BaseCongestionMonitor.java:75) - CongestionMonitor-TestMonitor: congestion decrease down to level 0, counter value=0.0, description=Test error description
+[2026-06-20 21:11:36,180] WARN    30[main] - org.restcomm.ss7.congestion.BaseCongestionMonitor.applyNewValue(BaseCongestionMonitor.java:89) - CongestionMonitor-TestMonitor: congestion increase up to level 3, counter value=600.0, description=Test error description
+[2026-06-20 21:11:36,181] WARN    31[main] - org.restcomm.ss7.congestion.BaseCongestionMonitor.applyNewValue(BaseCongestionMonitor.java:75) - CongestionMonitor-TestMonitor: congestion decrease down to level 1, counter value=3.0, description=Test error description
+[2026-06-20 21:11:45,214] INFO  9064[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.start(NettySctpManagementImpl.java:329) - SCTP configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/GatewayTest_sctp.xml
+[2026-06-20 21:11:45,663] WARN  9513[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.start(NettySctpManagementImpl.java:344) - Failed to load the SCTP configuration file. 
+/home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/GatewayTest_sctp.xml (No such file or directory)
+[2026-06-20 21:11:45,664] INFO  9514[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.start(NettySctpManagementImpl.java:348) - Started SCTP Management=GatewayTest
+[2026-06-20 21:11:45,831] INFO  9681[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:277) - M3UA configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/GatewayTest_m3ua1.xml
+[2026-06-20 21:11:46,232] WARN 10082[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:288) - JENNY-M3UA-START: aspFactories size=0 transportManagement=org.mobicents.protocols.sctp.netty.NettySctpManagementImpl@5e2c3d18
+[2026-06-20 21:11:46,263] INFO 10113[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:380) - Started M3UAManagement
+[2026-06-20 21:11:47,171] INFO 11021[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.addServer(NettySctpManagementImpl.java:542) - Created Server=testserver
+[2026-06-20 21:11:47,175] WARN 11025[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.store(NettySctpManagementImpl.java:1441) - JENNY-DEBUG-STORE: assoc=serverAssociation started=false listener=null
+[2026-06-20 21:11:47,193] INFO 11043[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.addServerAssociation(NettySctpManagementImpl.java:788) - Added Association=serverAssociation of type=SERVER
+[2026-06-20 21:11:47,516] INFO 11366[Sctp-BossGroup-GatewayTest-1-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xc3428047] REGISTERED
+[2026-06-20 21:11:47,518] INFO 11368[Sctp-BossGroup-GatewayTest-1-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xc3428047] BIND: /127.0.0.1:2365
+[2026-06-20 21:11:47,525] INFO 11375[main] - org.mobicents.protocols.sctp.netty.NettyServerImpl.initSocket(NettyServerImpl.java:408) - SctpServerChannel bound to=[/127.0.0.1:2365] 
+[2026-06-20 21:11:47,527] WARN 11377[main] - org.mobicents.protocols.sctp.netty.NettyAssociationImpl.start(NettyAssociationImpl.java:567) - AssociationListener is null for Association=serverAssociation. Starting SERVER association anyway. Listener will be set by application layer.
+[2026-06-20 21:11:47,526] INFO 11376[Sctp-BossGroup-GatewayTest-1-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xc3428047, L:/127.0.0.1:2365] ACTIVE
+[2026-06-20 21:11:47,529] INFO 11379[main] - org.mobicents.protocols.sctp.netty.NettyAssociationImpl.start(NettyAssociationImpl.java:587) - Started Association=Association [name=serverAssociation, associationType=SERVER, ipChannelType=SCTP, hostAddress=null, hostPort=0, peerAddress=127.0.0.1, peerPort=2366, serverName=testserver, started=true, extraHostAddress=[]]
+[2026-06-20 21:11:47,531] WARN 11381[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.store(NettySctpManagementImpl.java:1441) - JENNY-DEBUG-STORE: assoc=serverAssociation started=true listener=null
+[2026-06-20 21:11:47,532] INFO 11382[main] - org.mobicents.protocols.sctp.netty.NettyServerImpl.start(NettyServerImpl.java:317) - Started SERVER Association=serverAssociation for Server=testserver
+[2026-06-20 21:11:47,533] INFO 11383[main] - org.mobicents.protocols.sctp.netty.NettyServerImpl.start(NettyServerImpl.java:327) - Started Server=testserver
+[2026-06-20 21:11:47,533] WARN 11383[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.store(NettySctpManagementImpl.java:1441) - JENNY-DEBUG-STORE: assoc=serverAssociation started=true listener=null
+[2026-06-20 21:11:47,612] WARN 11462[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.store(NettySctpManagementImpl.java:1441) - JENNY-DEBUG-STORE: assoc=serverAssociation started=true listener=null
+[2026-06-20 21:11:47,614] INFO 11464[main] - org.mobicents.protocols.sctp.netty.NettyAssociationImpl.stop(NettyAssociationImpl.java:602) - Management requested to stop Association [name=serverAssociation, associationType=SERVER, ipChannelType=SCTP, hostAddress=null, hostPort=0, peerAddress=127.0.0.1, peerPort=2366, serverName=testserver, started=true, extraHostAddress=[]]
+[2026-06-20 21:11:47,615] INFO 11465[main] - org.mobicents.protocols.sctp.netty.NettyServerImpl.stop(NettyServerImpl.java:349) - Stopped Server=testserver
+[2026-06-20 21:11:47,616] INFO 11466[Sctp-BossGroup-GatewayTest-1-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xc3428047, L:/127.0.0.1:2365] CLOSE
+[2026-06-20 21:11:47,618] INFO 11468[Sctp-BossGroup-GatewayTest-1-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xc3428047, L:/127.0.0.1:2365] INACTIVE
+[2026-06-20 21:11:47,618] INFO 11468[Sctp-BossGroup-GatewayTest-1-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xc3428047, L:/127.0.0.1:2365] UNREGISTERED
+[2026-06-20 21:11:47,626] INFO 11476[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:277) - M3UA configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/IPSPClientFSMTest_m3ua1.xml
+[2026-06-20 21:11:47,825] WARN 11675[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:288) - JENNY-M3UA-START: aspFactories size=0 transportManagement=org.restcomm.protocols.ss7.m3ua.impl.IPSPClientFSMTest$NettyTransportManagement@6c2ed0cd
+[2026-06-20 21:11:47,826] INFO 11676[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:380) - Started M3UAManagement
+[2026-06-20 21:11:47,891] WARN 11741[main] - org.restcomm.protocols.ss7.m3ua.impl.AspFactoryImpl.start(AspFactoryImpl.java:201) - JENNY-FACTORY-START: AspFactory=testasp set listener on existing Association=null up=false
+[2026-06-20 21:11:47,911] INFO 11761[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:923) - Removing allocated resources: AppServers=1, AspFactories=1
+[2026-06-20 21:11:47,923] INFO 11773[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:277) - M3UA configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/IPSPServerFSMTest_m3ua1.xml
+[2026-06-20 21:11:47,926] WARN 11776[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:288) - JENNY-M3UA-START: aspFactories size=0 transportManagement=org.restcomm.protocols.ss7.m3ua.impl.IPSPServerFSMTest$NettyTransportManagement@35645047
+[2026-06-20 21:11:47,927] INFO 11777[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:380) - Started M3UAManagement
+[2026-06-20 21:11:47,939] WARN 11789[main] - org.restcomm.protocols.ss7.m3ua.impl.AspFactoryImpl.handleCommUp(AspFactoryImpl.java:779) - JENNY-HANDLE-COMMUP: AspFactory=testasp func=IPSP exchange=SE ipspType=SERVER willSendAspUp=false
+[2026-06-20 21:11:47,944] WARN 11794[main] - org.restcomm.protocols.ss7.m3ua.impl.AspTrafficMaintenanceHandler.handleAspActive(AspTrafficMaintenanceHandler.java:34) - JENNY-HANDLE-ASPACTIVE: AspFactory=testasp func=IPSP exchange=SE ipspType=SERVER aspListSize=1
+[2026-06-20 21:11:47,945] WARN 11795[main] - org.restcomm.protocols.ss7.m3ua.impl.AspTrafficMaintenanceHandler.handleAspActive(AspTrafficMaintenanceHandler.java:57) - JENNY-HANDLE-ASPACTIVE: ASP=testasp peerFSM=INACTIVE AS=testas AS-RC=[100] msgRC=[100]
+[2026-06-20 21:11:47,946] WARN 11796[main] - org.restcomm.protocols.ss7.m3ua.impl.AspTrafficMaintenanceHandler.handleAspActive(AspTrafficMaintenanceHandler.java:114) - JENNY-HANDLE-ASPACTIVE: Sending ASP_ACTIVE_ACK for ASP=testasp
+[2026-06-20 21:11:50,428] INFO 14278[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:923) - Removing allocated resources: AppServers=1, AspFactories=1
+[2026-06-20 21:11:50,450] INFO 14300[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:277) - M3UA configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/M3UAManagementTest_m3ua1.xml
+[2026-06-20 21:11:50,457] WARN 14307[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:288) - JENNY-M3UA-START: aspFactories size=0 transportManagement=org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementTest$NettyTransportManagement@30c93896
+[2026-06-20 21:11:50,459] INFO 14309[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:380) - Started M3UAManagement
+[2026-06-20 21:11:50,469] INFO 14319[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:277) - M3UA configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/M3UAManagementTest_m3ua1.xml
+[2026-06-20 21:11:50,471] WARN 14321[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:288) - JENNY-M3UA-START: aspFactories size=0 transportManagement=org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementTest$NettyTransportManagement@67d18ed7
+[2026-06-20 21:11:50,471] INFO 14321[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:380) - Started M3UAManagement
+[2026-06-20 21:11:50,475] WARN 14325[main] - org.restcomm.protocols.ss7.m3ua.impl.AspFactoryImpl.start(AspFactoryImpl.java:201) - JENNY-FACTORY-START: AspFactory=ASP1 set listener on existing Association=ASPAssoc1 up=false
+[2026-06-20 21:11:50,487] INFO 14337[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:277) - M3UA configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/M3UAManagementTest_m3ua1.xml
+[2026-06-20 21:11:50,492] WARN 14342[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.loadVer2(M3UAManagementImpl.java:1303) - JENNY-DESER-FACTORY: name=ASP1 assocName=ASPAssoc1 started=true
+[2026-06-20 21:11:50,493] WARN 14343[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.loadActualData(M3UAManagementImpl.java:1234) - JENNY-LOAD-AS: as=AS1 tempAspSize=0 aspFactoryNames=null
+[2026-06-20 21:11:50,497] WARN 14347[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:288) - JENNY-M3UA-START: aspFactories size=1 transportManagement=org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementTest$NettyTransportManagement@67d18ed7
+[2026-06-20 21:11:50,498] WARN 14348[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:291) - JENNY-M3UA-START: factory=ASP1 assoc=org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementTest$TestAssociation@5f354bcf assocName=ASPAssoc1 status=true
+[2026-06-20 21:11:50,498] WARN 14348[main] - org.restcomm.protocols.ss7.m3ua.impl.AspFactoryImpl.start(AspFactoryImpl.java:201) - JENNY-FACTORY-START: AspFactory=ASP1 set listener on existing Association=ASPAssoc1 up=false
+[2026-06-20 21:11:50,499] INFO 14349[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:310) - Auto-started AspFactory=ASP1 after loading config (status=true)
+[2026-06-20 21:11:50,499] INFO 14349[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:380) - Started M3UAManagement
+[2026-06-20 21:11:50,514] INFO 14364[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:277) - M3UA configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/M3UAManagementTest_m3ua1.xml
+[2026-06-20 21:11:50,517] WARN 14367[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.loadVer2(M3UAManagementImpl.java:1303) - JENNY-DESER-FACTORY: name=ASP1 assocName=ASPAssoc1 started=false
+[2026-06-20 21:11:50,518] WARN 14368[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.loadActualData(M3UAManagementImpl.java:1234) - JENNY-LOAD-AS: as=AS1 tempAspSize=0 aspFactoryNames=null
+[2026-06-20 21:11:50,518] WARN 14368[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.loadActualData(M3UAManagementImpl.java:1279) - Association=ASPAssoc1 for AspFactory=ASP1 not yet available during load, will retry on start
+[2026-06-20 21:11:50,521] WARN 14371[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:288) - JENNY-M3UA-START: aspFactories size=1 transportManagement=org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementTest$NettyTransportManagement@5a2d131d
+[2026-06-20 21:11:50,521] WARN 14371[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:291) - JENNY-M3UA-START: factory=ASP1 assoc=null assocName=ASPAssoc1 status=false
+[2026-06-20 21:11:50,522] INFO 14372[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:380) - Started M3UAManagement
+[2026-06-20 21:11:50,523] INFO 14373[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:923) - Removing allocated resources: AppServers=1, AspFactories=1
+[2026-06-20 21:11:50,531] INFO 14381[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:277) - M3UA configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/M3UAManagementTest_OldVerToNewVers_m3ua1.xml
+[2026-06-20 21:11:50,531] WARN 14381[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.loadVer1(M3UAManagementImpl.java:1294) - Legacy M3UA config format (v1) not supported, using defaults
+[2026-06-20 21:11:50,534] WARN 14384[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:288) - JENNY-M3UA-START: aspFactories size=0 transportManagement=org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementTest$NettyTransportManagement@5a2d131d
+[2026-06-20 21:11:50,535] INFO 14385[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:380) - Started M3UAManagement
+[2026-06-20 21:11:50,544] INFO 14394[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:277) - M3UA configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/M3UAShellExecutorTest_m3ua1.xml
+[2026-06-20 21:11:50,546] WARN 14396[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:288) - JENNY-M3UA-START: aspFactories size=0 transportManagement=org.restcomm.protocols.ss7.m3ua.impl.oam.M3UAShellExecutorTest$TransportManagement@30e868be
+[2026-06-20 21:11:50,547] INFO 14397[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:380) - Started M3UAManagement
+[2026-06-20 21:11:50,549]ERROR 14399[main] - org.restcomm.protocols.ss7.m3ua.impl.oam.M3UAShellExecutor.executeM3UA(M3UAShellExecutor.java:716) - Error while executing command [m3ua, as, create, testas, AS, mode, SE, rc, 100, traffic-mode, loadshare]
+java.lang.Exception: Creation of AS failed. Other AS with name=testas already exist
+	at org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.createAs(M3UAManagementImpl.java:480)
+	at org.restcomm.protocols.ss7.m3ua.impl.oam.M3UAShellExecutor.createAs(M3UAShellExecutor.java:141)
+	at org.restcomm.protocols.ss7.m3ua.impl.oam.M3UAShellExecutor.executeM3UA(M3UAShellExecutor.java:418)
+	at org.restcomm.protocols.ss7.m3ua.impl.oam.M3UAShellExecutor.execute(M3UAShellExecutor.java:985)
+	at org.restcomm.protocols.ss7.m3ua.impl.oam.M3UAShellExecutorTest.testServerCommands(M3UAShellExecutorTest.java:100)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.testng.internal.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:80)
+	at org.testng.internal.Invoker.invokeMethod(Invoker.java:691)
+	at org.testng.internal.Invoker.invokeTestMethod(Invoker.java:883)
+	at org.testng.internal.Invoker.invokeTestMethods(Invoker.java:1208)
+	at org.testng.internal.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:127)
+	at org.testng.internal.TestMethodWorker.run(TestMethodWorker.java:111)
+	at org.testng.TestRunner.privateRun(TestRunner.java:754)
+	at org.testng.TestRunner.run(TestRunner.java:614)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:335)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:330)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:292)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:241)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1169)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1094)
+	at org.testng.TestNG.run(TestNG.java:1006)
+	at org.apache.maven.surefire.testng.TestNGExecutor.run(TestNGExecutor.java:132)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.executeMulti(TestNGDirectoryTestSuite.java:193)
+	at org.apache.maven.surefire.testng.TestNGDirectoryTestSuite.execute(TestNGDirectoryTestSuite.java:94)
+	at org.apache.maven.surefire.testng.TestNGProvider.invoke(TestNGProvider.java:147)
+	at org.apache.maven.surefire.booter.ForkedBooter.invokeProviderInSameClassLoader(ForkedBooter.java:290)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:242)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:121)
+[2026-06-20 21:11:50,557] INFO 14407[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:923) - Removing allocated resources: AppServers=4, AspFactories=2
+[2026-06-20 21:11:50,658] INFO 14508[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.start(NettySctpManagementImpl.java:329) - SCTP configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/RKMTest-client_sctp.xml
+[2026-06-20 21:11:50,660] WARN 14510[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.start(NettySctpManagementImpl.java:344) - Failed to load the SCTP configuration file. 
+/home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/RKMTest-client_sctp.xml (No such file or directory)
+[2026-06-20 21:11:50,661] INFO 14511[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.start(NettySctpManagementImpl.java:348) - Started SCTP Management=RKMTest-client
+[2026-06-20 21:11:50,663] INFO 14513[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.start(NettySctpManagementImpl.java:329) - SCTP configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/RKMTest-server_sctp.xml
+[2026-06-20 21:11:50,664] WARN 14514[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.start(NettySctpManagementImpl.java:344) - Failed to load the SCTP configuration file. 
+/home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/RKMTest-server_sctp.xml (No such file or directory)
+[2026-06-20 21:11:50,665] INFO 14515[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.start(NettySctpManagementImpl.java:348) - Started SCTP Management=RKMTest-server
+[2026-06-20 21:11:50,669] INFO 14519[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:277) - M3UA configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/RKMTest-client_m3ua1.xml
+[2026-06-20 21:11:50,672] WARN 14522[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:288) - JENNY-M3UA-START: aspFactories size=0 transportManagement=org.mobicents.protocols.sctp.netty.NettySctpManagementImpl@61a88b8c
+[2026-06-20 21:11:50,674] INFO 14524[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:380) - Started M3UAManagement
+[2026-06-20 21:11:50,675] INFO 14525[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:277) - M3UA configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/RKMTest-server_m3ua1.xml
+[2026-06-20 21:11:50,680] WARN 14530[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:288) - JENNY-M3UA-START: aspFactories size=0 transportManagement=org.mobicents.protocols.sctp.netty.NettySctpManagementImpl@8dbfffb
+[2026-06-20 21:11:50,681] INFO 14531[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:380) - Started M3UAManagement
+[2026-06-20 21:11:50,681] INFO 14531[main] - org.restcomm.protocols.ss7.m3ua.impl.RKMAsDoesNotExistTest.testSingleAspInAs(RKMAsDoesNotExistTest.java:122) - Starting server
+[2026-06-20 21:11:50,683] INFO 14533[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.addServer(NettySctpManagementImpl.java:542) - Created Server=testserver
+[2026-06-20 21:11:50,684] WARN 14534[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.store(NettySctpManagementImpl.java:1441) - JENNY-DEBUG-STORE: assoc=serverAssociation started=false listener=null
+[2026-06-20 21:11:50,686] INFO 14536[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.addServerAssociation(NettySctpManagementImpl.java:788) - Added Association=serverAssociation of type=SERVER
+[2026-06-20 21:11:50,690] INFO 14540[Sctp-BossGroup-RKMTest-server-89-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xb0a67888] REGISTERED
+[2026-06-20 21:11:50,692] INFO 14542[Sctp-BossGroup-RKMTest-server-89-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xb0a67888] BIND: /127.0.0.1:2345
+[2026-06-20 21:11:50,692] INFO 14542[Sctp-BossGroup-RKMTest-server-89-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xb0a67888, L:/127.0.0.1:2345] ACTIVE
+[2026-06-20 21:11:50,694] INFO 14544[main] - org.mobicents.protocols.sctp.netty.NettyServerImpl.initSocket(NettyServerImpl.java:408) - SctpServerChannel bound to=[/127.0.0.1:2345] 
+[2026-06-20 21:11:50,695] WARN 14545[main] - org.mobicents.protocols.sctp.netty.NettyAssociationImpl.start(NettyAssociationImpl.java:567) - AssociationListener is null for Association=serverAssociation. Starting SERVER association anyway. Listener will be set by application layer.
+[2026-06-20 21:11:50,695] INFO 14545[main] - org.mobicents.protocols.sctp.netty.NettyAssociationImpl.start(NettyAssociationImpl.java:587) - Started Association=Association [name=serverAssociation, associationType=SERVER, ipChannelType=SCTP, hostAddress=null, hostPort=0, peerAddress=127.0.0.1, peerPort=2346, serverName=testserver, started=true, extraHostAddress=[]]
+[2026-06-20 21:11:50,696] WARN 14546[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.store(NettySctpManagementImpl.java:1441) - JENNY-DEBUG-STORE: assoc=serverAssociation started=true listener=null
+[2026-06-20 21:11:50,697] INFO 14547[main] - org.mobicents.protocols.sctp.netty.NettyServerImpl.start(NettyServerImpl.java:317) - Started SERVER Association=serverAssociation for Server=testserver
+[2026-06-20 21:11:50,697] INFO 14547[main] - org.mobicents.protocols.sctp.netty.NettyServerImpl.start(NettyServerImpl.java:327) - Started Server=testserver
+[2026-06-20 21:11:50,698] WARN 14548[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.store(NettySctpManagementImpl.java:1441) - JENNY-DEBUG-STORE: assoc=serverAssociation started=true listener=null
+[2026-06-20 21:11:50,700] WARN 14550[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.store(NettySctpManagementImpl.java:1441) - JENNY-DEBUG-STORE: assoc=serverAssociation started=true listener=null
+[2026-06-20 21:11:50,702] INFO 14552[main] - org.mobicents.protocols.sctp.netty.NettyAssociationImpl.stop(NettyAssociationImpl.java:602) - Management requested to stop Association [name=serverAssociation, associationType=SERVER, ipChannelType=SCTP, hostAddress=null, hostPort=0, peerAddress=127.0.0.1, peerPort=2346, serverName=testserver, started=true, extraHostAddress=[]]
+[2026-06-20 21:11:50,703] INFO 14553[main] - org.mobicents.protocols.sctp.netty.NettyServerImpl.stop(NettyServerImpl.java:349) - Stopped Server=testserver
+[2026-06-20 21:11:50,704] INFO 14554[Sctp-BossGroup-RKMTest-server-89-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xb0a67888, L:/127.0.0.1:2345] CLOSE
+[2026-06-20 21:11:50,705] INFO 14555[Sctp-BossGroup-RKMTest-server-89-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xb0a67888, L:/127.0.0.1:2345] INACTIVE
+[2026-06-20 21:11:50,705] INFO 14555[Sctp-BossGroup-RKMTest-server-89-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xb0a67888, L:/127.0.0.1:2345] UNREGISTERED
+[2026-06-20 21:11:50,718] INFO 14568[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.start(NettySctpManagementImpl.java:329) - SCTP configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/RKMTest-client_sctp.xml
+[2026-06-20 21:11:50,739] WARN 14589[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.loadFromPersistData(NettySctpManagementImpl.java:1350) - JENNY-DEBUG-LOAD: Loaded 0 associations from XML
+[2026-06-20 21:11:50,739] INFO 14589[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.start(NettySctpManagementImpl.java:348) - Started SCTP Management=RKMTest-client
+[2026-06-20 21:11:50,739] INFO 14589[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.start(NettySctpManagementImpl.java:329) - SCTP configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/RKMTest-server_sctp.xml
+[2026-06-20 21:11:50,742] WARN 14592[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.loadFromPersistData(NettySctpManagementImpl.java:1350) - JENNY-DEBUG-LOAD: Loaded 1 associations from XML
+[2026-06-20 21:11:50,743] WARN 14593[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.loadFromPersistData(NettySctpManagementImpl.java:1352) - JENNY-DEBUG-LOAD: assoc=serverAssociation started=true type=SERVER serverName=testserver
+[2026-06-20 21:11:50,744] INFO 14594[Sctp-BossGroup-RKMTest-server-113-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xe1175c61] REGISTERED
+[2026-06-20 21:11:50,745] INFO 14595[Sctp-BossGroup-RKMTest-server-113-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xe1175c61] BIND: /127.0.0.1:2345
+[2026-06-20 21:11:50,746] INFO 14596[Sctp-BossGroup-RKMTest-server-113-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xe1175c61, L:/127.0.0.1:2345] ACTIVE
+[2026-06-20 21:11:50,746] INFO 14596[main] - org.mobicents.protocols.sctp.netty.NettyServerImpl.initSocket(NettyServerImpl.java:408) - SctpServerChannel bound to=[/127.0.0.1:2345] 
+[2026-06-20 21:11:50,747] INFO 14597[main] - org.mobicents.protocols.sctp.netty.NettyServerImpl.start(NettyServerImpl.java:327) - Started Server=testserver
+[2026-06-20 21:11:50,747] INFO 14597[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.start(NettySctpManagementImpl.java:348) - Started SCTP Management=RKMTest-server
+[2026-06-20 21:11:50,748] WARN 14598[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.store(NettySctpManagementImpl.java:1441) - JENNY-DEBUG-STORE: assoc=serverAssociation started=true listener=null
+[2026-06-20 21:11:50,750] INFO 14600[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.removeAllResources(NettySctpManagementImpl.java:456) - Removing allocated resources: Servers=1, Associations=1
+[2026-06-20 21:11:50,752] INFO 14602[main] - org.mobicents.protocols.sctp.netty.NettyAssociationImpl.stop(NettyAssociationImpl.java:602) - Management requested to stop Association [name=serverAssociation, associationType=SERVER, ipChannelType=SCTP, hostAddress=null, hostPort=0, peerAddress=127.0.0.1, peerPort=2346, serverName=testserver, started=true, extraHostAddress=[]]
+[2026-06-20 21:11:50,752] WARN 14602[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.store(NettySctpManagementImpl.java:1441) - JENNY-DEBUG-STORE: assoc=serverAssociation started=false listener=null
+[2026-06-20 21:11:50,754] INFO 14604[main] - org.mobicents.protocols.sctp.netty.NettyServerImpl.stop(NettyServerImpl.java:349) - Stopped Server=testserver
+[2026-06-20 21:11:50,755] INFO 14605[Sctp-BossGroup-RKMTest-server-113-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xe1175c61, L:/127.0.0.1:2345] CLOSE
+[2026-06-20 21:11:50,756] INFO 14606[Sctp-BossGroup-RKMTest-server-113-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xe1175c61, L:/127.0.0.1:2345] INACTIVE
+[2026-06-20 21:11:50,757] INFO 14607[Sctp-BossGroup-RKMTest-server-113-1] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xe1175c61, L:/127.0.0.1:2345] UNREGISTERED
+[2026-06-20 21:11:50,761] INFO 14611[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:277) - M3UA configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/RKMTest-client_m3ua1.xml
+[2026-06-20 21:11:50,763] WARN 14613[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:288) - JENNY-M3UA-START: aspFactories size=0 transportManagement=org.mobicents.protocols.sctp.netty.NettySctpManagementImpl@eda25e5
+[2026-06-20 21:11:50,764] INFO 14614[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:380) - Started M3UAManagement
+[2026-06-20 21:11:50,767] INFO 14617[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:277) - M3UA configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/RKMTest-server_m3ua1.xml
+[2026-06-20 21:11:50,768] WARN 14618[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.loadActualData(M3UAManagementImpl.java:1234) - JENNY-LOAD-AS: as=server-testas tempAspSize=0 aspFactoryNames=null
+[2026-06-20 21:11:50,770] WARN 14620[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:288) - JENNY-M3UA-START: aspFactories size=0 transportManagement=org.mobicents.protocols.sctp.netty.NettySctpManagementImpl@6399551e
+[2026-06-20 21:11:50,771] INFO 14621[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:380) - Started M3UAManagement
+[2026-06-20 21:11:50,772] INFO 14622[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:923) - Removing allocated resources: AppServers=1, AspFactories=0
+[2026-06-20 21:11:50,773] INFO 14623[main] - org.restcomm.protocols.ss7.m3ua.impl.RKMAsExistTest.testSingleAspInAs(RKMAsExistTest.java:123) - Starting server
+[2026-06-20 21:11:50,775] INFO 14625[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.addServer(NettySctpManagementImpl.java:542) - Created Server=testserver
+[2026-06-20 21:11:50,775] WARN 14625[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.store(NettySctpManagementImpl.java:1441) - JENNY-DEBUG-STORE: assoc=serverAssociation started=false listener=null
+[2026-06-20 21:11:50,777] INFO 14627[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.addServerAssociation(NettySctpManagementImpl.java:788) - Added Association=serverAssociation of type=SERVER
+[2026-06-20 21:11:50,779] INFO 14629[Sctp-BossGroup-RKMTest-server-113-2] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xf282da6c] REGISTERED
+[2026-06-20 21:11:50,780] INFO 14630[Sctp-BossGroup-RKMTest-server-113-2] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xf282da6c] BIND: /127.0.0.1:2345
+[2026-06-20 21:11:50,781] INFO 14631[Sctp-BossGroup-RKMTest-server-113-2] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xf282da6c, L:/127.0.0.1:2345] ACTIVE
+[2026-06-20 21:11:50,781] INFO 14631[main] - org.mobicents.protocols.sctp.netty.NettyServerImpl.initSocket(NettyServerImpl.java:408) - SctpServerChannel bound to=[/127.0.0.1:2345] 
+[2026-06-20 21:11:50,782] WARN 14632[main] - org.mobicents.protocols.sctp.netty.NettyAssociationImpl.start(NettyAssociationImpl.java:567) - AssociationListener is null for Association=serverAssociation. Starting SERVER association anyway. Listener will be set by application layer.
+[2026-06-20 21:11:50,783] INFO 14633[main] - org.mobicents.protocols.sctp.netty.NettyAssociationImpl.start(NettyAssociationImpl.java:587) - Started Association=Association [name=serverAssociation, associationType=SERVER, ipChannelType=SCTP, hostAddress=null, hostPort=0, peerAddress=127.0.0.1, peerPort=2346, serverName=testserver, started=true, extraHostAddress=[]]
+[2026-06-20 21:11:50,783] WARN 14633[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.store(NettySctpManagementImpl.java:1441) - JENNY-DEBUG-STORE: assoc=serverAssociation started=true listener=null
+[2026-06-20 21:11:50,784] INFO 14634[main] - org.mobicents.protocols.sctp.netty.NettyServerImpl.start(NettyServerImpl.java:317) - Started SERVER Association=serverAssociation for Server=testserver
+[2026-06-20 21:11:50,784] INFO 14634[main] - org.mobicents.protocols.sctp.netty.NettyServerImpl.start(NettyServerImpl.java:327) - Started Server=testserver
+[2026-06-20 21:11:50,785] WARN 14635[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.store(NettySctpManagementImpl.java:1441) - JENNY-DEBUG-STORE: assoc=serverAssociation started=true listener=null
+[2026-06-20 21:11:50,789] WARN 14639[main] - org.mobicents.protocols.sctp.netty.NettySctpManagementImpl.store(NettySctpManagementImpl.java:1441) - JENNY-DEBUG-STORE: assoc=serverAssociation started=true listener=null
+[2026-06-20 21:11:50,790] INFO 14640[main] - org.mobicents.protocols.sctp.netty.NettyAssociationImpl.stop(NettyAssociationImpl.java:602) - Management requested to stop Association [name=serverAssociation, associationType=SERVER, ipChannelType=SCTP, hostAddress=null, hostPort=0, peerAddress=127.0.0.1, peerPort=2346, serverName=testserver, started=true, extraHostAddress=[]]
+[2026-06-20 21:11:50,791] INFO 14641[main] - org.mobicents.protocols.sctp.netty.NettyServerImpl.stop(NettyServerImpl.java:349) - Stopped Server=testserver
+[2026-06-20 21:11:50,792] INFO 14642[Sctp-BossGroup-RKMTest-server-113-2] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xf282da6c, L:/127.0.0.1:2345] CLOSE
+[2026-06-20 21:11:50,793] INFO 14643[Sctp-BossGroup-RKMTest-server-113-2] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xf282da6c, L:/127.0.0.1:2345] INACTIVE
+[2026-06-20 21:11:50,794] INFO 14644[Sctp-BossGroup-RKMTest-server-113-2] - io.netty.util.internal.logging.AbstractInternalLogger.log(AbstractInternalLogger.java:148) - [id: 0xf282da6c, L:/127.0.0.1:2345] UNREGISTERED
+[2026-06-20 21:11:50,818] INFO 14668[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:277) - M3UA configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/RemSgFSMTest_m3ua1.xml
+[2026-06-20 21:11:50,822] WARN 14672[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:288) - JENNY-M3UA-START: aspFactories size=0 transportManagement=org.restcomm.protocols.ss7.m3ua.impl.RemSgFSMTest$NettyTransportManagement@23aa363a
+[2026-06-20 21:11:50,824] INFO 14674[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:380) - Started M3UAManagement
+[2026-06-20 21:11:50,830] WARN 14680[main] - org.restcomm.protocols.ss7.m3ua.impl.AspFactoryImpl.start(AspFactoryImpl.java:201) - JENNY-FACTORY-START: AspFactory=testasp set listener on existing Association=testAssoc up=false
+[2026-06-20 21:11:50,832] WARN 14682[main] - org.restcomm.protocols.ss7.m3ua.impl.AspFactoryImpl.handleCommUp(AspFactoryImpl.java:779) - JENNY-HANDLE-COMMUP: AspFactory=testasp func=AS exchange=SE ipspType=null willSendAspUp=true
+[2026-06-20 21:11:50,833] WARN 14683[main] - org.restcomm.protocols.ss7.m3ua.impl.AspFactoryImpl.sendAspUp(AspFactoryImpl.java:768) - JENNY-SEND-ASPUP: AspFactory=testasp sending ASP_UP
+[2026-06-20 21:11:50,835] WARN 14685[main] - org.restcomm.protocols.ss7.m3ua.impl.AspFactoryImpl.start(AspFactoryImpl.java:201) - JENNY-FACTORY-START: AspFactory=testasp set listener on existing Association=testAssoc up=false
+[2026-06-20 21:11:50,835] INFO 14685[main] - org.restcomm.protocols.ss7.m3ua.impl.AsImpl.write(AsImpl.java:755) - Adding the PayloadData=TransferMessage: {528=Protocol opc=1408 dpc=123 si=3 ni=1 sls=1, 6=RoutingContext rc=[100]} to PendingQueue for AS=testas
+[2026-06-20 21:11:50,836] WARN 14686[main] - org.restcomm.protocols.ss7.m3ua.impl.AspFactoryImpl.handleCommUp(AspFactoryImpl.java:779) - JENNY-HANDLE-COMMUP: AspFactory=testasp func=AS exchange=SE ipspType=null willSendAspUp=true
+[2026-06-20 21:11:50,836] WARN 14686[main] - org.restcomm.protocols.ss7.m3ua.impl.AspFactoryImpl.sendAspUp(AspFactoryImpl.java:768) - JENNY-SEND-ASPUP: AspFactory=testasp sending ASP_UP
+[2026-06-20 21:11:50,842] INFO 14692[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:923) - Removing allocated resources: AppServers=1, AspFactories=1
+[2026-06-20 21:11:50,856] INFO 14706[main] - org.mobicents.protocols.sctp.ManagementImpl.start(ManagementImpl.java:282) - SCTP configuration file path '/home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/TestSCTP1_sctp.xml'
+[2026-06-20 21:11:50,869] INFO 14719[main] - org.mobicents.protocols.sctp.ManagementImpl.start(ManagementImpl.java:305) - Started SCTP Management=TestSCTP1 WorkerThreads=0 SingleThread=true
+[2026-06-20 21:11:50,869] INFO 14719[Thread-1] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:95) - SelectorThread for Management=TestSCTP1 started.
+[2026-06-20 21:11:50,870] INFO 14720[main] - org.mobicents.protocols.sctp.ManagementImpl.start(ManagementImpl.java:282) - SCTP configuration file path '/home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/TestSCTP2_sctp.xml'
+[2026-06-20 21:11:50,873] INFO 14723[main] - org.mobicents.protocols.sctp.ManagementImpl.start(ManagementImpl.java:305) - Started SCTP Management=TestSCTP2 WorkerThreads=0 SingleThread=true
+[2026-06-20 21:11:50,873] INFO 14723[Thread-2] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:95) - SelectorThread for Management=TestSCTP2 started.
+[2026-06-20 21:11:50,884] INFO 14734[main] - org.mobicents.protocols.sctp.ManagementImpl.addAssociation(ManagementImpl.java:858) - Added Association=Assoc1 of type=CLIENT
+[2026-06-20 21:11:50,885] INFO 14735[main] - org.mobicents.protocols.sctp.ManagementImpl.addAssociation(ManagementImpl.java:858) - Added Association=Assoc2 of type=CLIENT
+[2026-06-20 21:11:50,889] INFO 14739[main] - org.mobicents.protocols.sctp.ManagementImpl.addServer(ManagementImpl.java:611) - Created Server=TestServer1
+[2026-06-20 21:11:50,891] INFO 14741[main] - org.mobicents.protocols.sctp.ManagementImpl.addServerAssociation(ManagementImpl.java:784) - Added Association=Assoc3 of type=SERVER
+[2026-06-20 21:11:50,895] INFO 14745[main] - org.mobicents.protocols.sctp.ManagementImpl.removeAllResources(ManagementImpl.java:515) - Removing allocated resources: Servers=1, Associations=0
+[2026-06-20 21:11:50,896] INFO 14746[main] - org.mobicents.protocols.sctp.ServerImpl.stop(ServerImpl.java:174) - Stopped Server=TestServer1
+[2026-06-20 21:11:50,899] INFO 14749[Thread-1] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:176) - SelectorThread for Management=TestSCTP1 stopped.
+[2026-06-20 21:11:50,900] INFO 14750[Thread-2] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:176) - SelectorThread for Management=TestSCTP2 stopped.
+[2026-06-20 21:11:50,901] INFO 14751[main] - org.mobicents.protocols.sctp.ManagementImpl.start(ManagementImpl.java:282) - SCTP configuration file path '/home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/TestSCTP1_sctp.xml'
+[2026-06-20 21:11:50,902] INFO 14752[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:95) - SelectorThread for Management=TestSCTP1 started.
+[2026-06-20 21:11:50,902] INFO 14752[main] - org.mobicents.protocols.sctp.ManagementImpl.start(ManagementImpl.java:305) - Started SCTP Management=TestSCTP1 WorkerThreads=0 SingleThread=true
+[2026-06-20 21:11:50,910] INFO 14760[main] - org.mobicents.protocols.sctp.ManagementImpl.start(ManagementImpl.java:282) - SCTP configuration file path '/home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/TestSCTP2_sctp.xml'
+[2026-06-20 21:11:50,911] INFO 14761[main] - org.mobicents.protocols.sctp.ManagementImpl.start(ManagementImpl.java:305) - Started SCTP Management=TestSCTP2 WorkerThreads=0 SingleThread=true
+[2026-06-20 21:11:50,911] INFO 14761[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:95) - SelectorThread for Management=TestSCTP2 started.
+[2026-06-20 21:11:50,913] INFO 14763[main] - org.mobicents.protocols.sctp.ManagementImpl.addServer(ManagementImpl.java:611) - Created Server=TestServer1
+[2026-06-20 21:11:50,914] INFO 14764[main] - org.mobicents.protocols.sctp.ManagementImpl.addServer(ManagementImpl.java:611) - Created Server=TestServer2
+[2026-06-20 21:11:50,915] INFO 14765[main] - org.mobicents.protocols.sctp.ManagementImpl.addServer(ManagementImpl.java:611) - Created Server=TestServer3
+[2026-06-20 21:11:50,918] INFO 14768[main] - org.mobicents.protocols.sctp.ManagementImpl.addServer(ManagementImpl.java:611) - Created Server=TestServer4
+[2026-06-20 21:11:50,921] INFO 14771[main] - org.mobicents.protocols.sctp.ServerImpl.doInitSocketTcp(ServerImpl.java:234) - ServerSocketChannel bound to=/127.0.0.1:2908 
+[2026-06-20 21:11:50,922] INFO 14772[main] - org.mobicents.protocols.sctp.ServerImpl.start(ServerImpl.java:144) - Started Server=TestServer4
+[2026-06-20 21:11:50,922]ERROR 14772[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,923]ERROR 14773[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,923]ERROR 14773[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,923]ERROR 14773[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,923]ERROR 14773[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,923] INFO 14773[main] - org.mobicents.protocols.sctp.ServerImpl.doInitSocketTcp(ServerImpl.java:234) - ServerSocketChannel bound to=/127.0.0.1:2906 
+[2026-06-20 21:11:50,924]ERROR 14774[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,924]ERROR 14774[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,924]ERROR 14774[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,926]ERROR 14776[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,926]ERROR 14776[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,926]ERROR 14776[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,926]ERROR 14776[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,926]ERROR 14776[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,927]ERROR 14777[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,927]ERROR 14777[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,927]ERROR 14777[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,927]ERROR 14777[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,927]ERROR 14777[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,927]ERROR 14777[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,927] INFO 14777[main] - org.mobicents.protocols.sctp.ServerImpl.start(ServerImpl.java:144) - Started Server=TestServer2
+[2026-06-20 21:11:50,927]ERROR 14777[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,927]ERROR 14777[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,930]ERROR 14780[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,930]ERROR 14780[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,930]ERROR 14780[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,930]ERROR 14780[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,928] INFO 14778[main] - org.mobicents.protocols.sctp.ServerImpl.stop(ServerImpl.java:174) - Stopped Server=TestServer2
+[2026-06-20 21:11:50,930]ERROR 14780[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,931]ERROR 14781[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,931]ERROR 14781[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,931]ERROR 14781[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,931]ERROR 14781[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,931]ERROR 14781[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,931]ERROR 14781[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,930]ERROR 14780[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,932]ERROR 14782[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,932]ERROR 14782[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,932]ERROR 14782[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,932]ERROR 14782[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,932]ERROR 14782[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,932]ERROR 14782[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,932]ERROR 14782[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,932]ERROR 14782[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,934]ERROR 14784[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,935]ERROR 14785[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,935]ERROR 14785[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,935]ERROR 14785[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,935]ERROR 14785[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,935]ERROR 14785[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,935]ERROR 14785[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,935]ERROR 14785[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,934] INFO 14784[main] - org.mobicents.protocols.sctp.ServerImpl.stop(ServerImpl.java:174) - Stopped Server=TestServer4
+[2026-06-20 21:11:50,937]ERROR 14787[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,937]ERROR 14787[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,937]ERROR 14787[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,937]ERROR 14787[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,939]ERROR 14789[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,940]ERROR 14790[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,940]ERROR 14790[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,940]ERROR 14790[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,932]ERROR 14782[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,943]ERROR 14793[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,943]ERROR 14793[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,943]ERROR 14793[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,943]ERROR 14793[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,943]ERROR 14793[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,943]ERROR 14793[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,943]ERROR 14793[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,943]ERROR 14793[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,944]ERROR 14794[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,944]ERROR 14794[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,944]ERROR 14794[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,944]ERROR 14794[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,945]ERROR 14795[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,946]ERROR 14796[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,946]ERROR 14796[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,946]ERROR 14796[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,946]ERROR 14796[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,947]ERROR 14797[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,947]ERROR 14797[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,948]ERROR 14798[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,948]ERROR 14798[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,948]ERROR 14798[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,948]ERROR 14798[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,944]ERROR 14794[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,949]ERROR 14799[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,952] INFO 14802[main] - org.mobicents.protocols.sctp.ManagementImpl.start(ManagementImpl.java:282) - SCTP configuration file path '/home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/TestSCTP1_sctp.xml'
+[2026-06-20 21:11:50,948]ERROR 14798[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,955] INFO 14805[Thread-4] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:176) - SelectorThread for Management=TestSCTP2 stopped.
+[2026-06-20 21:11:50,949]ERROR 14799[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:165) - Error while selecting the ready keys
+java.lang.UnsupportedOperationException: remove
+	at org.jctools.queues.ConcurrentCircularArrayQueue$WeakIterator.remove(ConcurrentCircularArrayQueue.java:142)
+	at java.util.AbstractCollection.remove(AbstractCollection.java:293)
+	at org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:113)
+	at java.lang.Thread.run(Thread.java:750)
+[2026-06-20 21:11:50,955] INFO 14805[Thread-3] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:176) - SelectorThread for Management=TestSCTP1 stopped.
+[2026-06-20 21:11:50,955] INFO 14805[main] - org.mobicents.protocols.sctp.ManagementImpl.start(ManagementImpl.java:305) - Started SCTP Management=TestSCTP1 WorkerThreads=0 SingleThread=true
+[2026-06-20 21:11:50,956] INFO 14806[main] - org.mobicents.protocols.sctp.ManagementImpl.start(ManagementImpl.java:282) - SCTP configuration file path '/home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/TestSCTP2_sctp.xml'
+[2026-06-20 21:11:50,957] INFO 14807[Thread-5] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:95) - SelectorThread for Management=TestSCTP1 started.
+[2026-06-20 21:11:50,959] INFO 14809[Thread-6] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:95) - SelectorThread for Management=TestSCTP2 started.
+[2026-06-20 21:11:50,959] INFO 14809[main] - org.mobicents.protocols.sctp.ManagementImpl.start(ManagementImpl.java:305) - Started SCTP Management=TestSCTP2 WorkerThreads=0 SingleThread=true
+[2026-06-20 21:11:50,964] INFO 14814[Thread-5] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:176) - SelectorThread for Management=TestSCTP1 stopped.
+[2026-06-20 21:11:50,965] INFO 14815[Thread-6] - org.mobicents.protocols.sctp.SelectorThread.run(SelectorThread.java:176) - SelectorThread for Management=TestSCTP2 stopped.
+[2026-06-20 21:11:50,967] INFO 14817[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:277) - M3UA configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/m3ua/impl/target/test-classes/SgFSMTest_m3ua1.xml
+[2026-06-20 21:11:50,970] WARN 14820[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:288) - JENNY-M3UA-START: aspFactories size=0 transportManagement=org.restcomm.protocols.ss7.m3ua.impl.SgFSMTest$NettyTransportManagement@61e94def
+[2026-06-20 21:11:50,971] INFO 14821[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.start(M3UAManagementImpl.java:380) - Started M3UAManagement
+[2026-06-20 21:11:50,974] WARN 14824[main] - org.restcomm.protocols.ss7.m3ua.impl.AspFactoryImpl.handleCommUp(AspFactoryImpl.java:779) - JENNY-HANDLE-COMMUP: AspFactory=testasp func=SGW exchange=SE ipspType=null willSendAspUp=false
+[2026-06-20 21:11:50,976] WARN 14826[main] - org.restcomm.protocols.ss7.m3ua.impl.AspTrafficMaintenanceHandler.handleAspActive(AspTrafficMaintenanceHandler.java:34) - JENNY-HANDLE-ASPACTIVE: AspFactory=testasp func=SGW exchange=SE ipspType=null aspListSize=1
+[2026-06-20 21:11:50,976] WARN 14826[main] - org.restcomm.protocols.ss7.m3ua.impl.AspTrafficMaintenanceHandler.handleAspActive(AspTrafficMaintenanceHandler.java:57) - JENNY-HANDLE-ASPACTIVE: ASP=testasp peerFSM=INACTIVE AS=testas AS-RC=[100] msgRC=[100]
+[2026-06-20 21:11:50,977] WARN 14827[main] - org.restcomm.protocols.ss7.m3ua.impl.AspTrafficMaintenanceHandler.handleAspActive(AspTrafficMaintenanceHandler.java:114) - JENNY-HANDLE-ASPACTIVE: Sending ASP_ACTIVE_ACK for ASP=testasp
+[2026-06-20 21:11:50,978] INFO 14828[main] - org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl.removeAllResources(M3UAManagementImpl.java:923) - Removing allocated resources: AppServers=1, AspFactories=1
