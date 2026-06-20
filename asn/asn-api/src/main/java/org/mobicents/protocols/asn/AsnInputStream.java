@@ -61,11 +61,7 @@ public class AsnInputStream extends InputStream {
 	 * Zero-copy view over a slice of {@code buffer}. The underlying array is shared; callers must not mutate it while decoding.
 	 */
 	public static AsnInputStream viewBytes(byte[] buffer, int offset, int length) {
-		AsnInputStream ais = new AsnInputStream(buffer);
-		ais.start = offset;
-		ais.length = length;
-		ais.pos = 0;
-		return ais;
+		return AsnStreamPool.borrowSlice(buffer, offset, length);
 	}
 
 	/**
@@ -79,6 +75,32 @@ public class AsnInputStream extends InputStream {
 		this.tagClass = 0;
 		this.pCBit = 0;
 		this.tag = 0;
+	}
+
+	/**
+	 * Rebind this stream to a slice of {@code buffer} for ThreadLocal reuse.
+	 */
+	public void resetSlice(byte[] buffer, int offset, int length) {
+		this.buffer = buffer;
+		this.start = offset;
+		this.length = length;
+		this.pos = 0;
+		this.tagClass = 0;
+		this.pCBit = 0;
+		this.tag = 0;
+	}
+
+	/**
+	 * Rebind this stream with pre-set tag metadata for ThreadLocal reuse.
+	 */
+	public void resetTagged(byte[] buf, int tagClass, boolean isPrimitive, int tag) {
+		this.buffer = buf;
+		this.start = 0;
+		this.length = buf.length;
+		this.pos = 0;
+		this.tagClass = tagClass;
+		this.pCBit = isPrimitive ? 0 : 1;
+		this.tag = tag;
 	}
 
 	public byte[] getBuffer() {

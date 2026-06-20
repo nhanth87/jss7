@@ -2,6 +2,7 @@ package org.mobicents.protocols.asn;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import org.testng.annotations.Test;
 
@@ -9,7 +10,7 @@ import org.testng.annotations.Test;
 public class FlatAsnParserTest {
 
     @Test
-    public void testMapUssdSequence() {
+    public void testMapUssdSequence() throws AsnException {
         byte[] data = new byte[] { 0x30, 0x0a, 0x04, 0x01, 0x0f, 0x04, 0x05, 0x2a, (byte) 0xd9, (byte) 0x8c, 0x36, 0x02 };
 
         AsnMessageIndex index = new AsnMessageIndex();
@@ -31,7 +32,7 @@ public class FlatAsnParserTest {
     }
 
     @Test
-    public void testNestedTcapMapFixture() {
+    public void testNestedTcapMapFixture() throws AsnException {
         byte[] data = new byte[] {
                 0x62, 0x1c,
                 0x49, 0x04, 0x51, 0x00, 0x02, 0x38,
@@ -71,7 +72,7 @@ public class FlatAsnParserTest {
     }
 
     @Test
-    public void testOctetStringWithEmbeddedDoubleZeroBytes() {
+    public void testOctetStringWithEmbeddedDoubleZeroBytes() throws AsnException {
         byte[] data = new byte[] { 0x30, 0x07, (byte) 0x81, 0x05, (byte) 0xC6, 0x00, 0x00, 0x11, 0x17 };
 
         AsnMessageIndex index = new AsnMessageIndex();
@@ -86,7 +87,7 @@ public class FlatAsnParserTest {
     }
 
     @Test
-    public void testInformServiceCentreFullSequenceIndexesAllTopLevelFields() {
+    public void testInformServiceCentreFullSequenceIndexesAllTopLevelFields() throws AsnException {
         byte[] data = new byte[] { 48, 61, 4, 6, -111, 17, 33, 34, 51, -13, 3, 2, 2, 80, 48, 39, -96, 32, 48, 10, 6, 3,
                 42, 3, 4, 11, 12, 13, 14, 15, 48, 5, 6, 3, 42, 3, 6, 48, 11, 6, 3, 42, 3, 5, 21, 22, 23, 24, 25, 26, -95,
                 3, 31, 32, 33, 2, 2, 2, 43, -128, 2, 1, -68 };
@@ -115,5 +116,86 @@ public class FlatAsnParserTest {
         assertTrue(ctx0Idx >= 0, "additionalAbsentSubscriberDiagnosticSM [0] missing");
         assertEquals(AsnReaderHelper.readInteger(index, integerIdx), 555L);
         assertEquals(AsnReaderHelper.readInteger(index, ctx0Idx), 444L);
+    }
+
+    @Test
+    public void testMaxTagsOverflowThrows() throws AsnException {
+        byte[] data = new byte[513 * 3 + 2];
+        int pos = 0;
+        data[pos++] = 0x30;
+        data[pos++] = (byte) (513 * 3);
+        for (int i = 0; i < 513; i++) {
+            data[pos++] = 0x02;
+            data[pos++] = 0x01;
+            data[pos++] = (byte) (i & 0xFF);
+        }
+
+        AsnMessageIndex index = new AsnMessageIndex();
+        try {
+            FlatAsnParser.parseAll(data, 0, data.length, index);
+            fail("Expected AsnException for MAX_TAGS overflow");
+        } catch (AsnException ex) {
+            assertTrue(ex.getMessage().contains("MAX_TAGS"));
+        }
+    }
+
+    @Test
+    public void testDeepNesting() throws AsnException {
+        byte[] withinLimit = buildNestedSequence(AsnMessageIndex.MAX_DEPTH, (byte) 0x42);
+        AsnMessageIndex okIndex = new AsnMessageIndex();
+        FlatAsnParser.parseAll(withinLimit, 0, withinLimit.length, okIndex);
+        assertEquals(okIndex.tagCount, AsnMessageIndex.MAX_DEPTH + 1);
+
+        byte[] overLimit = buildNestedSequence(AsnMessageIndex.MAX_DEPTH + 1, (byte) 0x43);
+        AsnMessageIndex failIndex = new AsnMessageIndex();
+        try {
+            FlatAsnParser.parseAll(overLimit, 0, overLimit.length, failIndex);
+            fail("Expected AsnException for MAX_DEPTH overflow");
+        } catch (AsnException ex) {
+            assertTrue(ex.getMessage().contains("MAX_DEPTH"));
+        }
+    }
+
+    @Test
+    public void testMultibyteTagNumber() throws AsnException {
+        byte[] data = new byte[] { (byte) 0xDF, (byte) 0x81, 0x00, 0x01, 0x42 };
+
+        AsnMessageIndex index = new AsnMessageIndex();
+        FlatAsnParser.parseAll(data, 0, data.length, index);
+
+        assertEquals(index.tagCount, 1);
+        assertEquals(index.tags[0], 0xDF);
+        assertEquals(AsnReaderHelper.getTagNumber(index, 0), 128);
+        assertEquals(index.tagNumbers[0], 128);
+        assertEquals(index.entries[AsnMessageIndex.E_TAG_NUM], 128);
+        assertEquals(index.valueLengths[0], 1);
+        assertEquals(index.rawBuffer[index.valueOffsets[0]], 0x42);
+    }
+
+    private static byte[] buildNestedSequence(int depth, byte leafValue) {
+        byte[] data = new byte[] { 0x04, 0x01, leafValue };
+        for (int i = 0; i < depth; i++) {
+            data = wrapSequence(data);
+        }
+        return data;
+    }
+
+    private static byte[] wrapSequence(byte[] content) {
+        byte[] lengthBytes = encodeDefiniteLength(content.length);
+        byte[] wrapped = new byte[1 + lengthBytes.length + content.length];
+        wrapped[0] = 0x30;
+        System.arraycopy(lengthBytes, 0, wrapped, 1, lengthBytes.length);
+        System.arraycopy(content, 0, wrapped, 1 + lengthBytes.length, content.length);
+        return wrapped;
+    }
+
+    private static byte[] encodeDefiniteLength(int length) {
+        if (length < 128) {
+            return new byte[] { (byte) length };
+        }
+        if (length < 256) {
+            return new byte[] { (byte) 0x81, (byte) length };
+        }
+        return new byte[] { (byte) 0x82, (byte) (length >> 8), (byte) length };
     }
 }

@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 public class AsnReaderHelperTest {
 
     @Test
-    public void testFindChildAndReadInteger() {
+    public void testFindChildAndReadInteger() throws AsnException {
         byte[] data = new byte[] { 0x30, 0x06, 0x02, 0x01, 0x2a, 0x04, 0x01, 0x0f };
 
         AsnMessageIndex index = new AsnMessageIndex();
@@ -22,6 +22,13 @@ public class AsnReaderHelperTest {
         assertEquals(AsnReaderHelper.readInteger(index, intIdx), 42L);
         assertEquals(AsnReaderHelper.findTagIndex(index, 0x99), -1);
 
+        int[] octetCoords = new int[2];
+        AsnReaderHelper.readOctetString(index, octIdx, octetCoords);
+        assertEquals(octetCoords[1], 1);
+        assertEquals(index.rawBuffer[octetCoords[0]], 0x0f);
+        assertEquals(AsnReaderHelper.readOctetOffset(index, octIdx), octetCoords[0]);
+        assertEquals(AsnReaderHelper.readOctetLength(index, octIdx), octetCoords[1]);
+
         AsnReaderHelper.OctetStringView view = AsnReaderHelper.readOctetStringView(index, octIdx);
         assertNotNull(view);
         assertEquals(view.length, 1);
@@ -29,7 +36,7 @@ public class AsnReaderHelperTest {
     }
 
     @Test
-    public void testFindNthChildTag() {
+    public void testFindNthChildTag() throws AsnException {
         byte[] data = new byte[] { 0x30, 0x0a, 0x04, 0x01, 0x0f, 0x04, 0x05, 0x2a, (byte) 0xd9, (byte) 0x8c, 0x36, 0x02 };
 
         AsnMessageIndex index = new AsnMessageIndex();
@@ -41,5 +48,30 @@ public class AsnReaderHelperTest {
 
         assertEquals(index.valueLengths[first], 1);
         assertEquals(index.valueLengths[second], 5);
+    }
+
+    @Test
+    public void testFindTagIndexUsesFirstOccurrence() throws AsnException {
+        byte[] data = new byte[] { 0x30, 0x06, 0x02, 0x01, 0x2a, 0x04, 0x01, 0x0f };
+
+        AsnMessageIndex index = new AsnMessageIndex();
+        FlatAsnParser.parseAll(data, 0, data.length, index);
+
+        assertEquals(index.firstOccurrence[0x30], 0);
+        assertEquals(AsnReaderHelper.findTagIndex(index, 0x30), 0);
+        assertEquals(index.firstOccurrence[0x02], 1);
+        assertEquals(AsnReaderHelper.findTagIndex(index, 0x02), 1);
+    }
+
+    @Test
+    public void testFindNthChildViaSiblingChain() throws AsnException {
+        byte[] data = new byte[] { 0x30, 0x06, 0x02, 0x01, 0x01, 0x02, 0x01, 0x02 };
+
+        AsnMessageIndex index = new AsnMessageIndex();
+        FlatAsnParser.parseAll(data, 0, data.length, index);
+
+        assertEquals(AsnReaderHelper.findNthChild(index, 0, 0), 1);
+        assertEquals(AsnReaderHelper.findNthChild(index, 0, 1), 2);
+        assertEquals(AsnReaderHelper.findNthChild(index, -1, 0), 0);
     }
 }

@@ -6,8 +6,8 @@ import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnIndexPool;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnMessageIndex;
-import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.AsnReaderHelper;
+import org.mobicents.protocols.asn.AsnStreamPool;
 import org.mobicents.protocols.asn.FlatAsnParser;
 import org.mobicents.protocols.asn.Jss7AsnConfig;
 import org.mobicents.protocols.asn.Tag;
@@ -132,7 +132,7 @@ public final class MapFlatAsnDecoder {
     public static UssdFields decodeUssdSequence(byte[] buffer, int offset, int length, boolean withOptionalFields,
             String messageName) throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
-        FlatAsnParser.parseAll(buffer, offset, length, index);
+        parseIndex(buffer, offset, length, index, messageName);
 
         int dcsIdx = AsnReaderHelper.findNthChildTag(index, -1, Tag.STRING_OCTET, 0);
         if (dcsIdx == -1 || index.valueLengths[dcsIdx] != 1) {
@@ -147,8 +147,7 @@ public final class MapFlatAsnDecoder {
         UssdFields fields = new UssdFields();
         fields.dataCodingScheme = new CBSDataCodingSchemeImpl(index.rawBuffer[index.valueOffsets[dcsIdx]]);
         fields.ussdString = new USSDStringImpl(fields.dataCodingScheme);
-        AsnReaderHelper.OctetStringView ussdView = AsnReaderHelper.readOctetStringView(index, ussdIdx);
-        fields.ussdString.setDataView(ussdView.buffer, ussdView.offset, ussdView.length);
+        fields.ussdString.setDataView(index.rawBuffer, index.valueOffsets[ussdIdx], index.valueLengths[ussdIdx]);
 
         if (withOptionalFields) {
             decodeOptionalUssdFields(index, dcsIdx, ussdIdx, fields, messageName);
@@ -168,18 +167,15 @@ public final class MapFlatAsnDecoder {
     public static MapOpenFields decodeMapOpenInfo(byte[] buffer, int offset, int length, String messageName)
             throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
-        FlatAsnParser.parseAll(buffer, offset, length, index);
+        parseIndex(buffer, offset, length, index, messageName);
 
         MapOpenFields fields = new MapOpenFields();
         fields.ericssonStyle = hasChildTag(index, -1, TAG_CTX_2);
 
-        for (int i = 0; i < index.tagCount; i++) {
-            if (index.parents[i] != -1) {
-                continue;
-            }
+        for (int i = index.rootFirstChild; i != -1; i = index.nextSibling[i]) {
             int tagByte = index.tags[i];
             int tagClass = AsnReaderHelper.getTagClass(tagByte);
-            int tagNum = AsnReaderHelper.getTagNumber(tagByte);
+            int tagNum = AsnReaderHelper.getTagNumber(index, i);
 
             if (tagClass == Tag.CLASS_CONTEXT_SPECIFIC && AsnReaderHelper.isPrimitive(tagByte)) {
                 AddressStringImpl addr = new AddressStringImpl();
@@ -220,7 +216,7 @@ public final class MapFlatAsnDecoder {
     public static ForwardSmFields decodeForwardSmSequence(byte[] buffer, int offset, int length, String messageName,
             boolean allowExtensionContainer, boolean allowImsi) throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
-        FlatAsnParser.parseAll(buffer, offset, length, index);
+        parseIndex(buffer, offset, length, index, messageName);
 
         int daIdx = AsnReaderHelper.findNthChild(index, -1, 0);
         int oaIdx = AsnReaderHelper.findNthChild(index, -1, 1);
@@ -235,13 +231,13 @@ public final class MapFlatAsnDecoder {
         fields.smRpOa = decodeSmRpOa(index, oaIdx, messageName);
         fields.smRpUi = decodeSmsSignalInfo(index, uiIdx, messageName);
 
-        for (int i = 0; i < index.tagCount; i++) {
-            if (index.parents[i] != -1 || i == daIdx || i == oaIdx || i == uiIdx) {
+        for (int i = index.rootFirstChild; i != -1; i = index.nextSibling[i]) {
+            if (i == daIdx || i == oaIdx || i == uiIdx) {
                 continue;
             }
             int tagByte = index.tags[i];
             int tagClass = AsnReaderHelper.getTagClass(tagByte);
-            int tagNum = AsnReaderHelper.getTagNumber(tagByte);
+            int tagNum = AsnReaderHelper.getTagNumber(index, i);
 
             if (tagClass == Tag.CLASS_UNIVERSAL && tagNum == Tag.NULL && AsnReaderHelper.isPrimitive(tagByte)) {
                 fields.moreMessagesToSend = true;
@@ -271,7 +267,7 @@ public final class MapFlatAsnDecoder {
     public static SriFields decodeSendRoutingInfoForSm(byte[] buffer, int offset, int length, String messageName)
             throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
-        FlatAsnParser.parseAll(buffer, offset, length, index);
+        parseIndex(buffer, offset, length, index, messageName);
 
         int msisdnIdx = AsnReaderHelper.findNthChild(index, -1, 0);
         int priIdx = AsnReaderHelper.findNthChild(index, -1, 1);
@@ -286,15 +282,15 @@ public final class MapFlatAsnDecoder {
         fields.smRpPri = readBoolean(index, priIdx);
         fields.serviceCentreAddress = decodeIsdnAddress(index, scaIdx, messageName);
 
-        for (int i = 0; i < index.tagCount; i++) {
-            if (index.parents[i] != -1 || i == msisdnIdx || i == priIdx || i == scaIdx) {
+        for (int i = index.rootFirstChild; i != -1; i = index.nextSibling[i]) {
+            if (i == msisdnIdx || i == priIdx || i == scaIdx) {
                 continue;
             }
             int tagByte = index.tags[i];
             if (AsnReaderHelper.getTagClass(tagByte) != Tag.CLASS_CONTEXT_SPECIFIC) {
                 continue;
             }
-            int tagNum = AsnReaderHelper.getTagNumber(tagByte);
+            int tagNum = AsnReaderHelper.getTagNumber(index, i);
             if (tagNum == 6 && AsnReaderHelper.isConstructed(tagByte)) {
                 fields.extensionContainer = decodeExtensionContainer(index, i, messageName);
             } else if (tagNum == 7 && AsnReaderHelper.isPrimitive(tagByte) && index.valueLengths[i] == 0) {
@@ -316,7 +312,7 @@ public final class MapFlatAsnDecoder {
     public static RsdsFields decodeReportSmDeliveryStatus(byte[] buffer, int offset, int length, String messageName)
             throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
-        FlatAsnParser.parseAll(buffer, offset, length, index);
+        parseIndex(buffer, offset, length, index, messageName);
 
         int msisdnIdx = AsnReaderHelper.findNthChild(index, -1, 0);
         int scaIdx = AsnReaderHelper.findNthChild(index, -1, 1);
@@ -331,15 +327,15 @@ public final class MapFlatAsnDecoder {
         fields.serviceCentreAddress = decodeAddressString(index, scaIdx, messageName);
         fields.smDeliveryOutcome = SMDeliveryOutcome.getInstance((int) AsnReaderHelper.readInteger(index, outcomeIdx));
 
-        for (int i = 0; i < index.tagCount; i++) {
-            if (index.parents[i] != -1 || i == msisdnIdx || i == scaIdx || i == outcomeIdx) {
+        for (int i = index.rootFirstChild; i != -1; i = index.nextSibling[i]) {
+            if (i == msisdnIdx || i == scaIdx || i == outcomeIdx) {
                 continue;
             }
             int tagByte = index.tags[i];
             if (AsnReaderHelper.getTagClass(tagByte) != Tag.CLASS_CONTEXT_SPECIFIC) {
                 continue;
             }
-            int tagNum = AsnReaderHelper.getTagNumber(tagByte);
+            int tagNum = AsnReaderHelper.getTagNumber(index, i);
             if (tagNum == 0 && AsnReaderHelper.isPrimitive(tagByte)) {
                 fields.absentSubscriberDiagnosticSm = (int) AsnReaderHelper.readInteger(index, i);
             } else if (tagNum == 1 && AsnReaderHelper.isConstructed(tagByte)) {
@@ -365,16 +361,13 @@ public final class MapFlatAsnDecoder {
     public static InformFields decodeInformServiceCentre(byte[] buffer, int offset, int length, String messageName)
             throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
-        FlatAsnParser.parseAll(buffer, offset, length, index);
+        parseIndex(buffer, offset, length, index, messageName);
 
         InformFields fields = new InformFields();
-        for (int i = 0; i < index.tagCount; i++) {
-            if (index.parents[i] != -1) {
-                continue;
-            }
+        for (int i = index.rootFirstChild; i != -1; i = index.nextSibling[i]) {
             int tagByte = index.tags[i];
             int tagClass = AsnReaderHelper.getTagClass(tagByte);
-            int tagNum = AsnReaderHelper.getTagNumber(tagByte);
+            int tagNum = AsnReaderHelper.getTagNumber(index, i);
 
             if (tagClass == Tag.CLASS_UNIVERSAL) {
                 if (tagNum == Tag.STRING_OCTET && AsnReaderHelper.isPrimitive(tagByte)) {
@@ -406,7 +399,7 @@ public final class MapFlatAsnDecoder {
     public static AlertFields decodeAlertServiceCentre(byte[] buffer, int offset, int length, String messageName)
             throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
-        FlatAsnParser.parseAll(buffer, offset, length, index);
+        parseIndex(buffer, offset, length, index, messageName);
 
         int msisdnIdx = AsnReaderHelper.findNthChild(index, -1, 0);
         int scaIdx = AsnReaderHelper.findNthChild(index, -1, 1);
@@ -431,7 +424,7 @@ public final class MapFlatAsnDecoder {
     public static SriResponseFields decodeSendRoutingInfoForSmResponse(byte[] buffer, int offset, int length,
             String messageName) throws MAPParsingComponentException {
         AsnMessageIndex index = AsnIndexPool.get();
-        FlatAsnParser.parseAll(buffer, offset, length, index);
+        parseIndex(buffer, offset, length, index, messageName);
 
         int imsiIdx = AsnReaderHelper.findNthChild(index, -1, 0);
         int liIdx = AsnReaderHelper.findNthChild(index, -1, 1);
@@ -441,7 +434,7 @@ public final class MapFlatAsnDecoder {
 
         int tagByte = index.tags[liIdx];
         if (AsnReaderHelper.getTagClass(tagByte) != Tag.CLASS_CONTEXT_SPECIFIC
-                || AsnReaderHelper.getTagNumber(tagByte) != 0 || !AsnReaderHelper.isConstructed(tagByte)) {
+                || AsnReaderHelper.getTagNumber(index, liIdx) != 0 || !AsnReaderHelper.isConstructed(tagByte)) {
             throw mistyped(messageName, "locationInfoWithLMSI bad tag");
         }
 
@@ -449,17 +442,16 @@ public final class MapFlatAsnDecoder {
         IMSIImpl imsi = new IMSIImpl();
         imsi.decodeFromOctetView(index.rawBuffer, index.valueOffsets[imsiIdx], index.valueLengths[imsiIdx]);
         fields.imsi = imsi;
-        fields.locationInfoWithLMSI = decodeLocationInfoWithLmsi(index, liIdx, messageName);
 
-        for (int i = 0; i < index.tagCount; i++) {
-            if (index.parents[i] != -1 || i == imsiIdx || i == liIdx) {
+        for (int i = index.rootFirstChild; i != -1; i = index.nextSibling[i]) {
+            if (i == imsiIdx || i == liIdx) {
                 continue;
             }
             tagByte = index.tags[i];
             if (AsnReaderHelper.getTagClass(tagByte) != Tag.CLASS_CONTEXT_SPECIFIC) {
                 continue;
             }
-            int tagNum = AsnReaderHelper.getTagNumber(tagByte);
+            int tagNum = AsnReaderHelper.getTagNumber(index, i);
             if (tagNum == 4 && AsnReaderHelper.isConstructed(tagByte)) {
                 fields.extensionContainer = decodeExtensionContainer(index, i, messageName);
             } else if (tagNum == 2 && AsnReaderHelper.isPrimitive(tagByte)) {
@@ -468,6 +460,8 @@ public final class MapFlatAsnDecoder {
                 fields.ipSmGwGuidance = decodeIpSmGwGuidance(index, i, messageName);
             }
         }
+
+        fields.locationInfoWithLMSI = decodeLocationInfoWithLmsi(index, liIdx, messageName);
 
         return fields;
     }
@@ -491,7 +485,7 @@ public final class MapFlatAsnDecoder {
         int len = index.valueLengths[elemIdx];
         byte[] buf = index.rawBuffer;
 
-        switch (AsnReaderHelper.getTagNumber(tagByte)) {
+        switch (AsnReaderHelper.getTagNumber(index, elemIdx)) {
             case 0: {
                 IMSIImpl imsi = new IMSIImpl();
                 imsi.decodeFromOctetView(buf, off, len);
@@ -510,7 +504,7 @@ public final class MapFlatAsnDecoder {
             case 5:
                 return new SM_RP_DAImpl();
             default:
-                throw mistyped(messageName, "SM_RP_DA bad tag: " + AsnReaderHelper.getTagNumber(tagByte));
+                throw mistyped(messageName, "SM_RP_DA bad tag: " + AsnReaderHelper.getTagNumber(index, elemIdx));
         }
     }
 
@@ -526,7 +520,7 @@ public final class MapFlatAsnDecoder {
         byte[] buf = index.rawBuffer;
         SM_RP_OAImpl oa = new SM_RP_OAImpl();
 
-        switch (AsnReaderHelper.getTagNumber(tagByte)) {
+        switch (AsnReaderHelper.getTagNumber(index, elemIdx)) {
             case 2: {
                 ISDNAddressStringImpl msisdn = new ISDNAddressStringImpl();
                 msisdn.decodeFromOctetView(buf, off, len);
@@ -542,7 +536,7 @@ public final class MapFlatAsnDecoder {
             case 5:
                 return oa;
             default:
-                throw mistyped(messageName, "SM_RP_OA bad tag: " + AsnReaderHelper.getTagNumber(tagByte));
+                throw mistyped(messageName, "SM_RP_OA bad tag: " + AsnReaderHelper.getTagNumber(index, elemIdx));
         }
     }
 
@@ -550,7 +544,7 @@ public final class MapFlatAsnDecoder {
             throws MAPParsingComponentException {
         int tagByte = index.tags[elemIdx];
         if (AsnReaderHelper.getTagClass(tagByte) != Tag.CLASS_UNIVERSAL || !AsnReaderHelper.isPrimitive(tagByte)
-                || AsnReaderHelper.getTagNumber(tagByte) != Tag.STRING_OCTET) {
+                || AsnReaderHelper.getTagNumber(index, elemIdx) != Tag.STRING_OCTET) {
             throw mistyped(messageName, "sm-RP-UI bad tag class or not STRING_OCTET");
         }
         SmsSignalInfoImpl ui = new SmsSignalInfoImpl();
@@ -581,8 +575,8 @@ public final class MapFlatAsnDecoder {
 
     private static LocationInfoWithLMSIImpl decodeLocationInfoWithLmsi(AsnMessageIndex index, int elemIdx,
             String messageName) throws MAPParsingComponentException {
-        AsnMessageIndex inner = new AsnMessageIndex();
-        FlatAsnParser.parseAll(index.rawBuffer, index.valueOffsets[elemIdx], index.valueLengths[elemIdx], inner);
+        AsnMessageIndex inner = AsnIndexPool.get();
+        parseIndex(index.rawBuffer, index.valueOffsets[elemIdx], index.valueLengths[elemIdx], inner, messageName);
 
         ISDNAddressStringImpl networkNodeNumber = null;
         LMSIImpl lmsi = null;
@@ -590,13 +584,10 @@ public final class MapFlatAsnDecoder {
         boolean gprsNodeIndicator = false;
         AdditionalNumber additionalNumber = null;
 
-        for (int i = 0; i < inner.tagCount; i++) {
-            if (inner.parents[i] != -1) {
-                continue;
-            }
+        for (int i = inner.rootFirstChild; i != -1; i = inner.nextSibling[i]) {
             int tagByte = inner.tags[i];
             int tagClass = AsnReaderHelper.getTagClass(tagByte);
-            int tagNum = AsnReaderHelper.getTagNumber(tagByte);
+            int tagNum = AsnReaderHelper.getTagNumber(inner, i);
 
             if (tagClass == Tag.CLASS_CONTEXT_SPECIFIC && tagNum == 1 && AsnReaderHelper.isPrimitive(tagByte)) {
                 networkNodeNumber = decodeIsdnAddress(inner, i, messageName);
@@ -627,7 +618,7 @@ public final class MapFlatAsnDecoder {
     private static AdditionalNumber decodeAdditionalNumber(AsnMessageIndex index, int elemIdx, String messageName)
             throws MAPParsingComponentException {
         try {
-            AsnInputStream ais = AsnInputStream.viewBytes(index.rawBuffer, index.valueOffsets[elemIdx],
+            AsnInputStream ais = AsnStreamPool.borrowSlice(index.rawBuffer, index.valueOffsets[elemIdx],
                     index.valueLengths[elemIdx]);
             ais.readTag();
             AdditionalNumberImpl an = new AdditionalNumberImpl();
@@ -645,7 +636,7 @@ public final class MapFlatAsnDecoder {
         try {
             AsnInputStream ais = sliceAsElement(index, elemIdx);
             IpSmGwGuidanceImpl guidance = new IpSmGwGuidanceImpl();
-            guidance.decodeAll(ais);
+            guidance.decodeData(ais, index.valueLengths[elemIdx]);
             return guidance;
         } catch (MAPParsingComponentException e) {
             throw mistyped(messageName, "decoding ipSmGwGuidance: " + e.getMessage());
@@ -657,12 +648,7 @@ public final class MapFlatAsnDecoder {
     }
 
     private static boolean hasChildTag(AsnMessageIndex index, int parentIndex, int targetTagByte) {
-        for (int i = 0; i < index.tagCount; i++) {
-            if (index.parents[i] == parentIndex && index.tags[i] == targetTagByte) {
-                return true;
-            }
-        }
-        return false;
+        return AsnReaderHelper.findChildTag(index, parentIndex, targetTagByte) != -1;
     }
 
     private static MAPExtensionContainer decodeExtensionContainer(AsnMessageIndex index, int elemIdx, String messageName)
@@ -670,7 +656,7 @@ public final class MapFlatAsnDecoder {
         try {
             AsnInputStream ais = sliceAsElement(index, elemIdx);
             MAPExtensionContainerImpl ec = new MAPExtensionContainerImpl();
-            ec.decodeAll(ais);
+            ec.decodeData(ais, index.valueLengths[elemIdx]);
             return ec;
         } catch (MAPParsingComponentException e) {
             throw mistyped(messageName, "decoding extensionContainer: " + e.getMessage());
@@ -679,8 +665,8 @@ public final class MapFlatAsnDecoder {
 
     private static void decodeOptionalUssdFields(AsnMessageIndex index, int dcsIdx, int ussdIdx, UssdFields fields,
             String messageName) throws MAPParsingComponentException {
-        for (int i = 0; i < index.tagCount; i++) {
-            if (index.parents[i] != -1 || i == dcsIdx || i == ussdIdx) {
+        for (int i = index.rootFirstChild; i != -1; i = index.nextSibling[i]) {
+            if (i == dcsIdx || i == ussdIdx) {
                 continue;
             }
 
@@ -701,20 +687,19 @@ public final class MapFlatAsnDecoder {
     }
 
     /**
-     * Wraps the value bytes of an indexed element for {@code decodeAll()} on {@link org.restcomm.protocols.ss7.map.primitives.SequenceBase}
-     * subclasses. Those decoders expect the stream positioned after the outer tag (at the length byte), not at the tag.
+     * Zero-copy view over indexed element value bytes for {@code decodeData()} on
+     * {@link org.restcomm.protocols.ss7.map.primitives.SequenceBase} subclasses.
      */
-    private static AsnInputStream sliceAsElement(AsnMessageIndex index, int elemIdx) throws MAPParsingComponentException {
+    private static AsnInputStream sliceAsElement(AsnMessageIndex index, int elemIdx) {
+        return AsnStreamPool.borrowSlice(index.rawBuffer, index.valueOffsets[elemIdx], index.valueLengths[elemIdx]);
+    }
+
+    private static void parseIndex(byte[] buffer, int offset, int length, AsnMessageIndex index, String messageName)
+            throws MAPParsingComponentException {
         try {
-            int off = index.valueOffsets[elemIdx];
-            int len = index.valueLengths[elemIdx];
-            AsnOutputStream aos = new AsnOutputStream();
-            aos.writeLength(len);
-            aos.write(index.rawBuffer, off, len);
-            return new AsnInputStream(aos.toByteArray());
-        } catch (IOException e) {
-            throw new MAPParsingComponentException("IOException wrapping ASN element: " + e.getMessage(), e,
-                    MAPParsingComponentExceptionReason.MistypedParameter);
+            FlatAsnParser.parseAll(buffer, offset, length, index);
+        } catch (AsnException e) {
+            throw mistyped(messageName, e.getMessage());
         }
     }
 }
