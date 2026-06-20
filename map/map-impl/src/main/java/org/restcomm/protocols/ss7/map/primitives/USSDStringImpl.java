@@ -10,6 +10,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 
+import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.datacoding.CBSDataCodingGroup;
 import org.restcomm.protocols.ss7.map.api.datacoding.CBSDataCodingScheme;
@@ -35,6 +36,11 @@ import org.restcomm.protocols.ss7.map.datacoding.Gsm7EncodingStyle;
 public class USSDStringImpl extends OctetStringBase implements USSDString {
 
     private CBSDataCodingScheme dataCodingScheme;
+
+    private byte[] viewBuffer;
+    private int viewOffset;
+    private int viewLength;
+    private boolean dataViewActive;
 
     private static GSMCharset gsm7Charset = new GSMCharset("GSM", new String[] {});
     private static GSMCharset gsm7Charset_Urdu = new GSMCharset("GSM", new String[] {}, GSMCharset.BYTE_TO_CHAR_UrduAlphabet,
@@ -154,10 +160,61 @@ public class USSDStringImpl extends OctetStringBase implements USSDString {
 
     public void setEncodedString(byte[] data) {
         this.data = data;
+        this.dataViewActive = false;
+    }
+
+    /**
+     * Bind USSD octets to a slice of an external buffer (zero-copy view).
+     * Used by flat ASN index pilot decode paths.
+     */
+    public void setDataView(byte[] buffer, int offset, int length) {
+        this.viewBuffer = buffer;
+        this.viewOffset = offset;
+        this.viewLength = length;
+        this.dataViewActive = true;
+        this.data = null;
+    }
+
+    public boolean hasDataView() {
+        return this.dataViewActive;
+    }
+
+    public byte[] getDataViewBuffer() {
+        return this.viewBuffer;
+    }
+
+    public int getDataViewOffset() {
+        return this.viewOffset;
+    }
+
+    public int getDataViewLength() {
+        return this.viewLength;
+    }
+
+    private byte[] activeData() {
+        if (this.dataViewActive) {
+            byte[] slice = new byte[this.viewLength];
+            System.arraycopy(this.viewBuffer, this.viewOffset, slice, 0, this.viewLength);
+            return slice;
+        }
+        return this.data;
     }
 
     public CBSDataCodingScheme getDataCodingScheme() {
         return this.dataCodingScheme;
+    }
+
+    @Override
+    public void encodeData(AsnOutputStream asnOutputStream) throws MAPException {
+        if (this.dataViewActive) {
+            if (this.viewLength < this.minLength || this.viewLength > this.maxLength) {
+                throw new MAPException("Error while encoding the " + _PrimitiveName + ": data field length must be from "
+                        + this.minLength + " to " + this.maxLength + " octets");
+            }
+            asnOutputStream.write(this.viewBuffer, this.viewOffset, this.viewLength);
+            return;
+        }
+        super.encodeData(asnOutputStream);
     }
 
     public void setDataCodingScheme(CBSDataCodingScheme dataCodingScheme) {
@@ -165,7 +222,7 @@ public class USSDStringImpl extends OctetStringBase implements USSDString {
     }
 
     public byte[] getEncodedString() {
-        return this.data;
+        return activeData();
     }
 
     public String getString(Charset gsm8Charset) throws MAPException {
@@ -175,9 +232,11 @@ public class USSDStringImpl extends OctetStringBase implements USSDString {
         if (dataCodingScheme == null) {
             dataCodingScheme = new CBSDataCodingSchemeImpl(15);
         }
-        if (this.data == null) {
+        if (this.data == null && !this.dataViewActive) {
             throw new MAPException("Error decoding a text in USSDStringImpl: encoded data can not be null");
         }
+
+        byte[] encoded = activeData();
 
         if (dataCodingScheme.getIsCompressed()) {
             // TODO: implement the case with compressed sms message
@@ -193,7 +252,7 @@ public class USSDStringImpl extends OctetStringBase implements USSDString {
                     GSMCharsetDecoder decoder = (GSMCharsetDecoder) cSet.newDecoder();
                     decoder.setGSMCharsetDecodingData(new GSMCharsetDecodingData(Gsm7EncodingStyle.bit7_ussd_style,
                             Integer.MAX_VALUE, 0));
-                    ByteBuffer bb = ByteBuffer.wrap(this.data);
+                    ByteBuffer bb = ByteBuffer.wrap(encoded);
                     CharBuffer bf = null;
                     try {
                         bf = decoder.decode(bb);
@@ -206,7 +265,7 @@ public class USSDStringImpl extends OctetStringBase implements USSDString {
 
                 case GSM8:
                     if (gsm8Charset != null) {
-                        byte[] buf = this.data;
+                        byte[] buf = encoded;
                         bb = ByteBuffer.wrap(buf);
                         bf = gsm8Charset.decode(bb);
                         res = bf.toString();
@@ -215,16 +274,16 @@ public class USSDStringImpl extends OctetStringBase implements USSDString {
 
                 case UCS2:
                     String pref = "";
-                    byte[] buf = this.data;
+                    byte[] buf = encoded;
                     if (dataCodingScheme.getDataCodingGroup() == CBSDataCodingGroup.GeneralWithLanguageIndication) {
                         cSet = gsm7Charset;
                         decoder = (GSMCharsetDecoder) cSet.newDecoder();
                         decoder.setGSMCharsetDecodingData(new GSMCharsetDecodingData(Gsm7EncodingStyle.bit7_ussd_style,
                                 Integer.MAX_VALUE, 0));
                         byte[] buf2 = new byte[3];
-                        if (this.data.length < 3)
-                            buf2 = new byte[this.data.length];
-                        System.arraycopy(this.data, 0, buf2, 0, buf2.length);
+                        if (encoded.length < 3)
+                            buf2 = new byte[encoded.length];
+                        System.arraycopy(encoded, 0, buf2, 0, buf2.length);
                         bb = ByteBuffer.wrap(buf2);
                         bf = null;
                         try {
@@ -235,11 +294,11 @@ public class USSDStringImpl extends OctetStringBase implements USSDString {
                         if (bf != null)
                             pref = bf.toString();
 
-                        if (this.data.length <= 3) {
+                        if (encoded.length <= 3) {
                             buf = new byte[0];
                         } else {
-                            buf = new byte[this.data.length - 3];
-                            System.arraycopy(this.data, 3, buf, 0, buf.length);
+                            buf = new byte[encoded.length - 3];
+                            System.arraycopy(encoded, 3, buf, 0, buf.length);
                         }
 
                         bb = ByteBuffer.wrap(buf);

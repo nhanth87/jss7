@@ -1,12 +1,6 @@
 package org.restcomm.protocols.ss7.m3ua.impl;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
-import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
-import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -15,58 +9,33 @@ import java.io.Writer;
 /**
  * Jackson XML helper for M3UA module XML serialization.
  * Replaces XStream to avoid Java module system issues.
- * @deprecated Use M3UAJacksonXMLHelper instead
+ * @deprecated Use {@link M3UAJacksonXMLHelper} instead
  */
 @Deprecated
 public class JacksonXMLHelper {
-    private static final XmlMapper xmlMapper;
-
-    static {
-        XmlFactory factory = new XmlFactory(
-            new com.ctc.wstx.stax.WstxInputFactory(),
-            new com.ctc.wstx.stax.WstxOutputFactory()
-        );
-        xmlMapper = new XmlMapper(factory);
-        // Configure for pretty printing
-        // INDENT_OUTPUT disabled to avoid Stax2WriterAdapter.writeRaw() UnsupportedOperationException
-        // with Jackson-dataformat-xml 2.15.2 + StAX on WildFly 10
-        // xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        xmlMapper.enable(ToXmlGenerator.Feature.WRITE_XML_DECLARATION);
-
-        // Configure to allow deserialization of generic types
-        xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        // Configure polymorphic type handling
-        PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
-                .allowIfBaseType("org.restcomm.protocols.ss7.m3ua")
-                .build();
-        xmlMapper.activateDefaultTyping(ptv, com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.NON_FINAL);
-        // Remove default pretty printer to prevent Stax2WriterAdapter.writeRaw() exception on WildFly 10
-        xmlMapper.setDefaultPrettyPrinter(null);
-    }
 
     public static XmlMapper getXmlMapper() {
-        return xmlMapper;
+        return M3UAJacksonXMLHelper.getXmlMapper();
     }
 
     public static void toXML(Object obj, Writer writer) throws IOException {
-        xmlMapper.writeValue(writer, obj);
+        M3UAJacksonXMLHelper.toXML(obj, writer);
     }
 
     public static String toXML(Object obj) throws IOException {
-        return xmlMapper.writeValueAsString(obj);
+        return M3UAJacksonXMLHelper.toXML(obj);
     }
 
     public static <T> T fromXML(Reader reader, Class<T> clazz) throws IOException {
-        return xmlMapper.readValue(reader, clazz);
+        return M3UAJacksonXMLHelper.fromXML(reader, clazz);
     }
 
     public static <T> T fromXML(String xml, Class<T> clazz) throws IOException {
-        return xmlMapper.readValue(xml, clazz);
+        return M3UAJacksonXMLHelper.fromXML(xml, clazz);
     }
 
     @SuppressWarnings("unchecked")
     public static <T> T fromXML(String xml) throws IOException {
-        return (T) xmlMapper.readValue(xml, Object.class);
+        return (T) M3UAJacksonXMLHelper.fromXML(xml);
     }
 }

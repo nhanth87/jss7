@@ -12,6 +12,7 @@ import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.map.api.primitives.AddressString;
 import org.restcomm.protocols.ss7.map.api.primitives.MAPExtensionContainer;
+import org.restcomm.protocols.ss7.map.MapFlatAsnDecoder;
 import org.restcomm.protocols.ss7.map.primitives.AddressStringImpl;
 import org.restcomm.protocols.ss7.map.primitives.MAPAsnPrimitive;
 import org.restcomm.protocols.ss7.map.primitives.MAPExtensionContainerImpl;
@@ -124,6 +125,10 @@ public class MAPOpenInfoImpl implements MAPAsnPrimitive {
 
         try {
             int length = ansIS.readLength();
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applyMapOpenFields(MapFlatAsnDecoder.decodeMapOpenInfo(ansIS, length, "MAPOpenInfo"));
+                return;
+            }
             this._decode(ansIS, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding MAPOpenInfo: " + e.getMessage(), e,
@@ -137,6 +142,10 @@ public class MAPOpenInfoImpl implements MAPAsnPrimitive {
     public void decodeData(AsnInputStream ansIS, int length) throws MAPParsingComponentException {
 
         try {
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applyMapOpenFields(MapFlatAsnDecoder.decodeMapOpenInfo(ansIS, length, "MAPOpenInfo"));
+                return;
+            }
             this._decode(ansIS, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding MAPOpenInfo: " + e.getMessage(), e,
@@ -145,6 +154,15 @@ public class MAPOpenInfoImpl implements MAPAsnPrimitive {
             throw new MAPParsingComponentException("AsnException when decoding MAPOpenInfo: " + e.getMessage(), e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
         }
+    }
+
+    private void applyMapOpenFields(MapFlatAsnDecoder.MapOpenFields fields) {
+        this.destReference = fields.destReference;
+        this.origReference = fields.origReference;
+        this.extensionContainer = fields.extensionContainer;
+        this.ericssonStyle = fields.ericssonStyle;
+        this.ericssonMsisdn = fields.ericssonMsisdn;
+        this.ericssonVlrNo = fields.ericssonVlrNo;
     }
 
     private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {

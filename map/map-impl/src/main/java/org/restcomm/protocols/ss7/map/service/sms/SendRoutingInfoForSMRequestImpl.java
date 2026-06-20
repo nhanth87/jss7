@@ -20,6 +20,7 @@ import org.restcomm.protocols.ss7.map.api.service.sms.SMDeliveryNotIntended;
 import org.restcomm.protocols.ss7.map.api.service.sms.SM_RP_MTI;
 import org.restcomm.protocols.ss7.map.api.service.sms.SM_RP_SMEA;
 import org.restcomm.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMRequest;
+import org.restcomm.protocols.ss7.map.MapFlatAsnDecoder;
 import org.restcomm.protocols.ss7.map.primitives.AddressStringImpl;
 import org.restcomm.protocols.ss7.map.primitives.IMSIImpl;
 import org.restcomm.protocols.ss7.map.primitives.ISDNAddressStringImpl;
@@ -170,6 +171,10 @@ public class SendRoutingInfoForSMRequestImpl extends SmsMessageImpl implements S
     public void decodeAll(AsnInputStream asnInputStream) throws MAPParsingComponentException {
         try {
             int length = asnInputStream.readLength();
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applySriFields(MapFlatAsnDecoder.decodeSendRoutingInfoForSm(asnInputStream, length, _PrimitiveName));
+                return;
+            }
             this._decode(asnInputStream, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
@@ -182,6 +187,10 @@ public class SendRoutingInfoForSMRequestImpl extends SmsMessageImpl implements S
 
     public void decodeData(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException {
         try {
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applySriFields(MapFlatAsnDecoder.decodeSendRoutingInfoForSm(asnInputStream, length, _PrimitiveName));
+                return;
+            }
             this._decode(asnInputStream, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
@@ -190,6 +199,23 @@ public class SendRoutingInfoForSMRequestImpl extends SmsMessageImpl implements S
             throw new MAPParsingComponentException("AsnException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
         }
+    }
+
+    private void applySriFields(MapFlatAsnDecoder.SriFields fields) {
+        this.msisdn = fields.msisdn;
+        this.sm_RP_PRI = fields.smRpPri;
+        this.serviceCentreAddress = fields.serviceCentreAddress;
+        this.extensionContainer = fields.extensionContainer;
+        this.gprsSupportIndicator = fields.gprsSupportIndicator;
+        this.sM_RP_MTI = null;
+        this.sM_RP_SMEA = null;
+        this.smDeliveryNotIntended = null;
+        this.ipSmGwGuidanceIndicator = false;
+        this.imsi = null;
+        this.t4TriggerIndicator = false;
+        this.singleAttemptDelivery = false;
+        this.teleservice = null;
+        this.correlationID = null;
     }
 
     private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {

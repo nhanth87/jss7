@@ -1,30 +1,23 @@
 package org.restcomm.protocols.ss7.isup.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+
+import org.restcomm.protocols.ss7.utility.SS7XmlMapperFactory;
 
 /**
  * Jackson XML helper for ISUP module XML serialization.
  * Replaces XStream XML serialization.
  */
 public class ISUPJacksonXMLHelper {
-    private static final XmlMapper xmlMapper = new XmlMapper();
-    
+    private static final XmlMapper xmlMapper;
+
     static {
-        // Configure XML mapper
-        xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
-        // INDENT_OUTPUT disabled to avoid Stax2WriterAdapter.writeRaw() UnsupportedOperationException
-        // with Jackson-dataformat-xml 2.15.2 + StAX on WildFly 10
-        // xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        // Remove default pretty printer to prevent Stax2WriterAdapter.writeRaw() exception on WildFly 10
-        xmlMapper.setDefaultPrettyPrinter(null);
+        xmlMapper = SS7XmlMapperFactory.createSccpStackConfigMapper();
     }
     
     public static XmlMapper getXmlMapper() {

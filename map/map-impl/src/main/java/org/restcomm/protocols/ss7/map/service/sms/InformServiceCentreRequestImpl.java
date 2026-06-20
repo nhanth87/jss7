@@ -18,6 +18,7 @@ import org.restcomm.protocols.ss7.map.api.service.sms.InformServiceCentreRequest
 import org.restcomm.protocols.ss7.map.api.service.sms.MWStatus;
 import org.restcomm.protocols.ss7.map.primitives.ISDNAddressStringImpl;
 import org.restcomm.protocols.ss7.map.primitives.MAPExtensionContainerImpl;
+import org.restcomm.protocols.ss7.map.MapFlatAsnDecoder;
 
 /**
  *
@@ -90,6 +91,11 @@ public class InformServiceCentreRequestImpl extends SmsMessageImpl implements In
     public void decodeAll(AsnInputStream asnInputStream) throws MAPParsingComponentException {
         try {
             int length = asnInputStream.readLength();
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applyInformFields(MapFlatAsnDecoder.decodeInformServiceCentre(asnInputStream, length,
+                        "InformServiceCentreRequest"));
+                return;
+            }
             this._decode(asnInputStream, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding InformServiceCentreRequest: " + e.getMessage(),
@@ -102,6 +108,11 @@ public class InformServiceCentreRequestImpl extends SmsMessageImpl implements In
 
     public void decodeData(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException {
         try {
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applyInformFields(MapFlatAsnDecoder.decodeInformServiceCentre(asnInputStream, length,
+                        "InformServiceCentreRequest"));
+                return;
+            }
             this._decode(asnInputStream, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding InformServiceCentreRequest: " + e.getMessage(),
@@ -192,6 +203,14 @@ public class InformServiceCentreRequestImpl extends SmsMessageImpl implements In
                 ais.advanceElement();
             }
         }
+    }
+
+    private void applyInformFields(MapFlatAsnDecoder.InformFields fields) {
+        this.storedMSISDN = fields.storedMSISDN;
+        this.mwStatus = fields.mwStatus;
+        this.extensionContainer = fields.extensionContainer;
+        this.absentSubscriberDiagnosticSM = fields.absentSubscriberDiagnosticSM;
+        this.additionalAbsentSubscriberDiagnosticSM = fields.additionalAbsentSubscriberDiagnosticSM;
     }
 
     public void encodeAll(AsnOutputStream asnOutputStream) throws MAPException {

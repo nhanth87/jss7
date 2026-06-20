@@ -1,0 +1,11 @@
+<GlobalTitle0100Impl type="GlobalTitle0100">
+  <encodingScheme>
+    <schemeCode>2</schemeCode>
+    <type>BCD_EVEN</type>
+  </encodingScheme>
+  <globalTitleIndicator>GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_ENCODING_SCHEME_AND_NATURE_OF_ADDRESS</globalTitleIndicator>
+  <digits>9023629581</digits>
+  <nai>NATIONAL</nai>
+  <np>ISDN_TELEPHONY</np>
+  <tt>0</tt>
+</GlobalTitle0100Impl>

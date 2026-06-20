@@ -1,7 +1,13 @@
 package org.restcomm.protocols.ss7.map.service.sms;
 
+import org.mobicents.protocols.asn.AsnException;
+import org.mobicents.protocols.asn.AsnInputStream;
+import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
+import org.restcomm.protocols.ss7.map.api.MAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.map.api.service.sms.MWStatus;
 import org.restcomm.protocols.ss7.map.primitives.BitStringBase;
+
+import java.io.IOException;
 
 /**
  *
@@ -46,6 +52,21 @@ public class MWStatusImpl extends BitStringBase implements MWStatus {
 
     public boolean getMnrgSet() {
         return this.bitString.get(_INDEX_MnrgSet);
+    }
+
+    public void decodeFromBitStringView(byte[] buf, int off, int len) throws MAPParsingComponentException {
+        try {
+            byte[] slice = new byte[len];
+            System.arraycopy(buf, off, slice, 0, len);
+            AsnInputStream ais = new AsnInputStream(slice);
+            this._decode(ais, len);
+        } catch (IOException e) {
+            throw new MAPParsingComponentException("IOException when decoding MWStatus view: " + e.getMessage(), e,
+                    MAPParsingComponentExceptionReason.MistypedParameter);
+        } catch (AsnException e) {
+            throw new MAPParsingComponentException("AsnException when decoding MWStatus view: " + e.getMessage(), e,
+                    MAPParsingComponentExceptionReason.MistypedParameter);
+        }
     }
 
     @Override

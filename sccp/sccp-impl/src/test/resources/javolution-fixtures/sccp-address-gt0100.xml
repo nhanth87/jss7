@@ -1,0 +1,33 @@
+<SccpAddressImpl>
+  <translated>false</translated>
+  <addressIndicator value="19">
+    <globalTitleIndicator>GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_ENCODING_SCHEME_AND_NATURE_OF_ADDRESS</globalTitleIndicator>
+    <pcPresent>true</pcPresent>
+    <ssnPresent>true</ssnPresent>
+    <routingIndicator>ROUTING_BASED_ON_GLOBAL_TITLE</routingIndicator>
+    <reservedForNationalUseBit>false</reservedForNationalUseBit>
+  </addressIndicator>
+  <signalingPointCode>146</signalingPointCode>
+  <subsystemNumber>8</subsystemNumber>
+  <gt class="GlobalTitle0100">
+    <encodingScheme>
+      <schemeCode>2</schemeCode>
+      <type>BCD_EVEN</type>
+    </encodingScheme>
+    <globalTitleIndicator>GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_ENCODING_SCHEME_AND_NATURE_OF_ADDRESS</globalTitleIndicator>
+    <digits>9023629581</digits>
+    <nai>NATIONAL</nai>
+    <np>ISDN_TELEPHONY</np>
+    <tt>0</tt>
+  </gt>
+  <pc>146</pc>
+  <ssn>8</ssn>
+  <networkId>0</networkId>
+  <ai value="19">
+    <globalTitleIndicator>GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_ENCODING_SCHEME_AND_NATURE_OF_ADDRESS</globalTitleIndicator>
+    <pcPresent>true</pcPresent>
+    <ssnPresent>true</ssnPresent>
+    <routingIndicator>ROUTING_BASED_ON_GLOBAL_TITLE</routingIndicator>
+    <reservedForNationalUseBit>false</reservedForNationalUseBit>
+  </ai>
+</SccpAddressImpl>

@@ -17,6 +17,7 @@ import org.restcomm.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.restcomm.protocols.ss7.map.api.primitives.MAPExtensionContainer;
 import org.restcomm.protocols.ss7.map.api.service.sms.ReportSMDeliveryStatusRequest;
 import org.restcomm.protocols.ss7.map.api.service.sms.SMDeliveryOutcome;
+import org.restcomm.protocols.ss7.map.MapFlatAsnDecoder;
 import org.restcomm.protocols.ss7.map.primitives.AddressStringImpl;
 import org.restcomm.protocols.ss7.map.primitives.ISDNAddressStringImpl;
 import org.restcomm.protocols.ss7.map.primitives.MAPExtensionContainerImpl;
@@ -127,6 +128,10 @@ public class ReportSMDeliveryStatusRequestImpl extends SmsMessageImpl implements
     public void decodeAll(AsnInputStream asnInputStream) throws MAPParsingComponentException {
         try {
             int length = asnInputStream.readLength();
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applyRsdsFields(MapFlatAsnDecoder.decodeReportSmDeliveryStatus(asnInputStream, length, _PrimitiveName));
+                return;
+            }
             this._decode(asnInputStream, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
@@ -139,6 +144,10 @@ public class ReportSMDeliveryStatusRequestImpl extends SmsMessageImpl implements
 
     public void decodeData(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException {
         try {
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applyRsdsFields(MapFlatAsnDecoder.decodeReportSmDeliveryStatus(asnInputStream, length, _PrimitiveName));
+                return;
+            }
             this._decode(asnInputStream, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
@@ -147,6 +156,18 @@ public class ReportSMDeliveryStatusRequestImpl extends SmsMessageImpl implements
             throw new MAPParsingComponentException("AsnException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
         }
+    }
+
+    private void applyRsdsFields(MapFlatAsnDecoder.RsdsFields fields) {
+        this.msisdn = fields.msisdn;
+        this.serviceCentreAddress = fields.serviceCentreAddress;
+        this.sMDeliveryOutcome = fields.smDeliveryOutcome;
+        this.absentSubscriberDiagnosticSM = fields.absentSubscriberDiagnosticSm;
+        this.extensionContainer = fields.extensionContainer;
+        this.gprsSupportIndicator = fields.gprsSupportIndicator;
+        this.deliveryOutcomeIndicator = fields.deliveryOutcomeIndicator;
+        this.additionalSMDeliveryOutcome = null;
+        this.additionalAbsentSubscriberDiagnosticSM = null;
     }
 
     private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {

@@ -1,13 +1,12 @@
 package org.restcomm.protocols.ss7.tcap;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import org.restcomm.protocols.ss7.utility.SS7XmlMapperFactory;
 
 /**
  * Jackson XML helper for TCAP module XML serialization.
@@ -17,16 +16,8 @@ public class TCAPJacksonXMLHelper {
     private static final XmlMapper xmlMapper;
 
     static {
-        XmlFactory factory = new XmlFactory(
-            new com.ctc.wstx.stax.WstxInputFactory(),
-            new com.ctc.wstx.stax.WstxOutputFactory()
-        );
-        xmlMapper = new XmlMapper(factory);
-        
-        // Enable pretty printing for XML output
-        xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        xmlMapper = SS7XmlMapperFactory.createConfigMapper();
         xmlMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-        xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
     }
 

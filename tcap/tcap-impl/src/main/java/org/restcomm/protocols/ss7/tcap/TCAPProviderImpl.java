@@ -92,6 +92,24 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 
     private static final Logger logger = Logger.getLogger(TCAPProviderImpl.class); // listeners
 
+    private static final ThreadLocal<AsnInputStream> ASN_INPUT_STREAM_POOL =
+            ThreadLocal.withInitial(() -> new AsnInputStream(new byte[0]));
+
+    private static final ThreadLocal<AsnOutputStream> ASN_OUTPUT_STREAM_POOL =
+            ThreadLocal.withInitial(AsnOutputStream::new);
+
+    private static AsnInputStream borrowAsnInputStream(byte[] data) {
+        AsnInputStream ais = ASN_INPUT_STREAM_POOL.get();
+        ais.reset(data);
+        return ais;
+    }
+
+    private static AsnOutputStream borrowAsnOutputStream() {
+        AsnOutputStream aos = ASN_OUTPUT_STREAM_POOL.get();
+        aos.reset();
+        return aos;
+    }
+
     private transient List<TCListener> tcListeners = new CopyOnWriteArrayList<>();
     protected transient ScheduledExecutorService _EXECUTOR;
     // boundary for Uni directional dialogs :), tx id is always encoded
@@ -108,8 +126,8 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     // mapping, but not described
     // explicitly...
 
-//    private transient FastMap<Long, DialogImpl> dialogs = new FastMap <Long, DialogImpl>();
-    private transient ConcurrentHashMap<Long, DialogImpl> dialogs = new ConcurrentHashMap<>();
+    private transient DialogRegistryImpl dialogs = new DialogRegistryImpl();
+    private transient DialogIdAllocator dialogIdAllocator;
 
 //    protected transient FastMap<PrevewDialogDataKey, PreviewDialogData> dialogPreviewList = new FastMap<PrevewDialogDataKey, PrevewDialogData>();
     protected transient ConcurrentHashMap<PreviewDialogDataKey, PreviewDialogData> dialogPreviewList = new ConcurrentHashMap<>();
@@ -119,7 +137,6 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     private AtomicInteger seqControl = new AtomicInteger(1);
     private int ssn;
     private long curDialogId = 0;
-//    private AtomicLong currentDialogId = new AtomicLong(1);
 
     private final ReentrantLock txIdLock = new ReentrantLock();
     private final ReentrantLock congestionLock = new ReentrantLock();
@@ -174,43 +191,39 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 
     }
 
-    private boolean checkAvailableTxId(Long availableTxId) {
-        if (!this.dialogs.containsKey(availableTxId))
-            return true;
-        else
-            return false;
+    private void ensureDialogIdAllocator() {
+        if (this.dialogIdAllocator == null) {
+            this.dialogIdAllocator = new DialogIdAllocator(this.stack.getDialogIdRangeStart(), this.stack.getDialogIdRangeEnd());
+        }
     }
 
     private Long getAvailableTxId() throws TCAPException {
         txIdLock.lock();
         try {
-            if (this.dialogs.size() >= this.stack.getMaxDialogs())
+            ensureDialogIdAllocator();
+            if (this.dialogs.size() >= this.stack.getMaxDialogs()) {
                 throw new TCAPException("Current dialog count exceeds its maximum value");
-
-            while (true) {
-                if (this.curDialogId < this.stack.getDialogIdRangeStart())
-                    this.curDialogId = this.stack.getDialogIdRangeStart() - 1;
-                if (++this.curDialogId > this.stack.getDialogIdRangeEnd())
-                    this.curDialogId = this.stack.getDialogIdRangeStart();
-                Long id = this.curDialogId;
-                if (checkAvailableTxId(id))
-                    return id;
             }
+            return this.dialogIdAllocator.allocate();
         } finally {
             txIdLock.unlock();
         }
     }
 
     protected void resetDialogIdValueAfterRangeChange() {
-        if (this.curDialogId < this.stack.getDialogIdRangeStart())
+        if (this.curDialogId < this.stack.getDialogIdRangeStart()) {
             this.curDialogId = this.stack.getDialogIdRangeStart();
-        if (this.curDialogId >= this.stack.getDialogIdRangeEnd())
+        }
+        if (this.curDialogId >= this.stack.getDialogIdRangeEnd()) {
             this.curDialogId = this.stack.getDialogIdRangeEnd() - 1;
+        }
 
-        // if (this.currentDialogId.longValue() < this.stack.getDialogIdRangeStart())
-        // this.currentDialogId.set(this.stack.getDialogIdRangeStart());
-        // if (this.currentDialogId.longValue() >= this.stack.getDialogIdRangeEnd())
-        // this.currentDialogId.set(this.stack.getDialogIdRangeEnd() - 1);
+        if (this.dialogIdAllocator != null) {
+            this.dialogIdAllocator.configure(this.stack.getDialogIdRangeStart(), this.stack.getDialogIdRangeEnd());
+            for (Long dialogId : this.dialogs.keys()) {
+                this.dialogIdAllocator.markUsed(dialogId);
+            }
+        }
     }
 
     // get next Seq Control value available
@@ -330,7 +343,8 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
         if (id == null) {
             id = this.getAvailableTxId();
         } else {
-            if (!checkAvailableTxId(id)) {
+            ensureDialogIdAllocator();
+            if (!this.dialogIdAllocator.tryReserve(id)) {
                 throw new TCAPException("Suggested local TransactionId is already present in system: " + id);
             }
         }
@@ -365,6 +379,11 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     @Override
     public int getCurrentDialogsCount() {
         return this.dialogs.size();
+    }
+
+    @Override
+    public Dialog getDialog(Long localDialogId) {
+        return this.dialogs.get(localDialogId);
     }
 
     public void send(byte[] data, boolean returnMessageOnError, SccpAddress destinationAddress, SccpAddress originatingAddress,
@@ -489,6 +508,9 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
             // synchronized (this.dialogs) {
 
             this.dialogs.remove(did);
+            if (this.dialogIdAllocator != null) {
+                this.dialogIdAllocator.release(did);
+            }
             if (this.stack.getStatisticsEnabled()) {
                 this.stack.getCounterProviderImpl().updateMinDialogsCount(this.dialogs.size());
                 this.stack.getCounterProviderImpl().updateMaxDialogsCount(this.dialogs.size());
@@ -610,6 +632,9 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
         }
 
         this.dialogs.clear();
+        if (this.dialogIdAllocator != null) {
+            this.dialogIdAllocator.reset();
+        }
         this.dialogPreviewList.clear();
     }
 
@@ -622,7 +647,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
         tcapAbortMessage.setDestinationTransactionId(remoteTransactionId);
         tcapAbortMessage.setPAbortCause(providerAbortCause);
 
-        AsnOutputStream aos = new AsnOutputStream();
+        AsnOutputStream aos = borrowAsnOutputStream();
         try {
             tcapAbortMessage.encode(aos);
             if (this.stack.getStatisticsEnabled()) {
@@ -658,7 +683,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
         msg.setDestinationTransactionId(remoteTransactionId);
         msg.setDialogPortion(dialogPortion);
 
-        AsnOutputStream aos = new AsnOutputStream();
+        AsnOutputStream aos = borrowAsnOutputStream();
         try {
             msg.encode(aos);
             if (this.stack.getStatisticsEnabled()) {
@@ -680,7 +705,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
             // FIXME: Qs state that OtxID and DtxID constitute to dialog id.....
 
             // asnData - it should pass
-            AsnInputStream ais = new AsnInputStream(data);
+            AsnInputStream ais = borrowAsnInputStream(data);
 
             // this should have TC message tag :)
             int tag = ais.readTag();
@@ -701,7 +726,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                         logger.error("ParseException when parsing TCContinueMessage: " + e, e);
 
                         // parsing OriginatingTransactionId
-                        ais = new AsnInputStream(data);
+                        ais = borrowAsnInputStream(data);
                         tag = ais.readTag();
                         TCUnidentifiedMessage tcapUnidentified = new TCUnidentifiedMessage();
                         tcapUnidentified.decode(ais);
@@ -740,7 +765,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                         dialog = (DialogImpl) this.getPreviewDialog(ky1, ky2, sccpCallingPartyAddress, sccpCalledPartyAddress, 0);
                         setSsnToDialog(dialog, sccpDataMessage.getCalledPartyAddress().getSubsystemNumber());
                     } else {
-                        dialog = this.dialogs.get(dialogId);
+                        dialog = (DialogImpl) this.dialogs.get(dialogId);
                     }
                     if (dialog == null) {
                         logger.warn("TC-CONTINUE: No dialog/transaction for id: " + dialogId);
@@ -762,7 +787,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                         logger.error("ParseException when parsing TCBeginMessage: " + e, e);
 
                         // parsing OriginatingTransactionId
-                        ais = new AsnInputStream(data);
+                        ais = borrowAsnInputStream(data);
                         tag = ais.readTag();
                         TCUnidentifiedMessage tcUnidentified = new TCUnidentifiedMessage();
                         tcUnidentified.decode(ais);
@@ -860,7 +885,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                         dialog = (DialogImpl) this.getPreviewDialog(ky, null, sccpCallingPartyAddress, sccpCalledPartyAddress, 0);
                         setSsnToDialog(dialog, sccpDataMessage.getCalledPartyAddress().getSubsystemNumber());
                     } else {
-                        dialog = this.dialogs.get(dialogId);
+                        dialog = (DialogImpl) this.dialogs.get(dialogId);
                     }
                     if (dialog == null) {
                         logger.warn("TC-END: No dialog/transaction for id: " + dialogId);
@@ -899,7 +924,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                         dialog = (DialogImpl) this.getPreviewDialog(ky, null, sccpCallingPartyAddress, sccpCalledPartyAddress, 0);
                         setSsnToDialog(dialog, sccpDataMessage.getCalledPartyAddress().getSubsystemNumber());
                     } else {
-                        dialog = this.dialogs.get(dialogId);
+                        dialog = (DialogImpl) this.dialogs.get(dialogId);
                     }
                     if (dialog == null) {
                         logger.warn("TC-ABORT: No dialog/transaction for id: " + dialogId);
@@ -978,7 +1003,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 
         try {
             byte[] data = sccpNoticeMessage.getData();
-            AsnInputStream ais = new AsnInputStream(data);
+            AsnInputStream ais = borrowAsnInputStream(data);
 
             // this should have TC message tag :)
             int tag = ais.readTag();
@@ -988,7 +1013,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 
             if (tcapUnidentified.getOriginatingTransactionId() != null) {
                 long otid = Utils.decodeTransactionId(tcapUnidentified.getOriginatingTransactionId(), this.stack.getSwapTcapIdBytes());
-                dialog = this.dialogs.get(otid);
+                dialog = (DialogImpl) this.dialogs.get(otid);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1150,7 +1175,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
         try {
             DraftParsedMessageImpl draftParsedMessage = new DraftParsedMessageImpl();
 
-            AsnInputStream ais = new AsnInputStream(data);
+            AsnInputStream ais = borrowAsnInputStream(data);
 
             int tag = ais.readTag();
 

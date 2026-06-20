@@ -1,10 +1,9 @@
 package org.restcomm.protocols.ss7.tools.simulator.management;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import java.io.*;
 
+import org.restcomm.protocols.ss7.utility.SS7XmlMapperFactory;
 import org.restcomm.protocols.ss7.tools.simulator.common.ConfigurationData;
 import org.restcomm.protocols.ss7.tools.simulator.level1.M3uaConfigurationData;
 import org.restcomm.protocols.ss7.tools.simulator.level1.M3uaConfigurationData_OldFormat;
@@ -33,25 +32,14 @@ import org.restcomm.protocols.ss7.tools.simulator.tests.lcs.TestLcsClientConfigu
 import org.restcomm.protocols.ss7.tools.simulator.tests.lcs.TestLcsServerConfigurationData;
 import org.restcomm.protocols.ss7.tools.simulator.tests.psi.TestPsiServerConfigurationData;
 
+import org.restcomm.protocols.ss7.utility.SS7XmlMapperFactory;
+
 /**
  * Jackson XML helper for TOOLS simulator module XML serialization.
  * Replaces XStream for better performance and Java 17+ compatibility.
  */
 public class ToolsJacksonXMLHelper {
-    private static final XmlMapper xmlMapper;
-
-    static {
-        xmlMapper = new XmlMapper();
-        xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
-        // INDENT_OUTPUT disabled to avoid Stax2WriterAdapter.writeRaw() UnsupportedOperationException
-        // with Jackson-dataformat-xml 2.15.2 + StAX on WildFly 10
-        // xmlMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        // Remove default pretty printer to prevent Stax2WriterAdapter.writeRaw() exception on WildFly 10
-        xmlMapper.setDefaultPrettyPrinter(null);
-        // Note: Jackson handles type information differently than XStream
-        // Classes need @JacksonXmlRootElement for proper XML element naming
-    }
+    private static final XmlMapper xmlMapper = SS7XmlMapperFactory.createSccpStackConfigMapper();
 
     public static XmlMapper getXmlMapper() {
         return xmlMapper;

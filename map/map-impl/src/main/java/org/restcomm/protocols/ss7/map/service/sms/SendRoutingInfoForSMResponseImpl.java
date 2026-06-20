@@ -17,6 +17,7 @@ import org.restcomm.protocols.ss7.map.api.service.sms.LocationInfoWithLMSI;
 import org.restcomm.protocols.ss7.map.api.service.sms.SendRoutingInfoForSMResponse;
 import org.restcomm.protocols.ss7.map.primitives.IMSIImpl;
 import org.restcomm.protocols.ss7.map.primitives.MAPExtensionContainerImpl;
+import org.restcomm.protocols.ss7.map.MapFlatAsnDecoder;
 
 import java.io.IOException;
 
@@ -95,6 +96,11 @@ public class SendRoutingInfoForSMResponseImpl extends SmsMessageImpl implements 
     public void decodeAll(AsnInputStream asnInputStream) throws MAPParsingComponentException {
         try {
             int length = asnInputStream.readLength();
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applySriResponseFields(MapFlatAsnDecoder.decodeSendRoutingInfoForSmResponse(asnInputStream, length,
+                        _PrimitiveName));
+                return;
+            }
             this._decode(asnInputStream, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
@@ -107,6 +113,11 @@ public class SendRoutingInfoForSMResponseImpl extends SmsMessageImpl implements 
 
     public void decodeData(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException {
         try {
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applySriResponseFields(MapFlatAsnDecoder.decodeSendRoutingInfoForSmResponse(asnInputStream, length,
+                        _PrimitiveName));
+                return;
+            }
             this._decode(asnInputStream, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
@@ -199,6 +210,14 @@ public class SendRoutingInfoForSMResponseImpl extends SmsMessageImpl implements 
             throw new MAPParsingComponentException("Error while decoding " + _PrimitiveName
                     + ": Needs at least 2 mandatory parameters, found " + num,
                     MAPParsingComponentExceptionReason.MistypedParameter);
+    }
+
+    private void applySriResponseFields(MapFlatAsnDecoder.SriResponseFields fields) {
+        this.imsi = fields.imsi;
+        this.locationInfoWithLMSI = fields.locationInfoWithLMSI;
+        this.extensionContainer = fields.extensionContainer;
+        this.mwdSet = fields.mwdSet;
+        this.ipSmGwGuidance = fields.ipSmGwGuidance;
     }
 
     public void encodeAll(AsnOutputStream asnOutputStream) throws MAPException {

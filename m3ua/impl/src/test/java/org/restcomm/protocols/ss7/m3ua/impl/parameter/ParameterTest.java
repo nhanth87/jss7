@@ -13,7 +13,10 @@ import java.util.Arrays;
 
 import javolution.xml.stream.XMLStreamException;
 
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+
 import org.restcomm.protocols.ss7.m3ua.impl.parameter.ASPIdentifierImpl;
+import org.restcomm.protocols.ss7.utility.SS7XmlMapperFactory;
 import org.restcomm.protocols.ss7.m3ua.impl.parameter.AffectedPointCodeImpl;
 import org.restcomm.protocols.ss7.m3ua.impl.parameter.ConcernedDPCImpl;
 import org.restcomm.protocols.ss7.m3ua.impl.parameter.CongestedIndicationImpl;
@@ -61,14 +64,18 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  */
 public class ParameterTest {
 
+    private static XmlMapper xmlMapper;
+
     private ParameterFactoryImpl factory = new ParameterFactoryImpl();
     private ByteBuf out = null;
+    private String serializedEvent;
 
     public ParameterTest() {
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        xmlMapper = SS7XmlMapperFactory.createProtocolMapper();
     }
 
     @AfterClass

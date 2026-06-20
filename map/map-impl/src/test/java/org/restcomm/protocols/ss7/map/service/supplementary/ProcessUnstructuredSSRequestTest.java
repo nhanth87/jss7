@@ -74,6 +74,33 @@ public class ProcessUnstructuredSSRequestTest {
 
     }
 
+    @Test(groups = { "functional.decode", "service.ussd", "flat-index" })
+    public void testDecodeFlatIndexPilot() throws Exception {
+        String previous = System.getProperty("jss7.asn.flatIndexEnabled");
+        try {
+            System.setProperty("jss7.asn.flatIndexEnabled", "true");
+
+            byte[] data = new byte[] { 0x30, 0x0a, 0x04, 0x01, 0x0f, 0x04, 0x05, 0x2a, (byte) 0xd9, (byte) 0x8c, 0x36, 0x02 };
+
+            AsnInputStream asn = new AsnInputStream(data);
+            asn.readTag();
+
+            ProcessUnstructuredSSRequestImpl req = new ProcessUnstructuredSSRequestImpl();
+            req.decodeAll(asn);
+
+            assertEquals(req.getDataCodingScheme().getCode(), 0x0f);
+            assertNotNull(req.getUSSDString());
+            assertTrue(req.getUSSDString().getString(null).equals("*234#"));
+            assertTrue(((USSDStringImpl) req.getUSSDString()).hasDataView());
+        } finally {
+            if (previous == null) {
+                System.clearProperty("jss7.asn.flatIndexEnabled");
+            } else {
+                System.setProperty("jss7.asn.flatIndexEnabled", previous);
+            }
+        }
+    }
+
     @Test(groups = { "functional.encode", "service.ussd" })
     public void testEncode() throws Exception {
         byte[] data = new byte[] { 0x30, 0x0a, 0x04, 0x01, 0x0f, 0x04, 0x05, 0x2a, (byte) 0xd9, (byte) 0x8c, 0x36, 0x02 };

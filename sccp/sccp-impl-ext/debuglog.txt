@@ -8866,3 +8866,12 @@ com.ctc.wstx.exc.WstxUnexpectedCharException: Unexpected character '1' (code 49)
 [2026-04-16 18:37:50,309] INFO107110[pool-90-thread-2] - org.restcomm.protocols.ss7.sccp.impl.SccpStackImpl.stop(SccpStackImpl.java:961) - Stopping management...
 [2026-04-16 18:37:50,310] INFO107111[pool-90-thread-2] - org.restcomm.protocols.ss7.sccp.impl.SccpStackImpl.stop(SccpStackImpl.java:963) - Stopping routing engine...
 [2026-04-16 18:37:50,310] INFO107111[pool-90-thread-2] - org.restcomm.protocols.ss7.sccp.impl.SccpStackImpl.stop(SccpStackImpl.java:965) - Stopping MSU handler...
+[2026-06-20 22:31:19,928]DEBUG     0[main] - org.restcomm.protocols.ss7.sccpext.impl.router.RuleImpl.matchGt(RuleImpl.java:531) - digits didn't match. Pattern digits=555 Address Digits=55 Return  False
+[2026-06-20 22:31:19,982] INFO    54[main] - org.restcomm.protocols.ss7.sccpext.impl.router.RouterExtImpl.start(RouterExtImpl.java:115) - SCCP RouterExt configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/sccp/sccp-impl-ext/MapLoadServerSccpStack_sccprouter3_ext.xml
+[2026-06-20 22:31:19,995] INFO    67[main] - org.restcomm.protocols.ss7.sccpext.impl.router.RouterExtImpl.start(RouterExtImpl.java:119) - Started SCCP Router
+[2026-06-20 22:33:23,044] INFO     0[main] - org.restcomm.protocols.ss7.sccpext.impl.router.RouterExtImpl.start(RouterExtImpl.java:115) - SCCP RouterExt configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/sccp/sccp-impl-ext/MapLoadServerSccpStack_sccprouter3_ext.xml
+[2026-06-20 22:33:23,387] INFO   343[main] - org.restcomm.protocols.ss7.sccpext.impl.router.RouterExtImpl.start(RouterExtImpl.java:119) - Started SCCP Router
+[2026-06-20 22:33:23,392] INFO   348[main] - org.restcomm.protocols.ss7.sccpext.impl.router.RouterExtImpl.start(RouterExtImpl.java:115) - SCCP RouterExt configuration file path /home/meodien/Desktop/ethiopia-working-dir/jSS7/sccp/sccp-impl-ext/RouterStoreExtTest_sccprouter3_ext.xml
+[2026-06-20 22:33:23,395] INFO   351[main] - org.restcomm.protocols.ss7.sccpext.impl.router.RouterExtImpl.start(RouterExtImpl.java:119) - Started SCCP Router
+[2026-06-20 23:01:14,796]DEBUG     1[main] - org.restcomm.protocols.ss7.sccpext.impl.router.RuleImpl.matchGt(RuleImpl.java:531) - digits didn't match. Pattern digits=555 Address Digits=55 Return  False
+[2026-06-20 23:02:37,140]DEBUG     0[main] - org.restcomm.protocols.ss7.sccpext.impl.router.RuleImpl.matchGt(RuleImpl.java:531) - digits didn't match. Pattern digits=555 Address Digits=55 Return  False

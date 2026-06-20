@@ -1,6 +1,5 @@
 package org.restcomm.protocols.ss7.sccp;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.AbstractTypeResolver;
 import com.fasterxml.jackson.databind.DeserializationConfig;
@@ -8,15 +7,20 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.Module.SetupContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import java.lang.reflect.Modifier;
 
 import org.restcomm.protocols.ss7.indicator.GlobalTitleIndicator;
 import org.restcomm.protocols.ss7.indicator.RoutingIndicator;
+import org.restcomm.protocols.ss7.sccp.impl.parameter.GlobalTitle0001Impl;
+import org.restcomm.protocols.ss7.sccp.impl.parameter.GlobalTitle0010Impl;
+import org.restcomm.protocols.ss7.sccp.impl.parameter.GlobalTitle0011Impl;
+import org.restcomm.protocols.ss7.sccp.impl.parameter.GlobalTitle0100Impl;
+import org.restcomm.protocols.ss7.sccp.impl.parameter.NoGlobalTitle;
+import org.restcomm.protocols.ss7.sccp.impl.parameter.SccpAddressImpl;
+import org.restcomm.protocols.ss7.utility.SS7XmlMapperFactory;
 
 import java.io.IOException;
 
@@ -28,16 +32,7 @@ public class SCCPJacksonXMLHelper {
     private static final XmlMapper XML_MAPPER;
     
     static {
-        XmlFactory factory = new XmlFactory(
-            new com.ctc.wstx.stax.WstxInputFactory(),
-            new com.ctc.wstx.stax.WstxOutputFactory()
-        );
-        XML_MAPPER = new XmlMapper(factory);
-        
-        // Enable pretty printing for XML output
-        XML_MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
-        XML_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        XML_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        XML_MAPPER = SS7XmlMapperFactory.createProtocolMapper();
         SimpleModule module = new SimpleModule("sccpjacksonxml-module") {
             @Override
             public void setupModule(SetupContext context) {
@@ -51,6 +46,17 @@ public class SCCPJacksonXMLHelper {
         module.addDeserializer(RoutingIndicator.class, new RoutingIndicatorDeserializer());
         
         XML_MAPPER.registerModule(module);
+        XML_MAPPER.registerSubtypes(
+                new NamedType(SccpAddressImpl.class, "SccpAddress"),
+                new NamedType(GlobalTitle0100Impl.class, "GlobalTitle0100"),
+                new NamedType(GlobalTitle0100Impl.class, "GlobalTitle0100Impl"),
+                new NamedType(GlobalTitle0011Impl.class, "GlobalTitle0011"),
+                new NamedType(GlobalTitle0011Impl.class, "GlobalTitle0011Impl"),
+                new NamedType(GlobalTitle0010Impl.class, "GlobalTitle0010"),
+                new NamedType(GlobalTitle0010Impl.class, "GlobalTitle0010Impl"),
+                new NamedType(GlobalTitle0001Impl.class, "GlobalTitle0001"),
+                new NamedType(GlobalTitle0001Impl.class, "GlobalTitle0001Impl"),
+                new NamedType(NoGlobalTitle.class, "NoGlobalTitle"));
     }
 
     public static XmlMapper getXmlMapper() {
@@ -109,6 +115,7 @@ public class SCCPJacksonXMLHelper {
                 pkg + "." + simple + "Impl",
                 pkg.replace(".api.", ".") + "." + simple + "Impl",
                 pkg + ".impl." + simple + "Impl",
+                "org.restcomm.protocols.ss7.sccp.impl.parameter." + simple + "Impl",
             };
 
             for (String candidate : candidates) {

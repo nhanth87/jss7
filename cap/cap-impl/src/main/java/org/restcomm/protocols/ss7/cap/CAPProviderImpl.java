@@ -4,10 +4,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import java.util.Map;
+import java.util.Set;
+
 import org.jctools.queues.MpscArrayQueue;
 
 import org.apache.log4j.Logger;
@@ -103,7 +102,6 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
     private final transient MpscArrayQueue<CAPDialogListener> dialogListeners = new MpscArrayQueue<>(256);
 
 //    protected transient FastMap<Long, CAPDialogImpl> dialogs = new FastMap<Long, CAPDialogImpl>().shared();
-    protected transient ConcurrentHashMap<Long, CAPDialogImpl> dialogs = new ConcurrentHashMap<Long, CAPDialogImpl>();
 
     private transient TCAPProvider tcapProvider = null;
 
@@ -185,9 +183,11 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
 
     @Override
     public CAPDialog getCAPDialog(Long dialogId) {
-        //synchronized (this.dialogs) {
-            return this.dialogs.get(dialogId);
-        //}
+        Dialog tcapDialog = this.tcapProvider.getDialog(dialogId);
+        if (tcapDialog == null) {
+            return null;
+        }
+        return (CAPDialog) ((DialogImpl) tcapDialog).getApplicationDialog();
     }
 
     public void start() {
@@ -196,19 +196,21 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
 
     public void stop() {
         this.tcapProvider.removeTCListener(this);
-
     }
 
     protected void addDialog(CAPDialogImpl capDialog) {
-        //synchronized (this.dialogs) {
-            this.dialogs.put(capDialog.getLocalDialogId(), capDialog);
-        //}
+        ((DialogImpl) capDialog.getTcapDialog()).setApplicationDialog(capDialog);
     }
 
     protected CAPDialogImpl removeDialog(Long dialogId) {
-        //synchronized (this.dialogs) {
-            return this.dialogs.remove(dialogId);
-        //}
+        Dialog tcapDialog = this.tcapProvider.getDialog(dialogId);
+        if (tcapDialog == null) {
+            return null;
+        }
+        DialogImpl dialogImpl = (DialogImpl) tcapDialog;
+        CAPDialogImpl capDialog = (CAPDialogImpl) dialogImpl.getApplicationDialog();
+        dialogImpl.setApplicationDialog(null);
+        return capDialog;
     }
 
     private void SendUnsupportedAcn(ApplicationContextName acn, Dialog dialog, String cs) {

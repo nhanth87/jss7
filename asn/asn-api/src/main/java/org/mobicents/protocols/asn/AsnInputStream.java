@@ -56,6 +56,42 @@ public class AsnInputStream extends InputStream {
 		this.buffer = buf;
 		this.length = buf.length;
 	}
+
+	/**
+	 * Zero-copy view over a slice of {@code buffer}. The underlying array is shared; callers must not mutate it while decoding.
+	 */
+	public static AsnInputStream viewBytes(byte[] buffer, int offset, int length) {
+		AsnInputStream ais = new AsnInputStream(buffer);
+		ais.start = offset;
+		ais.length = length;
+		ais.pos = 0;
+		return ais;
+	}
+
+	/**
+	 * Rebind this stream to a new buffer for ThreadLocal reuse.
+	 */
+	public void reset(byte[] buf) {
+		this.buffer = buf;
+		this.start = 0;
+		this.length = buf.length;
+		this.pos = 0;
+		this.tagClass = 0;
+		this.pCBit = 0;
+		this.tag = 0;
+	}
+
+	public byte[] getBuffer() {
+		return this.buffer;
+	}
+
+	public int getStartOffset() {
+		return this.start;
+	}
+
+	public int getDataLength() {
+		return this.length;
+	}
 	
 	public AsnInputStream( byte[] buf, int tagClass, boolean isPrimitive, int tag ) {
 		this.buffer = buf;

@@ -13,6 +13,7 @@ import org.restcomm.protocols.ss7.map.api.MAPOperationCode;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentExceptionReason;
 import org.restcomm.protocols.ss7.map.api.primitives.MAPExtensionContainer;
+import org.restcomm.protocols.ss7.map.MapFlatAsnDecoder;
 import org.restcomm.protocols.ss7.map.api.service.sms.MtForwardShortMessageRequest;
 import org.restcomm.protocols.ss7.map.api.service.sms.SM_RP_DA;
 import org.restcomm.protocols.ss7.map.api.service.sms.SM_RP_OA;
@@ -89,6 +90,11 @@ public class MtForwardShortMessageRequestImpl extends SmsMessageImpl implements 
     public void decodeAll(AsnInputStream asnInputStream) throws MAPParsingComponentException {
         try {
             int length = asnInputStream.readLength();
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applyForwardSmFields(MapFlatAsnDecoder.decodeForwardSmSequence(asnInputStream, length, _PrimitiveName, true,
+                        false));
+                return;
+            }
             this._decode(asnInputStream, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
@@ -101,6 +107,11 @@ public class MtForwardShortMessageRequestImpl extends SmsMessageImpl implements 
 
     public void decodeData(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException {
         try {
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applyForwardSmFields(MapFlatAsnDecoder.decodeForwardSmSequence(asnInputStream, length, _PrimitiveName, true,
+                        false));
+                return;
+            }
             this._decode(asnInputStream, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
@@ -109,6 +120,14 @@ public class MtForwardShortMessageRequestImpl extends SmsMessageImpl implements 
             throw new MAPParsingComponentException("AsnException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
         }
+    }
+
+    private void applyForwardSmFields(MapFlatAsnDecoder.ForwardSmFields fields) {
+        this.sM_RP_DA = fields.smRpDa;
+        this.sM_RP_OA = fields.smRpOa;
+        this.sM_RP_UI = fields.smRpUi;
+        this.moreMessagesToSend = fields.moreMessagesToSend;
+        this.extensionContainer = fields.extensionContainer;
     }
 
     private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {

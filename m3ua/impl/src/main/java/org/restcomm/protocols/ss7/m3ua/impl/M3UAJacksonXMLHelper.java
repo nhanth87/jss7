@@ -60,9 +60,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import com.fasterxml.jackson.dataformat.xml.XmlFactory;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.fasterxml.jackson.dataformat.xml.ser.XmlBeanSerializer;
 import java.io.IOException;
 import java.io.Reader;
@@ -70,6 +68,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.restcomm.protocols.ss7.utility.SS7XmlMapperFactory;
 import org.restcomm.protocols.ss7.m3ua.parameter.ASPIdentifier;
 import org.restcomm.protocols.ss7.m3ua.impl.parameter.ASPIdentifierImpl;
 import org.restcomm.protocols.ss7.m3ua.Asp;
@@ -86,22 +85,7 @@ import org.restcomm.protocols.ss7.m3ua.ExchangeType;
 public class M3UAJacksonXMLHelper {
     private static final XmlMapper xmlMapper;
     static {
-        XmlFactory factory = new XmlFactory(
-            new com.ctc.wstx.stax.WstxInputFactory(),
-            new com.ctc.wstx.stax.WstxOutputFactory()
-        );
-        xmlMapper = new XmlMapper(factory);
-        
-        // Enable pretty printing with proper indentation
-        xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        xmlMapper.enable(ToXmlGenerator.Feature.WRITE_XML_DECLARATION);
-
-        // Configure to allow deserialization of unknown properties
-        xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        // Configure to allow serialization of empty beans (needed for complex objects with no serializable fields)
-        xmlMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        // Skip null values in serialization to avoid empty XML elements that break deserialization
-        xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        xmlMapper = SS7XmlMapperFactory.createM3uaConfigMapper();
 
         SimpleModule m3uaModule = new SimpleModule("m3ua-module");
         
@@ -175,6 +159,10 @@ public class M3UAJacksonXMLHelper {
 
     public static <T> T fromXML(Reader reader, Class<T> clazz) throws IOException {
         return xmlMapper.readValue(reader, clazz);
+    }
+
+    public static <T> T fromXML(String xml, Class<T> clazz) throws IOException {
+        return xmlMapper.readValue(xml, clazz);
     }
 
     public static Object fromXML(String xml) throws IOException {

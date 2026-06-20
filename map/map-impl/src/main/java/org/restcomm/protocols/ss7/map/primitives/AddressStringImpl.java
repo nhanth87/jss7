@@ -2,6 +2,7 @@ package org.restcomm.protocols.ss7.map.primitives;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
@@ -33,13 +34,16 @@ public class AddressStringImpl implements AddressString, MAPAsnPrimitive {
     protected int NATURE_OF_ADD_IND_MASK = 0x70;
     protected int NUMBERING_PLAN_IND_MASK = 0x0F;
 
-    @JacksonXmlProperty(isAttribute = true, localName = "nai")
+    @JacksonXmlProperty(isAttribute = true, localName = "NAI")
+    @JsonAlias({ "nai", "NAI" })
     protected AddressNature addressNature;
-    
-    @JacksonXmlProperty(isAttribute = true, localName = "npi")
+
+    @JacksonXmlProperty(isAttribute = true, localName = "NPI")
+    @JsonAlias({ "npi", "NPI" })
     protected NumberingPlan numberingPlan;
-    
+
     @JacksonXmlProperty(isAttribute = true, localName = "number")
+    @JsonAlias({ "number", "NUMBER" })
     protected String address;
 
     private boolean isExtension;
@@ -131,6 +135,20 @@ public class AddressStringImpl implements AddressString, MAPAsnPrimitive {
                     MAPParsingComponentExceptionReason.MistypedParameter);
     }
 
+    public void decodeFromOctetView(byte[] buffer, int offset, int length) throws MAPParsingComponentException {
+        this._testLengthDecode(length);
+        if (length < 1) {
+            throw new MAPParsingComponentException("Error when decoding AddressString: empty value",
+                    MAPParsingComponentExceptionReason.MistypedParameter);
+        }
+        try {
+            decodeAddressOctets(buffer[offset], buffer, offset + 1, length - 1);
+        } catch (IOException e) {
+            throw new MAPParsingComponentException("IOException when decoding AddressString: " + e.getMessage(), e,
+                    MAPParsingComponentExceptionReason.MistypedParameter);
+        }
+    }
+
     protected void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException {
 
         this._testLengthDecode(length);
@@ -139,6 +157,22 @@ public class AddressStringImpl implements AddressString, MAPAsnPrimitive {
         // numbering plan indicator
         int nature = asnInputStream.read();
 
+        decodeAddressOctets(nature, asnInputStream, length - 1);
+    }
+
+    private void decodeAddressOctets(int nature, byte[] buffer, int offset, int tbcdLength)
+            throws MAPParsingComponentException, IOException {
+        applyNatureByte(nature);
+        this.address = TbcdString.decodeString(buffer, offset, tbcdLength);
+    }
+
+    private void decodeAddressOctets(int nature, AsnInputStream asnInputStream, int tbcdLength)
+            throws MAPParsingComponentException, IOException {
+        applyNatureByte(nature);
+        this.address = TbcdString.decodeString(asnInputStream, tbcdLength);
+    }
+
+    private void applyNatureByte(int nature) {
         if ((nature & NO_EXTENSION_MASK) == 0x80) {
             this.isExtension = false;
         } else {
@@ -146,14 +180,10 @@ public class AddressStringImpl implements AddressString, MAPAsnPrimitive {
         }
 
         int natureOfAddInd = ((nature & NATURE_OF_ADD_IND_MASK) >> 4);
-
         this.addressNature = AddressNature.getInstance(natureOfAddInd);
 
         int numbPlanInd = (nature & NUMBERING_PLAN_IND_MASK);
-
         this.numberingPlan = NumberingPlan.getInstance(numbPlanInd);
-
-        this.address = TbcdString.decodeString(asnInputStream, length - 1);
     }
 
     public void encodeAll(AsnOutputStream asnOutputStream) throws MAPException {

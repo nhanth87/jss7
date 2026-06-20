@@ -95,7 +95,17 @@ public class DialogImpl implements Dialog {
 
     private static final Logger logger = Logger.getLogger(DialogImpl.class);
 
+    private static final ThreadLocal<AsnOutputStream> ASN_OUTPUT_STREAM_POOL =
+            ThreadLocal.withInitial(AsnOutputStream::new);
+
+    private static AsnOutputStream borrowAsnOutputStream() {
+        AsnOutputStream aos = ASN_OUTPUT_STREAM_POOL.get();
+        aos.reset();
+        return aos;
+    }
+
     private Object userObject;
+    private Object applicationDialog;
 
     // lock... ech
     protected final ReentrantLock dialogLock = new ReentrantLock();
@@ -564,14 +574,14 @@ public class DialogImpl implements Dialog {
                 tcapBeginMessage.setComponent(componentsToSend);
             }
 
-            AsnOutputStream aos = new AsnOutputStream();
+            AsnOutputStream aos = borrowAsnOutputStream();
             try {
                 tcapBeginMessage.encode(aos);
                 this.setState(TRPseudoState.InitialSent);
                 if (this.provider.getStack().getStatisticsEnabled()) {
                     this.provider.getStack().getCounterProviderImpl().updateTcBeginSentCount(this);
                 }
-                this.provider.send(aos.toByteArray(), tcapBeginRequest.getReturnMessageOnError(), this.remoteAddress, this.localAddress,
+                this.provider.send(aos.copyEncodedBytes(), tcapBeginRequest.getReturnMessageOnError(), this.remoteAddress, this.localAddress,
                         this.seqControl, this.networkId, this.localSsn, this.remotePc);
                 this.scheduledComponentList.clear();
             } catch (Throwable e) {
@@ -645,13 +655,13 @@ public class DialogImpl implements Dialog {
                 if (tcapContinueRequest.getOriginatingAddress() != null && !tcapContinueRequest.getOriginatingAddress().equals(this.localAddress)) {
                     this.localAddress = tcapContinueRequest.getOriginatingAddress();
                 }
-                AsnOutputStream aos = new AsnOutputStream();
+                AsnOutputStream aos = borrowAsnOutputStream();
                 try {
                     tcapContinueMessage.encode(aos);
                     if (this.provider.getStack().getStatisticsEnabled()) {
                         this.provider.getStack().getCounterProviderImpl().updateTcContinueSentCount(this);
                     }
-                    this.provider.send(aos.toByteArray(), tcapContinueRequest.getReturnMessageOnError(), this.remoteAddress,
+                    this.provider.send(aos.copyEncodedBytes(), tcapContinueRequest.getReturnMessageOnError(), this.remoteAddress,
                             this.localAddress, this.seqControl, this.networkId, this.localSsn, this.remotePc);
                     this.setState(TRPseudoState.Active);
                     this.scheduledComponentList.clear();
@@ -678,11 +688,11 @@ public class DialogImpl implements Dialog {
 
                 }
 
-                AsnOutputStream aos = new AsnOutputStream();
+                AsnOutputStream aos = borrowAsnOutputStream();
                 try {
                     tcapContinueMessage.encode(aos);
                     this.provider.getStack().getCounterProviderImpl().updateTcContinueSentCount(this);
-                    this.provider.send(aos.toByteArray(), tcapContinueRequest.getReturnMessageOnError(), this.remoteAddress,
+                    this.provider.send(aos.copyEncodedBytes(), tcapContinueRequest.getReturnMessageOnError(), this.remoteAddress,
                             this.localAddress, this.seqControl, this.networkId, this.localSsn, this.remotePc);
                     this.scheduledComponentList.clear();
                 } catch (Exception e) {
@@ -801,13 +811,13 @@ public class DialogImpl implements Dialog {
                         TRPseudoState.InitialReceived, this.state));
             }
 
-            AsnOutputStream aos = new AsnOutputStream();
+            AsnOutputStream aos = borrowAsnOutputStream();
             try {
                 tcapEndMessage.encode(aos);
                 if (this.provider.getStack().getStatisticsEnabled()) {
                     this.provider.getStack().getCounterProviderImpl().updateTcEndSentCount(this);
                 }
-                this.provider.send(aos.toByteArray(), tcapEndRequest.getReturnMessageOnError(), this.remoteAddress, this.localAddress,
+                this.provider.send(aos.copyEncodedBytes(), tcapEndRequest.getReturnMessageOnError(), this.remoteAddress, this.localAddress,
                         this.seqControl, this.networkId, this.localSsn, this.remotePc);
 
                 this.scheduledComponentList.clear();
@@ -866,13 +876,13 @@ public class DialogImpl implements Dialog {
 
             }
 
-            AsnOutputStream aos = new AsnOutputStream();
+            AsnOutputStream aos = borrowAsnOutputStream();
             try {
                 tcapUniMessage.encode(aos);
                 if (this.provider.getStack().getStatisticsEnabled()) {
                     this.provider.getStack().getCounterProviderImpl().updateTcUniSentCount(this);
                 }
-                this.provider.send(aos.toByteArray(), tcapUniRequest.getReturnMessageOnError(), this.remoteAddress, this.localAddress,
+                this.provider.send(aos.copyEncodedBytes(), tcapUniRequest.getReturnMessageOnError(), this.remoteAddress, this.localAddress,
                         this.seqControl, this.networkId, this.localSsn, this.remotePc);
                 this.scheduledComponentList.clear();
             } catch (Exception e) {
@@ -972,13 +982,13 @@ public class DialogImpl implements Dialog {
                 }
 
                 // no components
-                AsnOutputStream aos = new AsnOutputStream();
+                AsnOutputStream aos = borrowAsnOutputStream();
                 try {
                     tcapAbortMessage.encode(aos);
                     if (this.provider.getStack().getStatisticsEnabled()) {
                         this.provider.getStack().getCounterProviderImpl().updateTcUserAbortSentCount(this);
                     }
-                    this.provider.send(aos.toByteArray(), tcapUserAbortRequest.getReturnMessageOnError(), this.remoteAddress,
+                    this.provider.send(aos.copyEncodedBytes(), tcapUserAbortRequest.getReturnMessageOnError(), this.remoteAddress,
                             this.localAddress, this.seqControl, this.networkId, this.localSsn, this.remotePc);
 
                     this.scheduledComponentList.clear();
@@ -1143,7 +1153,7 @@ public class DialogImpl implements Dialog {
             tcapBeginMessage.setComponent(componentsToSend);
         }
 
-        AsnOutputStream aos = new AsnOutputStream();
+        AsnOutputStream aos = borrowAsnOutputStream();
         try {
             tcapBeginMessage.encode(aos);
         } catch (EncodeException e) {
@@ -1190,7 +1200,7 @@ public class DialogImpl implements Dialog {
             tcapContinueMessage.setComponent(componentsToSend);
         }
 
-        AsnOutputStream aos = new AsnOutputStream();
+        AsnOutputStream aos = borrowAsnOutputStream();
         try {
             tcapContinueMessage.encode(aos);
         } catch (Exception e) {
@@ -1243,7 +1253,7 @@ public class DialogImpl implements Dialog {
             }
         }
 
-        AsnOutputStream aos = new AsnOutputStream();
+        AsnOutputStream aos = borrowAsnOutputStream();
         try {
             tcapEndMessage.encode(aos);
         } catch (Exception e) {
@@ -1280,7 +1290,7 @@ public class DialogImpl implements Dialog {
 
         }
 
-        AsnOutputStream aos = new AsnOutputStream();
+        AsnOutputStream aos = borrowAsnOutputStream();
         try {
             tcapUniMessage.encode(aos);
         } catch (Exception e) {
@@ -1818,14 +1828,14 @@ public class DialogImpl implements Dialog {
                 tcapAbortMessage.setDestinationTransactionId(this.remoteTransactionId);
                 tcapAbortMessage.setDialogPortion(dialogPortion);
 
-                AsnOutputStream aos = new AsnOutputStream();
+                AsnOutputStream aos = borrowAsnOutputStream();
                 try {
                     tcapAbortMessage.encode(aos);
                     if (this.provider.getStack().getStatisticsEnabled()) {
                         this.provider.getStack().getCounterProviderImpl().updateTcPAbortSentCount(this.remoteTransactionId,
                                 PAbortCauseType.NoReasonGiven);
                     }
-                    this.provider.send(aos.toByteArray(), false, this.remoteAddress, this.localAddress, this.seqControl,
+                    this.provider.send(aos.copyEncodedBytes(), false, this.remoteAddress, this.localAddress, this.seqControl,
                             this.networkId, this.localSsn, this.remotePc);
                 } catch (Exception e) {
                     if (logger.isEnabledFor(Level.ERROR)) {
@@ -2175,6 +2185,14 @@ public class DialogImpl implements Dialog {
 
     public void setUserObject(Object userObject) {
         this.userObject = userObject;
+    }
+
+    public Object getApplicationDialog() {
+        return this.applicationDialog;
+    }
+
+    public void setApplicationDialog(Object applicationDialog) {
+        this.applicationDialog = applicationDialog;
     }
 
     public boolean getPreviewMode() {

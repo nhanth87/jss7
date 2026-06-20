@@ -17,6 +17,7 @@ import org.restcomm.protocols.ss7.map.api.primitives.ISDNAddressString;
 import org.restcomm.protocols.ss7.map.api.service.sms.AlertServiceCentreRequest;
 import org.restcomm.protocols.ss7.map.primitives.AddressStringImpl;
 import org.restcomm.protocols.ss7.map.primitives.ISDNAddressStringImpl;
+import org.restcomm.protocols.ss7.map.MapFlatAsnDecoder;
 
 /**
  *
@@ -72,6 +73,11 @@ public class AlertServiceCentreRequestImpl extends SmsMessageImpl implements Ale
     public void decodeAll(AsnInputStream asnInputStream) throws MAPParsingComponentException {
         try {
             int length = asnInputStream.readLength();
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applyAlertFields(MapFlatAsnDecoder.decodeAlertServiceCentre(asnInputStream, length,
+                        "AlertServiceCentreRequest"));
+                return;
+            }
             this._decode(asnInputStream, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding AlertServiceCentreRequest: " + e.getMessage(), e,
@@ -84,6 +90,11 @@ public class AlertServiceCentreRequestImpl extends SmsMessageImpl implements Ale
 
     public void decodeData(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException {
         try {
+            if (MapFlatAsnDecoder.isFlatIndexEnabled()) {
+                applyAlertFields(MapFlatAsnDecoder.decodeAlertServiceCentre(asnInputStream, length,
+                        "AlertServiceCentreRequest"));
+                return;
+            }
             this._decode(asnInputStream, length);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding AlertServiceCentreRequest: " + e.getMessage(), e,
@@ -133,6 +144,11 @@ public class AlertServiceCentreRequestImpl extends SmsMessageImpl implements Ale
         if (this.msisdn == null || this.serviceCentreAddress == null)
             throw new MAPParsingComponentException("Error while decoding AlertServiceCentreRequest: 2 parameters are mandatory, found " + num,
                     MAPParsingComponentExceptionReason.MistypedParameter);
+    }
+
+    private void applyAlertFields(MapFlatAsnDecoder.AlertFields fields) {
+        this.msisdn = fields.msisdn;
+        this.serviceCentreAddress = fields.serviceCentreAddress;
     }
 
     public void encodeAll(AsnOutputStream asnOutputStream) throws MAPException {
