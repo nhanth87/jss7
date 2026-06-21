@@ -76,6 +76,24 @@ java -cp "target/load/*" org.restcomm.protocols.ss7.map.load.ussd.Client \
 
 **ADAPTIVE profile**: same menu paths as RANDOM; pair with think delay 50–500 ms and gRPC AS `--min-delay 1 --max-delay 100`.
 
+## TPS warmup (default ON)
+
+All load generators ramp TPS over the first **60 seconds** before reaching the configured target. Steps: `1 → 100 → 500 → 1000 → 2000 → 3000 → 5000 → 7000 → 10000` (capped at `--tps` / `MAXCONCURRENTDIALOGS`). Avoids slamming full rate into USSD GW before JVM/SLEE/TCAP are ready.
+
+| Tool | Disable warmup |
+|------|----------------|
+| gRPC `loadtest_client.py` | `--no-warmup` |
+| HTTP `http_push_loadtest.py` | `--no-warmup` |
+| MAP `Client.java` | `-Dwarmup=false` |
+
+Example (gRPC, 5000 TPS target):
+
+```
+warmup 60s: 1 → 100 → 500 → 1000 → 2000 → 3000 → 5000 TPS
+```
+
+MAP client prints the same summary at startup via `WarmupRateHelper.summary(MAXCONCURRENTDIALOGS)`.
+
 ## jSS7 MAP Simulator
 
 **ussdgw-test package:**
