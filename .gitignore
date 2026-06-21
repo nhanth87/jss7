@@ -17,6 +17,15 @@ target/
 # Logs
 *.log
 logs/
+debuglog.txt
+debuglog.txt.*
+
+# Local one-off migration / debug scripts — not for GitHub
+fix_*.py
+*.py
+
+# Local Maven classpath dumps (dev/debug)
+**/cp.txt
 
 # OS
 .DS_Store
