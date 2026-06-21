@@ -16,6 +16,8 @@ Aligns jSS7 `map/load` with `ussdgateway` demo config and the gRPC Python tester
 
 ## Build
 
+**From jSS7 source (dev machine):**
+
 ```bash
 cd jSS7/map/load
 ant -f ussd_build.xml clean assemble
@@ -23,7 +25,14 @@ ant -f ussd_build.xml clean assemble
 cd jSS7/map && mvn install -N -DskipTests && cd load && mvn clean package -Passemble -DskipTests
 ```
 
-Output: `target/load/map-load.jar` + dependencies.
+Output: `jSS7/map/load/target/load/map-load.jar` + dependencies.
+
+**From ussdgw-test package** (pre-built by `ussdgw-test/scripts/build-package.sh`):
+
+```bash
+cd ussdgw-test/tools/jss7-map-load
+ls lib/map-load.jar lib/*.jar   # map-load.jar + all runtime deps
+```
 
 ## Run against USSD Gateway
 
@@ -32,6 +41,17 @@ Output: `target/load/map-load.jar` + dependencies.
 3. Start gRPC AS: `python3 ussd_as_server.py --port 8443 --menu-config menu_config.json`
 4. Enable bridge (optional): `sessionbridgeenabled=true`, `asyncgatetimeoutms=7000`.
 5. Run MAP load client:
+
+**ussdgw-test package** (use `lib/*`, not `target/load/*`):
+
+```bash
+cd ussdgw-test/tools/jss7-map-load
+java -cp "lib/*" org.restcomm.protocols.ss7.map.load.ussd.Client \
+  1000 50 sctp 127.0.0.1 8011 -1 127.0.0.1 8012 IPSP 101 102 1 2 3 2 8 6 8 \
+  1111112 9960639999 1 16 -100 0 "*100#" RANDOM 50 200
+```
+
+**From jSS7 source:**
 
 ```bash
 cd jSS7/map/load
@@ -57,6 +77,18 @@ java -cp "target/load/*" org.restcomm.protocols.ss7.map.load.ussd.Client \
 **ADAPTIVE profile**: same menu paths as RANDOM; pair with think delay 50–500 ms and gRPC AS `--min-delay 1 --max-delay 100`.
 
 ## jSS7 MAP Simulator
+
+**ussdgw-test package:**
+
+```bash
+cd ussdgw-test/tools/jss7-simulator/bin
+chmod +x run.sh
+./run.sh gui --name=main
+```
+
+Config is pre-seeded at `ussdgw-test/tools/jss7-simulator/data/main_simulator2.xml`.
+
+**From jSS7 source:**
 
 ```bash
 cd jSS7

@@ -71,7 +71,15 @@
               	<include>org.restcomm.protocols.ss7.statistics:statistics-impl</include>
               	<include>org.restcomm.protocols.ss7.ss7ext:ss7-ext-api</include>
 				<include>org.restcomm.protocols.ss7.ss7ext:ss7-ext-impl</include>
-			    <include>org.apache.commons:commons-email</include>				
+			    <include>org.apache.commons:commons-email</include>
+
+				<!-- Jackson XML + Woodstox StAX (ss7-ext XML persistence) -->
+				<include>com.fasterxml.jackson.core:jackson-databind</include>
+				<include>com.fasterxml.jackson.core:jackson-core</include>
+				<include>com.fasterxml.jackson.core:jackson-annotations</include>
+				<include>com.fasterxml.jackson.dataformat:jackson-dataformat-xml</include>
+				<include>com.fasterxml.woodstox:woodstox-core</include>
+				<include>org.codehaus.woodstox:stax2-api</include>
 
 				<!-- lic dep -->
 				<!--include>com.paic.licenser:PAiClicenser</include>
