@@ -135,6 +135,7 @@ public class Client extends TestHarnessUssd {
 
     volatile long start = 0L;
     volatile long prev = 0L;
+    volatile long loadStartMs = 0L;
 
     private RateLimiter rateLimiterObj = null;
 
@@ -322,6 +323,11 @@ public class Client extends TestHarnessUssd {
         }
 
         System.out.println("[DEBUG] Acquiring rate limiter...");
+        if (loadStartMs == 0L) {
+            loadStartMs = System.currentTimeMillis();
+        }
+        long elapsed = System.currentTimeMillis() - loadStartMs;
+        this.rateLimiterObj.setRate(WarmupRateHelper.tpsAt(elapsed, MAXCONCURRENTDIALOGS));
         this.rateLimiterObj.acquire();
         System.out.println("[DEBUG] Rate limiter acquired");
         // System.out.println("initiateUSSD");
@@ -467,6 +473,7 @@ public class Client extends TestHarnessUssd {
             System.out.println("SENDING_MESSAGE_THREAD_COUNT = " + SENDING_MESSAGE_THREAD_COUNT);
             System.out.println("NDIALOGS = " + NDIALOGS);
             System.out.println("MAXCONCURRENTDIALOGS = " + MAXCONCURRENTDIALOGS);
+            System.out.println(WarmupRateHelper.summary(MAXCONCURRENTDIALOGS));
         }
 
         final Client client = new Client();
@@ -948,8 +955,9 @@ public class Client extends TestHarnessUssd {
             System.out.println("[DEBUG] DialogInitiator thread started, endCount=" + endCount + " NDIALOGS=" + NDIALOGS);
             try {
                 while (endCount < NDIALOGS && !isDurationExpired()) {
-                    if (endCount < 0) {
-                        start = System.currentTimeMillis();
+                    if (endCount < 0 && loadStartMs == 0L) {
+                        loadStartMs = System.currentTimeMillis();
+                        start = loadStartMs;
                         prev = start;
                     }
                     System.out.println("[DEBUG] Calling initiateUSSD(), endCount=" + endCount);
