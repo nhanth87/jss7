@@ -29,6 +29,8 @@ import org.restcomm.protocols.ss7.sccpext.impl.router.RouterExtImpl;
 import org.restcomm.protocols.ss7.sccpext.router.RouterExt;
 import org.restcomm.protocols.ss7.ss7ext.Ss7ExtSccpInterface;
 
+import io.netty.buffer.ByteBuf;
+
 /**
  * @author Amit Bhayani
  *
@@ -96,6 +98,11 @@ public class SccpManagementJmx implements SccpManagementJmxMBean, SccpManagement
     @Override
     public Mtp3UserPart getMtp3UserPart(int id) {
         return this.wrappedSccpStack.getMtp3UserPart(id);
+    }
+
+    @Override
+    public void receiveM3uaProtocolData(int opc, int dpc, int si, int ni, int mp, int sls, ByteBuf userData) {
+        this.wrappedSccpStack.receiveM3uaProtocolData(opc, dpc, si, ni, mp, sls, userData);
     }
 
     @Override
