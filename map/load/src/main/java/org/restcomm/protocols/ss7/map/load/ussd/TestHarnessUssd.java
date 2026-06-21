@@ -64,7 +64,14 @@ public abstract class TestHarnessUssd implements MAPDialogListener, MAPServiceSu
 
     protected static int DURATION_MINUTES = 0;  // 0 = count-based, >0 = time-based mode
 
-    protected static String USSD_MESSAGE = "*509#";  // Default USSD string
+    protected static String USSD_MESSAGE = "*100#";  // gRPC demo short code (HTTP demo: *519#)
+
+    /** Menu walk profile: RANDOM, BALANCE, DATA, SUBSCRIBE, ADAPTIVE */
+    protected static String MENU_PROFILE = "RANDOM";
+
+    /** Random think-time before each user digit (ms) — exercises gateway adaptive gate on multi-turn dialogs. */
+    protected static int THINK_MIN_MS = 0;
+    protected static int THINK_MAX_MS = 0;
 
     protected final String SERVER_ASSOCIATION_NAME = "serverAssociation";
     protected final String CLIENT_ASSOCIATION_NAME = "clientAssociation";

@@ -140,6 +140,10 @@ public class Client extends TestHarnessUssd {
 
     private CsvWriter csvWriter;
 
+    private UssdMenuEngine menuEngine;
+    private UssdMenuEngine.Profile menuProfile = UssdMenuEngine.Profile.RANDOM;
+    private final Random thinkRandom = new Random();
+
     protected void initializeStack(IpChannelType ipChannelType) throws Exception {
 
         this.rateLimiterObj = RateLimiter.create(MAXCONCURRENTDIALOGS); // rate
@@ -185,6 +189,13 @@ public class Client extends TestHarnessUssd {
         this.csvWriter.addCounter(SUCCESSFUL_DIALOGS);
         this.csvWriter.addCounter(ERROR_DIALOGS);
         this.csvWriter.start(TEST_START_DELAY, PRINT_WRITER_PERIOD);
+
+        try {
+            this.menuEngine = UssdMenuEngine.defaultEngine();
+            this.menuProfile = UssdMenuEngine.Profile.valueOf(MENU_PROFILE.toUpperCase());
+        } catch (Exception e) {
+            throw new Exception("Failed to load USSD menu config", e);
+        }
     }
 
     private void initSCTP(IpChannelType ipChannelType) throws Exception {
@@ -347,9 +358,23 @@ public class Client extends TestHarnessUssd {
         // This will initiate the TC-BEGIN with INVOKE component
         System.out.println("[DEBUG] Sending mapDialog...");
         mapDialog.send();
-        System.out.println("[DEBUG] mapDialog sent successfully");
+        this.menuEngine.beginDialog(mapDialog.getLocalDialogId());
 
         this.csvWriter.incrementCounter(CREATED_DIALOGS);
+    }
+
+    private void applyThinkDelay() {
+        if (THINK_MAX_MS <= 0) {
+            return;
+        }
+        int lo = Math.max(0, THINK_MIN_MS);
+        int hi = Math.max(lo, THINK_MAX_MS);
+        int delay = lo + thinkRandom.nextInt(hi - lo + 1);
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private SccpAddress createSccpAddress(RoutingIndicator ri, int dpc, int ssn, String address) {
@@ -371,7 +396,7 @@ public class Client extends TestHarnessUssd {
         int i = 0;
         IpChannelType ipChannelType = IpChannelType.SCTP;
 
-        if (args.length >= 23 && args.length <= 25) {
+        if (args.length >= 23 && args.length <= 28) {
             NDIALOGS = Integer.parseInt(args[i++]);
             MAXCONCURRENTDIALOGS = Integer.parseInt(args[i++]);
             if (args[i++].toLowerCase().equals("tcp"))
@@ -403,10 +428,22 @@ public class Client extends TestHarnessUssd {
             if (args.length >= 25) {
                 USSD_MESSAGE = args[i++];
             }
+            if (args.length >= 26) {
+                MENU_PROFILE = args[i++];
+            }
+            if (args.length >= 27) {
+                THINK_MIN_MS = Integer.parseInt(args[i++]);
+            }
+            if (args.length >= 28) {
+                THINK_MAX_MS = Integer.parseInt(args[i++]);
+            }
 
             System.out.println("IpChannelType = " + ipChannelType);
             System.out.println("DURATION_MINUTES = " + DURATION_MINUTES);
             System.out.println("USSD_MESSAGE = " + USSD_MESSAGE);
+            System.out.println("MENU_PROFILE = " + MENU_PROFILE);
+            System.out.println("THINK_MIN_MS = " + THINK_MIN_MS);
+            System.out.println("THINK_MAX_MS = " + THINK_MAX_MS);
             System.out.println("HOST_IP = " + HOST_IP);
             System.out.println("HOST_PORT = " + HOST_PORT);
             System.out.println("EXTRA_HOST_ADDRESS = " + EXTRA_HOST_ADDRESS);
@@ -562,14 +599,18 @@ public class Client extends TestHarnessUssd {
             logger.debug(String.format("Rx UnstructuredSSRequestIndication. USSD String=%s ", unstructuredSSRequest.getUSSDString()));
         }
         MAPDialogSupplementary mapDialog = unstructuredSSRequest.getMAPDialog();
+        long dialogId = mapDialog.getLocalDialogId();
 
         try {
+            applyThinkDelay();
+            String digit = this.menuEngine.nextInput(dialogId, this.menuProfile);
+            if (digit == null) {
+                logger.warn("No menu input for dialog " + dialogId + ", skipping response");
+                return;
+            }
+
             CBSDataCodingScheme ussdDataCodingScheme = new CBSDataCodingSchemeImpl(0x0f);
-
-            USSDString ussdString = this.mapProvider.getMAPParameterFactory().createUSSDString("1", null, null);
-
-            AddressString msisdn = this.mapProvider.getMAPParameterFactory()
-                    .createAddressString(AddressNature.international_number, NumberingPlan.ISDN, "31628838002");
+            USSDString ussdString = this.mapProvider.getMAPParameterFactory().createUSSDString(digit, null, null);
 
             mapDialog.addUnstructuredSSResponse(unstructuredSSRequest.getInvokeId(), ussdDataCodingScheme, ussdString);
             mapDialog.send();
@@ -761,6 +802,7 @@ public class Client extends TestHarnessUssd {
         if (logger.isDebugEnabled()) {
             logger.debug(String.format("onDialogRelease for DialogId=%d", mapDialog.getLocalDialogId()));
         }
+        this.menuEngine.clearDialog(mapDialog.getLocalDialogId());
         this.csvWriter.incrementCounter(SUCCESSFUL_DIALOGS);
         this.endCount++;
 
@@ -800,6 +842,7 @@ public class Client extends TestHarnessUssd {
     @Override
     public void onDialogTimeout(MAPDialog mapDialog) {
         logger.error(String.format("onDialogTimeout for DialogId=%d", mapDialog.getLocalDialogId()));
+        this.menuEngine.clearDialog(mapDialog.getLocalDialogId());
         this.csvWriter.incrementCounter(ERROR_DIALOGS);
     }
 
