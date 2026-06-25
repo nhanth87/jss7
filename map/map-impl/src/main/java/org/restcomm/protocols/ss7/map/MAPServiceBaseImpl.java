@@ -166,4 +166,10 @@ public abstract class MAPServiceBaseImpl implements MAPServiceBase {
         }
     }
 
+    protected void deliverInvokeTimeout(MAPDialog mapDialog, Long invokeId) {
+        for (MAPServiceListener mapServiceListener : this.serviceListeners) {
+            mapServiceListener.onInvokeTimeout(mapDialog, invokeId);
+        }
+    }
+
 }

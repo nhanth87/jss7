@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.restcomm.protocols.ss7.scheduler.api.TimerHandle;
+import org.restcomm.protocols.ss7.scheduler.api.TimerScheduler;
+import org.restcomm.protocols.ss7.scheduler.api.TimerType;
 import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
 import org.restcomm.protocols.ss7.tcap.api.TCAPException;
 import org.restcomm.protocols.ss7.tcap.api.TCAPSendException;
@@ -141,7 +141,7 @@ public class DialogImpl implements Dialog {
     private int localSsn;
     private int remotePc = -1;
 
-    private Future idleTimerFuture;
+    private TimerHandle idleTimerHandle;
     private boolean idleTimerActionTaken = false;
     private boolean idleTimerInvoked = false;
     private volatile TRPseudoState state = TRPseudoState.Idle;
@@ -159,7 +159,7 @@ public class DialogImpl implements Dialog {
     protected InvokeImpl[] operationsSent = new InvokeImpl[invokeIDTable.length];
     protected InvokeImpl[] operationsSentA = new InvokeImpl[invokeIDTable.length];
     private Set<Long> incomingInvokeList = ConcurrentHashMap.<Long>newKeySet();
-    private ScheduledExecutorService executor;
+    private TimerScheduler timerScheduler;
 
     // scheduled components list
     private List<Component> scheduledComponentList = new ArrayList<Component>();
@@ -197,13 +197,13 @@ public class DialogImpl implements Dialog {
      * @param sccpCalledPartyAddress
      * @param origTransactionId
      * @param structured
-     * @param executor
+     * @param timerScheduler
      * @param provider
      * @param seqControl
      * @param previewMode
      */
     protected DialogImpl(SccpAddress sccpCallingPartyAddress, SccpAddress sccpCalledPartyAddress, Long origTransactionId, boolean structured,
-            ScheduledExecutorService executor, TCAPProviderImpl provider, int seqControl, boolean previewMode) {
+            TimerScheduler timerScheduler, TCAPProviderImpl provider, int seqControl, boolean previewMode) {
         super();
         this.localAddress = sccpCallingPartyAddress;
         this.remoteAddress = sccpCalledPartyAddress;
@@ -211,7 +211,7 @@ public class DialogImpl implements Dialog {
             this.localTransactionIdObject = origTransactionId;
             this.localTransactionId = origTransactionId;
         }
-        this.executor = executor;
+        this.timerScheduler = timerScheduler;
         this.provider = provider;
         this.structured = structured;
 
@@ -234,18 +234,18 @@ public class DialogImpl implements Dialog {
      * @param sccpCallingPartyAddress
      * @param sccpCalledPartyAddress
      * @param seqControl
-     * @param executor
+     * @param timerScheduler
      * @param provider
      * @param pdd
      * @param sideB
      */
-    protected DialogImpl(SccpAddress sccpCallingPartyAddress, SccpAddress sccpCalledPartyAddress, int seqControl, ScheduledExecutorService executor,
+    protected DialogImpl(SccpAddress sccpCallingPartyAddress, SccpAddress sccpCalledPartyAddress, int seqControl, TimerScheduler timerScheduler,
             TCAPProviderImpl provider, PreviewDialogData pdd, boolean sideB) {
         this.localAddress = sccpCallingPartyAddress;
         this.remoteAddress = sccpCalledPartyAddress;
         this.localTransactionIdObject = pdd.getDialogId();
         this.localTransactionId = pdd.getDialogId();
-        this.executor = executor;
+        this.timerScheduler = timerScheduler;
         this.provider = provider;
         this.structured = true;
 
@@ -310,6 +310,10 @@ public class DialogImpl implements Dialog {
                         // operationTimedOut(invokeImpl);
                     }
                 }
+            }
+
+            if (this.timerScheduler != null) {
+                this.timerScheduler.cancelAll(this.localTransactionId);
             }
 
             if (this.isStructured() && this.provider.getStack().getStatisticsEnabled()) {
@@ -2018,13 +2022,18 @@ public class DialogImpl implements Dialog {
 
         try {
             this.dialogLock.lock();
-            if (this.idleTimerFuture != null) {
+            if (this.idleTimerHandle != null) {
                 throw new IllegalStateException();
             }
 
             IdleTimerTask t = new IdleTimerTask();
             t.dialog = this;
-            this.idleTimerFuture = this.executor.schedule(t, this.idleTaskTimeout, TimeUnit.MILLISECONDS);
+            long dialogId = this.localTransactionId;
+            long timerId = TcapTimerIds.dialogIdleTimerId(dialogId);
+            this.timerScheduler.cancel(timerId);
+            this.idleTimerHandle = this.timerScheduler.schedule(
+                    TcapTimerIds.newRecord(timerId, dialogId, TimerType.TCAP_DIALOG_TIMEOUT, this.idleTaskTimeout),
+                    this.idleTaskTimeout, record -> t.run());
 
         } finally {
             this.dialogLock.unlock();
@@ -2037,9 +2046,12 @@ public class DialogImpl implements Dialog {
 
         try {
             this.dialogLock.lock();
-            if (this.idleTimerFuture != null) {
-                this.idleTimerFuture.cancel(false);
-                this.idleTimerFuture = null;
+            if (this.idleTimerHandle != null) {
+                this.idleTimerHandle.cancel();
+                this.idleTimerHandle = null;
+            }
+            if (this.timerScheduler != null) {
+                this.timerScheduler.cancel(TcapTimerIds.dialogIdleTimerId(this.localTransactionId));
             }
 
         } finally {
@@ -2058,7 +2070,7 @@ public class DialogImpl implements Dialog {
         public void run() {
             try {
                 dialogLock.lock();
-                dialog.idleTimerFuture = null;
+                dialog.idleTimerHandle = null;
 
                 dialog.idleTimerActionTaken = false;
                 dialog.idleTimerInvoked = true;

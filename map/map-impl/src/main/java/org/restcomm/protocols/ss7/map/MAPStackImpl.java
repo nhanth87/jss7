@@ -3,6 +3,7 @@ package org.restcomm.protocols.ss7.map;
 
 import org.restcomm.protocols.ss7.map.api.MAPProvider;
 import org.restcomm.protocols.ss7.map.api.MAPStack;
+import org.restcomm.protocols.ss7.scheduler.api.TimerScheduler;
 import org.restcomm.protocols.ss7.sccp.SccpProvider;
 import org.restcomm.protocols.ss7.tcap.TCAPStackImpl;
 import org.restcomm.protocols.ss7.tcap.api.TCAPProvider;
@@ -119,6 +120,13 @@ public class MAPStackImpl implements MAPStack {
     @Override
     public TCAPStack getTCAPStack() {
         return this.tcapStack;
+    }
+
+    public TimerScheduler getTimerScheduler() {
+        if (this.tcapStack instanceof TCAPStackImpl) {
+            return ((TCAPStackImpl) this.tcapStack).getTimerScheduler();
+        }
+        return null;
     }
 
 //    public void onCongestionStart(String congName) {

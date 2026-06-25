@@ -2,13 +2,14 @@
 package org.restcomm.protocols.ss7.tcap.asn;
 
 import java.io.IOException;
-import java.util.concurrent.Future;
+
 import org.apache.log4j.Logger;
 
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
+import org.restcomm.protocols.ss7.scheduler.api.TimerHandle;
 import org.restcomm.protocols.ss7.tcap.DialogImpl;
 import org.restcomm.protocols.ss7.tcap.TCAPProviderImpl;
 import org.restcomm.protocols.ss7.tcap.TCAPStackImpl;
@@ -33,7 +34,7 @@ public class InvokeImpl implements Invoke {
     private InvokeClass invokeClass = InvokeClass.Class1;
     private long invokeTimeout = TCAPStackImpl._EMPTY_INVOKE_TIMEOUT;
     private OperationState state = OperationState.Idle;
-    private Future timerFuture;
+    private TimerHandle timerHandle;
     private OperationTimerTask operationTimerTask = new OperationTimerTask(this);
     private TCAPProviderImpl provider;
     private DialogImpl dialog;
@@ -371,13 +372,17 @@ public class InvokeImpl implements Invoke {
 
         this.stopTimer();
         if (this.invokeTimeout > 0)
-            this.timerFuture = this.provider.createOperationTimer(this.operationTimerTask, this.invokeTimeout);
+            this.timerHandle = this.provider.scheduleInvokeTimer(this.dialog, this.invokeId, this.invokeTimeout,
+                    this.operationTimerTask);
     }
 
     public synchronized void stopTimer() {
-        if (this.timerFuture != null) {
-            this.timerFuture.cancel(false);
-            this.timerFuture = null;
+        if (this.timerHandle != null) {
+            this.timerHandle.cancel();
+            this.timerHandle = null;
+        }
+        if (this.provider != null && this.dialog != null) {
+            this.provider.cancelInvokeTimer(this.dialog.getLocalDialogId(), this.invokeId);
         }
     }
 
@@ -409,7 +414,7 @@ public class InvokeImpl implements Invoke {
             try {
                 dialog.getDialogLock().lock();
                 // op failed, we must delete it from dialog and notify!
-                timerFuture = null;
+                timerHandle = null;
                 setState(OperationState.Idle);
                 // TC-L-CANCEL
                 ((DialogImpl) invoke.dialog).operationTimedOut(invoke);

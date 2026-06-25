@@ -1,8 +1,8 @@
-# 🚀 jSS7-NG 9.2.12 - Next Generation SS7 Stack
+# 🚀 jSS7-NG 9.3.0 - Next Generation SS7 Stack
 
 > **JCTools Powered | Zero-Copy ByteBuf | Flat ASN | Netty Encode | 84 Modules**
 
-[![jSS7-NG](https://img.shields.io/badge/jSS7--NG-9.2.12-blue.svg)](https://github.com/nhanth87/jSS7)
+[![jSS7-NG](https://img.shields.io/badge/jSS7--NG-9.3.0-blue.svg)](https://github.com/nhanth87/jSS7)
 [![JCTools](https://img.shields.io/badge/Javolution--%3E%3E-JCTools-orange.svg)](https://github.com/JCTools/JCTools)
 [![ASN](https://img.shields.io/badge/ASN-Internalized-green.svg)](https://github.com/nhanth87/jSS7)
 [![Modules](https://img.shields.io/badge/Modules-84-brightgreen.svg)](https://github.com/nhanth87/jSS7)
@@ -139,7 +139,7 @@ xmlMapper.writeValue(writer, lstCounterCampaign); // One line! ✅
 
 ---
 
-## ⚡ Zero-Copy SS7 Pipeline (9.2.12+)
+## ⚡ Zero-Copy SS7 Pipeline (9.3.0+)
 
 Inbound SIGTRAN traffic stays on **Netty direct buffers** from SCTP through M3UA and SCCP. No feature flags — always on.
 

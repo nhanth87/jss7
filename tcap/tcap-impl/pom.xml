@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>tcap-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7.tcap</groupId>
-		<version>9.2.12</version>
+		<version>9.3.0</version>
 	</parent>
 
 	<artifactId>tcap-impl</artifactId>
@@ -74,6 +74,10 @@
 		<dependency>
 			<groupId>org.restcomm.protocols.ss7.sccp</groupId>
 			<artifactId>sccp-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.scheduler</groupId>
+			<artifactId>scheduler</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

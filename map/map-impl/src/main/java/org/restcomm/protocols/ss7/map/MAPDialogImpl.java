@@ -34,6 +34,7 @@ import org.restcomm.protocols.ss7.tcap.asn.comp.Reject;
 import org.restcomm.protocols.ss7.tcap.asn.comp.ReturnError;
 import org.restcomm.protocols.ss7.tcap.asn.comp.ReturnResult;
 import org.restcomm.protocols.ss7.tcap.asn.comp.ReturnResultLast;
+import org.restcomm.protocols.ss7.scheduler.api.TimerScheduler;
 
 /**
  *
@@ -162,6 +163,11 @@ public abstract class MAPDialogImpl implements MAPDialog {
     }
 
     public void release() {
+        TimerScheduler scheduler = this.mapProviderImpl.getTimerScheduler();
+        if (scheduler != null && this.tcapDialog != null) {
+            scheduler.cancelAll(this.tcapDialog.getLocalDialogId());
+        }
+
         this.setState(MAPDialogState.EXPUNGED);
 
         if (this.tcapDialog != null)
@@ -550,11 +556,25 @@ public abstract class MAPDialogImpl implements MAPDialog {
         if (this.tcapDialog.getPreviewMode())
             return;
 
-        try {
-            this.getTcapDialog().resetTimer(invokeId);
-        } catch (TCAPException e) {
-            throw new MAPException("TCAPException occure: " + e.getMessage(), e);
+        TimerScheduler scheduler = this.mapProviderImpl.getTimerScheduler();
+        if (scheduler == null) {
+            return;
         }
+
+        long dialogId = this.tcapDialog.getLocalDialogId();
+        long timeout = this.mapProviderImpl.getTCAPProvider().getStack().getInvokeTimeout();
+        long timerId = MapTimerIds.guardTimerId(dialogId, invokeId);
+        scheduler.cancel(timerId);
+        final Long guardInvokeId = invokeId;
+        scheduler.schedule(MapTimerIds.newGuardRecord(timerId, dialogId, timeout), timeout,
+                record -> onGuardInvokeTimeout(guardInvokeId));
+    }
+
+    private void onGuardInvokeTimeout(Long invokeId) {
+        if (this.getState() == MAPDialogState.EXPUNGED) {
+            return;
+        }
+        ((MAPServiceBaseImpl) this.mapService).deliverInvokeTimeout(this, invokeId);
     }
 
     public boolean cancelInvocation(Long invokeId) throws MAPException {

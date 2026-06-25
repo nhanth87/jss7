@@ -212,6 +212,8 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
             throw new StartException("SS7Scheduler MBean creating is failed: " + e.getMessage(), e);
         }
 
+        Jss7TimerService.start();
+
         createPayloadParts(dataDir);
         if(shellExecutorExists()) {
             shellExecutorMBean = null;
@@ -607,6 +609,8 @@ public class SS7ExtensionService implements SS7ServiceInterface,Service<SS7Servi
                 log.warn("ISUPStack_" + beanName + " MBean stopping is failed: " + e);
             }
         }
+
+        Jss7TimerService.stop();
 
         // scheduler - stop
         try {

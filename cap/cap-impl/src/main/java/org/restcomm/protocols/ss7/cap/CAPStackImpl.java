@@ -2,6 +2,7 @@ package org.restcomm.protocols.ss7.cap;
 
 import org.restcomm.protocols.ss7.cap.api.CAPProvider;
 import org.restcomm.protocols.ss7.cap.api.CAPStack;
+import org.restcomm.protocols.ss7.scheduler.api.TimerScheduler;
 import org.restcomm.protocols.ss7.sccp.SccpProvider;
 import org.restcomm.protocols.ss7.tcap.TCAPStackImpl;
 import org.restcomm.protocols.ss7.tcap.api.TCAPProvider;
@@ -93,6 +94,13 @@ public class CAPStackImpl implements CAPStack {
     @Override
     public TCAPStack getTCAPStack() {
         return this.tcapStack;
+    }
+
+    public TimerScheduler getTimerScheduler() {
+        if (this.tcapStack instanceof TCAPStackImpl) {
+            return ((TCAPStackImpl) this.tcapStack).getTimerScheduler();
+        }
+        return null;
     }
 
     public void setPersistDir(String persistDir) {

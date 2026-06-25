@@ -46,6 +46,8 @@ import org.restcomm.protocols.ss7.map.api.service.oam.MAPServiceOam;
 import org.restcomm.protocols.ss7.map.api.service.pdpContextActivation.MAPServicePdpContextActivation;
 import org.restcomm.protocols.ss7.map.api.service.sms.MAPServiceSms;
 import org.restcomm.protocols.ss7.map.api.service.supplementary.MAPServiceSupplementary;
+import org.restcomm.protocols.ss7.scheduler.api.TimerScheduler;
+import org.restcomm.protocols.ss7.tcap.TCAPProviderImpl;
 import org.restcomm.protocols.ss7.map.dialog.MAPAcceptInfoImpl;
 import org.restcomm.protocols.ss7.map.dialog.MAPCloseInfoImpl;
 import org.restcomm.protocols.ss7.map.dialog.MAPOpenInfoImpl;
@@ -155,6 +157,13 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
 
     public TCAPProvider getTCAPProvider() {
         return this.tcapProvider;
+    }
+
+    public TimerScheduler getTimerScheduler() {
+        if (this.tcapProvider instanceof TCAPProviderImpl) {
+            return ((TCAPProviderImpl) this.tcapProvider).getTimerScheduler();
+        }
+        return null;
     }
 
     public MAPServiceMobility getMAPServiceMobility() {

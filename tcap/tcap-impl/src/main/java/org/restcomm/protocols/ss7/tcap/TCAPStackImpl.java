@@ -18,6 +18,8 @@ import org.apache.log4j.Logger;
 import org.restcomm.protocols.ss7.sccp.SccpProvider;
 import org.restcomm.protocols.ss7.sccp.SccpStack;
 import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
+import org.restcomm.protocols.ss7.scheduler.api.TimerScheduler;
+import org.restcomm.protocols.ss7.scheduler.distributed.InfinispanTimerFactory;
 import org.restcomm.protocols.ss7.tcap.api.TCAPCounterEventsListener;
 import org.restcomm.protocols.ss7.tcap.api.TCAPCounterProvider;
 import org.restcomm.protocols.ss7.tcap.api.TCAPProvider;
@@ -128,6 +130,8 @@ public class TCAPStackImpl implements TCAPStack {
     // SLS value
     private SlsRangeType slsRange = SlsRangeType.All;
 
+    private transient TimerScheduler timerScheduler;
+
     public TCAPStackImpl(String name) {
         super();
         this.name = name;
@@ -205,6 +209,8 @@ public class TCAPStackImpl implements TCAPStack {
         }
 
         this.tcapCounterProvider = new TCAPCounterProviderImpl(this.tcapProvider);
+        this.timerScheduler = InfinispanTimerFactory.getTimerPort("Tcap-Timer-" + this.name);
+        this.tcapProvider.setTimerScheduler(this.timerScheduler);
         tcapProvider.start();
 
         this.started = true;
@@ -225,6 +231,7 @@ public class TCAPStackImpl implements TCAPStack {
 
     public void stop() {
         this.tcapProvider.stop();
+        this.timerScheduler = null;
         this.started = false;
 
         this.store();
@@ -283,6 +290,10 @@ public class TCAPStackImpl implements TCAPStack {
      */
     public long getDialogIdleTimeout() {
         return this.dialogTimeout;
+    }
+
+    public TimerScheduler getTimerScheduler() {
+        return this.timerScheduler;
     }
 
     /*
