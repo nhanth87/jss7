@@ -1,16 +1,16 @@
-# RestComm jSS7 9.4.0
+# RestComm jSS7 9.5.0
 
 High-performance SS7 protocol stack for MAP, CAP, TCAP, SCCP, M3UA, ISUP, and SCTP transport.  
 Built on JCTools lock-free collections, Netty zero-copy I/O, and a unified timer subsystem with optional WildFly Infinispan clustering.
 
-[![Version](https://img.shields.io/badge/version-9.4.0-blue)](https://github.com/nhanth87/jSS7)
+[![Version](https://img.shields.io/badge/version-9.5.0-blue)](https://github.com/nhanth87/jSS7)
 [![Modules](https://img.shields.io/badge/modules-84-green)](pom.xml)
 
 ---
 
 ## Infinispan Timer Deployment
 
-jSS7 9.4.0 separates **two schedulers** that must not be confused:
+jSS7 9.5.0 separates **two schedulers** that must not be confused:
 
 | Component | Package | Role | Infinispan |
 |-----------|---------|------|------------|
@@ -175,7 +175,7 @@ InfinispanTimerFactory.reset();
 
 | Scenario | Mode | Action |
 |----------|------|--------|
-| WildFly USSD GW / SS7 extension | Infinispan (or local fallback) | Merge `jss7` cache snippet; deploy 9.4.0 module |
+| WildFly USSD GW / SS7 extension | Infinispan (or local fallback) | Merge `jss7` cache snippet; deploy 9.5.0 module |
 | WildFly HA cluster | Infinispan distributed | `distributed-cache` + JGroups |
 | Simulator, unit tests, embedded JVM | Local only | None — automatic fallback |
 | Custom app on same WildFly as jSS7 | Separate container | Do not share `jss7` caches — use dedicated JNDI (see guide §6.5) |
@@ -255,7 +255,7 @@ mvn test -pl scheduler
 <dependency>
     <groupId>org.restcomm.protocols.ss7</groupId>
     <artifactId>ss7-parent</artifactId>
-    <version>9.4.0</version>
+    <version>9.5.0</version>
 </dependency>
 ```
 
@@ -265,7 +265,7 @@ Timer API for custom modules:
 <dependency>
     <groupId>org.restcomm.protocols.ss7.scheduler</groupId>
     <artifactId>scheduler</artifactId>
-    <version>9.4.0</version>
+    <version>9.5.0</version>
 </dependency>
 ```
 
@@ -303,7 +303,7 @@ Timer API for custom modules:
 
 ## Changelog
 
-### 9.4.0
+### 9.5.0
 - Unified `TimerScheduler` API for TCAP, MAP, CAP protocol timers
 - WildFly Infinispan integration via JNDI (`jss7-timers`, `jss7-timer-index`)
 - Automatic `LocalTimerAdapter` fallback for standalone and simulator

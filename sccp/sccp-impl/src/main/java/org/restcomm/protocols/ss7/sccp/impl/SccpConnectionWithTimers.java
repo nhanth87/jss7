@@ -1,5 +1,8 @@
 package org.restcomm.protocols.ss7.sccp.impl;
 
+import org.restcomm.protocols.ss7.scheduler.api.TimerHandle;
+import org.restcomm.protocols.ss7.scheduler.api.TimerScheduler;
+import org.restcomm.protocols.ss7.scheduler.api.TimerType;
 import org.restcomm.protocols.ss7.sccp.SccpConnection;
 import org.restcomm.protocols.ss7.sccp.SccpConnectionState;
 import org.restcomm.protocols.ss7.sccp.SccpListener;
@@ -14,9 +17,6 @@ import org.restcomm.protocols.ss7.sccp.message.SccpConnMessage;
 import org.restcomm.protocols.ss7.sccp.parameter.LocalReference;
 import org.restcomm.protocols.ss7.sccp.parameter.ProtocolClass;
 import org.restcomm.protocols.ss7.sccp.parameter.ReleaseCauseValue;
-
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import static org.restcomm.protocols.ss7.sccp.SccpConnectionState.CLOSED;
 import static org.restcomm.protocols.ss7.sccp.SccpConnectionState.CONNECTION_INITIATED;
@@ -47,14 +47,18 @@ abstract class SccpConnectionWithTimers extends SccpConnectionWithTransmitQueueI
     }
 
     protected void stopTimers() {
-        connEstProcess.stopTimer();
-        iasInactivitySendProcess.stopTimer();
-        iarInactivityReceiveProcess.stopTimer();
-        relProcess.stopTimer();
-        repeatRelProcess.stopTimer();
-        intProcess.stopTimer();
-        guardProcess.stopTimer();
-        resetProcess.stopTimer();
+        TimerScheduler timerScheduler = stack.getTimerScheduler();
+        if (timerScheduler != null) {
+            timerScheduler.cancelAll(SccpTimerIds.connectionScopeId(getLocalReference().getValue()));
+        }
+        connEstProcess.markStopped();
+        iasInactivitySendProcess.markStopped();
+        iarInactivityReceiveProcess.markStopped();
+        relProcess.markStopped();
+        repeatRelProcess.markStopped();
+        intProcess.markStopped();
+        guardProcess.markStopped();
+        resetProcess.markStopped();
     }
 
     protected void receiveMessage(SccpConnMessage message) throws Exception {
@@ -100,9 +104,9 @@ abstract class SccpConnectionWithTimers extends SccpConnectionWithTransmitQueueI
         }
     }
 
-    protected class ConnEstProcess extends BaseProcess implements Runnable {
-        {
-            delay = stack.getConnEstTimerDelay();
+    protected class ConnEstProcess extends BaseProcess {
+        ConnEstProcess() {
+            super(SccpTimerIds.SLOT_CONN_EST, TimerType.SCCP_CONN_EST, stack.getConnEstTimerDelay());
         }
 
         @Override
@@ -123,9 +127,9 @@ abstract class SccpConnectionWithTimers extends SccpConnectionWithTransmitQueueI
         }
     }
 
-    protected class IasInactivitySendProcess extends BaseProcess implements Runnable {
-        {
-            delay = stack.getIasTimerDelay();
+    protected class IasInactivitySendProcess extends BaseProcess {
+        IasInactivitySendProcess() {
+            super(SccpTimerIds.SLOT_IAS, TimerType.SCCP_IAS, stack.getIasTimerDelay());
         }
 
         @Override
@@ -156,9 +160,9 @@ abstract class SccpConnectionWithTimers extends SccpConnectionWithTransmitQueueI
         }
     }
 
-    protected class IarInactivityReceiveProcess extends BaseProcess implements Runnable {
-        {
-            delay = stack.getIarTimerDelay();
+    protected class IarInactivityReceiveProcess extends BaseProcess {
+        IarInactivityReceiveProcess() {
+            super(SccpTimerIds.SLOT_IAR, TimerType.SCCP_IAR, stack.getIarTimerDelay());
         }
 
         @Override
@@ -179,9 +183,9 @@ abstract class SccpConnectionWithTimers extends SccpConnectionWithTransmitQueueI
         }
     }
 
-    protected class RelProcess extends BaseProcess implements Runnable {
-        {
-            delay = stack.getRelTimerDelay();
+    protected class RelProcess extends BaseProcess {
+        RelProcess() {
+            super(SccpTimerIds.SLOT_REL, TimerType.SCCP_REL, stack.getRelTimerDelay());
         }
 
         @Override
@@ -218,9 +222,9 @@ abstract class SccpConnectionWithTimers extends SccpConnectionWithTransmitQueueI
         }
     }
 
-    protected class RepeatRelProcess extends BaseProcess implements Runnable {
-        {
-            delay = stack.getRepeatRelTimerDelay();
+    protected class RepeatRelProcess extends BaseProcess {
+        RepeatRelProcess() {
+            super(SccpTimerIds.SLOT_REPEAT_REL, TimerType.SCCP_REPEAT_REL, stack.getRepeatRelTimerDelay());
         }
 
         @Override
@@ -256,9 +260,9 @@ abstract class SccpConnectionWithTimers extends SccpConnectionWithTransmitQueueI
         }
     }
 
-    protected class IntProcess extends BaseProcess implements Runnable {
-        {
-            delay = stack.getIntTimerDelay();
+    protected class IntProcess extends BaseProcess {
+        IntProcess() {
+            super(SccpTimerIds.SLOT_INT, TimerType.SCCP_INT, stack.getIntTimerDelay());
         }
 
         @Override
@@ -297,9 +301,9 @@ abstract class SccpConnectionWithTimers extends SccpConnectionWithTransmitQueueI
         }
     }
 
-    protected class GuardProcess extends BaseProcess implements Runnable {
-        {
-            delay = stack.getGuardTimerDelay();
+    protected class GuardProcess extends BaseProcess {
+        GuardProcess() {
+            super(SccpTimerIds.SLOT_GUARD, TimerType.SCCP_GUARD, stack.getGuardTimerDelay());
         }
 
         @Override
@@ -317,9 +321,9 @@ abstract class SccpConnectionWithTimers extends SccpConnectionWithTransmitQueueI
         }
     }
 
-    protected class ResetProcess extends BaseProcess implements Runnable {
-        {
-            delay = stack.getResetTimerDelay();
+    protected class ResetProcess extends BaseProcess {
+        ResetProcess() {
+            super(SccpTimerIds.SLOT_RESET, TimerType.SCCP_RESET, stack.getResetTimerDelay());
         }
 
         @Override
@@ -341,17 +345,44 @@ abstract class SccpConnectionWithTimers extends SccpConnectionWithTransmitQueueI
         }
     }
 
-    private class BaseProcess implements Runnable {
-        protected long delay = stack.getConnEstTimerDelay();
-        private Future future;
+    private abstract class BaseProcess implements Runnable {
+        private final int timerSlot;
+        private final TimerType timerType;
+        protected long delay;
+        private TimerHandle timerHandle;
+        private boolean scheduled;
+
+        BaseProcess(int timerSlot, TimerType timerType, long delay) {
+            this.timerSlot = timerSlot;
+            this.timerType = timerType;
+            this.delay = delay;
+        }
+
+        private long connectionId() {
+            return getLocalReference().getValue();
+        }
+
+        private long timerId() {
+            return SccpTimerIds.connectionTimerId(connectionId(), timerSlot);
+        }
 
         public void startTimer() {
             try {
                 connectionLock.lock();
-                if (this.future != null) { // need to lock because otherwise this check won't ensure safety
+                if (this.scheduled) {
                     logger.error(new IllegalStateException(String.format("Already started %s timer", getClass())));
                 }
-                this.future = stack.timerExecutors.schedule(this, delay, TimeUnit.MILLISECONDS);
+                TimerScheduler timerScheduler = stack.getTimerScheduler();
+                if (timerScheduler == null) {
+                    return;
+                }
+                timerScheduler.cancel(timerId());
+                final BaseProcess self = this;
+                this.timerHandle = timerScheduler.schedule(
+                        SccpTimerIds.newConnectionRecord(connectionId(), timerSlot, timerType, delay),
+                        delay,
+                        record -> self.run());
+                this.scheduled = true;
 
             } finally {
                 connectionLock.unlock();
@@ -361,14 +392,24 @@ abstract class SccpConnectionWithTimers extends SccpConnectionWithTransmitQueueI
         public void stopTimer() {
             try {
                 connectionLock.lock();
-                if (this.future != null) { // need to lock because otherwise this check won't ensure safety
-                    this.future.cancel(false);
-                    this.future = null;
+                TimerScheduler timerScheduler = stack.getTimerScheduler();
+                if (timerScheduler != null) {
+                    timerScheduler.cancel(timerId());
                 }
+                if (this.timerHandle != null) {
+                    this.timerHandle.cancel();
+                    this.timerHandle = null;
+                }
+                this.scheduled = false;
 
             } finally {
                 connectionLock.unlock();
             }
+        }
+
+        void markStopped() {
+            this.timerHandle = null;
+            this.scheduled = false;
         }
 
         public void resetTimer() {
@@ -377,11 +418,7 @@ abstract class SccpConnectionWithTimers extends SccpConnectionWithTransmitQueueI
         }
 
         public boolean isStarted() {
-            return future != null;
-        }
-
-        @Override
-        public void run() {
+            return scheduled;
         }
     }
 }

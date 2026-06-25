@@ -105,8 +105,8 @@ public class TestEvent implements Serializable {
         if (timestamp != other.timestamp) {
             long v = timestamp - other.timestamp;
             v = Math.abs(v);
-            // 600ms, this can happen if we run tests concurrently and its not a big deal :)
-            if (v > 600) {
+            // Allow extra slack when functional tests run in parallel (testng-classes.xml).
+            if (v > 2000) {
                 return false;
             }
         }

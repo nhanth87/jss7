@@ -1,14 +1,14 @@
-# jSS7 Timer Refactor Plan (9.4.0)
+# jSS7 Timer Refactor Plan (9.5.0)
 
-**Status:** Implemented (9.4.0)  
-**Target release:** 9.4.0  
+**Status:** Implemented (9.5.0)  
+**Target release:** 9.5.0  
 **Last updated:** 2026-06-25
 
 ---
 
 ## Executive Summary
 
-jSS7 9.4.0 introduces a unified, protocol-safe timer subsystem to replace the current ad-hoc use of `ScheduledExecutorService`, `Future.cancel()`, and scheduler heartbeat tasks across TCAP, MAP, CAP, SCCP, ISUP, and M3UA.
+jSS7 9.5.0 introduces a unified, protocol-safe timer subsystem to replace the current ad-hoc use of `ScheduledExecutorService`, `Future.cancel()`, and scheduler heartbeat tasks across TCAP, MAP, CAP, SCCP, ISUP, and M3UA.
 
 Today, timers are fragmented:
 
@@ -28,7 +28,7 @@ Today, timers are fragmented:
 4. Migrate protocol stacks incrementally, preserving 3GPP timer semantics and dialog state machines (Phases 7–8).
 5. Enable HA timer failover via WildFly-managed Infinispan caches looked up through JNDI — **no embedded Infinispan inside jSS7** (Phase 9).
 
-**Non-goals for 9.4.0:**
+**Non-goals for 9.5.0:**
 
 - Rewriting ISUP T-timers off the heartbeat queue (deferred; documented as follow-up).
 - Changing MAP/CAP ASN semantics or transaction state machines.
@@ -180,7 +180,7 @@ public enum QueueId {
 }
 ```
 
-- Add `Scheduler.submit(Task task, QueueId queue)`; deprecate `Integer` overload (remove in 9.4.0).
+- Add `Scheduler.submit(Task task, QueueId queue)`; deprecate `Integer` overload (remove in 9.5.0).
 - Update call sites: `ShellServer`, `Mtp3UserPartBaseImpl`, ISUP `Circuit`, M3UA scheduler, congestion layer.
 - `INTERNETWORKING_QUEUE` becomes alias: `QueueId.L4READ`.
 
@@ -433,7 +433,7 @@ Add inside `<subsystem xmlns="urn:jboss:domain:infinispan:4.0">`:
 
 ---
 
-## Acceptance Criteria (9.4.0 Release)
+## Acceptance Criteria (9.5.0 Release)
 
 1. **Scheduler:** `stop()` joins threads, shuts down executor, zero `Thread.sleep` in `CpuThread`.
 2. **API:** Protocol code does not import `java.util.concurrent.ScheduledExecutorService` for TCAP timers.
@@ -442,7 +442,7 @@ Add inside `<subsystem xmlns="urn:jboss:domain:infinispan:4.0">`:
 5. **Local mode:** Single-node WildFly + standalone simulator work with `LocalTimerAdapter`.
 6. **Cluster mode:** With `standalone-full-ha.xml` snippet deployed, TCAP invoke timeout survives single node failure within 2× `invokeTimeout`.
 7. **No embedded Infinispan:** `jSS7/pom.xml` has no `infinispan-core` compile dependency; only `provided` in WildFly extension.
-8. **Version:** All modules at `9.4.0`; WildFly module assembly packages `*-9.4.0.jar`.
+8. **Version:** All modules at `9.5.0`; WildFly module assembly packages `*-9.5.0.jar`.
 
 ---
 
@@ -463,9 +463,9 @@ Add inside `<subsystem xmlns="urn:jboss:domain:infinispan:4.0">`:
 
 ---
 
-## Follow-Up (Post-9.4.0)
+## Follow-Up (Post-9.5.0)
 
-### Phase 10 — SCCP / ISUP / M3UA timer migration (deferred 9.4.0)
+### Phase 10 — SCCP / ISUP / M3UA timer migration (deferred 9.5.0)
 
 | Layer | Current | Timer count / types | Migration notes |
 |-------|---------|---------------------|-----------------|
@@ -473,7 +473,7 @@ Add inside `<subsystem xmlns="urn:jboss:domain:infinispan:4.0">`:
 | **M3UA** (`M3UAManagementImpl`) | `ScheduledExecutorService fsmTicker` | ASP/AS FSM tick + heartbeat | Lower priority: FSM ticker is periodic sweep, not per-dialog TTL. Consider keeping `fsmTicker` or migrate to `QueueId.L3WRITE` heartbeat Task. |
 | **ISUP** | Scheduler `Task` on `HEARTBEAT_QUEUE` | T1–T38 as recurring heartbeat tasks | Largest effort: must preserve Q.764 timing semantics and switch from tick-count to wall-clock `TimerScheduler`. Dispatch callbacks to `QueueId.L4READ`. |
 
-**Recommendation:** SCCP first (9.4.0), then ISUP (9.5.0), M3UA optional.
+**Recommendation:** SCCP first (9.5.0), then ISUP (9.5.0), M3UA optional.
 
 ### Phase 11 — Distributed dialog state (epic, separate from timers)
 
@@ -487,7 +487,7 @@ Timer HA (Infinispan TTL expiry) only survives **timer metadata** across node fa
 
 **Deployed:** `ussdgateway/release-wildfly/standalone-patched.xml` now includes `jss7` cache-container (JNDI `java:jboss/infinispan/container/jss7`).
 
-**Non-goals for 9.4.0:** Full dialog migration — timers only.
+**Non-goals for 9.5.0:** Full dialog migration — timers only.
 
-- Deprecate `Integer` queue overload removal (9.4.0).
+- Deprecate `Integer` queue overload removal (9.5.0).
 - Metrics: Micrometer timer for active handles, fired/expired/cancelled counters.
