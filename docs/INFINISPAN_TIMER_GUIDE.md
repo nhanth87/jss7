@@ -1,6 +1,6 @@
-# jSS7 9.4.0 — Hướng dẫn Timer + Infinispan
+# jSS7 9.5.0 — Hướng dẫn Timer + Infinispan
 
-**Phiên bản:** 9.4.0  
+**Phiên bản:** 9.5.0  
 **Đối tượng:** vận hành WildFly, tích hợp USSDGW, developer protocol stack
 
 ---
@@ -12,7 +12,7 @@
 | **`Scheduler`** (`org.restcomm.protocols.ss7.scheduler.Scheduler`) | I/O event dispatcher — 11 priority queue, chu kỳ ~4 ms | **Không** |
 | **`TimerScheduler`** (`scheduler/api/TimerScheduler`) | Protocol timers — TCAP idle/invoke, MAP/CAP guard | **Có thể** (qua WildFly) |
 
-jSS7 9.4.0 chỉ dùng Infinispan cho **protocol timers** (`TimerScheduler`), không phải cho I/O scheduler.
+jSS7 9.5.0 chỉ dùng Infinispan cho **protocol timers** (`TimerScheduler`), không phải cho I/O scheduler.
 
 ---
 
@@ -60,11 +60,11 @@ Lý do:
 | Tình huống | Khuyến nghị |
 |------------|-------------|
 | jSS7 trong WildFly | **Không embed** — dùng WildFly Infinispan subsystem |
-| jSS7 standalone + cần HA timer | **Không hỗ trợ sẵn** trong 9.4.0; deploy lên WildFly hoặc tự host Infinispan Server riêng + JNDI (ngoài scope jSS7) |
+| jSS7 standalone + cần HA timer | **Không hỗ trợ sẵn** trong 9.5.0; deploy lên WildFly hoặc tự host Infinispan Server riêng + JNDI (ngoài scope jSS7) |
 | Custom app ngoài WildFly, single node | **Không cần Infinispan** — `LocalTimerAdapter` đủ |
 | Test tích hợp Infinispan | Dùng mock cache (`TtlMockCache`) trong `scheduler` tests |
 
-**Kết luận:** với jSS7 9.4.0, **không có trường hợp chính thức cần embed Infinispan trong jSS7 JAR.** Embedded chỉ có ý nghĩa nếu bạn tự viết bootstrap ngoài jSS7 (không được maintain trong repo).
+**Kết luận:** với jSS7 9.5.0, **không có trường hợp chính thức cần embed Infinispan trong jSS7 JAR.** Embedded chỉ có ý nghĩa nếu bạn tự viết bootstrap ngoài jSS7 (không được maintain trong repo).
 
 ---
 
@@ -191,7 +191,7 @@ Dialog idle / invoke timeout qua `TimerHandle` + `TcapTimerIds` — không dùng
 ### 6.2 WildFly extension — lifecycle
 
 ```java
-// SS7ExtensionService — đã wired sẵn 9.4.0
+// SS7ExtensionService — đã wired sẵn 9.5.0
 Jss7TimerService.start();   // server boot
 Jss7TimerService.stop();    // server shutdown
 ```
@@ -274,7 +274,7 @@ TimerScheduler slee = InfinispanTimerFactory.create(
 3. **Fire:** Infinispan `@CacheEntryExpired` → `TimerExpirationListener` → gọi callback đã register trên node đó
 4. **Cancel:** xóa entry cache + callback map
 
-**Giới hạn 9.4.0:** timer **callback không survive failover** — metadata `TimerRecord` có trong cache, nhưng lambda/callback phải rehydrate trên node mới (Phase 11 / dialog state epic). HA hiện tại = đồng bộ TTL + index, fire trên node còn callback.
+**Giới hạn 9.5.0:** timer **callback không survive failover** — metadata `TimerRecord` có trong cache, nhưng lambda/callback phải rehydrate trên node mới (Phase 11 / dialog state epic). HA hiện tại = đồng bộ TTL + index, fire trên node còn callback.
 
 ---
 
@@ -283,7 +283,7 @@ TimerScheduler slee = InfinispanTimerFactory.create(
 ### WildFly + USSDGW
 
 - [ ] Merge `jss7` cache-container vào `standalone.xml` (hoặc dùng `standalone-patched.xml`)
-- [ ] Deploy jSS7 **9.4.0** WildFly module
+- [ ] Deploy jSS7 **9.5.0** WildFly module
 - [ ] Restart WildFly, kiểm log `InfinispanTimerAdapter`
 - [ ] Không set `-Djboss.as.management.blocking.timeout` quá thấp khi cache lớn
 
@@ -296,7 +296,7 @@ TimerScheduler slee = InfinispanTimerFactory.create(
 ### HA production
 
 - [ ] `distributed-cache` + JGroups stack
-- [ ] Test failover TCAP invoke timeout (manual — chưa automation trong 9.4.0)
+- [ ] Test failover TCAP invoke timeout (manual — chưa automation trong 9.5.0)
 - [ ] Monitor cache size `jss7-timers` (orphan entry nếu dialog leak)
 
 ---
@@ -307,7 +307,7 @@ TimerScheduler slee = InfinispanTimerFactory.create(
 <dependency>
     <groupId>org.restcomm.protocols.ss7.scheduler</groupId>
     <artifactId>scheduler</artifactId>
-    <version>9.4.0</version>
+    <version>9.5.0</version>
 </dependency>
 ```
 

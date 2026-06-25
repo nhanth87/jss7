@@ -1,6 +1,6 @@
 # JAIN-SLEE ↔ jSS7 Scheduler Integration Report
 
-**Version:** jSS7 9.4.0 / RestComm JAIN-SLEE  
+**Version:** jSS7 9.5.0 / RestComm JAIN-SLEE  
 **Last updated:** 2026-06-25
 
 ---

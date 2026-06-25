@@ -128,6 +128,9 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     private transient DialogRegistryImpl dialogs = new DialogRegistryImpl();
     private transient DialogIdAllocator dialogIdAllocator;
 
+    private static final AtomicInteger TIMER_SCOPE_SEQ = new AtomicInteger();
+    private final int timerScope = TIMER_SCOPE_SEQ.incrementAndGet();
+
 //    protected transient FastMap<PrevewDialogDataKey, PreviewDialogData> dialogPreviewList = new FastMap<PrevewDialogDataKey, PrevewDialogData>();
     protected transient ConcurrentHashMap<PreviewDialogDataKey, PreviewDialogData> dialogPreviewList = new ConcurrentHashMap<>();
     private transient Map<Integer, NetworkIdState> networkIdStateList = new NonBlockingHashMap<Integer, NetworkIdState>();
@@ -203,7 +206,21 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
             if (this.dialogs.size() >= this.stack.getMaxDialogs()) {
                 throw new TCAPException("Current dialog count exceeds its maximum value");
             }
-            return this.dialogIdAllocator.allocate();
+            long span = this.stack.getDialogIdRangeEnd() - this.stack.getDialogIdRangeStart() + 1;
+            if (this.curDialogId < this.stack.getDialogIdRangeStart()) {
+                this.curDialogId = this.stack.getDialogIdRangeStart() - 1;
+            }
+            for (long attempt = 0; attempt < span; attempt++) {
+                long nextId = this.curDialogId + 1;
+                if (nextId > this.stack.getDialogIdRangeEnd()) {
+                    nextId = this.stack.getDialogIdRangeStart();
+                }
+                this.curDialogId = nextId;
+                if (this.dialogIdAllocator.tryReserve(this.curDialogId)) {
+                    return this.curDialogId;
+                }
+            }
+            throw new TCAPException("No available transaction id in configured range");
         } finally {
             txIdLock.unlock();
         }
@@ -553,6 +570,14 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     /**
      * @param dialog TCAP dialog
      */
+    int getTimerScope() {
+        return this.timerScope;
+    }
+
+    long getTimerDialogScope(long localDialogId) {
+        return TcapTimerIds.timerDialogScope(this.timerScope, localDialogId);
+    }
+
     public void timeout(DialogImpl dialog) {
 
         if (this.stack.getStatisticsEnabled()) {
@@ -575,16 +600,27 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     // ///////////////////////////////////////////
     // Some methods invoked by operation FSM //
     // //////////////////////////////////////////
+    void executeTimerCallback(Runnable callback) {
+        ScheduledExecutorService executor = this._EXECUTOR;
+        if (executor != null && !executor.isShutdown()) {
+            executor.execute(callback);
+            return;
+        }
+        callback.run();
+    }
+
     public TimerHandle scheduleInvokeTimer(DialogImpl dialog, Long invokeId, long delayMillis, Runnable operationTimerTask) {
         long dialogId = dialog.getLocalDialogId();
-        long timerId = TcapTimerIds.invokeTimerId(dialogId, invokeId);
+        long timerId = TcapTimerIds.invokeTimerId(this.timerScope, dialogId, invokeId);
+        long dialogScope = TcapTimerIds.timerDialogScope(this.timerScope, dialogId);
         this.timerScheduler.cancel(timerId);
-        return this.timerScheduler.schedule(TcapTimerIds.newRecord(timerId, dialogId, TimerType.TCAP_INVOKE_TIMEOUT, delayMillis),
-                delayMillis, record -> operationTimerTask.run());
+        return this.timerScheduler.schedule(
+                TcapTimerIds.newRecord(timerId, dialogScope, TimerType.TCAP_INVOKE_TIMEOUT, delayMillis),
+                delayMillis, record -> executeTimerCallback(operationTimerTask));
     }
 
     public void cancelInvokeTimer(long dialogId, Long invokeId) {
-        this.timerScheduler.cancel(TcapTimerIds.invokeTimerId(dialogId, invokeId));
+        this.timerScheduler.cancel(TcapTimerIds.invokeTimerId(this.timerScope, dialogId, invokeId));
     }
 
     void setTimerScheduler(TimerScheduler timerScheduler) {

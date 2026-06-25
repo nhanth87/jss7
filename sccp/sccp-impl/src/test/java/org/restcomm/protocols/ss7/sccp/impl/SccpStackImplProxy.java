@@ -17,6 +17,7 @@ import org.restcomm.protocols.ss7.sccp.impl.SccpStackImpl;
 import org.restcomm.protocols.ss7.sccp.impl.message.MessageFactoryImpl;
 import org.restcomm.protocols.ss7.sccp.impl.router.RouterImpl;
 import org.restcomm.protocols.ss7.scheduler.Scheduler;
+import org.restcomm.protocols.ss7.scheduler.distributed.InfinispanTimerFactory;
 import org.restcomm.protocols.ss7.ss7ext.Ss7ExtInterface;
 
 /**
@@ -88,7 +89,7 @@ public class SccpStackImplProxy extends SccpStackImpl {
         this.sccpManagement.start();
         // layer3exec.execute(new MtpStreamHandler());
 
-        this.timerExecutors = Executors.newScheduledThreadPool(1);
+        this.timerScheduler = InfinispanTimerFactory.getTimerPort("Sccp-Timer-" + this.name);
 
         for (Map.Entry<Integer, Mtp3UserPart> e : this.mtp3UserParts.entrySet()) {
             Mtp3UserPart mup = e.getValue();

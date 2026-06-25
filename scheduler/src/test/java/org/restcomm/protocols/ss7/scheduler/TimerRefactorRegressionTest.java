@@ -38,8 +38,8 @@ public class TimerRefactorRegressionTest {
         Assert.assertFalse(source.contains("ScheduledFuture"), "DialogImpl must not use ScheduledFuture for timers");
         Assert.assertFalse(source.contains("idleTimerFuture"), "DialogImpl must not keep idleTimerFuture");
         Assert.assertTrue(source.contains("TimerHandle"), "DialogImpl must use TimerHandle for idle timer");
-        Assert.assertTrue(source.contains("cancelAll(this.localTransactionId)"),
-                "DialogImpl.release must call timerScheduler.cancelAll(dialogId)");
+        Assert.assertTrue(source.contains("getTimerDialogScope(this.localTransactionId)"),
+                "DialogImpl.release must call timerScheduler.cancelAll with stack-scoped dialog id");
     }
 
     @Test

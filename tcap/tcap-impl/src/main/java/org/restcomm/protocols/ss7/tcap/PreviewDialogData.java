@@ -104,13 +104,16 @@ public class PreviewDialogData {
                 throw new IllegalStateException();
             }
 
+            this.idleTaskTimeout = this.provider.getStack().getDialogIdleTimeout();
             IdleTimerTask idleTimerTask = new IdleTimerTask();
             idleTimerTask.pdd = this;
-            long timerId = TcapTimerIds.dialogIdleTimerId(this.dialogId);
+            int stackScope = this.provider.getTimerScope();
+            long timerId = TcapTimerIds.dialogIdleTimerId(stackScope, this.dialogId);
+            long dialogScope = TcapTimerIds.timerDialogScope(stackScope, this.dialogId);
             this.timerScheduler.cancel(timerId);
             this.idleTimerHandle = this.timerScheduler.schedule(
-                    TcapTimerIds.newRecord(timerId, this.dialogId, TimerType.TCAP_DIALOG_TIMEOUT, this.idleTaskTimeout),
-                    this.idleTaskTimeout, record -> idleTimerTask.run());
+                    TcapTimerIds.newRecord(timerId, dialogScope, TimerType.TCAP_DIALOG_TIMEOUT, this.idleTaskTimeout),
+                    this.idleTaskTimeout, record -> this.provider.executeTimerCallback(idleTimerTask));
 
         } finally {
             this.dialogLock.unlock();
@@ -125,7 +128,7 @@ public class PreviewDialogData {
                 this.idleTimerHandle = null;
             }
             if (this.timerScheduler != null) {
-                this.timerScheduler.cancel(TcapTimerIds.dialogIdleTimerId(this.dialogId));
+                this.timerScheduler.cancel(TcapTimerIds.dialogIdleTimerId(this.provider.getTimerScope(), this.dialogId));
             }
 
         } finally {
@@ -145,7 +148,7 @@ public class PreviewDialogData {
 
     protected void cancelAllTimers() {
         if (this.timerScheduler != null) {
-            this.timerScheduler.cancelAll(this.dialogId);
+            this.timerScheduler.cancelAll(this.provider.getTimerDialogScope(this.dialogId));
         }
     }
 

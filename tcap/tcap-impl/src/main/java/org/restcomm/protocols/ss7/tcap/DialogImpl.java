@@ -313,7 +313,7 @@ public class DialogImpl implements Dialog {
             }
 
             if (this.timerScheduler != null) {
-                this.timerScheduler.cancelAll(this.localTransactionId);
+                this.timerScheduler.cancelAll(this.provider.getTimerDialogScope(this.localTransactionId));
             }
 
             if (this.isStructured() && this.provider.getStack().getStatisticsEnabled()) {
@@ -2026,14 +2026,17 @@ public class DialogImpl implements Dialog {
                 throw new IllegalStateException();
             }
 
+            this.idleTaskTimeout = this.provider.getStack().getDialogIdleTimeout();
             IdleTimerTask t = new IdleTimerTask();
             t.dialog = this;
             long dialogId = this.localTransactionId;
-            long timerId = TcapTimerIds.dialogIdleTimerId(dialogId);
+            int stackScope = this.provider.getTimerScope();
+            long timerId = TcapTimerIds.dialogIdleTimerId(stackScope, dialogId);
+            long dialogScope = TcapTimerIds.timerDialogScope(stackScope, dialogId);
             this.timerScheduler.cancel(timerId);
             this.idleTimerHandle = this.timerScheduler.schedule(
-                    TcapTimerIds.newRecord(timerId, dialogId, TimerType.TCAP_DIALOG_TIMEOUT, this.idleTaskTimeout),
-                    this.idleTaskTimeout, record -> t.run());
+                    TcapTimerIds.newRecord(timerId, dialogScope, TimerType.TCAP_DIALOG_TIMEOUT, this.idleTaskTimeout),
+                    this.idleTaskTimeout, record -> this.provider.executeTimerCallback(t));
 
         } finally {
             this.dialogLock.unlock();
@@ -2051,7 +2054,8 @@ public class DialogImpl implements Dialog {
                 this.idleTimerHandle = null;
             }
             if (this.timerScheduler != null) {
-                this.timerScheduler.cancel(TcapTimerIds.dialogIdleTimerId(this.localTransactionId));
+                this.timerScheduler.cancel(
+                        TcapTimerIds.dialogIdleTimerId(this.provider.getTimerScope(), this.localTransactionId));
             }
 
         } finally {

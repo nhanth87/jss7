@@ -19,21 +19,28 @@ public class LocalTimerAdapter implements TimerScheduler {
 
     private static final Logger logger = Logger.getLogger(LocalTimerAdapter.class);
 
-    private final HashedWheelTimerFacade wheelTimer;
+    private HashedWheelTimerFacade wheelTimer;
+    private final String threadNamePrefix;
     private final ConcurrentHashMap<Long, LocalTimerHandle> timersById = new ConcurrentHashMap<Long, LocalTimerHandle>();
     private final ConcurrentHashMap<Long, ConcurrentHashMap<Long, LocalTimerHandle>> timersByDialogId =
             new ConcurrentHashMap<Long, ConcurrentHashMap<Long, LocalTimerHandle>>();
     private volatile boolean started;
 
     public LocalTimerAdapter() {
-        this(new HashedWheelTimerFacade());
+        this(null, new HashedWheelTimerFacade());
     }
 
     public LocalTimerAdapter(String threadNamePrefix) {
-        this(new HashedWheelTimerFacade(new DefaultThreadFactory(threadNamePrefix), 10L, TimeUnit.MILLISECONDS));
+        this(threadNamePrefix, new HashedWheelTimerFacade(
+                new DefaultThreadFactory(threadNamePrefix), 10L, TimeUnit.MILLISECONDS));
     }
 
     public LocalTimerAdapter(HashedWheelTimerFacade wheelTimer) {
+        this(null, wheelTimer);
+    }
+
+    private LocalTimerAdapter(String threadNamePrefix, HashedWheelTimerFacade wheelTimer) {
+        this.threadNamePrefix = threadNamePrefix;
         this.wheelTimer = wheelTimer;
     }
 
@@ -93,6 +100,9 @@ public class LocalTimerAdapter implements TimerScheduler {
         if (started) {
             return;
         }
+        if (wheelTimer == null) {
+            wheelTimer = createWheel();
+        }
         wheelTimer.start();
         started = true;
     }
@@ -104,8 +114,21 @@ public class LocalTimerAdapter implements TimerScheduler {
         }
         started = false;
         wheelTimer.stop();
+        wheelTimer = null;
         timersById.clear();
         timersByDialogId.clear();
+    }
+
+    public boolean isStarted() {
+        return started;
+    }
+
+    private HashedWheelTimerFacade createWheel() {
+        if (threadNamePrefix != null) {
+            return new HashedWheelTimerFacade(
+                    new DefaultThreadFactory(threadNamePrefix), 10L, TimeUnit.MILLISECONDS);
+        }
+        return new HashedWheelTimerFacade();
     }
 
     private void registerDialogTimer(long dialogId, long timerId, LocalTimerHandle handle) {

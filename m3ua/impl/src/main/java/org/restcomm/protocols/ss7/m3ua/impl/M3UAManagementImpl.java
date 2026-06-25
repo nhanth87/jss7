@@ -20,9 +20,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -67,6 +64,10 @@ import org.restcomm.protocols.ss7.mtp.Mtp3StatusPrimitive;
 import org.restcomm.protocols.ss7.mtp.Mtp3TransferPrimitive;
 import org.restcomm.protocols.ss7.mtp.Mtp3UserPartBaseImpl;
 import org.restcomm.protocols.ss7.mtp.RoutingLabelFormat;
+import org.restcomm.protocols.ss7.scheduler.api.TimerCallback;
+import org.restcomm.protocols.ss7.scheduler.api.TimerRecord;
+import org.restcomm.protocols.ss7.scheduler.api.TimerScheduler;
+import org.restcomm.protocols.ss7.scheduler.distributed.InfinispanTimerFactory;
 import org.restcomm.protocols.ss7.ss7ext.Ss7ExtInterface;
 
 /**
@@ -94,6 +95,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
     private static final String TAB_INDENT = "\t";
 
     protected static final int MAX_SEQUENCE_NUMBER = 256;
+    private static final long FSM_TICK_INTERVAL_MS = 500L;
 
     protected ConcurrentLinkedQueue<As> appServers = new ConcurrentLinkedQueue<>();
     protected ConcurrentLinkedQueue<AspFactory> aspFactories = new ConcurrentLinkedQueue<>();
@@ -116,7 +118,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
     protected Management transportManagement = null;
     protected boolean sctpLibNettySupport = false;
 
-    protected ScheduledExecutorService fsmTicker;
+    private transient TimerScheduler timerScheduler;
 
     protected int maxAsForRoute = 2;
 
@@ -366,8 +368,8 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
             public void onAssociationModified(Association association) {}
         });
 
-        fsmTicker = Executors.newSingleThreadScheduledExecutor();
-        fsmTicker.scheduleAtFixedRate(m3uaScheduler, 500, 500, TimeUnit.MILLISECONDS);
+        this.timerScheduler = InfinispanTimerFactory.getTimerPort("M3ua-Timer-" + this.name);
+        scheduleFsmTick();
 
         for (M3UAManagementEventListener m3uaManagementEventListener : this.managementEventListeners) {
             try {
@@ -405,9 +407,44 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         this.store();
 
         this.stopFactories();
+        cancelFsmTick();
         super.stop();
+    }
 
-        fsmTicker.shutdown();
+    private void scheduleFsmTick() {
+        if (this.timerScheduler == null || !this.isStarted) {
+            return;
+        }
+
+        this.timerScheduler.cancel(M3uaTimerIds.fsmTickTimerId());
+        this.timerScheduler.schedule(M3uaTimerIds.newFsmTickRecord(FSM_TICK_INTERVAL_MS), FSM_TICK_INTERVAL_MS,
+                new TimerCallback() {
+                    @Override
+                    public void onTimerFire(TimerRecord record) {
+                        onFsmTick(record);
+                    }
+                });
+    }
+
+    private void onFsmTick(TimerRecord record) {
+        if (!this.isStarted || this.timerScheduler == null) {
+            return;
+        }
+
+        try {
+            this.m3uaScheduler.run();
+        } catch (Exception e) {
+            logger.error("M3UA FSM tick failed", e);
+        }
+
+        scheduleFsmTick();
+    }
+
+    private void cancelFsmTick() {
+        if (this.timerScheduler != null) {
+            this.timerScheduler.cancel(M3uaTimerIds.fsmTickTimerId());
+            this.timerScheduler = null;
+        }
     }
 
     @Override

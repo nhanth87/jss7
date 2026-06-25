@@ -48,6 +48,9 @@ import org.restcomm.protocols.ss7.sccp.parameter.ProtocolClass;
 import org.restcomm.protocols.ss7.sccp.parameter.ReturnCauseValue;
 import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
 import org.restcomm.protocols.ss7.scheduler.Scheduler;
+import org.restcomm.protocols.ss7.scheduler.api.TimerHandle;
+import org.restcomm.protocols.ss7.scheduler.api.TimerScheduler;
+import org.restcomm.protocols.ss7.scheduler.distributed.InfinispanTimerFactory;
 import org.restcomm.protocols.ss7.ss7ext.Ss7ExtInterface;
 import org.restcomm.protocols.ss7.ss7ext.Ss7ExtSccpInterface;
 
@@ -64,9 +67,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import io.netty.buffer.ByteBuf;
 
@@ -214,7 +214,7 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
     protected int referenceNumberCounterMax = 0xffffff;
 
     protected NonBlockingHashMap<Integer, Mtp3UserPart> mtp3UserParts = new NonBlockingHashMap<Integer, Mtp3UserPart>();
-    protected ScheduledExecutorService timerExecutors;
+    protected TimerScheduler timerScheduler;
     protected NonBlockingHashMap<MessageReassemblyProcess, SccpSegmentableMessageImpl> reassemplyCache = new NonBlockingHashMap<MessageReassemblyProcess, SccpSegmentableMessageImpl>();
 
     // executors for delivering messages SCCP user -> SCCP -> SCCP user (for messages that are not from or to MTP part)
@@ -897,7 +897,7 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
         this.sccpManagement.start();
         logger.info("Starting MSU handler...");
 
-        this.timerExecutors = Executors.newScheduledThreadPool(timerExecutorsThreadCount);
+        this.timerScheduler = InfinispanTimerFactory.getTimerPort("Sccp-Timer-" + this.name);
 
         // initiating of SCCP delivery executors
         // TODO: we do it for ITU standard, may be we may configure it for other standard's (different SLS count) maxSls and
@@ -972,9 +972,12 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
         this.router.stop();
 
         synchronized (reassemplyCache) {
-            this.timerExecutors.shutdownNow();
+            for (MessageReassemblyProcess proc : reassemplyCache.keySet()) {
+                proc.stopTimer();
+            }
             reassemplyCache.clear();
         }
+        this.timerScheduler = null;
 
         this.store();
 
@@ -1027,6 +1030,10 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
 
         connections.put(refNumber, conn);
         return conn;
+    }
+
+    public TimerScheduler getTimerScheduler() {
+        return this.timerScheduler;
     }
 
     protected void removeConnection(LocalReference ref) {
@@ -1555,7 +1562,7 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
         private int segmentationLocalRef;
         private SccpAddress callingPartyAddress;
 
-        private Future timer;
+        private TimerHandle timer;
 
         public MessageReassemblyProcess(int segmentationLocalRef, SccpAddress callingPartyAddress) {
             this.segmentationLocalRef = segmentationLocalRef;
@@ -1584,13 +1591,27 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
         }
 
         public void startTimer() {
-            this.timer = timerExecutors.schedule(this, reassemblyTimerDelay, TimeUnit.MILLISECONDS);
+            TimerScheduler ts = timerScheduler;
+            if (ts == null) {
+                return;
+            }
+            long timerId = SccpTimerIds.reassemblyTimerId(segmentationLocalRef);
+            ts.cancel(timerId);
+            final MessageReassemblyProcess self = this;
+            this.timer = ts.schedule(
+                    SccpTimerIds.newReassemblyRecord(segmentationLocalRef, reassemblyTimerDelay),
+                    reassemblyTimerDelay,
+                    record -> self.run());
         }
 
         public void stopTimer() {
             if (this.timer != null) {
-                this.timer.cancel(false);
+                this.timer.cancel();
                 this.timer = null;
+            }
+            TimerScheduler ts = timerScheduler;
+            if (ts != null) {
+                ts.cancel(SccpTimerIds.reassemblyTimerId(segmentationLocalRef));
             }
         }
 

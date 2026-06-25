@@ -1,12 +1,11 @@
 package org.restcomm.protocols.ss7.sccp.impl;
 
-import java.util.concurrent.Executors;
-
 import java.util.Map;
 
 import org.restcomm.protocols.ss7.mtp.Mtp3UserPart;
 import org.restcomm.protocols.ss7.sccp.SccpManagementEventListener;
 import org.restcomm.protocols.ss7.sccp.impl.router.NonPersistentRouterImpl;
+import org.restcomm.protocols.ss7.scheduler.distributed.InfinispanTimerFactory;
 import org.restcomm.protocols.ss7.ss7ext.Ss7ExtInterface;
 
 public class NonPersistentSccpStackImpl extends SccpStackImpl {
@@ -41,7 +40,7 @@ public class NonPersistentSccpStackImpl extends SccpStackImpl {
         this.sccpManagement.start();
         logger.info("Starting MSU handler...");
 
-        this.timerExecutors = Executors.newScheduledThreadPool(1);
+        this.timerScheduler = InfinispanTimerFactory.getTimerPort("Sccp-Timer-" + this.name);
 
         for (Map.Entry<Integer, Mtp3UserPart> e : this.mtp3UserParts.entrySet()) {
             Mtp3UserPart mup = e.getValue();

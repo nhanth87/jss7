@@ -32,17 +32,35 @@ public final class InfinispanTimerFactory {
     }
 
     public static TimerScheduler getTimerPort(String threadNamePrefix) {
-        TimerScheduler local = instance;
-        if (local == null) {
+        TimerScheduler scheduler = instance;
+        if (scheduler == null) {
             synchronized (InfinispanTimerFactory.class) {
-                local = instance;
-                if (local == null) {
-                    local = create(defaultEventBus(), threadNamePrefix);
-                    instance = local;
+                scheduler = instance;
+                if (scheduler == null) {
+                    scheduler = create(defaultEventBus(), threadNamePrefix);
+                    instance = scheduler;
                 }
             }
         }
-        return local;
+        ensureRunning(scheduler, threadNamePrefix);
+        return scheduler;
+    }
+
+    private static void ensureRunning(TimerScheduler scheduler, String threadNamePrefix) {
+        if (scheduler instanceof LocalTimerAdapter) {
+            LocalTimerAdapter local = (LocalTimerAdapter) scheduler;
+            if (!local.isStarted()) {
+                synchronized (InfinispanTimerFactory.class) {
+                    if (instance == scheduler && !local.isStarted()) {
+                        scheduler = create(defaultEventBus(), threadNamePrefix);
+                        instance = scheduler;
+                    } else {
+                        scheduler = instance;
+                    }
+                }
+            }
+        }
+        scheduler.start();
     }
 
     public static TimerScheduler create(TimerEventBus bus) {
