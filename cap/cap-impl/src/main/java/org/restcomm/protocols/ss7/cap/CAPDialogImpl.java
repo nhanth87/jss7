@@ -31,6 +31,7 @@ import org.restcomm.protocols.ss7.tcap.asn.comp.Problem;
 import org.restcomm.protocols.ss7.tcap.asn.comp.Reject;
 import org.restcomm.protocols.ss7.tcap.asn.comp.ReturnError;
 import org.restcomm.protocols.ss7.tcap.asn.comp.ReturnResultLast;
+import org.restcomm.protocols.ss7.scheduler.api.TimerScheduler;
 
 /**
  *
@@ -132,6 +133,11 @@ public abstract class CAPDialogImpl implements CAPDialog {
 
     public void release() {
         // this.setNormalDialogShutDown();
+        TimerScheduler scheduler = this.capProviderImpl.getTimerScheduler();
+        if (scheduler != null && this.tcapDialog != null) {
+            scheduler.cancelAll(this.tcapDialog.getLocalDialogId());
+        }
+
         this.setState(CAPDialogState.Expunged);
 
         if (this.tcapDialog != null)
@@ -492,11 +498,25 @@ public abstract class CAPDialogImpl implements CAPDialog {
         if (this.tcapDialog.getPreviewMode())
             return;
 
-        try {
-            this.getTcapDialog().resetTimer(invokeId);
-        } catch (TCAPException e) {
-            throw new CAPException("TCAPException occure: " + e.getMessage(), e);
+        TimerScheduler scheduler = this.capProviderImpl.getTimerScheduler();
+        if (scheduler == null) {
+            return;
         }
+
+        long dialogId = this.tcapDialog.getLocalDialogId();
+        long timeout = this.capProviderImpl.getTCAPProvider().getStack().getInvokeTimeout();
+        long timerId = CapTimerIds.guardTimerId(dialogId, invokeId);
+        scheduler.cancel(timerId);
+        final Long guardInvokeId = invokeId;
+        scheduler.schedule(CapTimerIds.newGuardRecord(timerId, dialogId, timeout), timeout,
+                record -> onGuardInvokeTimeout(guardInvokeId));
+    }
+
+    private void onGuardInvokeTimeout(Long invokeId) {
+        if (this.getState() == CAPDialogState.Expunged) {
+            return;
+        }
+        ((CAPServiceBaseImpl) this.capService).deliverInvokeTimeout(this, invokeId);
     }
 
     @Override

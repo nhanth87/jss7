@@ -48,6 +48,8 @@ import org.restcomm.protocols.ss7.isup.ISUPParameterFactory;
 import org.restcomm.protocols.ss7.isup.impl.message.parameter.ISUPParameterFactoryImpl;
 import org.restcomm.protocols.ss7.map.MAPParameterFactoryImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParameterFactory;
+import org.restcomm.protocols.ss7.scheduler.api.TimerScheduler;
+import org.restcomm.protocols.ss7.tcap.TCAPProviderImpl;
 import org.restcomm.protocols.ss7.sccp.NetworkIdState;
 import org.restcomm.protocols.ss7.tcap.DialogImpl;
 import org.restcomm.protocols.ss7.tcap.api.MessageType;
@@ -130,6 +132,13 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
 
     public TCAPProvider getTCAPProvider() {
         return this.tcapProvider;
+    }
+
+    public TimerScheduler getTimerScheduler() {
+        if (this.tcapProvider instanceof TCAPProviderImpl) {
+            return ((TCAPProviderImpl) this.tcapProvider).getTimerScheduler();
+        }
+        return null;
     }
 
     @Override

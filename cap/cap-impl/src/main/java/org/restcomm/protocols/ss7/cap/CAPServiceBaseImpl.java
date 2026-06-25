@@ -150,5 +150,11 @@ public abstract class CAPServiceBaseImpl implements CAPServiceBase {
             serLis.onInvokeTimeout(capDialog, invoke.getInvokeId());
         }
     }
+
+    protected void deliverInvokeTimeout(CAPDialog capDialog, Long invokeId) {
+        for (CAPServiceListener serLis : this.serviceListeners) {
+            serLis.onInvokeTimeout(capDialog, invokeId);
+        }
+    }
 }
 

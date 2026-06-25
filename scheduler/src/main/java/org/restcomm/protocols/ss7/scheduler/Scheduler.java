@@ -2,10 +2,11 @@ package org.restcomm.protocols.ss7.scheduler;
 
 import org.apache.log4j.Logger;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * Implements scheduler with multi-level priority queue.
@@ -52,6 +53,8 @@ public class Scheduler implements SchedulerMBean {
 
     public static final Integer HEARTBEAT_QUEUE = -1;
 
+    private static final int DEFAULT_CYCLE_DURATION_MS = 4;
+
     // The clock for time measurement
     private Clock clock;
 
@@ -65,18 +68,33 @@ public class Scheduler implements SchedulerMBean {
     // flag indicating state of the scheduler
     private boolean isActive;
 
+    private final int cycleDurationMs;
+
     private Logger logger = Logger.getLogger(Scheduler.class);
 
     /**
-     * Creates new instance of scheduler.
+     * Creates new instance of scheduler with the default 4ms cycle.
      */
     public Scheduler() {
+        this(DEFAULT_CYCLE_DURATION_MS);
+    }
+
+    /**
+     * Creates new instance of scheduler with a configurable cycle duration.
+     *
+     * @param cycleDurationMs scheduler tick duration in milliseconds
+     */
+    public Scheduler(int cycleDurationMs) {
+        if (cycleDurationMs <= 0) {
+            throw new IllegalArgumentException("cycleDurationMs must be positive");
+        }
+        this.cycleDurationMs = cycleDurationMs;
         for (int i = 0; i < taskQueues.length; i++)
             taskQueues[i] = new OrderedTaskQueue();
 
         heartBeatQueue = new OrderedTaskQueue();
 
-        cpuThread = new CpuThread(String.format("Scheduler"));
+        cpuThread = new CpuThread(String.format("Scheduler"), cycleDurationMs);
     }
 
     /**
@@ -105,6 +123,16 @@ public class Scheduler implements SchedulerMBean {
     public void submit(Task task, Integer index) {
         task.activate(false);
         taskQueues[index].accept(task);
+    }
+
+    /**
+     * Queues task for execution according to its queue identifier.
+     *
+     * @param task the task to be executed.
+     * @param queueId the target queue
+     */
+    public void submit(Task task, QueueId queueId) {
+        submit(task, queueId.getIndex());
     }
 
     /**
@@ -145,11 +173,20 @@ public class Scheduler implements SchedulerMBean {
             return;
         }
 
+        this.isActive = false;
         cpuThread.shutdown();
+        cpuThread.shutdownExecutor();
 
         try {
-            Thread.sleep(40);
+            cpuThread.awaitExecutorTermination(5, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        try {
+            cpuThread.join(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
 
         for (int i = 0; i < taskQueues.length; i++)
@@ -182,14 +219,15 @@ public class Scheduler implements SchedulerMBean {
     private class CpuThread extends Thread {
         private volatile boolean active;
         private int currQueue = MANAGEMENT_QUEUE;
-        private AtomicInteger activeTasksCount = new AtomicInteger();
+        private volatile CountDownLatch batchLatch;
         private long cycleStart = 0;
         private int runIndex = 0;
         private ExecutorService eservice;
-        private Object LOCK = new Object();
+        private final long cycleDurationNanos;
 
-        public CpuThread(String name) {
+        public CpuThread(String name, int cycleDurationMs) {
             super(name);
+            this.cycleDurationNanos = cycleDurationMs * 1_000_000L;
             int size = Runtime.getRuntime().availableProcessors() * 2;
             eservice = new ThreadPoolExecutor(size, size, 0L, TimeUnit.MILLISECONDS, new ConcurrentLinkedList<Runnable>());
         }
@@ -200,79 +238,61 @@ public class Scheduler implements SchedulerMBean {
         }
 
         public void notifyCompletion() {
-            int newValue = activeTasksCount.decrementAndGet();
-            if (newValue == 0 && this.active)
-                synchronized (LOCK) {
-                    LOCK.notify();
-                }
+            CountDownLatch latch = batchLatch;
+            if (latch != null) {
+                latch.countDown();
+            }
         }
 
         @Override
         public void run() {
-            long cycleDuration, cycleDuration2;
+            long cycleDuration;
             cycleStart = System.nanoTime();
 
             while (active) {
                 while (currQueue <= L2WRITE_QUEUE) {
-                    synchronized (LOCK) {
-                        if (executeQueue(taskQueues[currQueue]))
-                            try {
-                                LOCK.wait();
-                            } catch (InterruptedException e) {
-                                // lets continue
-                            }
-                    }
-
+                    executeQueue(taskQueues[currQueue]);
                     currQueue++;
                 }
 
                 runIndex = (runIndex + 1) % 25;
                 if (runIndex == 0) {
-                    synchronized (LOCK) {
-                        if (executeQueue(heartBeatQueue))
-                            try {
-                                LOCK.wait();
-                            } catch (InterruptedException e) {
-                                // lets continue
-                            }
-                    }
+                    executeQueue(heartBeatQueue);
                 }
 
-                // sleep till next cycle
                 cycleDuration = System.nanoTime() - cycleStart;
-                if (cycleDuration < 4000000L) {
-                    try {
-                        sleep(4L - cycleDuration / 1000000L, (int) ((4000000L - cycleDuration) % 1000000L));
-                    } catch (InterruptedException e) {
-                        // lets continue
-                    }
+                if (cycleDuration < cycleDurationNanos) {
+                    LockSupport.parkNanos(cycleDurationNanos - cycleDuration);
                 }
 
-                // new cycle starts , updating cycle start time by 4ms
-                // cycleDuration2=System.nanoTime() - cycleStart;
-                cycleStart = cycleStart + 4000000L;
+                cycleStart = cycleStart + cycleDurationNanos;
                 currQueue = MANAGEMENT_QUEUE;
-
-                // if(cycleDuration2>4100000L)
-                // System.out.println("TIME LONGER THEN 4.1MS,DURATION:" + cycleDuration);
-                // else if(cycleDuration2<3900000L)
-                // System.out.println("TIME SHORTER THEN 3.9MS,DURATION:" + cycleDuration);
             }
         }
 
-        private boolean executeQueue(OrderedTaskQueue currQueue) {
+        private void executeQueue(OrderedTaskQueue currQueue) {
             Task t;
             currQueue.changePool();
             int currQueueSize = currQueue.size();
-            activeTasksCount.set(currQueueSize);
+            if (currQueueSize == 0) {
+                return;
+            }
+
+            CountDownLatch latch = new CountDownLatch(currQueueSize);
+            batchLatch = latch;
             t = currQueue.poll();
-            // submit all tasks in current queue
             while (t != null) {
                 eservice.execute(t);
                 t = currQueue.poll();
             }
 
-            return currQueueSize != 0;
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } finally {
+                batchLatch = null;
+            }
         }
 
         /**
@@ -280,6 +300,14 @@ public class Scheduler implements SchedulerMBean {
          */
         private void shutdown() {
             this.active = false;
+        }
+
+        private void shutdownExecutor() {
+            eservice.shutdown();
+        }
+
+        private void awaitExecutorTermination(long timeout, TimeUnit unit) throws InterruptedException {
+            eservice.awaitTermination(timeout, unit);
         }
     }
 }

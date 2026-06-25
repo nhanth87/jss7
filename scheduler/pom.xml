@@ -6,12 +6,16 @@
 	<parent>
 		<artifactId>ss7-parent</artifactId>
 		<groupId>org.restcomm.protocols.ss7</groupId>
-		<version>9.2.12</version>
+		<version>9.3.0</version>
 	</parent>
 
 	<groupId>org.restcomm.protocols.ss7.scheduler</groupId>
 	<artifactId>scheduler</artifactId>
 	<name>Restcomm jSS7 :: Scheduler :: ${project.artifactId}</name>
+
+	<properties>
+		<infinispan.version>8.2.8.Final</infinispan.version>
+	</properties>
 
 	<dependencies>
                 <!-- non restcomm -->
@@ -20,6 +24,22 @@
                         <artifactId>log4j</artifactId>
                         <scope>provided</scope>
                 </dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-common</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.infinispan</groupId>
+			<artifactId>infinispan-core</artifactId>
+			<version>${infinispan.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<!--  -->
@@ -32,6 +52,11 @@
 					<source>1.8</source>
 					<target>1.8</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
 			</plugin>
 			<plugin>
 				<artifactId>maven-eclipse-plugin</artifactId>
@@ -59,4 +84,3 @@
 	</build>
 
 </project>
-

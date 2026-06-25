@@ -1,12 +1,12 @@
 
 package org.restcomm.protocols.ss7.tcap;
 
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
+import org.restcomm.protocols.ss7.scheduler.api.TimerHandle;
+import org.restcomm.protocols.ss7.scheduler.api.TimerScheduler;
+import org.restcomm.protocols.ss7.scheduler.api.TimerType;
 import org.restcomm.protocols.ss7.tcap.api.TCAPStack;
 import org.restcomm.protocols.ss7.tcap.asn.ApplicationContextName;
 import org.restcomm.protocols.ss7.tcap.asn.InvokeImpl;
@@ -30,8 +30,8 @@ public class PreviewDialogData {
     private PreviewDialogDataKey previewDialogDataKey2;
 
     private ReentrantLock dialogLock = new ReentrantLock();
-    private Future idleTimerFuture;
-    private ScheduledExecutorService executor;
+    private TimerHandle idleTimerHandle;
+    private TimerScheduler timerScheduler;
     private TCAPProviderImpl provider;
     private long idleTaskTimeout;
     private Long dialogId;
@@ -41,7 +41,7 @@ public class PreviewDialogData {
         this.dialogId = dialogId;
         TCAPStack stack = provider.getStack();
         this.idleTaskTimeout = stack.getDialogIdleTimeout();
-        this.executor = provider._EXECUTOR;
+        this.timerScheduler = provider.getTimerScheduler();
     }
 
     public ApplicationContextName getLastACN() {
@@ -100,13 +100,17 @@ public class PreviewDialogData {
 
         try {
             this.dialogLock.lock();
-            if (this.idleTimerFuture != null) {
+            if (this.idleTimerHandle != null) {
                 throw new IllegalStateException();
             }
 
             IdleTimerTask idleTimerTask = new IdleTimerTask();
             idleTimerTask.pdd = this;
-            this.idleTimerFuture = this.executor.schedule(idleTimerTask, this.idleTaskTimeout, TimeUnit.MILLISECONDS);
+            long timerId = TcapTimerIds.dialogIdleTimerId(this.dialogId);
+            this.timerScheduler.cancel(timerId);
+            this.idleTimerHandle = this.timerScheduler.schedule(
+                    TcapTimerIds.newRecord(timerId, this.dialogId, TimerType.TCAP_DIALOG_TIMEOUT, this.idleTaskTimeout),
+                    this.idleTaskTimeout, record -> idleTimerTask.run());
 
         } finally {
             this.dialogLock.unlock();
@@ -116,9 +120,12 @@ public class PreviewDialogData {
     protected void stopIdleTimer() {
         try {
             this.dialogLock.lock();
-            if (this.idleTimerFuture != null) {
-                this.idleTimerFuture.cancel(false);
-                this.idleTimerFuture = null;
+            if (this.idleTimerHandle != null) {
+                this.idleTimerHandle.cancel();
+                this.idleTimerHandle = null;
+            }
+            if (this.timerScheduler != null) {
+                this.timerScheduler.cancel(TcapTimerIds.dialogIdleTimerId(this.dialogId));
             }
 
         } finally {
@@ -133,6 +140,12 @@ public class PreviewDialogData {
             startIdleTimer();
         } finally {
             this.dialogLock.unlock();
+        }
+    }
+
+    protected void cancelAllTimers() {
+        if (this.timerScheduler != null) {
+            this.timerScheduler.cancelAll(this.dialogId);
         }
     }
 

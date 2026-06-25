@@ -41,6 +41,9 @@ import org.restcomm.protocols.ss7.sccp.parameter.RefusalCause;
 import org.restcomm.protocols.ss7.sccp.parameter.ReleaseCause;
 import org.restcomm.protocols.ss7.sccp.parameter.ResetCause;
 import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
+import org.restcomm.protocols.ss7.scheduler.api.TimerHandle;
+import org.restcomm.protocols.ss7.scheduler.api.TimerScheduler;
+import org.restcomm.protocols.ss7.scheduler.api.TimerType;
 import org.restcomm.protocols.ss7.tcap.api.ComponentPrimitiveFactory;
 import org.restcomm.protocols.ss7.tcap.api.DialogPrimitiveFactory;
 import org.restcomm.protocols.ss7.tcap.api.MessageType;
@@ -107,6 +110,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 
     private transient List<TCListener> tcListeners = new CopyOnWriteArrayList<>();
     protected transient ScheduledExecutorService _EXECUTOR;
+    private transient TimerScheduler timerScheduler;
     // boundary for Uni directional dialogs :), tx id is always encoded
     // on 4 octets, so this is its max value
     // private static final long _4_OCTETS_LONG_FILL = 4294967295l;
@@ -344,7 +348,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
             }
         }
         if (structured) {
-            DialogImpl dialog = new DialogImpl(sccpCallingPartyAddress, sccpCalledPartyAddress, id, structured, this._EXECUTOR, this, seqControl,
+            DialogImpl dialog = new DialogImpl(sccpCallingPartyAddress, sccpCalledPartyAddress, id, structured, this.timerScheduler, this, seqControl,
                     this.stack.getPreviewMode());
 
             this.dialogs.put(id, dialog);
@@ -355,7 +359,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 
             return dialog;
         } else {
-            return new DialogImpl(sccpCallingPartyAddress, sccpCalledPartyAddress, id, structured, this._EXECUTOR, this, seqControl,
+            return new DialogImpl(sccpCallingPartyAddress, sccpCalledPartyAddress, id, structured, this.timerScheduler, this, seqControl,
                     this.stack.getPreviewMode());
         }
 
@@ -571,9 +575,24 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     // ///////////////////////////////////////////
     // Some methods invoked by operation FSM //
     // //////////////////////////////////////////
-    public Future createOperationTimer(Runnable operationTimerTask, long invokeTimeout) {
+    public TimerHandle scheduleInvokeTimer(DialogImpl dialog, Long invokeId, long delayMillis, Runnable operationTimerTask) {
+        long dialogId = dialog.getLocalDialogId();
+        long timerId = TcapTimerIds.invokeTimerId(dialogId, invokeId);
+        this.timerScheduler.cancel(timerId);
+        return this.timerScheduler.schedule(TcapTimerIds.newRecord(timerId, dialogId, TimerType.TCAP_INVOKE_TIMEOUT, delayMillis),
+                delayMillis, record -> operationTimerTask.run());
+    }
 
-        return this._EXECUTOR.schedule(operationTimerTask, invokeTimeout, TimeUnit.MILLISECONDS);
+    public void cancelInvokeTimer(long dialogId, Long invokeId) {
+        this.timerScheduler.cancel(TcapTimerIds.invokeTimerId(dialogId, invokeId));
+    }
+
+    void setTimerScheduler(TimerScheduler timerScheduler) {
+        this.timerScheduler = timerScheduler;
+    }
+
+    public TimerScheduler getTimerScheduler() {
+        return this.timerScheduler;
     }
 
     public void operationTimedOut(InvokeImpl tcapInvokeRequest) {
@@ -1078,7 +1097,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                     + " is already exists - we ignore it and drops current dialog");
         }
 
-        DialogImpl dialog = new DialogImpl(sccpCallingPartyAddress, sccpCalledPartyAddress, seqControl, this._EXECUTOR, this, pdd, false);
+        DialogImpl dialog = new DialogImpl(sccpCallingPartyAddress, sccpCalledPartyAddress, seqControl, this.timerScheduler, this, pdd, false);
 
         pdd.startIdleTimer();
 
@@ -1131,13 +1150,13 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
         boolean sideB = false;
         if (previewDialogData != null) {
             sideB = previewDialogData.getPreviewDialogDataKey1().equals(previewDialogDataKey);
-            dialog = new DialogImpl(sccpCallingPartyAddress, sccpCalledPartyAddress, seqControl, this._EXECUTOR, this, previewDialogData, sideB);
+            dialog = new DialogImpl(sccpCallingPartyAddress, sccpCalledPartyAddress, seqControl, this.timerScheduler, this, previewDialogData, sideB);
         } else {
             if (ky2 != null)
                 previewDialogData = this.dialogPreviewList.get(ky2);
             if (previewDialogData != null) {
                 sideB = previewDialogData.getPreviewDialogDataKey1().equals(previewDialogDataKey);
-                dialog = new DialogImpl(sccpCallingPartyAddress, sccpCalledPartyAddress, seqControl, this._EXECUTOR, this, previewDialogData, sideB);
+                dialog = new DialogImpl(sccpCallingPartyAddress, sccpCalledPartyAddress, seqControl, this.timerScheduler, this, previewDialogData, sideB);
             } else {
                 return null;
             }

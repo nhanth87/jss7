@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Snippet for WildFly standalone.xml / domain.xml — Infinispan subsystem.
+  Merge into the existing <subsystem xmlns="urn:jboss:domain:infinispan:4.0"> block.
+
+  JNDI container: java:jboss/infinispan/container/jss7
+  Caches:
+    - jss7-timers      : TimerRecord values with per-entry TTL (expiration events drive firing)
+    - jss7-timer-index : dialogId -> Set<timerId> for bulk cancellation by dialog
+
+  For clustered HA, replace <local-cache> with <distributed-cache> and configure a transport stack.
+-->
+<cache-container name="jss7" default-cache="jss7-timers" module="org.wildfly.clustering.server">
+    <local-cache name="jss7-timers">
+        <locking isolation="READ_COMMITTED"/>
+        <!-- Per-entry lifespan is set by InfinispanTimerAdapter; cache-level max is a safety net -->
+        <expiration max-idle="-1" lifespan="-1" interval="1000"/>
+    </local-cache>
+    <local-cache name="jss7-timer-index">
+        <locking isolation="READ_COMMITTED"/>
+        <!-- Index entries outlive timers slightly; align with longest expected dialog lifetime -->
+        <expiration max-idle="3600000" interval="60000"/>
+    </local-cache>
+</cache-container>
