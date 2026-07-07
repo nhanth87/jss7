@@ -74,6 +74,23 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Netty timer classes used by scheduler's InfinispanTimerFactory /
+             HashedWheelTimerFacade (io.netty.util.TimerTask). The assembly is
+             non-transitive, so these must be declared explicitly or the WildFly
+             module fails with NoClassDefFoundError: io/netty/util/TimerTask at
+             boot (restcomm.ss7 subsystem fails -> MAPSS7Service in error ->
+             USSD SBB never activates). -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
+
 	</dependencies>
 	
 	
