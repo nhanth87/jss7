@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>ss7-parent</artifactId>
+		<groupId>org.restcomm.protocols.ss7</groupId>
+		<version>9.2.8-j25</version>
+	</parent>
+
+	<groupId>org.restcomm.protocols.ss7.config</groupId>
+	<artifactId>ss7-config</artifactId>
+	<packaging>jar</packaging>
+
+	<name>Restcomm jSS7 :: Config :: ${project.artifactId}</name>
+	<description>
+		Neutral single-file stack configuration (JSON) and the compiler that
+		translates it into a fully-wired, started jSS7 stack
+		(SCTP -> M3UA -> SCCP -> TCAP -> MAP/CAP). Lets a resource adaptor stay
+		vendor-neutral: it hands a config document to Ss7StackBuilder and gets
+		back running providers, with no per-layer jSS7 wiring on the RA side.
+	</description>
+
+	<dependencies>
+		<!-- jSS7 stack modules this compiler wires together -->
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.m3ua</groupId>
+			<artifactId>m3ua-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.m3ua</groupId>
+			<artifactId>m3ua-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.sccp</groupId>
+			<artifactId>sccp-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.sccp</groupId>
+			<artifactId>sccp-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.sccp</groupId>
+			<artifactId>sccp-api-ext</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.sccp</groupId>
+			<artifactId>sccp-impl-ext</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.ss7ext</groupId>
+			<artifactId>ss7-ext-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.ss7ext</groupId>
+			<artifactId>ss7-ext-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.tcap</groupId>
+			<artifactId>tcap-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.tcap</groupId>
+			<artifactId>tcap-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.map</groupId>
+			<artifactId>map-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.map</groupId>
+			<artifactId>map-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.cap</groupId>
+			<artifactId>cap-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.cap</groupId>
+			<artifactId>cap-impl</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- SCTP transport (versions managed by ss7-parent) -->
+		<dependency>
+			<groupId>org.mobicents.protocols.sctp</groupId>
+			<artifactId>sctp-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.protocols.sctp</groupId>
+			<artifactId>sctp-impl</artifactId>
+		</dependency>
+
+		<!-- JSON binding (tree standard: Jackson 2.15.2) -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.15.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>

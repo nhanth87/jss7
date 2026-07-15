@@ -1,0 +1,81 @@
+{
+  "//": "VNPT production stack — ONE JSON replacing five legacy XML files",
+  "//sctp":     "VNPT_sctp.xml        -> sctp.links  (12 links, multi-homed)",
+  "//m3ua":     "VNPT_m3ua1.xml       -> m3ua        (1 AS over 12 links; ASPs auto-derived)",
+  "//sccp-rt":  "VNPT_sccprouter2.xml -> sccp.routing (12 rules, targets inline, no ids)",
+  "//sccp-res": "VNPT_sccpresource2.xml -> sccp.reachablePointCodes (remoteSpc/Ssn auto-derived)",
+  "//tcap":     "VNPT_management.xml  -> tcap",
+  "//services": "new: hlr(ssn6) + smsc(ssn8), both MAP",
+
+  "stackName": "VNPT",
+  "protocols": { "map": true, "cap": false },
+
+  "sctp": {
+    "connectDelay": 10000,
+    "workerThreads": 8,
+    "links": [
+      { "name": "STPT1A_AS1", "local": "10.155.183.170:2905", "peer": "10.204.92.149:2905",  "localSecondary": ["10.155.183.171"] },
+      { "name": "STPT1A_AS2", "local": "10.155.183.170:2906", "peer": "10.204.92.150:2905",  "localSecondary": ["10.155.183.171"] },
+      { "name": "STPT1B_AS1", "local": "10.155.183.170:2907", "peer": "10.204.93.142:2905",  "localSecondary": ["10.155.183.171"] },
+      { "name": "STPT1B_AS2", "local": "10.155.183.170:2908", "peer": "10.204.93.149:2905",  "localSecondary": ["10.155.183.171"] },
+      { "name": "STPT2A_AS1", "local": "10.155.183.170:2909", "peer": "10.204.191.146:2905", "localSecondary": ["10.155.183.171"] },
+      { "name": "STPT2A_AS2", "local": "10.155.183.170:2910", "peer": "10.204.191.147:2905", "localSecondary": ["10.155.183.171"] },
+      { "name": "STPT2B_AS1", "local": "10.155.183.170:2911", "peer": "10.204.192.146:2905", "localSecondary": ["10.155.183.171"] },
+      { "name": "STPT2B_AS2", "local": "10.155.183.170:2912", "peer": "10.204.191.147:2905", "localSecondary": ["10.155.183.171"] },
+      { "name": "STPT3A_AS1", "local": "10.155.183.170:2913", "peer": "10.204.208.133:2905", "localSecondary": ["10.155.183.171"] },
+      { "name": "STPT3A_AS2", "local": "10.155.183.170:2914", "peer": "10.204.208.200:2905", "localSecondary": ["10.155.183.171"] },
+      { "name": "STPT3B_AS1", "local": "10.155.183.170:2915", "peer": "10.204.209.133:2905", "localSecondary": ["10.155.183.171"] },
+      { "name": "STPT3B_AS2", "local": "10.155.183.170:2916", "peer": "10.204.209.200:2905", "localSecondary": ["10.155.183.171"] }
+    ]
+  },
+
+  "m3ua": {
+    "heartbeatTime": 10000,
+    "as": [
+      { "name": "AS1", "mode": "loadshare", "functionality": "as", "ipsp": "client",
+        "routingContext": 0, "minAspActiveForLb": 1,
+        "links": [
+          "STPT1A_AS1", "STPT1A_AS2", "STPT1B_AS1", "STPT1B_AS2",
+          "STPT2A_AS1", "STPT2A_AS2", "STPT2B_AS1", "STPT2B_AS2",
+          "STPT3A_AS1", "STPT3A_AS2", "STPT3B_AS1", "STPT3B_AS2"
+        ] }
+    ],
+    "routes": [
+      { "to": { "dpc": 4796, "opc": 8752 }, "via": "AS1" }
+    ]
+  },
+
+  "sccp": {
+    "localPoints": [
+      { "pc": 4773, "networkIndicator": "national", "networkId": 0,
+        "reachablePointCodes": [4796, 4797, 5670, 5671, 8752, 8753] }
+    ],
+    "routing": [
+      { "match": { "pc": 4796, "ssn": 6, "gt": "*" }, "from": "local",  "to": { "pc": 4796, "ssn": 6 } },
+      { "match": { "pc": 4796, "ssn": 8, "gt": "*" }, "from": "local",  "to": { "pc": 4796, "ssn": 8 } },
+      { "match": { "ssn": 6, "gt": "*" },            "from": "remote", "to": { "pc": 4773, "ssn": 6, "gt": "8491020547" } },
+      { "match": { "ssn": 8, "gt": "*" },            "from": "remote", "to": { "pc": 4773, "ssn": 8, "gt": "8491020547" } },
+      { "match": { "pc": 4797, "ssn": 6, "gt": "*" }, "from": "local",  "to": { "pc": 4797, "ssn": 6 } },
+      { "match": { "pc": 4797, "ssn": 8, "gt": "*" }, "from": "local",  "to": { "pc": 4797, "ssn": 8 } },
+      { "match": { "pc": 5670, "ssn": 6, "gt": "*" }, "from": "local",  "to": { "pc": 5670, "ssn": 6 } },
+      { "match": { "pc": 5670, "ssn": 8, "gt": "*" }, "from": "local",  "to": { "pc": 5670, "ssn": 8 } },
+      { "match": { "pc": 5671, "ssn": 6, "gt": "*" }, "from": "local",  "to": { "pc": 5671, "ssn": 6 } },
+      { "match": { "pc": 5671, "ssn": 8, "gt": "*" }, "from": "local",  "to": { "pc": 5671, "ssn": 8 } },
+      { "match": { "pc": 4796, "ssn": 6, "gt": "*" }, "from": "local",  "to": { "pc": 4773, "ssn": 6 } },
+      { "match": { "pc": 4796, "ssn": 8, "gt": "*" }, "from": "local",  "to": { "pc": 4773, "ssn": 8 } }
+    ]
+  },
+
+  "tcap": {
+    "dialogIdleTimeout": 60000,
+    "invokeTimeout": 30000,
+    "maxDialogs": 5000,
+    "dialogIdRangeStart": 1,
+    "dialogIdRangeEnd": 2147483647
+  },
+
+  "services": [
+    { "name": "hlr",  "ssn": 6, "protocol": "map" },
+    { "name": "smsc", "ssn": 8, "protocol": "map" }
+  ]
+}

@@ -1,0 +1,105 @@
+<project basedir="." default="server">
+	<property environment="sys" />
+	<property name="packageprefix" value="org.restcomm.protocols.ss7.map.load.ussd" />
+
+	<!-- Load test params (override via -D on command line) -->
+	<property name="test.client.numOfDialogs" value="1440000" />
+	<property name="test.client.concurrentDialog" value="400" />
+
+	<!-- Java 25 JVM path -->
+	<property name="jvm.home" value="/home/meodien/.local/share/mise/installs/java/zulu-25.34.17.0/bin/java" />
+
+	<!-- CLASSPATH: target/classes + all runtime JARs from Maven -->
+	<loadresource property="cp.list">
+		<file file="ant-classpath.txt"/>
+	</loadresource>
+	<path id="full.class.path">
+		<pathelement location="target/classes"/>
+		<pathelement location="src/main/resources"/>
+		<pathelement path="${cp.list}"/>
+	</path>
+
+	<!-- ============================================================= -->
+	<!-- SETUP: generate ant-classpath.txt (run once after pom changes) -->
+	<!-- ============================================================= -->
+	<target name="setup" description="Generate ant-classpath.txt from Maven">
+		<exec executable="mvn" dir="../.." failonerror="true">
+			<arg line="-pl map/load dependency:build-classpath -q -DincludeScope=runtime -Dmdep.outputFile=map/load/ant-classpath.txt -o"/>
+		</exec>
+		<echo message="ant-classpath.txt generated"/>
+	</target>
+
+	<!-- ============================================================= -->
+	<!-- SERVER                                                         -->
+	<!-- ============================================================= -->
+	<target name="server" description="Start USSD Load Test Server">
+		<delete dir="server" />
+		<mkdir dir="server" />
+		<delete quiet="true">
+			<fileset dir="." includes="map-load-server-*.xml"/>
+		</delete>
+		<echo message="Server starting with ${basedir}/ss7-server.json"/>
+		<java classname="${packageprefix}.Server" fork="true"
+		      jvm="${jvm.home}" maxmemory="1024m" classpathref="full.class.path"
+		      dir="server" failonerror="true">
+			<jvmarg value="-Xms512m"/>
+			<jvmarg value="-Xmx1024m"/>
+			<jvmarg value="-XX:MetaspaceSize=128m"/>
+			<jvmarg value="-XX:MaxMetaspaceSize=128m"/>
+			<jvmarg value="-XX:+UseZGC"/>
+			<jvmarg value="-XX:+ZGenerational"/>
+			<jvmarg value="-XX:ConcGCThreads=2"/>
+			<jvmarg value="-Dlog4j.configurationFile=${basedir}/log4j2-server.xml"/>
+			<jvmarg value="-Djava.net.preferIPv4Stack=true"/>
+			<jvmarg value="-Dio.netty.leakDetection.level=disabled"/>
+			<arg value="${basedir}/ss7-server.json" />
+		</java>
+	</target>
+
+	<!-- ============================================================= -->
+	<!-- CLIENT                                                         -->
+	<!-- ============================================================= -->
+	<target name="client" description="Start USSD Load Test Client">
+		<delete dir="client" />
+		<mkdir dir="client" />
+		<delete quiet="true">
+			<fileset dir="." includes="map-load-client-*.xml"/>
+		</delete>
+		<echo message="Client: ${test.client.numOfDialogs} dialogs @ ${test.client.concurrentDialog} TPS"/>
+		<java classname="${packageprefix}.Client" fork="true"
+		      jvm="${jvm.home}" maxmemory="1024m" classpathref="full.class.path"
+		      dir="client" failonerror="true">
+			<jvmarg value="-Xms512m"/>
+			<jvmarg value="-Xmx1024m"/>
+			<jvmarg value="-XX:MetaspaceSize=128m"/>
+			<jvmarg value="-XX:MaxMetaspaceSize=128m"/>
+			<jvmarg value="-XX:+UseZGC"/>
+			<jvmarg value="-XX:+ZGenerational"/>
+			<jvmarg value="-XX:ConcGCThreads=2"/>
+			<jvmarg value="-Dlog4j.configurationFile=${basedir}/log4j2-client.xml"/>
+			<jvmarg value="-Djava.net.preferIPv4Stack=true"/>
+			<jvmarg value="-Dio.netty.leakDetection.level=disabled"/>
+			<jvmarg value="-Dss7.load.ndialogs=${test.client.numOfDialogs}"/>
+			<jvmarg value="-Dss7.load.rateLimit=${test.client.concurrentDialog}"/>
+			<jvmarg value="-Dss7.load.rampUp=-100"/>
+			<arg value="${basedir}/ss7-client.json" />
+		</java>
+	</target>
+
+	<!-- ============================================================= -->
+	<!-- CLEAN                                                          -->
+	<!-- ============================================================= -->
+	<target name="clean" description="Kill processes + clean">
+		<exec executable="pkill" failonerror="false">
+			<arg line="-9 -f 'ussd.Server'"/>
+		</exec>
+		<exec executable="pkill" failonerror="false">
+			<arg line="-9 -f 'ussd.Client'"/>
+		</exec>
+		<delete dir="server" />
+		<delete dir="client" />
+		<delete quiet="true">
+			<fileset dir="." includes="map-load-*.xml"/>
+		</delete>
+	</target>
+</project>

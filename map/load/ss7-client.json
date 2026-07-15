@@ -1,0 +1,72 @@
+// ============================================================================
+//  ss7-client.json — MAP USSD Load Test CLIENT (OPC=1, DPC=2)
+//  Maps from: ussd-client.xml + Client.java initSCCP/initM3UA/initTCAP/initMAP
+// ============================================================================
+{
+  "stackName": "map-load-client",
+
+  "protocols": { "map": true, "cap": false },
+
+  // ═══ SCTP — client binds 127.0.0.1:8012, connects to server :8011 ═══
+  "sctp": {
+    "connectDelay": 10000,
+    "workerThreads": 8,
+    "links": [
+      {
+        "name": "clientLink",
+        "local": "127.0.0.1:8012",
+        "peer": "127.0.0.1:8011"
+      }
+    ]
+  },
+
+  // ═══ M3UA — IPSP client, RC=101, NA=102, deliveryThreads=16 ═══
+  "m3ua": {
+    "deliveryThreads": 16,
+    "as": [
+      {
+        "name": "AS1",
+        "mode": "loadshare",
+        "functionality": "ipsp",
+        "ipsp": "client",
+        "routingContext": 101,
+        "networkAppearance": 102,
+        "links": ["clientLink"]
+      }
+    ],
+    "routes": [
+      { "to": { "dpc": 2, "opc": 1, "si": 3 }, "via": "AS1" }
+    ]
+  },
+
+  // ═══ SCCP — local PC=1, reachable PC=[2]; GT-based routing ═══
+  "sccp": {
+    "localPoints": [
+      {
+        "pc": 1,
+        "networkIndicator": "national",
+        "networkId": 0,
+        "reachablePointCodes": [2]
+      }
+    ],
+    "routing": [
+      // Rule 1: REMOTE (network→app) — "*" GT → deliver locally to PC=1
+      { "from": "remote", "match": { "gt": "*/" }, "to": { "pc": 1 } },
+      // Rule 2: LOCAL  (app→network) — "*" GT → route to PC=2
+      { "from": "local",  "match": { "gt": "*/" }, "to": { "pc": 2 } }
+    ]
+  },
+
+  // ═══ TCAP — primary SSN=8 (MSC), extra=[147 (USSD)] for remote SSN discovery ═══
+  "tcap": {
+    "dialogIdleTimeout": 15000,
+    "invokeTimeout": 10000,
+    "maxDialogs": 25000
+  },
+
+  // ═══ Services — builder auto-creates remote SSNs [8,147] at reachable PC=2 ═══
+  "services": [
+    { "name": "msc",  "ssn": 8,   "protocol": "map" },
+    { "name": "ussd", "ssn": 147, "protocol": "map" }
+  ]
+}

@@ -1,0 +1,84 @@
+package org.restcomm.protocols.ss7.map.service.supplementary;
+
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+
+
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.restcomm.protocols.ss7.map.MessageImpl;
+import org.restcomm.protocols.ss7.map.api.MAPException;
+import org.restcomm.protocols.ss7.map.api.datacoding.CBSDataCodingScheme;
+import org.restcomm.protocols.ss7.map.api.primitives.USSDString;
+import org.restcomm.protocols.ss7.map.api.service.supplementary.MAPDialogSupplementary;
+import org.restcomm.protocols.ss7.map.api.service.supplementary.SupplementaryMessage;
+import org.restcomm.protocols.ss7.map.datacoding.CBSDataCodingSchemeImpl;
+import org.restcomm.protocols.ss7.map.primitives.MAPAsnPrimitive;
+import org.restcomm.protocols.ss7.map.primitives.USSDStringImpl;
+
+/**
+ * @author amit bhayani
+ *
+ */
+@JacksonXmlRootElement(localName = "supplementaryMessageImpl")
+public abstract class SupplementaryMessageImpl extends MessageImpl implements SupplementaryMessage, MAPAsnPrimitive {
+
+    private static final Logger logger = LogManager.getLogger(SupplementaryMessageImpl.class);
+
+    private static final String DATA_CODING_SCHEME = "dataCodingScheme";
+    private static final String STRING = "string";
+
+    private static final byte DEFAULT_DATA_CODING_SCHEME = 0x0f;
+    private static final String DEFAULT_USSD_STRING = "";
+
+    protected CBSDataCodingScheme ussdDataCodingSch;
+    protected USSDString ussdString;
+
+    /**
+     *
+     */
+    public SupplementaryMessageImpl() {
+        super();
+    }
+
+    public SupplementaryMessageImpl(CBSDataCodingScheme ussdDataCodingSch, USSDString ussdString) {
+        this.ussdDataCodingSch = ussdDataCodingSch;
+        this.ussdString = ussdString;
+    }
+
+    public MAPDialogSupplementary getMAPDialog() {
+        return (MAPDialogSupplementary) super.getMAPDialog();
+    }
+
+    public CBSDataCodingScheme getDataCodingScheme() {
+        return ussdDataCodingSch;
+    }
+
+    public USSDString getUSSDString() {
+        return this.ussdString;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(", ussdDataCodingSch=");
+        sb.append(ussdDataCodingSch);
+        if (ussdString != null) {
+            sb.append(", ussdString=");
+            try {
+                sb.append(ussdString.getString(null));
+            } catch (Exception e) {
+            }
+        }
+
+        sb.append("]");
+
+        return sb.toString();
+    }
+
+    /**
+     * XML Serialization/Deserialization
+     */
+
+}

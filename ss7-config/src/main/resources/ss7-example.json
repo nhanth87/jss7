@@ -1,0 +1,103 @@
+// ============================================================================
+//  ss7-example.json — annotated template for the single-file SS7 stack config.
+//  Comments (// and #) are allowed. Every "magic number" (address indicator,
+//  encoding scheme, rule/address ids, ASP factories, remote SPC/SSN) is DERIVED
+//  by the compiler — you only write what is meaningful to an operator.
+// ============================================================================
+{
+  "stackName": "ss7",
+
+  // Which application providers to start over TCAP. Omitted => map:true only.
+  "protocols": { "map": true, "cap": false },
+
+  // ── SCTP transport ──────────────────────────────────────────────────────
+  "sctp": {
+    "connectDelay": 10000,
+    "workerThreads": 8,
+    "links": [
+      // local/peer are written host:port. localSecondary = SCTP multi-homing
+      // (extra local IPs). One M3UA ASP is auto-created per link (<name>-ASP).
+      // aspId/heartbeat are optional; set aspId when the peer expects a fixed
+      // ASP identifier (otherwise ids are auto-assigned sequentially).
+      { "name": "STPT1A", "local": "10.155.183.170:2905", "peer": "10.204.92.149:2905", "localSecondary": ["10.155.183.171"], "aspId": 1 },
+      { "name": "STPT1B", "local": "10.155.183.170:2907", "peer": "10.204.93.142:2905", "localSecondary": ["10.155.183.171"], "aspId": 5 }
+      // a SERVER link instead of client:
+      // { "name": "SRV1", "type": "server", "channel": "sctp", "local": "0.0.0.0:2905", "peer": "10.0.0.9:2905" }
+    ]
+  },
+
+  // ── M3UA ────────────────────────────────────────────────────────────────
+  "m3ua": {
+    "as": [
+      // The AS cluster:
+      //   functionality: as | sgw | ipsp        exchangeType: se (default) | de
+      //   ipsp: client | server                 (omit unless functionality=ipsp)
+      //   mode: loadshare (default) | override | broadcast
+      //   routingContext:   RC negotiated with the SG (e.g. 101; 0/omit for IPSP)
+      //   networkAppearance: optional NA (e.g. 102) when the peer uses one
+      //   minAspActiveForLb: min active ASPs before load-balancing (default 1)
+      //   links = the SCTP link names this AS spans; one ASP is generated each.
+      { "name": "AS1", "mode": "loadshare", "functionality": "as", "ipsp": "client",
+        "routingContext": 0, "links": ["STPT1A", "STPT1B"] }
+      // registered-AS example over an SG:
+      // { "name": "AS2", "mode": "loadshare", "functionality": "as", "exchangeType": "se",
+      //   "routingContext": 101, "networkAppearance": 102, "minAspActiveForLb": 1,
+      //   "links": ["STPT1A"] }
+    ],
+    // route: traffic to (dpc,opc) is carried via an AS. si defaults to -1 (any).
+    "routes": [
+      { "to": { "dpc": 4796, "opc": 8752 }, "via": "AS1" }
+    ]
+  },
+
+  // ── SCCP ────────────────────────────────────────────────────────────────
+  "sccp": {
+    // One local point code = one MTP3 SAP. Declare several to run multiple
+    // local PCs on one stack; networkId keeps their routing tables apart and a
+    // rule's networkId picks which local point it belongs to.
+    "localPoints": [
+      { "pc": 4773, "networkIndicator": "national", "networkId": 0,
+        "reachablePointCodes": [4796, 4797] }
+      // second local point (e.g. an international plane) — its own reachables:
+      // { "pc": 4774, "networkIndicator": "international", "networkId": 1,
+      //   "reachablePointCodes": [9001, 9002] }
+    ],
+
+    // routing rules, read top-to-bottom. A message whose called address matches
+    // "match" is translated to "to". Wildcards live in the GT: * = any tail,
+    // ? = one digit, / = digit-group separator. Omit pc/ssn to wildcard them.
+    "routing": [
+
+      // (1) OUTBOUND pass-through by point code (app -> network). match==to,
+      //     default mask "K". SSN 6 vs 8 = remote subsystem (HLR vs SMSC).
+      { "from": "local", "match": { "pc": 4796, "ssn": 6, "gt": "*" }, "to": { "pc": 4796, "ssn": 6 } },
+      { "from": "local", "match": { "pc": 4796, "ssn": 8, "gt": "*" }, "to": { "pc": 4796, "ssn": 8 } },
+
+      // (2) OUTBOUND real GT ROUTING: any called GT starting 84 (national mobile)
+      //     -> route to STP at PC 4796, SSN 6. "mask":"K" keeps the dialled
+      //     digits; use "R" with a "to.gt" to REPLACE them.
+      { "from": "local", "match": { "gt": "84*" }, "to": { "pc": 4796, "ssn": 6 }, "mask": "K" },
+
+      // (3) OUTBOUND GT translation with a WILDCARD single digit: 849?  matches
+      //     8490..8499 (one digit), sent to a different STP.
+      { "from": "local", "match": { "gt": "849?" }, "to": { "pc": 4797, "ssn": 6 } },
+
+      // (4) INBOUND (network -> app): a message GT-routed to OUR title, any SSN,
+      //     is delivered to our local PC 4773 on the called SSN. Omitting ssn in
+      //     "match" wildcards it. "backup" gives a failover address.
+      { "from": "remote", "match": { "gt": "*" }, "to": { "pc": 4773, "ssn": 6 },
+        "backup": { "pc": 4773, "ssn": 8 } }
+    ]
+  },
+
+  // ── TCAP ────────────────────────────────────────────────────────────────
+  "tcap": { "dialogIdleTimeout": 60000, "invokeTimeout": 30000, "maxDialogs": 5000 },
+
+  // ── services: SSN -> logical service. The SSN set becomes the TCAP local
+  //    SSNs (first = primary, rest = extra); inbound dialogs dispatch by their
+  //    called SSN. Here SSN 6 = HLR, SSN 8 = SMSC on one stack. ─────────────
+  "services": [
+    { "name": "hlr",  "ssn": 6, "protocol": "map" },
+    { "name": "smsc", "ssn": 8, "protocol": "map" }
+  ]
+}

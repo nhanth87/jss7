@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.restcomm.protocols.ss7</groupId>
+        <artifactId>ss7-parent</artifactId>
+        <version>9.2.8-j25</version>
+    </parent>
+
+    <packaging>jar</packaging>
+
+    <artifactId>asn</artifactId>
+    <groupId>org.mobicents.protocols.asn</groupId>
+    <name>RestComm jSS7 :: ASN :: API</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.bundle.skip>false</maven.bundle.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
+        <!-- No other external dependencies - pure Java ASN.1 library -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <!-- Java 25: the inherited maven-bundle-plugin can't generate an OSGi manifest
+                 (its bnd analyzer AIOOBEs on modern bytecode). The inherited jar-plugin config
+                 points <archive><manifestFile> at that never-generated file, failing the build.
+                 Override the default-jar execution's archive so the jar plugin generates its own
+                 plain manifest instead. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <configuration>
+                            <archive combine.self="override">
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

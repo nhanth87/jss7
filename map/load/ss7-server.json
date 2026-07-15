@@ -1,0 +1,81 @@
+// ============================================================================
+//  ss7-server.json — MAP USSD Load Test SERVER (own PC=2, peer/client PC=1)
+//  Maps from: ussd-server.xml + Server.java initSCCP/initM3UA/initTCAP/initMAP
+//  Server owns PC=2 (the DPC the client targets) and routes back to PC=1.
+//  remote SSNs [8,6,147] now live at reachable PC=1 (the client).
+// ============================================================================
+{
+  "stackName": "map-load-server",
+
+  "protocols": { "map": true, "cap": false },
+
+  // ═══ SCTP — server listens on 127.0.0.1:8011, expects peer at :8012 ═══
+  "sctp": {
+    "connectDelay": 10000,
+    "workerThreads": 8,
+    "links": [
+      {
+        "name": "serverLink",
+        "type": "server",
+        "local": "127.0.0.1:8011",
+        "peer": "127.0.0.1:8012"
+      }
+    ]
+  },
+
+  // ═══ M3UA — IPSP server, RC=101, NA=102, deliveryThreads=16 ═══
+  "m3ua": {
+    "deliveryThreads": 16,
+    "as": [
+      {
+        "name": "AS1",
+        "mode": "loadshare",
+        "functionality": "ipsp",
+        "ipsp": "server",
+        "routingContext": 101,
+        "networkAppearance": 102,
+        "links": ["serverLink"]
+      }
+    ],
+    "routes": [
+      { "to": { "dpc": 1, "opc": 2, "si": 3 }, "via": "AS1" }
+    ]
+  },
+
+  // ═══ SCCP — local PC=2, reachable PC=[1]; GT-based routing ═══
+  //  Server MUST own PC=2 — that's the DPC the client puts on its messages.
+  //  If server owns PC=1 (== client), incoming DPC=2 is seen as a *remote*
+  //  destination and bounced back → point-code routing loop, MAP never fires.
+  "sccp": {
+    "localPoints": [
+      {
+        "pc": 2,
+        "networkIndicator": "national",
+        "networkId": 0,
+        "reachablePointCodes": [1]
+      }
+    ],
+    "routing": [
+      // Rule 1: REMOTE (network→app) — "*/" GT → deliver locally to PC=2 SSN=147 (USSD)
+      { "from": "remote", "match": { "gt": "*/" }, "to": { "pc": 2, "ssn": 147 } },
+      // Rule 2: LOCAL  (app→network) — "*/" GT → route to PC=1 (client)
+      { "from": "local",  "match": { "gt": "*/" }, "to": { "pc": 1 } }
+    ]
+  },
+
+  // ═══ TCAP — primary SSN=8 (MSC), extra=[6 (HLR), 147 (USSD)] ═══
+  "tcap": {
+    "dialogIdleTimeout": 15000,
+    "invokeTimeout": 10000,
+    "maxDialogs": 25000
+  },
+
+  // ═══ Services — SSN bindings drive TCAP multi-SSN + auto remote SSNs ═══
+  // Builder creates remote SSNs [8,6,147] at reachable PC=2 — this FIXES the
+  // "no Remote SubSystem = 8" warning that blocks server→client responses.
+  "services": [
+    { "name": "msc",  "ssn": 8,   "protocol": "map" },
+    { "name": "hlr",  "ssn": 6,   "protocol": "map" },
+    { "name": "ussd", "ssn": 147, "protocol": "map" }
+  ]
+}
