@@ -66,10 +66,7 @@ public class CAPStackImpl implements CAPStack {
         if (state != State.CONFIGURED) {
             throw new IllegalStateException("Stack has not been configured or is already running!");
         }
-        if (tcapStack != null) {
-            // this is null in junits!
-            this.tcapStack.start();
-        }
+        // TCAP is already started by the builder before CAP; skip re-start.
         this.capProvider.start();
 
         this.state = State.RUNNING;
