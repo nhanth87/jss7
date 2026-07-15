@@ -6,14 +6,14 @@
       <remoteSsn>8</remoteSsn>
       <remoteSsnFlag>0</remoteSsnFlag>
       <markProhibitedWhenSpcResuming>false</markProhibitedWhenSpcResuming>
-      <remoteSsnProhibited>true</remoteSsnProhibited>
+      <remoteSsnProhibited>false</remoteSsnProhibited>
     </1>
     <2>
       <remoteSpc>2</remoteSpc>
       <remoteSsn>147</remoteSsn>
       <remoteSsnFlag>0</remoteSsnFlag>
       <markProhibitedWhenSpcResuming>false</markProhibitedWhenSpcResuming>
-      <remoteSsnProhibited>true</remoteSsnProhibited>
+      <remoteSsnProhibited>false</remoteSsnProhibited>
     </2>
   </remoteSsns>
   <remoteSpcs>
@@ -21,8 +21,8 @@
       <remoteSpc>2</remoteSpc>
       <remoteSpcFlag>0</remoteSpcFlag>
       <mask>0</mask>
-      <remoteSpcProhibited>true</remoteSpcProhibited>
-      <remoteSccpProhibited>true</remoteSccpProhibited>
+      <remoteSpcProhibited>false</remoteSpcProhibited>
+      <remoteSccpProhibited>false</remoteSccpProhibited>
       <rl>0</rl>
       <rsl>0</rsl>
       <currentRestrictionLevel>0</currentRestrictionLevel>

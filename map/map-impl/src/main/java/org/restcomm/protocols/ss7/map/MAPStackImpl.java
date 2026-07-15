@@ -65,10 +65,7 @@ public class MAPStackImpl implements MAPStack {
         if (state != State.CONFIGURED) {
             throw new IllegalStateException("Stack has not been configured or is already running!");
         }
-        if (tcapStack != null) {
-            // this is null in junits!
-            this.tcapStack.start();
-        }
+        // TCAP is already started by the builder before MAP; skip re-start.
         this.mapProvider.start();
 
         this.state = State.RUNNING;
