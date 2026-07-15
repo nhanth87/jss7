@@ -437,6 +437,18 @@ public class Server extends TestHarnessSmsMo {
     }
 
     public static void main(String[] args) {
+        // JSON config path → use Ss7StackBuilder
+        if (args.length == 1 && args[0].endsWith(".json")) {
+            try {
+                new Server().startWithJson(args[0]);
+            } catch (Exception e) {
+                log.error("Failed to start server", e);
+                System.exit(1);
+            }
+            return;
+        }
+
+        // Legacy CLI args (backward compat)
         int i = 0;
         IpChannelType ipChannelType = IpChannelType.SCTP;
 
@@ -458,23 +470,6 @@ public class Server extends TestHarnessSmsMo {
             SSN = Integer.parseInt(args[i++]);
             REMOTE_SSN = Integer.parseInt(args[i++]);
             DELIVERY_TRANSFER_MESSAGE_THREAD_COUNT = Integer.parseInt(args[i++]);
-
-            System.out.println("IpChannelType = " + ipChannelType);
-            System.out.println("HOST_IP = " + HOST_IP);
-            System.out.println("HOST_PORT = " + HOST_PORT);
-            System.out.println("EXTRA_HOST_ADDRESS = " + EXTRA_HOST_ADDRESS);
-            System.out.println("PEER_IP = " + PEER_IP);
-            System.out.println("PEER_PORT = " + PEER_PORT);
-            System.out.println("AS_FUNCTIONALITY = " + AS_FUNCTIONALITY);
-            System.out.println("ROUTING_CONTEXT = " + ROUTING_CONTEXT);
-            System.out.println("NETWORK_APPEARANCE = " + NETWORK_APPEARANCE);
-            System.out.println("ORIGINATING_PC = " + ORIGINATING_PC);
-            System.out.println("DESTINATION_PC = " + DESTINATION_PC);
-            System.out.println("SERVICE_INDICATOR = " + SERVICE_INDICATOR);
-            System.out.println("NETWORK_INDICATOR = " + NETWORK_INDICATOR);
-            System.out.println("SSN = " + SSN);
-            System.out.println("REMOTE_SSN = " + REMOTE_SSN);
-            System.out.println("DELIVERY_TRANSFER_MESSAGE_THREAD_COUNT = " + DELIVERY_TRANSFER_MESSAGE_THREAD_COUNT);
         }
 
         final Server server = new Server();
@@ -483,6 +478,23 @@ public class Server extends TestHarnessSmsMo {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /** Start server from JSON config via Ss7StackBuilder. */
+    public void startWithJson(String configPath) throws Exception {
+        log.info("Building jSS7 stack from config: {}", configPath);
+        var stack = org.restcomm.protocols.ss7.config.Ss7StackBuilder.build(java.nio.file.Path.of(configPath));
+        mapProvider = stack.mapProvider();
+        mapProvider.getMAPServiceSms().addMAPServiceListener(this);
+        mapProvider.getMAPServiceSms().activate();
+        log.info("SMS listeners registered");
+        mapStack = (MAPStackImpl) stack.mapProvider().getMAPStack();
+        tcapStack = stack.tcapStack();
+        sccpStack = stack.sccpStack();
+        serverM3UAMgmt = stack.m3uaManagement();
+        stack.m3uaManagement().startAsp();
+        log.info("MO-SMS Server started");
+        Thread.currentThread().join();
     }
 
     @Override

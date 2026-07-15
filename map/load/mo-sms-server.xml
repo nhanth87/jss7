@@ -1,26 +1,24 @@
-<project basedir="." default="server" name="USSD Load Test Server"
+<project basedir="." default="server" name="MO-SMS Load Test Server"
          xmlns:if="ant:if" xmlns:unless="ant:unless">
 
     <!-- ============================================================= -->
-    <!-- CONFIGURATION — override in server.properties                 -->
+    <!-- CONFIGURATION                                                 -->
     <!-- ============================================================= -->
     <property file="server.properties"/>
 
     <!-- JSON config file for Ss7StackBuilder -->
-    <property name="test.server.config" value="ss7-ussd-server.json"/>
+    <property name="test.server.config" value="ss7-mo-sms-server.json"/>
 
-    <!-- ASN.1 telemetry — set to true to show BerCursor stats in TUI (+3ns/op) -->
+    <!-- ASN.1 telemetry -->
     <property name="test.server.asnTelemetry" value="true"/>
 
-    <!-- JVM settings -->
-    <!-- JVM settings — 1g heap (safe for 2 CPU/4G RAM); ZGC + Generational -->
+    <!-- JVM settings — 1g heap, ZGC Generational -->
     <property name="jvm.xms" value="512m"/>
     <property name="jvm.xmx" value="1g"/>
 
     <!-- ============================================================= -->
-    <!-- CLASSPATH  (from Maven ant-classpath.txt)                      -->
+    <!-- CLASSPATH                                                     -->
     <!-- ============================================================= -->
-
     <loadresource property="cp.list">
         <file file="ant-classpath.txt"/>
     </loadresource>
@@ -32,9 +30,8 @@
     </path>
 
     <!-- ============================================================= -->
-    <!-- COMPILE via Maven                                              -->
+    <!-- COMPILE via Maven                                             -->
     <!-- ============================================================= -->
-
     <target name="compile" description="Compile map-load module via Maven">
         <exec executable="mvn" dir="../.." failonerror="true">
             <arg line="compile -pl map/load -DskipTests -q -o"/>
@@ -46,13 +43,12 @@
     </target>
 
     <!-- ============================================================= -->
-    <!-- SERVER                                                         -->
+    <!-- SERVER                                                        -->
     <!-- ============================================================= -->
-
-    <target name="server" depends="compile" description="Start USSD Load Test Server">
+    <target name="server" depends="compile" description="Start MO-SMS Load Test Server">
         <echo message=""/>
         <echo message="============================================"/>
-        <echo message="  MAP USSD Load Test SERVER"/>
+        <echo message="  MAP MO-SMS Load Test SERVER"/>
         <echo message="============================================"/>
         <echo message="Config      : ${test.server.config}"/>
         <echo message="Heap        : ${jvm.xms}/${jvm.xmx}"/>
@@ -62,9 +58,10 @@
 
         <!-- Auto-delete stale XStream configs before start -->
         <delete quiet="true">
-            <fileset dir="." includes="map-load-server-sccp_*.xml,map-load-server-tcap_*.xml,map-load-server-m3ua_*.xml,map-load-server-sctp_*.xml"/>
+            <fileset dir="." includes="map-load-mo-sms-server-*.xml"/>
         </delete>
-        <java classname="org.restcomm.protocols.ss7.map.load.ussd.Server"
+
+        <java classname="org.restcomm.protocols.ss7.map.load.sms.mo.Server"
               fork="true"
               jvm="/home/meodien/.local/share/mise/installs/java/zulu-25.34.17.0/bin/java"
               maxmemory="${jvm.xmx}"
@@ -73,7 +70,6 @@
 
             <jvmarg value="-Xms${jvm.xms}"/>
             <jvmarg value="-Xmx${jvm.xmx}"/>
-            <!-- Generational ZGC: low-pause, keeps p99 flat at high TPS -->
             <jvmarg value="-XX:+UseZGC"/>
             <jvmarg value="-XX:+ZGenerational"/>
             <jvmarg value="-XX:ConcGCThreads=2"/>
@@ -83,20 +79,22 @@
             <jvmarg value="-Dio.netty.leakDetection.level=disabled"/>
             <jvmarg value="-Dasn.telemetry.enabled=${test.server.asnTelemetry}"/>
 
-            <!-- Single arg: JSON config file path -->
             <arg value="${test.server.config}"/>
         </java>
     </target>
 
     <!-- ============================================================= -->
-    <!-- CLEAN                                                          -->
+    <!-- CLEAN                                                         -->
     <!-- ============================================================= -->
-
-    <target name="clean" description="Clean logs + kill any running server">
+    <target name="clean" description="Kill server + clean logs">
         <exec executable="pkill" failonerror="false">
-            <arg line="-f 'ussd.Server'"/>
+            <arg line="-f 'sms.mo.Server'"/>
         </exec>
         <delete file="server.log" failonerror="false"/>
+        <delete quiet="true">
+            <fileset dir="." includes="map-load-mo-sms-server-*.xml"/>
+        </delete>
+        <delete file="mo-sms.csv" failonerror="false"/>
         <echo message="Cleaned."/>
     </target>
 

@@ -7,7 +7,7 @@
     <property file="client.properties"/>
 
     <!-- JSON config file for Ss7StackBuilder -->
-    <property name="test.client.config" value="ss7-client.json"/>
+    <property name="test.client.config" value="ss7-ussd-client.json"/>
 
     <!-- Load test params (passed as JVM system properties) -->
     <property name="test.client.numOfDialogs"       value="300000"/>

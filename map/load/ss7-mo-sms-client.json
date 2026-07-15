@@ -1,0 +1,69 @@
+// ============================================================================
+//  ss7-mo-sms-client.json — MAP MO-SMS Load Test CLIENT (OPC=1, DPC=2)
+// ============================================================================
+{
+  "stackName": "map-load-mo-sms-client",
+
+  "protocols": { "map": true, "cap": false },
+
+  // ═══ SCTP — client binds 127.0.0.1:8012, connects to server :8011 ═══
+  "sctp": {
+    "connectDelay": 10000,
+    "workerThreads": 8,
+    "links": [
+      {
+        "name": "clientLink",
+        "local": "127.0.0.1:8012",
+        "peer": "127.0.0.1:8011"
+      }
+    ]
+  },
+
+  // ═══ M3UA — IPSP client, RC=101, NA=102, deliveryThreads=16 ═══
+  "m3ua": {
+    "deliveryThreads": 16,
+    "as": [
+      {
+        "name": "AS1",
+        "mode": "loadshare",
+        "functionality": "ipsp",
+        "ipsp": "client",
+        "routingContext": 101,
+        "networkAppearance": 102,
+        "links": ["clientLink"]
+      }
+    ],
+    "routes": [
+      { "to": { "dpc": 2, "opc": 1, "si": 3 }, "via": "AS1" }
+    ]
+  },
+
+  // ═══ SCCP — local PC=1, reachable PC=[2]; GT-based routing ═══
+  "sccp": {
+    "localPoints": [
+      {
+        "pc": 1,
+        "networkIndicator": "national",
+        "networkId": 0,
+        "reachablePointCodes": [2]
+      }
+    ],
+    "routing": [
+      { "from": "remote", "match": { "gt": "*/" }, "to": { "pc": 1 } },
+      { "from": "local",  "match": { "gt": "*/" }, "to": { "pc": 2 } }
+    ]
+  },
+
+  // ═══ TCAP — primary SSN=8 (MSC), extra=[6 (HLR)] ═══
+  "tcap": {
+    "dialogIdleTimeout": 15000,
+    "invokeTimeout": 10000,
+    "maxDialogs": 25000
+  },
+
+  // ═══ Services — SMS: MSC SSN=8, HLR SSN=6 ═══
+  "services": [
+    { "name": "msc", "ssn": 8,  "protocol": "map" },
+    { "name": "hlr", "ssn": 6,  "protocol": "map" }
+  ]
+}

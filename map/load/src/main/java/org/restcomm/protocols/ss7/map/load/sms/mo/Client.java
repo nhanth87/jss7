@@ -394,6 +394,27 @@ public class Client extends TestHarnessSmsMo {
     }
 
     public static void main(String[] args) throws InterruptedException {
+        // JSON config path → use Ss7StackBuilder
+        if (args.length == 1 && args[0].endsWith(".json")) {
+            try {
+                new Client().startWithJson(args[0]);
+            } catch (Exception e) {
+                log.error("Failed to start client", e);
+                System.exit(1);
+            }
+            return;
+        }
+
+        // JSON config path → use Ss7StackBuilder
+        if (args.length == 1 && args[0].endsWith(".json")) {
+            try {
+                new Client().startWithJson(args[0]);
+            } catch (Exception e) {
+                log.error("Failed to start client", e);
+                System.exit(1);
+            }
+            return;
+        }
         int i = 0;
         IpChannelType ipChannelType = IpChannelType.SCTP;
 
@@ -915,5 +936,22 @@ public class Client extends TestHarnessSmsMo {
         }
 
         return x;
+    }
+
+    /** Start client from JSON config via Ss7StackBuilder. */
+    public void startWithJson(String configPath) throws Exception {
+        log.info("Building jSS7 stack from config: {}", configPath);
+        var stack = org.restcomm.protocols.ss7.config.Ss7StackBuilder.build(java.nio.file.Path.of(configPath));
+        mapProvider = stack.mapProvider();
+        mapProvider.getMAPServiceSms().addMAPServiceListener(this);
+        mapProvider.getMAPServiceSms().activate();
+        log.info("SMS listeners registered");
+        mapStack = (org.restcomm.protocols.ss7.map.MAPStackImpl) stack.mapProvider().getMAPStack();
+        tcapStack = stack.tcapStack();
+        sccpStack = stack.sccpStack();
+        serverM3UAMgmt = stack.m3uaManagement();
+        stack.m3uaManagement().startAsp();
+        log.info("MO-SMS Client started");
+        Thread.currentThread().join();
     }
 }

@@ -1,26 +1,29 @@
-<project basedir="." default="server" name="USSD Load Test Server"
+<project basedir="." default="client" name="MT-SMS Load Test Client"
          xmlns:if="ant:if" xmlns:unless="ant:unless">
 
     <!-- ============================================================= -->
-    <!-- CONFIGURATION — override in server.properties                 -->
+    <!-- CONFIGURATION                                                 -->
     <!-- ============================================================= -->
-    <property file="server.properties"/>
+    <property file="client.properties"/>
 
     <!-- JSON config file for Ss7StackBuilder -->
-    <property name="test.server.config" value="ss7-ussd-server.json"/>
+    <property name="test.client.config" value="ss7-mt-sms-client.json"/>
 
-    <!-- ASN.1 telemetry — set to true to show BerCursor stats in TUI (+3ns/op) -->
-    <property name="test.server.asnTelemetry" value="true"/>
+    <!-- Load test params (passed as JVM system properties) -->
+    <property name="test.client.numOfDialogs"     value="60000"/>
+    <property name="test.client.concurrentDialog" value="400"/>
+    <property name="test.client.rampUpPeriod"     value="0"/>
 
-    <!-- JVM settings -->
-    <!-- JVM settings — 1g heap (safe for 2 CPU/4G RAM); ZGC + Generational -->
+    <!-- ASN.1 telemetry -->
+    <property name="test.client.asnTelemetry" value="false"/>
+
+    <!-- JVM settings — 1g heap, ZGC Generational -->
     <property name="jvm.xms" value="512m"/>
     <property name="jvm.xmx" value="1g"/>
 
     <!-- ============================================================= -->
-    <!-- CLASSPATH  (from Maven ant-classpath.txt)                      -->
+    <!-- CLASSPATH                                                     -->
     <!-- ============================================================= -->
-
     <loadresource property="cp.list">
         <file file="ant-classpath.txt"/>
     </loadresource>
@@ -32,9 +35,8 @@
     </path>
 
     <!-- ============================================================= -->
-    <!-- COMPILE via Maven                                              -->
+    <!-- COMPILE via Maven                                             -->
     <!-- ============================================================= -->
-
     <target name="compile" description="Compile map-load module via Maven">
         <exec executable="mvn" dir="../.." failonerror="true">
             <arg line="compile -pl map/load -DskipTests -q -o"/>
@@ -46,25 +48,27 @@
     </target>
 
     <!-- ============================================================= -->
-    <!-- SERVER                                                         -->
+    <!-- CLIENT                                                        -->
     <!-- ============================================================= -->
-
-    <target name="server" depends="compile" description="Start USSD Load Test Server">
+    <target name="client" depends="compile" description="Start MT-SMS Load Test Client">
         <echo message=""/>
         <echo message="============================================"/>
-        <echo message="  MAP USSD Load Test SERVER"/>
+        <echo message="  MAP MT-SMS Load Test CLIENT"/>
         <echo message="============================================"/>
-        <echo message="Config      : ${test.server.config}"/>
+        <echo message="Config      : ${test.client.config}"/>
         <echo message="Heap        : ${jvm.xms}/${jvm.xmx}"/>
-        <echo message="ASN telemetry: ${test.server.asnTelemetry}"/>
+        <echo message="NDIALOGS    : ${test.client.numOfDialogs}"/>
+        <echo message="Rate Limit  : ${test.client.concurrentDialog}"/>
+        <echo message="Ramp-up     : ${test.client.rampUpPeriod}"/>
         <echo message="============================================"/>
         <echo message=""/>
 
         <!-- Auto-delete stale XStream configs before start -->
         <delete quiet="true">
-            <fileset dir="." includes="map-load-server-sccp_*.xml,map-load-server-tcap_*.xml,map-load-server-m3ua_*.xml,map-load-server-sctp_*.xml"/>
+            <fileset dir="." includes="map-load-mt-sms-client-*.xml"/>
         </delete>
-        <java classname="org.restcomm.protocols.ss7.map.load.ussd.Server"
+
+        <java classname="org.restcomm.protocols.ss7.map.load.sms.mt.Client"
               fork="true"
               jvm="/home/meodien/.local/share/mise/installs/java/zulu-25.34.17.0/bin/java"
               maxmemory="${jvm.xmx}"
@@ -73,30 +77,37 @@
 
             <jvmarg value="-Xms${jvm.xms}"/>
             <jvmarg value="-Xmx${jvm.xmx}"/>
-            <!-- Generational ZGC: low-pause, keeps p99 flat at high TPS -->
             <jvmarg value="-XX:+UseZGC"/>
             <jvmarg value="-XX:+ZGenerational"/>
             <jvmarg value="-XX:ConcGCThreads=2"/>
             <jvmarg value="-Dlog4j.defaultInitOverride=true"/>
-            <jvmarg value="-Dlog4j.configurationFile=log4j2-server.xml"/>
+            <jvmarg value="-Dlog4j.configurationFile=log4j2-client.xml"/>
             <jvmarg value="-Djava.net.preferIPv4Stack=true"/>
             <jvmarg value="-Dio.netty.leakDetection.level=disabled"/>
-            <jvmarg value="-Dasn.telemetry.enabled=${test.server.asnTelemetry}"/>
+            <jvmarg value="-Dasn.telemetry.enabled=${test.client.asnTelemetry}"/>
 
-            <!-- Single arg: JSON config file path -->
-            <arg value="${test.server.config}"/>
+            <!-- Load test parameters via system properties -->
+            <sysproperty key="ss7.load.ndialogs"          value="${test.client.numOfDialogs}"/>
+            <sysproperty key="ss7.load.rateLimit"         value="${test.client.concurrentDialog}"/>
+            <sysproperty key="ss7.load.rampUp"            value="${test.client.rampUpPeriod}"/>
+            <sysproperty key="ss7.load.senderThreads"     value="8"/>
+
+            <arg value="${test.client.config}"/>
         </java>
     </target>
 
     <!-- ============================================================= -->
-    <!-- CLEAN                                                          -->
+    <!-- CLEAN                                                         -->
     <!-- ============================================================= -->
-
-    <target name="clean" description="Clean logs + kill any running server">
+    <target name="clean" description="Kill client + clean logs">
         <exec executable="pkill" failonerror="false">
-            <arg line="-f 'ussd.Server'"/>
+            <arg line="-f 'sms.mt.Client'"/>
         </exec>
-        <delete file="server.log" failonerror="false"/>
+        <delete file="client.log" failonerror="false"/>
+        <delete quiet="true">
+            <fileset dir="." includes="map-load-mt-sms-client-*.xml"/>
+        </delete>
+        <delete file="mt-sms.csv" failonerror="false"/>
         <echo message="Cleaned."/>
     </target>
 
