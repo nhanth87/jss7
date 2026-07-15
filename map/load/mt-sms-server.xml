@@ -71,7 +71,6 @@
             <jvmarg value="-Xms${jvm.xms}"/>
             <jvmarg value="-Xmx${jvm.xmx}"/>
             <jvmarg value="-XX:+UseZGC"/>
-            <jvmarg value="-XX:+ZGenerational"/>
             <jvmarg value="-XX:ConcGCThreads=2"/>
             <jvmarg value="-Dlog4j.defaultInitOverride=true"/>
             <jvmarg value="-Dlog4j.configurationFile=log4j2-server.xml"/>

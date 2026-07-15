@@ -10,7 +10,7 @@
     "connectDelay": 10000,
     "workerThreads": 8,
     "links": [
-      { "name": "clientLink", "local": "127.0.0.1:8012", "peer": "127.0.0.1:8011" }
+      { "name": "clientLink", "type": "client", "local": "127.0.0.1:8012", "peer": "127.0.0.1:8011" }
     ]
   },
 

@@ -75,7 +75,6 @@
             <jvmarg value="-Xmx${jvm.xmx}"/>
             <!-- Generational ZGC: low-pause, keeps p99 flat at high TPS -->
             <jvmarg value="-XX:+UseZGC"/>
-            <jvmarg value="-XX:+ZGenerational"/>
             <jvmarg value="-XX:ConcGCThreads=2"/>
             <jvmarg value="-Dlog4j.defaultInitOverride=true"/>
             <jvmarg value="-Dlog4j.configurationFile=log4j2-server.xml"/>

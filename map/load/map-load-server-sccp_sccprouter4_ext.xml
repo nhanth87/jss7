@@ -88,10 +88,10 @@
         <routingIndicator>ROUTING_BASED_ON_GLOBAL_TITLE</routingIndicator>
         <reservedForNationalUseBit>false</reservedForNationalUseBit>
         <pcpresent>true</pcpresent>
-        <ssnpresent>true</ssnpresent>
+        <ssnpresent>false</ssnpresent>
       </addressIndicator>
       <signalingPointCode>2</signalingPointCode>
-      <subsystemNumber>147</subsystemNumber>
+      <subsystemNumber>0</subsystemNumber>
       <globalTitle>
         <digits>*</digits>
         <encodingScheme>
@@ -104,7 +104,7 @@
         <translationType>0</translationType>
       </globalTitle>
       <pc>2</pc>
-      <ssn>147</ssn>
+      <ssn>0</ssn>
       <networkId>0</networkId>
     </1>
     <2>
