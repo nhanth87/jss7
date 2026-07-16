@@ -9,6 +9,8 @@ import org.mobicents.protocols.asn.BerTag;
 import org.mobicents.protocols.asn.Jss7AsnConfig;
 import org.restcomm.protocols.ss7.map.datacoding.CBSDataCodingSchemeImpl;
 import org.restcomm.protocols.ss7.map.primitives.USSDStringImpl;
+import org.restcomm.protocols.ss7.map.primitives.ISDNAddressStringImpl;
+import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
 
 /**
  * Shared support for wiring SMSC/USSD hot-path MAP messages onto {@link org.mobicents.protocols.asn.BerCursor}
@@ -71,6 +73,8 @@ public final class MapBerSupport {
     public static final class UssdArg {
         public CBSDataCodingSchemeImpl dcs;
         public USSDStringImpl ussdString;
+        /** Optional msisdn [0] (decoded via BerCursor; null if absent). */
+        public ISDNAddressStringImpl msisdn;
     }
 
     /**
@@ -100,8 +104,24 @@ public final class MapBerSupport {
         r.ussdString.setData(c.heapBuffer(), c.valueOffset(), c.valueLength());
         c.skipValue();
 
-        if (c.hasMore()) // optional msisdn [0] / alertingPattern -> classic decoder handles it
-            throw new AsnException("USSD arg: optional fields present, fallback");
+        // Optional msisdn [0] ISDN-AddressString — decode via BerCursor (the common load-test
+        // field). alertingPattern (universal OCTET STRING, encoded before msisdn) is rare, so
+        // any non-[0] optional field falls back to the classic decoder.
+        while (c.hasMore()) {
+            c.readTag();
+            if (c.tagClass() == BerTag.CONTEXT && c.isPrimitive() && c.tag() == 0) {
+                ISDNAddressStringImpl m = new ISDNAddressStringImpl();
+                try {
+                    m.decodeData(taggedValueStream(c), c.valueLength());
+                } catch (MAPParsingComponentException e) {
+                    throw new AsnException("USSD arg: bad msisdn: " + e.getMessage());
+                }
+                r.msisdn = m;
+                c.skipValue();
+            } else {
+                throw new AsnException("USSD arg: unsupported optional field, fallback");
+            }
+        }
         return r;
     }
 }

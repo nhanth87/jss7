@@ -181,8 +181,19 @@ public class ProcessUnstructuredSSRequestImpl extends SupplementaryMessageImpl i
         this.ussdString = us;
         c.skipValue();
 
-        if (c.hasMore()) // optional msisdn [0] / alertingPattern -> let the classic decoder handle it
-            throw new AsnException("ProcessUnstructuredSSRequest: optional fields present, fallback");
+        // Optional msisdn [0] ISDN-AddressString — decode via BerCursor (present in the load
+        // test). alertingPattern (universal OCTET STRING) is rare -> fall back for anything else.
+        while (c.hasMore()) {
+            c.readTag();
+            if (c.tagClass() == BerTag.CONTEXT && c.isPrimitive() && c.tag() == _TAG_MSISDN) {
+                ISDNAddressStringImpl m = new ISDNAddressStringImpl();
+                m.decodeData(MapBerSupport.taggedValueStream(c), c.valueLength());
+                this.msisdnAddressString = m;
+                c.skipValue();
+            } else {
+                throw new AsnException("ProcessUnstructuredSSRequest: unsupported optional field, fallback");
+            }
+        }
     }
 
     private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
