@@ -559,7 +559,18 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     void start() {
         logger.info("Starting TCAP Provider");
 
-        this._EXECUTOR = Executors.newScheduledThreadPool(4, new DefaultThreadFactory("Tcap-Thread"));
+        // Phase 4 (Virtual Thread readiness): the executor is configurable.
+        //   -Dss7.tcap.executorThreads=N   scheduled-pool size (default 4)
+        //   -Dss7.tcap.virtualThreads=true  back the pool with virtual threads
+        // NOTE: this pool runs TCAP timers (invoke/dialog timeouts), not message processing
+        // (that is on the M3UA delivery threads). Virtual threads do NOT raise CPU-bound
+        // throughput; the benefit is scalability under many blocking activities (RA use case).
+        int tcapExecThreads = Integer.getInteger("ss7.tcap.executorThreads", 4);
+        java.util.concurrent.ThreadFactory tcapThreadFactory =
+                Boolean.getBoolean("ss7.tcap.virtualThreads")
+                        ? Thread.ofVirtual().name("Tcap-VT-", 0).factory()
+                        : new DefaultThreadFactory("Tcap-Thread");
+        this._EXECUTOR = Executors.newScheduledThreadPool(tcapExecThreads, tcapThreadFactory);
 
         this.sccpProvider.registerSccpListener(ssn, this);
         logger.info("Registered SCCP listener with ssn " + ssn);
