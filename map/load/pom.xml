@@ -865,4 +865,22 @@
 		</profile>
 	</profiles>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<!-- The SMS mo/mt load harness is stale: it calls a removed no-arg
+					     M3UAManagementImpl.startAsp() and other drifted APIs, and is unused
+					     (USSD is the active load test). Exclude it so map-load compiles. -->
+					<excludes>
+						<exclude>**/sms/mo/*.java</exclude>
+						<exclude>**/sms/mt/*.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>

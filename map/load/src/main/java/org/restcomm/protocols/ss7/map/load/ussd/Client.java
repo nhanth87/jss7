@@ -106,6 +106,14 @@ public class Client extends TestHarnessUssd {
     private CsvWriter csvWriter;
     private ConsoleTui tui;
 
+    // Constant per-run request objects — built once, reused every message (avoids re-creating
+    // addresses/global-titles/app-context on each initiateUSSD). Only the random MSISDN/USSD
+    // string is built per message.
+    private AddressString cOrigRef, cDestRef;
+    private SccpAddress cClientAddr, cServerAddr;
+    private MAPApplicationContext cAppCtx;
+    private CBSDataCodingScheme cDcs;
+
     /**
      * Build stack from JSON, register listeners, start ASP, launch DialogInitiator threads.
      */
@@ -115,6 +123,16 @@ public class Client extends TestHarnessUssd {
         log.info("Building jSS7 stack from config: {}", configPath);
         stack = Ss7StackBuilder.build(Path.of(configPath));
         mapProvider = stack.mapProvider();
+
+        // Build constant request objects once (addresses, GT, app-context, DCS).
+        var pf = mapProvider.getMAPParameterFactory();
+        this.cOrigRef = pf.createAddressString(AddressNature.international_number, NumberingPlan.ISDN, "12345");
+        this.cDestRef = pf.createAddressString(AddressNature.international_number, NumberingPlan.ISDN, "67890");
+        this.cClientAddr = createSccpAddress(ROUTING_INDICATOR, ORIGINATING_PC, MSC_SSN, SCCP_CLIENT_ADDRESS);
+        this.cServerAddr = createSccpAddress(ROUTING_INDICATOR, DESTINATION_PC, USSD_SSN, SCCP_SERVER_ADDRESS);
+        this.cAppCtx = MAPApplicationContext.getInstance(
+                MAPApplicationContextName.networkUnstructuredSsContext, MAPApplicationContextVersion.version2);
+        this.cDcs = new CBSDataCodingSchemeImpl(0x0f);
 
         // Register MAP listeners
         mapProvider.addMAPDialogListener(this);
@@ -165,7 +183,6 @@ public class Client extends TestHarnessUssd {
     }
 
     private void initiateUSSD() throws MAPException {
-        Random r = new Random();
         NetworkIdState networkIdState = this.mapProvider.getNetworkIdState(0);
         int executorCongestionLevel = this.mapProvider.getExecutorCongestionLevel();
         if (!(networkIdState == null
@@ -181,26 +198,16 @@ public class Client extends TestHarnessUssd {
 
         this.rateLimiterObj.acquire();
 
-        AddressString origRef = this.mapProvider.getMAPParameterFactory()
-                .createAddressString(AddressNature.international_number, NumberingPlan.ISDN, "12345");
-        AddressString destRef = this.mapProvider.getMAPParameterFactory()
-                .createAddressString(AddressNature.international_number, NumberingPlan.ISDN, "67890");
+        MAPDialogSupplementary mapDialog = this.mapProvider.getMAPServiceSupplementary()
+                .createNewDialog(cAppCtx, cClientAddr, cOrigRef, cServerAddr, cDestRef);
 
-        SccpAddress clientSccpAddress = createSccpAddress(ROUTING_INDICATOR, ORIGINATING_PC, MSC_SSN, SCCP_CLIENT_ADDRESS);
-        SccpAddress serverSccpAddress = createSccpAddress(ROUTING_INDICATOR, DESTINATION_PC, USSD_SSN, SCCP_SERVER_ADDRESS);
-        MAPDialogSupplementary mapDialog = this.mapProvider.getMAPServiceSupplementary().createNewDialog(MAPApplicationContext
-                .getInstance(MAPApplicationContextName.networkUnstructuredSsContext, MAPApplicationContextVersion.version2),
-                clientSccpAddress, origRef, serverSccpAddress, destRef);
-
-        CBSDataCodingScheme ussdDataCodingScheme = new CBSDataCodingSchemeImpl(0x0f);
-
-        int random = 8000000 + r.nextInt(1000000);
+        int random = 8000000 + java.util.concurrent.ThreadLocalRandom.current().nextInt(1000000);
         USSDString ussdString = this.mapProvider.getMAPParameterFactory().createUSSDString("*125*+3162" + random + "#", null, null);
 
         ISDNAddressString msisdn = this.mapProvider.getMAPParameterFactory()
                 .createISDNAddressString(AddressNature.international_number, NumberingPlan.ISDN, "3162" + random);
 
-        mapDialog.addProcessUnstructuredSSRequest(ussdDataCodingScheme, ussdString, null, msisdn);
+        mapDialog.addProcessUnstructuredSSRequest(cDcs, ussdString, null, msisdn);
 
         mapDialog.send();
         if (java.util.concurrent.ThreadLocalRandom.current().nextInt(100) == 0) {

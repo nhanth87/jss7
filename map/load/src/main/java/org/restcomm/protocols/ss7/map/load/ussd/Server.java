@@ -99,6 +99,14 @@ public class Server extends TestHarnessUssd {
     private final AtomicLong errorCount = new AtomicLong();
     private ConsoleTui tui;
 
+    // Pre-built constant response objects — encoded ONCE (GSM7 + TBCD) and reused on every
+    // message instead of re-creating/re-encoding identical strings/addresses per request.
+    // Immutable value objects; safe to share across delivery threads.
+    private CBSDataCodingScheme dcsGsm7;
+    private USSDString respHello, respBalance, respMenu;
+    private ISDNAddressString respMsisdnIsdn;
+    private AddressString respMsisdnAddr;
+
     /**
      * Build stack from JSON, register listeners, start SCTP server + ASP, launch TUI.
      */
@@ -106,6 +114,15 @@ public class Server extends TestHarnessUssd {
         log.info("Building jSS7 stack from config: {}", configPath);
         stack = Ss7StackBuilder.build(Path.of(configPath));
         mapProvider = stack.mapProvider();
+
+        // Build constant response objects once (avoids per-message GSM7/TBCD re-encode).
+        var pf = mapProvider.getMAPParameterFactory();
+        this.dcsGsm7 = new CBSDataCodingSchemeImpl(0x0F);
+        this.respHello = pf.createUSSDString("USSD String : Hello World <CR> 1. Balance <CR> 2. Texts Remaining");
+        this.respBalance = pf.createUSSDString("Your balance is 500");
+        this.respMenu = pf.createUSSDString("1", null, null);
+        this.respMsisdnIsdn = pf.createISDNAddressString(AddressNature.international_number, NumberingPlan.ISDN, "31628838002");
+        this.respMsisdnAddr = pf.createAddressString(AddressNature.international_number, NumberingPlan.ISDN, "31628838002");
 
         // Register MAP listeners (same as before)
         mapProvider.addMAPDialogListener(this);
@@ -236,18 +253,9 @@ public class Server extends TestHarnessUssd {
                     processUnstructuredSSRequest.getMAPDialog().getLocalDialogId(), processUnstructuredSSRequest.getInvokeId());
         try {
             long invokeId = processUnstructuredSSRequest.getInvokeId();
-
-            USSDString ussdStrObj = this.mapProvider.getMAPParameterFactory().createUSSDString(
-                    "USSD String : Hello World <CR> 1. Balance <CR> 2. Texts Remaining");
-            CBSDataCodingScheme ussdDataCodingScheme = new CBSDataCodingSchemeImpl(0x0F);
             MAPDialogSupplementary dialog = processUnstructuredSSRequest.getMAPDialog();
-
             dialog.setUserObject(invokeId);
-
-            ISDNAddressString msisdn = this.mapProvider.getMAPParameterFactory().createISDNAddressString(
-                    AddressNature.international_number, NumberingPlan.ISDN, "31628838002");
-
-            dialog.addUnstructuredSSRequest(ussdDataCodingScheme, ussdStrObj, null, msisdn);
+            dialog.addUnstructuredSSRequest(dcsGsm7, respHello, null, respMsisdnIsdn);
             dialog.send();
         } catch (MAPException e) {
             log.error("Error while sending UnstructuredSSRequest", e);
@@ -267,12 +275,7 @@ public class Server extends TestHarnessUssd {
         MAPDialogSupplementary mapDialog = unstructuredSSRequest.getMAPDialog();
 
         try {
-            CBSDataCodingScheme ussdDataCodingScheme = new CBSDataCodingSchemeImpl(0x0f);
-            USSDString ussdString = this.mapProvider.getMAPParameterFactory().createUSSDString("1", null, null);
-            AddressString msisdn = this.mapProvider.getMAPParameterFactory()
-                    .createAddressString(AddressNature.international_number, NumberingPlan.ISDN, "31628838002");
-
-            mapDialog.addUnstructuredSSResponse(unstructuredSSRequest.getInvokeId(), ussdDataCodingScheme, ussdString);
+            mapDialog.addUnstructuredSSResponse(unstructuredSSRequest.getInvokeId(), dcsGsm7, respMenu);
             mapDialog.send();
         } catch (MAPException e) {
             log.error("Error sending UnstructuredSSResponse Dialog={}", mapDialog.getLocalDialogId());
@@ -284,14 +287,8 @@ public class Server extends TestHarnessUssd {
         if (log.isDebugEnabled())
             log.debug("onUnstructuredSSResponse DialogId={}", unstructuredSSResponse.getMAPDialog().getLocalDialogId());
         try {
-            USSDString ussdStrObj = this.mapProvider.getMAPParameterFactory().createUSSDString("Your balance is 500");
-            CBSDataCodingScheme ussdDataCodingScheme = new CBSDataCodingSchemeImpl(0x0F);
             MAPDialogSupplementary dialog = unstructuredSSResponse.getMAPDialog();
-
-            AddressString msisdn = this.mapProvider.getMAPParameterFactory().createAddressString(
-                    AddressNature.international_number, NumberingPlan.ISDN, "31628838002");
-
-            dialog.addProcessUnstructuredSSResponse(((Long) dialog.getUserObject()).longValue(), ussdDataCodingScheme, ussdStrObj);
+            dialog.addProcessUnstructuredSSResponse(((Long) dialog.getUserObject()).longValue(), dcsGsm7, respBalance);
             dialog.close(false);
         } catch (MAPException e) {
             log.error("Error sending UnstructuredSSRequest", e);
