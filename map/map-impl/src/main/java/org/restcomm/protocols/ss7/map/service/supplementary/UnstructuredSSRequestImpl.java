@@ -132,6 +132,7 @@ public class UnstructuredSSRequestImpl extends SupplementaryMessageImpl implemen
                 MapBerSupport.UssdArg r = MapBerSupport.decodeUssdArg(buf, off, length);
                 this.ussdDataCodingSch = r.dcs;
                 this.ussdString = r.ussdString;
+                this.msisdnAddressString = r.msisdn;
                 asnInputStream.advance(length);
                 return;
             } catch (Throwable t) {
