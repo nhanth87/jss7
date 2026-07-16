@@ -33,7 +33,7 @@ public class InvokeImpl implements Invoke {
     private InvokeClass invokeClass = InvokeClass.Class1;
     private long invokeTimeout = TCAPStackImpl._EMPTY_INVOKE_TIMEOUT;
     private OperationState state = OperationState.Idle;
-    private Future timerFuture;
+    private TCAPProviderImpl.TimerHandle timerFuture;
     private OperationTimerTask operationTimerTask = new OperationTimerTask(this);
     private TCAPProviderImpl provider;
     private DialogImpl dialog;
@@ -364,7 +364,7 @@ public class InvokeImpl implements Invoke {
 
     public synchronized void stopTimer() {
         if (this.timerFuture != null) {
-            this.timerFuture.cancel(false);
+            this.timerFuture.cancel();
             this.timerFuture = null;
         }
     }

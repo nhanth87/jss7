@@ -1,6 +1,9 @@
 package org.restcomm.protocols.ss7.tcap;
 
 import io.netty.util.concurrent.DefaultThreadFactory;
+import io.netty.util.HashedWheelTimer;
+import io.netty.util.Timeout;
+import io.netty.util.Timer;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -95,6 +98,12 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 
     private transient List<TCListener> tcListeners = new CopyOnWriteArrayList<>();
     protected transient ScheduledExecutorService _EXECUTOR;
+
+    /** Netty hashed-wheel timer for O(1) invoke-timeout schedule/cancel (default; JDK fallback). */
+    private transient Timer wheelTimer;
+
+    /** Cancellable handle abstracting a Netty {@link Timeout} or a JDK {@link Future}. */
+    public interface TimerHandle { void cancel(); }
     // boundary for Uni directional dialogs :), tx id is always encoded
     // on 4 octets, so this is its max value
     // private static final long _4_OCTETS_LONG_FILL = 4294967295l;
@@ -541,9 +550,16 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     // ///////////////////////////////////////////
     // Some methods invoked by operation FSM //
     // //////////////////////////////////////////
-    public Future createOperationTimer(Runnable operationTimerTask, long invokeTimeout) {
-
-        return this._EXECUTOR.schedule(operationTimerTask, invokeTimeout, TimeUnit.MILLISECONDS);
+    public TimerHandle createOperationTimer(Runnable operationTimerTask, long invokeTimeout) {
+        Timer wt = this.wheelTimer;
+        if (wt != null) {
+            // O(1) schedule + cancel on the hashed wheel (vs O(log n) on the JDK
+            // ScheduledThreadPoolExecutor DelayedWorkQueue heap that dominated the profile).
+            final Timeout t = wt.newTimeout(to -> operationTimerTask.run(), invokeTimeout, TimeUnit.MILLISECONDS);
+            return t::cancel;
+        }
+        final Future<?> f = this._EXECUTOR.schedule(operationTimerTask, invokeTimeout, TimeUnit.MILLISECONDS);
+        return () -> f.cancel(false);
     }
 
     public void operationTimedOut(InvokeImpl tcapInvokeRequest) {
@@ -572,6 +588,13 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                         : new DefaultThreadFactory("Tcap-Thread");
         this._EXECUTOR = Executors.newScheduledThreadPool(tcapExecThreads, tcapThreadFactory);
 
+        // Invoke-timeout timer: Netty hashed wheel by default — O(1), thread-safe schedule/cancel.
+        // Disable with -Dss7.tcap.wheelTimer=false to fall back to the JDK scheduled pool.
+        if (Boolean.parseBoolean(System.getProperty("ss7.tcap.wheelTimer", "true"))) {
+            this.wheelTimer = new HashedWheelTimer(new DefaultThreadFactory("Tcap-WheelTimer"),
+                    100, TimeUnit.MILLISECONDS, 512);
+        }
+
         this.sccpProvider.registerSccpListener(ssn, this);
         logger.info("Registered SCCP listener with ssn " + ssn);
 
@@ -596,6 +619,10 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     void stop() {
         stopNetworkIdStateList();
 
+        if (this.wheelTimer != null) {
+            try { this.wheelTimer.stop(); } catch (Exception ignore) { }
+            this.wheelTimer = null;
+        }
         this._EXECUTOR.shutdown();
         this.sccpProvider.deregisterSccpListener(ssn);
 
