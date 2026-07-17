@@ -111,6 +111,7 @@ public class ForwardShortMessageRequestImpl extends SmsMessageImpl implements Fo
             try {
                 this._decodeBer(buf, off, length);
                 asnInputStream.advance(length);
+                MapBerSupport.recordBerOk();
                 return;
             } catch (Throwable t) {
                 MapBerSupport.logFallback("ForwardShortMessageRequest", t);

@@ -32,7 +32,10 @@ public class PreviewDialogData {
     private PreviewDialogDataKey previewDialogDataKey2;
 
     private ReentrantLock dialogLock = new ReentrantLock();
-    private Future idleTimerFuture;
+    private Future<?> idleTimerFuture;
+    private long idleDeadlineNanos;
+    private static final boolean STICKY_IDLE_TIMER =
+            Boolean.parseBoolean(System.getProperty("ss7.tcap.stickyIdleTimer", "true"));
     private ScheduledExecutorService executor;
     private TCAPProviderImpl provider;
     private long idleTaskTimeout;
@@ -99,17 +102,10 @@ public class PreviewDialogData {
     }
 
     protected void startIdleTimer() {
-
         try {
             this.dialogLock.lock();
-            if (this.idleTimerFuture != null) {
-                throw new IllegalStateException();
-            }
-
-            IdleTimerTask idleTimerTask = new IdleTimerTask();
-            idleTimerTask.pdd = this;
-            this.idleTimerFuture = this.executor.schedule(idleTimerTask, this.idleTaskTimeout, TimeUnit.MILLISECONDS);
-
+            bumpIdleDeadlineLocked();
+            scheduleIdleTimerLocked();
         } finally {
             this.dialogLock.unlock();
         }
@@ -118,24 +114,48 @@ public class PreviewDialogData {
     protected void stopIdleTimer() {
         try {
             this.dialogLock.lock();
+            this.idleDeadlineNanos = 0L;
             if (this.idleTimerFuture != null) {
                 this.idleTimerFuture.cancel(false);
                 this.idleTimerFuture = null;
             }
-
         } finally {
             this.dialogLock.unlock();
         }
     }
 
     protected void restartIdleTimer() {
-        try {
-            this.dialogLock.lock();
+        if (!STICKY_IDLE_TIMER) {
             stopIdleTimer();
             startIdleTimer();
+            return;
+        }
+        try {
+            this.dialogLock.lock();
+            bumpIdleDeadlineLocked();
+            scheduleIdleTimerLocked();
         } finally {
             this.dialogLock.unlock();
         }
+    }
+
+    private void bumpIdleDeadlineLocked() {
+        this.idleDeadlineNanos = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(this.idleTaskTimeout);
+    }
+
+    private void scheduleIdleTimerLocked() {
+        if (this.idleTimerFuture != null || this.idleDeadlineNanos == 0L)
+            return;
+
+        long remainingMs = TimeUnit.NANOSECONDS.toMillis(this.idleDeadlineNanos - System.nanoTime());
+        if (remainingMs < 1L)
+            remainingMs = 1L;
+        else if (remainingMs > this.idleTaskTimeout)
+            remainingMs = this.idleTaskTimeout;
+
+        IdleTimerTask idleTimerTask = new IdleTimerTask();
+        idleTimerTask.pdd = this;
+        this.idleTimerFuture = this.executor.schedule(idleTimerTask, remainingMs, TimeUnit.MILLISECONDS);
     }
 
     private class IdleTimerTask implements Runnable {
@@ -144,6 +164,16 @@ public class PreviewDialogData {
         public void run() {
             try {
                 dialogLock.lock();
+                pdd.idleTimerFuture = null;
+
+                long deadline = pdd.idleDeadlineNanos;
+                if (deadline == 0L)
+                    return;
+                long now = System.nanoTime();
+                if (now < deadline) {
+                    pdd.scheduleIdleTimerLocked();
+                    return;
+                }
 
 //              Dialog d1 = new DialogImpl(localAddress, remoteAddress, seqControl, provider._EXECUTOR, provider, pdd, sideB);
                 DialogImpl dialog = (DialogImpl)provider.getPreviewDialog(previewDialogDataKey1, null, null, null, 0);

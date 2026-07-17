@@ -124,6 +124,7 @@ public class SendRoutingInfoForSMResponseImpl extends SmsMessageImpl implements 
             try {
                 this._decodeBer(asnInputStream.getBuffer(), MapBerSupport.absOffset(asnInputStream), length);
                 asnInputStream.advance(length);
+                MapBerSupport.recordBerOk();
                 return;
             } catch (Throwable t) {
                 MapBerSupport.logFallback("SendRoutingInfoForSMResponse", t);

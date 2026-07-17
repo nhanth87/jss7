@@ -588,12 +588,25 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                         : new DefaultThreadFactory("Tcap-Thread");
         this._EXECUTOR = Executors.newScheduledThreadPool(tcapExecThreads, tcapThreadFactory);
 
-        // Invoke-timeout timer: Netty hashed wheel by default — O(1), thread-safe schedule/cancel.
-        // Disable with -Dss7.tcap.wheelTimer=false to fall back to the JDK scheduled pool.
-        if (Boolean.parseBoolean(System.getProperty("ss7.tcap.wheelTimer", "true"))) {
+        // Invoke-timeout only on Netty hashed wheel (O(1) schedule/cancel). Dialog-idle stays on
+        // the JDK pool with sticky deadlines — never put idle restart-every-message on the wheel.
+        // Disable wheel: -Dss7.tcap.wheelTimer=false
+        boolean wheelEnabled = Boolean.parseBoolean(System.getProperty("ss7.tcap.wheelTimer", "true"));
+        int wheelTickMs = Integer.getInteger("ss7.tcap.wheelTickMs", 50);
+        int wheelTicks = Integer.getInteger("ss7.tcap.wheelTicks", 1024);
+        long wheelMaxPending = Long.getLong("ss7.tcap.wheelMaxPending", 100_000L);
+        boolean stickyIdle = Boolean.parseBoolean(System.getProperty("ss7.tcap.stickyIdleTimer", "true"));
+        if (wheelEnabled) {
             this.wheelTimer = new HashedWheelTimer(new DefaultThreadFactory("Tcap-WheelTimer"),
-                    100, TimeUnit.MILLISECONDS, 512);
+                    wheelTickMs, TimeUnit.MILLISECONDS, wheelTicks, true, wheelMaxPending);
         }
+        logger.info("TCAP timers: invoke="
+                + (this.wheelTimer != null
+                        ? ("HashedWheelTimer(tick=" + wheelTickMs + "ms,ticks=" + wheelTicks
+                                + ",maxPending=" + wheelMaxPending + ")")
+                        : "JDK")
+                + " dialog-idle=JDK" + (stickyIdle ? "-sticky" : "-classic")
+                + " executorThreads=" + tcapExecThreads);
 
         this.sccpProvider.registerSccpListener(ssn, this);
         logger.info("Registered SCCP listener with ssn " + ssn);

@@ -104,7 +104,8 @@
             <jvmarg value="-Djava.net.preferIPv4Stack=true"/>
             <jvmarg value="-Dio.netty.leakDetection.level=disabled"/>
             <jvmarg value="-Dasn.telemetry.enabled=${test.client.asnTelemetry}"/>
-            <jvmarg value="-Dss7.tcap.wheelTimer=false"/>
+            <!-- Hybrid timers (default): invoke=HashedWheelTimer, dialog-idle=JDK sticky.
+                 Override only for bisect: -Dss7.tcap.wheelTimer=false or stickyIdleTimer=false -->
 
             <!-- Load test params via system properties -->
             <jvmarg value="-Dss7.load.ndialogs=${test.client.numOfDialogs}"/>
