@@ -1,0 +1,104 @@
+{
+  "stackName": "map-load-server",
+  "protocols": { "map": true, "cap": false },
+  "sctp": {
+    "connectDelay": 10000,
+    "workerThreads": 16,
+    "links": [
+      { "name": "serverLink", "type": "server", "local": "127.0.0.1:8011", "peer": "127.0.0.1:8012" }
+    ]
+  },
+  "m3ua": {
+    "deliveryThreads": 32,
+    "as": [
+      { "name": "AS1", "mode": "loadshare", "functionality": "ipsp", "ipsp": "server",
+        "routingContext": 101, "networkAppearance": 102, "links": ["serverLink"] }
+    ],
+    "routes": [
+      { "to": { "dpc": 1, "opc": 2, "si": 3 }, "via": "AS1" }
+    ]
+  },
+  "sccp": {
+    "localPoints": [
+      { "pc": 2, "networkIndicator": "national", "networkId": 0, "reachablePointCodes": [1] }
+    ],
+    "routing": [
+      { "from": "remote", "match": { "gt": "*/" }, "to": { "pc": 2 } },
+      { "from": "local",  "match": { "gt": "*/" }, "to": { "pc": 1 } }
+    ]
+  },
+  "tcap": {
+    "dialogIdleTimeout": 10000,
+    "invokeTimeout": 5000,
+    "maxDialogs": 50000
+  },
+  "services": [
+    { "name": "msc",  "ssn": 8,   "protocol": "map" },
+    { "name": "ussd", "ssn": 147, "protocol": "map" }
+  ]
+}
+
+// ============================================================================
+//  ss7-ussd-server.json — MAP USSD Load Test SERVER (DPC=2, OPC=1)
+// ============================================================================
+{
+  "stackName": "map-load-server",
+
+  "protocols": { "map": true, "cap": false },
+
+  "sctp": {
+    "connectDelay": 10000,
+    "workerThreads": 16,
+    "links": [
+      {
+        "name": "serverLink",
+        "local": "127.0.0.1:8011",
+        "peer": "127.0.0.1:8012"
+      }
+    ]
+  },
+
+  "m3ua": {
+    "deliveryThreads": 32,
+    "as": [
+      {
+        "name": "AS1",
+        "mode": "loadshare",
+        "functionality": "ipsp",
+        "ipsp": "server",
+        "routingContext": 101,
+        "networkAppearance": 102,
+        "links": ["serverLink"]
+      }
+    ],
+    "routes": [
+      { "to": { "dpc": 1, "opc": 2, "si": 3 }, "via": "AS1" }
+    ]
+  },
+
+  "sccp": {
+    "localPoints": [
+      {
+        "pc": 2,
+        "networkIndicator": "national",
+        "networkId": 0,
+        "reachablePointCodes": [1]
+      }
+    ],
+    "routing": [
+      { "from": "remote", "match": { "gt": "*/" }, "to": { "pc": 2 } },
+      { "from": "local",  "match": { "gt": "*/" }, "to": { "pc": 1 } }
+    ]
+  },
+
+  "tcap": {
+    "dialogIdleTimeout": 10000,
+    "invokeTimeout": 5000,
+    "maxDialogs": 50000
+  },
+
+  "services": [
+    { "name": "msc",  "ssn": 8,   "protocol": "map" },
+    { "name": "ussd", "ssn": 147, "protocol": "map" }
+  ]
+}
