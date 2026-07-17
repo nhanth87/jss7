@@ -3,13 +3,13 @@
   "protocols": { "map": true, "cap": false },
   "sctp": {
     "connectDelay": 10000,
-    "workerThreads": 8,
+    "workerThreads": 16,
     "links": [
       { "name": "serverLink", "type": "server", "local": "127.0.0.1:8011", "peer": "127.0.0.1:8012" }
     ]
   },
   "m3ua": {
-    "deliveryThreads": 8,
+    "deliveryThreads": 32,
     "as": [
       { "name": "AS1", "mode": "loadshare", "functionality": "ipsp", "ipsp": "server",
         "routingContext": 101, "networkAppearance": 102, "links": ["serverLink"] }
@@ -29,7 +29,7 @@
   },
   "tcap": {
     "dialogIdleTimeout": 10000,
-    "invokeTimeout": 10000,
+    "invokeTimeout": 5000,
     "maxDialogs": 50000
   },
   "services": [
@@ -48,7 +48,7 @@
 
   "sctp": {
     "connectDelay": 10000,
-    "workerThreads": 8,
+    "workerThreads": 16,
     "links": [
       {
         "name": "serverLink",
@@ -59,7 +59,7 @@
   },
 
   "m3ua": {
-    "deliveryThreads": 8,
+    "deliveryThreads": 32,
     "as": [
       {
         "name": "AS1",
@@ -93,7 +93,7 @@
 
   "tcap": {
     "dialogIdleTimeout": 10000,
-    "invokeTimeout": 10000,
+    "invokeTimeout": 5000,
     "maxDialogs": 50000
   },
 

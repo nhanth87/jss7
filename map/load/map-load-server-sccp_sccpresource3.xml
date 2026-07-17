@@ -25,9 +25,9 @@
       <remoteSccpProhibited>false</remoteSccpProhibited>
       <rl>0</rl>
       <rsl>0</rsl>
-      <remoteSignalingPointCodeExt/>
       <currentRestrictionLevel>0</currentRestrictionLevel>
       <currentRestrictionSubLevel>0</currentRestrictionSubLevel>
+      <remoteSignalingPointCodeExt/>
     </1>
   </remoteSpcs>
   <concernedSpcs/>
