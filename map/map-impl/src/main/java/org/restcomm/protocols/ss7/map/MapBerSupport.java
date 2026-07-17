@@ -1,5 +1,7 @@
 package org.restcomm.protocols.ss7.map;
 
+import java.util.concurrent.atomic.LongAdder;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mobicents.protocols.asn.AsnException;
@@ -24,6 +26,7 @@ import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
  *     try {
  *         berDecode(buf, off, length);   // BerCursor navigation, sets fields (views on octets)
  *         ais.advance(length);           // consume — BerCursor read from a snapshot, not the stream
+ *         MapBerSupport.recordBerOk();
  *         return;
  *     } catch (Throwable t) {            // ANY failure -> legacy path, stream untouched
  *         MapBerSupport.logFallback("MsgName", t);
@@ -39,6 +42,10 @@ public final class MapBerSupport {
 
     private static final Logger logger = LogManager.getLogger(MapBerSupport.class);
 
+    /** Always-on (cheap) counters — independent of {@code asn.telemetry.enabled}. */
+    private static final LongAdder BER_OK = new LongAdder();
+    private static final LongAdder BER_FALLBACK = new LongAdder();
+
     private MapBerSupport() {
     }
 
@@ -52,8 +59,24 @@ public final class MapBerSupport {
         return ais.getStartOffset() + ais.position();
     }
 
+    /** Cumulative successful BerCursor MAP decodes (hot path). */
+    public static long berOkCount() {
+        return BER_OK.sum();
+    }
+
+    /** Cumulative BerCursor → AsnInputStream fallbacks (should stay near-zero on USSD load). */
+    public static long berFallbackCount() {
+        return BER_FALLBACK.sum();
+    }
+
+    /** Record a successful BerCursor decode for load-test / ops observability. */
+    public static void recordBerOk() {
+        BER_OK.increment();
+    }
+
     /** Records a fallback to the classic decoder (debug level — expected for exotic encodings). */
     public static void logFallback(String messageName, Throwable t) {
+        BER_FALLBACK.increment();
         if (logger.isDebugEnabled()) {
             logger.debug("BerCursor decode of " + messageName + " failed; falling back to AsnInputStream: " + t);
         }

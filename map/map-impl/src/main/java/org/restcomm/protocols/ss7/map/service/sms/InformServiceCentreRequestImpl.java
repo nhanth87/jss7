@@ -144,6 +144,7 @@ public class InformServiceCentreRequestImpl extends SmsMessageImpl implements In
             try {
                 this._decodeBer(asnInputStream.getBuffer(), MapBerSupport.absOffset(asnInputStream), length);
                 asnInputStream.advance(length);
+                MapBerSupport.recordBerOk();
                 return;
             } catch (Throwable t) {
                 MapBerSupport.logFallback("InformServiceCentreRequest", t);

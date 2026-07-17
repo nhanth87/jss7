@@ -143,6 +143,7 @@ public class ReadyForSMRequestImpl extends SmsMessageImpl implements ReadyForSMR
             try {
                 this._decodeBer(asnInputStream.getBuffer(), MapBerSupport.absOffset(asnInputStream), length);
                 asnInputStream.advance(length);
+                MapBerSupport.recordBerOk();
                 return;
             } catch (Throwable t) {
                 MapBerSupport.logFallback("ReadyForSMRequest", t);

@@ -115,11 +115,17 @@ public class TCAPStackImpl implements TCAPStack {
     // congestion level 0, 1 or 2
     private double[] congControl_ExecutorBackToNormalDelayThreshold = { 0.5, 3, 8 };
     // MemoryMonitor Thresholds: a percent of occupied memory after which MemoryMonitor becomes the
-    // congestion level 1, 2 or 3
-    private double[] congControl_MemoryThreshold = new double[] { 77, 87, 97 };
+    // congestion level 1, 2 or 3. Override via -Dss7.tcap.memoryCongestionL{1,2,3}=NN (gateway load).
+    private double[] congControl_MemoryThreshold = new double[] {
+            Double.parseDouble(System.getProperty("ss7.tcap.memoryCongestionL1", "77")),
+            Double.parseDouble(System.getProperty("ss7.tcap.memoryCongestionL2", "87")),
+            Double.parseDouble(System.getProperty("ss7.tcap.memoryCongestionL3", "97")) };
     // MemoryMonitor Thresholds: a percent of occupied memory after which MemoryMonitor resumes to the
     // congestion level 0, 1 or 2
-    private double[] congControl_BackToNormalMemoryThreshold = new double[] { 72, 82, 92 };
+    private double[] congControl_BackToNormalMemoryThreshold = new double[] {
+            Double.parseDouble(System.getProperty("ss7.tcap.memoryCongestionL1Back", "72")),
+            Double.parseDouble(System.getProperty("ss7.tcap.memoryCongestionL2Back", "82")),
+            Double.parseDouble(System.getProperty("ss7.tcap.memoryCongestionL3Back", "92")) };
 
     private boolean isSwapTcapIdBytes = true;  // for now configurable only via XML file
 

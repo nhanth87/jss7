@@ -12,10 +12,9 @@
     <!-- ASN.1 telemetry — set to true to show BerCursor stats in TUI (+3ns/op) -->
     <property name="test.server.asnTelemetry" value="false"/>
 
-    <!-- JVM settings -->
-    <!-- JVM settings — 1g heap (safe for 2 CPU/4G RAM); ZGC + Generational -->
-    <property name="jvm.xms" value="512m"/>
-    <property name="jvm.xmx" value="1g"/>
+    <!-- JVM settings — 8g heap for gateway headroom under 4k TPS (avoid MEMORY congestion @77%) -->
+    <property name="jvm.xms" value="8g"/>
+    <property name="jvm.xmx" value="8g"/>
 
     <!-- ============================================================= -->
     <!-- CLASSPATH  (from Maven ant-classpath.txt)                      -->
@@ -75,13 +74,19 @@
             <jvmarg value="-Xmx${jvm.xmx}"/>
             <!-- Generational ZGC: low-pause, keeps p99 flat at high TPS -->
             <jvmarg value="-XX:+UseZGC"/>
-            <jvmarg value="-XX:ConcGCThreads=2"/>
+            <jvmarg value="-XX:ConcGCThreads=4"/>
+            <jvmarg value="-XX:ParallelGCThreads=8"/>
             <jvmarg value="-Dlog4j.defaultInitOverride=true"/>
             <jvmarg value="-Dlog4j.configurationFile=log4j2-server.xml"/>
             <jvmarg value="-Djava.net.preferIPv4Stack=true"/>
             <jvmarg value="-Dio.netty.leakDetection.level=disabled"/>
             <jvmarg value="-Dasn.telemetry.enabled=${test.server.asnTelemetry}"/>
-            <jvmarg value="-Dss7.tcap.wheelTimer=false"/>
+            <!-- TCAP: more timer/callback threads; hybrid wheel invoke + sticky idle -->
+            <jvmarg value="-Dss7.tcap.executorThreads=16"/>
+            <!-- Raise memory congestion L1 from default 77% — ZGC often sits high; avoid outgoing throttle -->
+            <jvmarg value="-Dss7.tcap.memoryCongestionL1=90"/>
+            <jvmarg value="-Dss7.tcap.memoryCongestionL2=95"/>
+            <jvmarg value="-Dss7.tcap.memoryCongestionL3=98"/>
 
             <!-- Single arg: JSON config file path -->
             <arg value="${test.server.config}"/>

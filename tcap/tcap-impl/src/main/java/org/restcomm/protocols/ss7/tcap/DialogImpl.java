@@ -119,7 +119,16 @@ public class DialogImpl implements Dialog {
     private int localSsn;
     private int remotePc = -1;
 
-    private Future idleTimerFuture;
+    private Future<?> idleTimerFuture;
+    /** Absolute nanoTime when the dialog becomes idle; 0 means idle timer disarmed. */
+    private long idleDeadlineNanos;
+    /**
+     * Sticky idle: extend {@link #idleDeadlineNanos} on activity without cancel+reschedule.
+     * Disable with {@code -Dss7.tcap.stickyIdleTimer=false} to restore classic restart churn
+     * (for bisect only). Default true — avoids JDK DelayedWorkQueue O(log n) per message.
+     */
+    private static final boolean STICKY_IDLE_TIMER =
+            Boolean.parseBoolean(System.getProperty("ss7.tcap.stickyIdleTimer", "true"));
     private boolean idleTimerActionTaken = false;
     private boolean idleTimerInvoked = false;
     private TRPseudoState state = TRPseudoState.Idle;
@@ -2049,18 +2058,11 @@ public class DialogImpl implements Dialog {
 
         try {
             this.dialogLock.lock();
-            if (this.idleTimerFuture != null) {
-                throw new IllegalStateException();
-            }
-
-            IdleTimerTask t = new IdleTimerTask();
-            t.dialog = this;
-            // Dialog-idle timer stays on the JDK scheduled pool. It is restarted on every message
-            // (restartIdleTimer), and that create+cancel churn overwhelms Netty HashedWheelTimer's
-            // single worker thread (cancelled timeouts linger in buckets) — causing late/spurious
-            // firings that tanked success rate. Only the once-per-invoke timer uses the wheel.
-            this.idleTimerFuture = this.executor.schedule(t, this.idleTaskTimeout, TimeUnit.MILLISECONDS);
-
+            // Dialog-idle stays on the JDK pool (never HashedWheelTimer): restart-every-message
+            // churn overwhelms the wheel's single worker. Sticky mode only updates the absolute
+            // deadline on activity; classic mode cancel+reschedules (bisect via stickyIdleTimer=false).
+            bumpIdleDeadlineLocked();
+            scheduleIdleTimerLocked();
         } finally {
             this.dialogLock.unlock();
         }
@@ -2072,19 +2074,54 @@ public class DialogImpl implements Dialog {
 
         try {
             this.dialogLock.lock();
+            this.idleDeadlineNanos = 0L;
             if (this.idleTimerFuture != null) {
                 this.idleTimerFuture.cancel(false);
                 this.idleTimerFuture = null;
             }
-
         } finally {
             this.dialogLock.unlock();
         }
     }
 
     private void restartIdleTimer() {
-        stopIdleTimer();
-        startIdleTimer();
+        if (!this.structured || this.previewMode)
+            return;
+
+        if (!STICKY_IDLE_TIMER) {
+            stopIdleTimer();
+            startIdleTimer();
+            return;
+        }
+
+        try {
+            this.dialogLock.lock();
+            bumpIdleDeadlineLocked();
+            // Sticky: do not cancel the armed Future — IdleTimerTask re-checks the deadline.
+            scheduleIdleTimerLocked();
+        } finally {
+            this.dialogLock.unlock();
+        }
+    }
+
+    private void bumpIdleDeadlineLocked() {
+        this.idleDeadlineNanos = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(this.idleTaskTimeout);
+    }
+
+    /** Arm a single JDK idle Future if none is pending. Caller must hold {@link #dialogLock}. */
+    private void scheduleIdleTimerLocked() {
+        if (this.idleTimerFuture != null || this.idleDeadlineNanos == 0L)
+            return;
+
+        long remainingMs = TimeUnit.NANOSECONDS.toMillis(this.idleDeadlineNanos - System.nanoTime());
+        if (remainingMs < 1L)
+            remainingMs = 1L;
+        else if (remainingMs > this.idleTaskTimeout)
+            remainingMs = this.idleTaskTimeout;
+
+        IdleTimerTask t = new IdleTimerTask();
+        t.dialog = this;
+        this.idleTimerFuture = this.executor.schedule(t, remainingMs, TimeUnit.MILLISECONDS);
     }
 
     private class IdleTimerTask implements Runnable {
@@ -2094,6 +2131,18 @@ public class DialogImpl implements Dialog {
             try {
                 dialogLock.lock();
                 dialog.idleTimerFuture = null;
+
+                long deadline = dialog.idleDeadlineNanos;
+                if (deadline == 0L) {
+                    // stopIdleTimer() disarmed us while we were queued
+                    return;
+                }
+                long now = System.nanoTime();
+                if (now < deadline) {
+                    // Activity extended the idle window — reschedule for the remainder
+                    dialog.scheduleIdleTimerLocked();
+                    return;
+                }
 
                 dialog.idleTimerActionTaken = false;
                 dialog.idleTimerInvoked = true;

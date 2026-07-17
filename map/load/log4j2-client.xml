@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
   <Appenders>
-    <Console name="Console" target="SYSTEM_OUT">
-      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
-    </Console>
+    <!-- File only during load — Console appender fights the TUI and causes scroll jump. -->
     <File name="ClientFile" fileName="client.log" append="false">
       <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
     </File>
   </Appenders>
   <Loggers>
-    <Root level="INFO">
-      <AppenderRef ref="Console"/>
+    <Root level="WARN">
       <AppenderRef ref="ClientFile"/>
     </Root>
-    <Logger name="org.restcomm" level="INFO"/>
-    <Logger name="org.mobicents" level="INFO"/>
+    <Logger name="org.restcomm" level="WARN"/>
+    <Logger name="org.mobicents" level="WARN"/>
     <Logger name="map.test" level="INFO"/>
   </Loggers>
 </Configuration>

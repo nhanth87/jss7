@@ -96,6 +96,7 @@ public class UnstructuredSSResponseImpl extends SupplementaryMessageImpl impleme
                 this.ussdDataCodingSch = r.dcs;
                 this.ussdString = r.ussdString;
                 asnInputStream.advance(length);
+                MapBerSupport.recordBerOk();
                 return;
             } catch (Throwable t) {
                 MapBerSupport.logFallback("UnstructuredSSResponse", t);

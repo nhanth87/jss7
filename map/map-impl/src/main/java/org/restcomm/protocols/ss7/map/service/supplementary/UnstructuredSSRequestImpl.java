@@ -134,6 +134,7 @@ public class UnstructuredSSRequestImpl extends SupplementaryMessageImpl implemen
                 this.ussdString = r.ussdString;
                 this.msisdnAddressString = r.msisdn;
                 asnInputStream.advance(length);
+                MapBerSupport.recordBerOk();
                 return;
             } catch (Throwable t) {
                 MapBerSupport.logFallback("UnstructuredSSRequest", t);

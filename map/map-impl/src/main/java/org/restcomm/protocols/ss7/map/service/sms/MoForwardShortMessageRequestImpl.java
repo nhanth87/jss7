@@ -150,6 +150,7 @@ public class MoForwardShortMessageRequestImpl extends SmsMessageImpl implements 
             try {
                 this._decodeBer(buf, off, length);
                 asnInputStream.advance(length);
+                MapBerSupport.recordBerOk();
                 return;
             } catch (Throwable t) {
                 MapBerSupport.logFallback(_PrimitiveName, t);

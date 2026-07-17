@@ -75,6 +75,8 @@ import org.restcomm.protocols.ss7.tcap.asn.comp.Problem;
 
 import java.nio.file.Path;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import org.restcomm.protocols.ss7.map.load.ConsoleTui;
 
@@ -95,8 +97,15 @@ public class Server extends TestHarnessUssd {
     volatile long start = System.currentTimeMillis();
 
     private final AtomicLong receivedCount = new AtomicLong();
+    /** Clean releases only (no prior timeout/abort/reject on that dialog). */
     private final AtomicLong processedCount = new AtomicLong();
     private final AtomicLong errorCount = new AtomicLong();
+    /** Dialogs that already failed — Success only on clean release; Error once per dialog. */
+    private final Set<Long> failedDialogs = ConcurrentHashMap.newKeySet();
+    /** Timeout/abort log sampling — full ERROR per dialog nukes CPU under cascade. */
+    private final AtomicLong timeoutCount = new AtomicLong();
+    private final AtomicLong providerAbortCount = new AtomicLong();
+    private final AtomicLong lastTimeoutLogMs = new AtomicLong();
     private ConsoleTui tui;
 
     // Pre-built constant response objects — encoded ONCE (GSM7 + TBCD) and reused on every
@@ -189,23 +198,34 @@ public class Server extends TestHarnessUssd {
     @Override
     public void onDialogReject(MAPDialog mapDialog, MAPRefuseReason refuseReason, ApplicationContextName alternativeApplicationContext,
                                MAPExtensionContainer extensionContainer) {
-        errorCount.incrementAndGet();
+        markDialogFailed(mapDialog);
         log.error("onDialogReject DialogId={} reason={} altCtx={} ext={}",
                 mapDialog.getLocalDialogId(), refuseReason, alternativeApplicationContext, extensionContainer);
     }
 
     @Override
     public void onDialogUserAbort(MAPDialog mapDialog, MAPUserAbortChoice userReason, MAPExtensionContainer extensionContainer) {
-        errorCount.incrementAndGet();
+        markDialogFailed(mapDialog);
         log.error("onDialogUserAbort DialogId={} reason={} ext={}", mapDialog.getLocalDialogId(), userReason, extensionContainer);
     }
 
     @Override
     public void onDialogProviderAbort(MAPDialog mapDialog, MAPAbortProviderReason abortProviderReason, MAPAbortSource abortSource,
                                       MAPExtensionContainer extensionContainer) {
-        errorCount.incrementAndGet();
-        log.error("onDialogProviderAbort DialogId={} reason={} source={} ext={}",
-                mapDialog.getLocalDialogId(), abortProviderReason, abortSource, extensionContainer);
+        markDialogFailed(mapDialog);
+        long n = providerAbortCount.incrementAndGet();
+        // Sample: first 5, then at most 1 summary line / second
+        if (n <= 5) {
+            log.error("onDialogProviderAbort DialogId={} reason={} source={} ext={}",
+                    mapDialog.getLocalDialogId(), abortProviderReason, abortSource, extensionContainer);
+        } else {
+            long now = System.currentTimeMillis();
+            long prev = lastTimeoutLogMs.get();
+            if (now - prev >= 1000 && lastTimeoutLogMs.compareAndSet(prev, now)) {
+                log.warn("onDialogProviderAbort sampled: total={}, last DialogId={} reason={}",
+                        n, mapDialog.getLocalDialogId(), abortProviderReason);
+            }
+        }
     }
 
     @Override
@@ -216,6 +236,7 @@ public class Server extends TestHarnessUssd {
 
     @Override
     public void onDialogNotice(MAPDialog mapDialog, MAPNoticeProblemDiagnostic noticeProblemDiagnostic) {
+        markDialogFailed(mapDialog);
         log.error("onDialogNotice DialogId={} diagnostic={}", mapDialog.getLocalDialogId(), noticeProblemDiagnostic);
     }
 
@@ -225,20 +246,40 @@ public class Server extends TestHarnessUssd {
             log.debug("onDialogRelease DialogId={}", mapDialog.getLocalDialogId());
 
         this.endCount.incrementAndGet();
-        processedCount.incrementAndGet();
+        // Success only if this dialog was not already marked failed (timeout/abort/reject).
+        if (!failedDialogs.remove(mapDialog.getLocalDialogId())) {
+            processedCount.incrementAndGet();
+        }
 
         if ((this.endCount.get() % 10000) == 0) {
             long currentTime = System.currentTimeMillis();
             long processingTime = currentTime - start;
             start = currentTime;
-            log.info("Completed {} dialogs. Rate: {} in {}ms", processedCount.get(), 10000, processingTime);
+            log.info("Completed {} dialogs (success={}, error={}). Rate: {} in {}ms",
+                    endCount.get(), processedCount.get(), errorCount.get(), 10000, processingTime);
         }
     }
 
     @Override
     public void onDialogTimeout(MAPDialog mapDialog) {
-        errorCount.incrementAndGet();
-        log.error("onDialogTimeout DialogId={}", mapDialog.getLocalDialogId());
+        markDialogFailed(mapDialog);
+        long n = timeoutCount.incrementAndGet();
+        if (n <= 5) {
+            log.error("onDialogTimeout DialogId={}", mapDialog.getLocalDialogId());
+        } else {
+            long now = System.currentTimeMillis();
+            long prev = lastTimeoutLogMs.get();
+            if (now - prev >= 1000 && lastTimeoutLogMs.compareAndSet(prev, now)) {
+                log.warn("onDialogTimeout sampled: total={}, last DialogId={}", n, mapDialog.getLocalDialogId());
+            }
+        }
+    }
+
+    /** Count Error once per dialog; timeout+abort cascade must not double-count. */
+    private void markDialogFailed(MAPDialog mapDialog) {
+        if (failedDialogs.add(mapDialog.getLocalDialogId())) {
+            errorCount.incrementAndGet();
+        }
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -319,17 +360,20 @@ public class Server extends TestHarnessUssd {
     @Override
     public void onErrorComponent(MAPDialog mapDialog, Long invokeId, MAPErrorMessage mapErrorMessage) {
         log.error("onErrorComponent Dialog={} invokeId={} error={}", mapDialog.getLocalDialogId(), invokeId, mapErrorMessage);
+        markDialogFailed(mapDialog);
     }
 
     @Override
     public void onRejectComponent(MAPDialog mapDialog, Long invokeId, Problem problem, boolean isLocalOriginated) {
         log.error("onRejectComponent Dialog={} invokeId={} problem={} local={}",
                 mapDialog.getLocalDialogId(), invokeId, problem, isLocalOriginated);
+        markDialogFailed(mapDialog);
     }
 
     @Override
     public void onInvokeTimeout(MAPDialog mapDialog, Long invokeId) {
         log.error("onInvokeTimeout Dialog={} invokeId={}", mapDialog.getLocalDialogId(), invokeId);
+        markDialogFailed(mapDialog);
     }
 
     // ═══════════════════════════════════════════════════════════
