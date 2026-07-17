@@ -119,7 +119,7 @@ public class DialogImpl implements Dialog {
     private int localSsn;
     private int remotePc = -1;
 
-    private TCAPProviderImpl.TimerHandle idleTimerFuture;
+    private Future idleTimerFuture;
     private boolean idleTimerActionTaken = false;
     private boolean idleTimerInvoked = false;
     private TRPseudoState state = TRPseudoState.Idle;
@@ -2055,7 +2055,11 @@ public class DialogImpl implements Dialog {
 
             IdleTimerTask t = new IdleTimerTask();
             t.dialog = this;
-            this.idleTimerFuture = this.provider.createOperationTimer(t, this.idleTaskTimeout);
+            // Dialog-idle timer stays on the JDK scheduled pool. It is restarted on every message
+            // (restartIdleTimer), and that create+cancel churn overwhelms Netty HashedWheelTimer's
+            // single worker thread (cancelled timeouts linger in buckets) — causing late/spurious
+            // firings that tanked success rate. Only the once-per-invoke timer uses the wheel.
+            this.idleTimerFuture = this.executor.schedule(t, this.idleTaskTimeout, TimeUnit.MILLISECONDS);
 
         } finally {
             this.dialogLock.unlock();
@@ -2069,7 +2073,7 @@ public class DialogImpl implements Dialog {
         try {
             this.dialogLock.lock();
             if (this.idleTimerFuture != null) {
-                this.idleTimerFuture.cancel();
+                this.idleTimerFuture.cancel(false);
                 this.idleTimerFuture = null;
             }
 

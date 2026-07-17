@@ -10,7 +10,7 @@
     <property name="test.server.config" value="ss7-ussd-server.json"/>
 
     <!-- ASN.1 telemetry — set to true to show BerCursor stats in TUI (+3ns/op) -->
-    <property name="test.server.asnTelemetry" value="true"/>
+    <property name="test.server.asnTelemetry" value="false"/>
 
     <!-- JVM settings -->
     <!-- JVM settings — 1g heap (safe for 2 CPU/4G RAM); ZGC + Generational -->
@@ -81,6 +81,7 @@
             <jvmarg value="-Djava.net.preferIPv4Stack=true"/>
             <jvmarg value="-Dio.netty.leakDetection.level=disabled"/>
             <jvmarg value="-Dasn.telemetry.enabled=${test.server.asnTelemetry}"/>
+            <jvmarg value="-Dss7.tcap.wheelTimer=false"/>
 
             <!-- Single arg: JSON config file path -->
             <arg value="${test.server.config}"/>

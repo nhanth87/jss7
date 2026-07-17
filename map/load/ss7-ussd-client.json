@@ -10,7 +10,7 @@
   // ═══ SCTP — client binds 127.0.0.1:8012, connects to server :8011 ═══
   "sctp": {
     "connectDelay": 10000,
-    "workerThreads": 8,
+    "workerThreads": 16,
     "links": [
       {
         "name": "clientLink",
@@ -22,7 +22,7 @@
 
   // ═══ M3UA — IPSP client, RC=101, NA=102, deliveryThreads=16 ═══
   "m3ua": {
-    "deliveryThreads": 8,
+    "deliveryThreads": 32,
     "as": [
       {
         "name": "AS1",
@@ -60,7 +60,7 @@
   // ═══ TCAP — primary SSN=8 (MSC), extra=[147 (USSD)] for remote SSN discovery ═══
   "tcap": {
     "dialogIdleTimeout": 10000,
-    "invokeTimeout": 10000,
+    "invokeTimeout": 5000,
     "maxDialogs": 50000
   },
 

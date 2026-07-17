@@ -11,11 +11,11 @@
 
     <!-- Load test params (passed as JVM system properties) -->
     <property name="test.client.numOfDialogs"       value="300000"/>
-    <property name="test.client.concurrentDialog"   value="1800"/>
+    <property name="test.client.concurrentDialog"   value="4000"/>
     <property name="test.client.rampUpPeriod"       value="0"/>
 
     <!-- ASN.1 telemetry — OFF for throughput runs (costs ~42% decode). Turn on only to inspect codec/heap. -->
-    <property name="test.client.asnTelemetry" value="true"/>
+    <property name="test.client.asnTelemetry" value="false"/>
 
     <!-- Monitoring for this round. Set false (or -Dtest.client.monitor=false) to disable next round.
          Produces: gc-client.log (ZGC pauses + allocation rate) and client.jfr (per-class heap
@@ -104,6 +104,7 @@
             <jvmarg value="-Djava.net.preferIPv4Stack=true"/>
             <jvmarg value="-Dio.netty.leakDetection.level=disabled"/>
             <jvmarg value="-Dasn.telemetry.enabled=${test.client.asnTelemetry}"/>
+            <jvmarg value="-Dss7.tcap.wheelTimer=false"/>
 
             <!-- Load test params via system properties -->
             <jvmarg value="-Dss7.load.ndialogs=${test.client.numOfDialogs}"/>
