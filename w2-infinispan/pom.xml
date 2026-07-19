@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>ss7-parent</artifactId>
+        <groupId>org.restcomm.protocols.ss7</groupId>
+        <version>9.2.8-j25</version>
+    </parent>
+
+    <groupId>org.restcomm.protocols.ss7.scheduler</groupId>
+    <artifactId>w2-infinispan</artifactId>
+    <name>Restcomm jSS7 :: Scheduler :: W2 Infinispan</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.restcomm.protocols.ss7.scheduler</groupId>
+            <artifactId>w2-scheduler</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-core</artifactId>
+            <version>${infinispan.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

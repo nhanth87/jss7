@@ -68,6 +68,27 @@ Edit properties at the top of `ussd-client.xml` (or override in `client.properti
 <property name="jvm.xmx" value="2g"/>
 ```
 
+## W2 TCAP scheduler A/B test
+
+The server launchers support an opt-in TCAP ingress scheduler. It has a bounded queue and a worker pool that processes **different SCCP flows in parallel** while preserving FIFO within a flow. It does not classify MAP operation codes yet, so this test measures isolation/parallelism rather than ATI-vs-MT-FSM priority.
+
+Run the FIFO baseline first (default):
+
+```bash
+cd /home/meodien/Desktop/ethiopia-working-dir/worktrees/jSS7/coral-valley/jSS7/map/load
+ant -f ussd-server.xml server
+# or: ant -f mt-sms-server.xml server
+```
+
+Then run an equivalent W2 server test (choose workers no higher than available CPU initially):
+
+```bash
+ant -f ussd-server.xml server -Dtest.server.w2Scheduler=true -Dtest.server.w2Workers=16 -Dtest.server.w2Capacity=100000
+# or: ant -f mt-sms-server.xml server -Dtest.server.w2Scheduler=true -Dtest.server.w2Workers=16 -Dtest.server.w2Capacity=100000
+```
+
+Keep client TPS, dialog count, delivery threads, JVM heap, peer and run duration identical between A/B runs. Record client successful/error dialogs and TPS, server CPU/heap/GC, TCAP timeout/abort logs, and `W2 TCAP ingress queue is full` warnings. A capacity warning means the run used inline fail-open processing and is not a pure queued-W2 comparison; increase capacity or reduce offered load. Confirm startup log `W2 TCAP ingress scheduler enabled` before treating a run as W2.
+
 ## TUI Display
 
 The ConsoleTui writes to **stderr** (keeps stdout clean for CSV output):

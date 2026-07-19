@@ -23,9 +23,11 @@ Một SS7 operation có chi phí xử lý không đồng nhất: ví dụ MAP AT
 
 This is an infrastructure primitive only. It is deliberately not wired to TCAP/MAP/CAP.
 
-### Case 2 — keyed dialog mailbox (implemented, not wired)
+### Case 2 — keyed mailbox and feature-flagged TCAP ingress (implemented)
 
-`W2KeyedMailboxDispatcher` provides a globally bounded, FIFO mailbox for each `W2Work.dialogKey`. It permits at most one active mailbox drainer per key. W2 priority/deadline selection applies only among eligible mailbox heads; a later high-priority event can never overtake an earlier event from the same dialog. This establishes the local ordering primitive required before an eventual feature-flagged TCAP adapter.
+`W2KeyedMailboxDispatcher` provides a globally bounded, FIFO mailbox for each `W2Work.dialogKey`. It permits at most one active mailbox drainer per key, while a configurable worker pool drains different keys in parallel. W2 priority/deadline selection applies only among eligible mailbox heads; a later high-priority event can never overtake an earlier event from the same key.
+
+`TCAPProviderImpl` now has an opt-in ingress adapter (`-Dss7.tcap.w2Scheduler.enabled=true`). It keys pre-decode work by inbound SCCP flow (`networkId/opc/SLS/calling/called address`) and runs the existing TCAP decode/FSM unchanged inside the mailbox. This establishes an executable USSD/SMSC load-test path, but is **not yet MAP/CAP operation-aware**: MAP/CAP opcode and application context are unavailable until after TCAP parsing. Queue exhaustion logs a warning and processes the item inline rather than silently dropping SS7 traffic.
 
 ## Kết luận hiện tại
 

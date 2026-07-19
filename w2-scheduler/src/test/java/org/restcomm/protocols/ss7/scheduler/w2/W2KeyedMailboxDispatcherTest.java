@@ -5,9 +5,11 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.restcomm.protocols.ss7.scheduler.W2Priority;
 import org.restcomm.protocols.ss7.scheduler.W2Work;
@@ -63,6 +65,49 @@ public class W2KeyedMailboxDispatcherTest {
             assertEquals(metrics.dispatched(), 2L);
             assertEquals(metrics.failed(), 1L);
         }
+    }
+
+    @Test
+    public void shouldDrainDifferentDialogMailboxesInParallelButKeepEachDialogSerial() throws Exception {
+        CountDownLatch started = new CountDownLatch(2);
+        CountDownLatch release = new CountDownLatch(1);
+        CountDownLatch completed = new CountDownLatch(4);
+        AtomicInteger active = new AtomicInteger();
+        AtomicInteger peakActive = new AtomicInteger();
+        List<String> execution = Collections.synchronizedList(new ArrayList<>());
+        try (W2KeyedMailboxDispatcher dispatcher = new W2KeyedMailboxDispatcher(4, 2, "w2-keyed-parallel-test")) {
+            assertTrue(dispatcher.submit(blockingWork("dialog-a", "a-first", started, release, completed, active, peakActive, execution)));
+            assertTrue(dispatcher.submit(work("dialog-a", "a-second", W2Priority.CRITICAL, 1L, execution, completed)));
+            assertTrue(dispatcher.submit(blockingWork("dialog-b", "b-first", started, release, completed, active, peakActive, execution)));
+            assertTrue(dispatcher.submit(work("dialog-b", "b-second", W2Priority.CRITICAL, 1L, execution, completed)));
+            dispatcher.start();
+            assertTrue(started.await(2, TimeUnit.SECONDS));
+            release.countDown();
+            assertTrue(completed.await(2, TimeUnit.SECONDS));
+        }
+        assertEquals(peakActive.get(), 2);
+        assertTrue(execution.indexOf("a-first") < execution.indexOf("a-second"));
+        assertTrue(execution.indexOf("b-first") < execution.indexOf("b-second"));
+    }
+
+    private static W2Work<Runnable> blockingWork(String dialogKey, String name, CountDownLatch started,
+            CountDownLatch release, CountDownLatch completed, AtomicInteger active, AtomicInteger peakActive,
+            List<String> execution) {
+        return new W2Work<>(dialogKey, W2Priority.NORMAL, 1L, () -> {
+            int current = active.incrementAndGet();
+            peakActive.accumulateAndGet(current, Math::max);
+            started.countDown();
+            try {
+                assertTrue(release.await(2, TimeUnit.SECONDS));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new AssertionError(e);
+            } finally {
+                active.decrementAndGet();
+            }
+            execution.add(name);
+            completed.countDown();
+        });
     }
 
     private static W2Work<Runnable> work(String dialogKey, String name, W2Priority priority, long deadline,

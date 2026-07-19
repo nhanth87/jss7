@@ -12,6 +12,11 @@
     <!-- ASN.1 telemetry -->
     <property name="test.server.asnTelemetry" value="true"/>
 
+    <!-- W2 TCAP ingress scheduler. Keep false for FIFO baseline; override with -Dtest.server.w2Scheduler=true. -->
+    <property name="test.server.w2Scheduler" value="false"/>
+    <property name="test.server.w2Workers" value="16"/>
+    <property name="test.server.w2Capacity" value="100000"/>
+
     <!-- JVM settings — 1g heap, ZGC Generational -->
     <property name="jvm.xms" value="512m"/>
     <property name="jvm.xmx" value="1g"/>
@@ -53,6 +58,7 @@
         <echo message="Config      : ${test.server.config}"/>
         <echo message="Heap        : ${jvm.xms}/${jvm.xmx}"/>
         <echo message="ASN telemetry: ${test.server.asnTelemetry}"/>
+        <echo message="W2 scheduler: ${test.server.w2Scheduler} (workers=${test.server.w2Workers}, capacity=${test.server.w2Capacity})"/>
         <echo message="============================================"/>
         <echo message=""/>
 
@@ -77,6 +83,9 @@
             <jvmarg value="-Djava.net.preferIPv4Stack=true"/>
             <jvmarg value="-Dio.netty.leakDetection.level=disabled"/>
             <jvmarg value="-Dasn.telemetry.enabled=${test.server.asnTelemetry}"/>
+            <jvmarg value="-Dss7.tcap.w2Scheduler.enabled=${test.server.w2Scheduler}"/>
+            <jvmarg value="-Dss7.tcap.w2Scheduler.workers=${test.server.w2Workers}"/>
+            <jvmarg value="-Dss7.tcap.w2Scheduler.capacity=${test.server.w2Capacity}"/>
 
             <arg value="${test.server.config}"/>
         </java>
