@@ -38,6 +38,7 @@
 		<javolution.version>5.5.1</javolution.version>
 		<guava.version>33.4.7-jre</guava.version>
 		<jakarta.xml.bind-api.version>4.0.2</jakarta.xml.bind-api.version>
+		<infinispan.version>15.0.0.Final</infinispan.version>
 
 		<compiler.plugin.version>3.13.0</compiler.plugin.version>
 		<compile.source>25</compile.source>
@@ -61,6 +62,7 @@
 		<module>scheduler</module>
 		<module>congestion</module>
 		<module>w2-scheduler</module>
+		<module>w2-infinispan</module>
 
 		<module>statistics</module>
 		<module>management</module>
@@ -138,6 +140,12 @@
 			<dependency>
 				<groupId>org.restcomm.protocols.ss7.scheduler</groupId>
 				<artifactId>w2-scheduler</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<!-- W2 Infinispan cluster coordinator -->
+			<dependency>
+				<groupId>org.restcomm.protocols.ss7.scheduler</groupId>
+				<artifactId>w2-infinispan</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<!-- Clock -->

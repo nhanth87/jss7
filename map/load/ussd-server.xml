@@ -12,6 +12,11 @@
     <!-- ASN.1 telemetry — set to true to show BerCursor stats in TUI (+3ns/op) -->
     <property name="test.server.asnTelemetry" value="false"/>
 
+    <!-- W2 TCAP ingress scheduler. Keep false for FIFO baseline; override with -Dtest.server.w2Scheduler=true. -->
+    <property name="test.server.w2Scheduler" value="false"/>
+    <property name="test.server.w2Workers" value="16"/>
+    <property name="test.server.w2Capacity" value="100000"/>
+
     <!-- JVM settings — 8g heap for gateway headroom under 4k TPS (avoid MEMORY congestion @77%) -->
     <property name="jvm.xms" value="8g"/>
     <property name="jvm.xmx" value="8g"/>
@@ -56,6 +61,7 @@
         <echo message="Config      : ${test.server.config}"/>
         <echo message="Heap        : ${jvm.xms}/${jvm.xmx}"/>
         <echo message="ASN telemetry: ${test.server.asnTelemetry}"/>
+        <echo message="W2 scheduler: ${test.server.w2Scheduler} (workers=${test.server.w2Workers}, capacity=${test.server.w2Capacity})"/>
         <echo message="============================================"/>
         <echo message=""/>
 
@@ -83,6 +89,9 @@
             <jvmarg value="-Dasn.telemetry.enabled=${test.server.asnTelemetry}"/>
             <!-- TCAP: more timer/callback threads; hybrid wheel invoke + sticky idle -->
             <jvmarg value="-Dss7.tcap.executorThreads=16"/>
+            <jvmarg value="-Dss7.tcap.w2Scheduler.enabled=${test.server.w2Scheduler}"/>
+            <jvmarg value="-Dss7.tcap.w2Scheduler.workers=${test.server.w2Workers}"/>
+            <jvmarg value="-Dss7.tcap.w2Scheduler.capacity=${test.server.w2Capacity}"/>
             <!-- Raise memory congestion L1 from default 77% — ZGC often sits high; avoid outgoing throttle -->
             <jvmarg value="-Dss7.tcap.memoryCongestionL1=90"/>
             <jvmarg value="-Dss7.tcap.memoryCongestionL2=95"/>

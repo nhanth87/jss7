@@ -27,6 +27,9 @@ import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
 import org.restcomm.protocols.ss7.sccp.NetworkIdState;
 import org.restcomm.protocols.ss7.sccp.RemoteSccpStatus;
+import org.restcomm.protocols.ss7.scheduler.W2Priority;
+import org.restcomm.protocols.ss7.scheduler.W2Work;
+import org.restcomm.protocols.ss7.scheduler.w2.W2KeyedMailboxDispatcher;
 import org.restcomm.protocols.ss7.sccp.SccpConnection;
 import org.restcomm.protocols.ss7.sccp.SccpListener;
 import org.restcomm.protocols.ss7.sccp.SccpProvider;
@@ -100,6 +103,9 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 
     /** Netty hashed-wheel timer for O(1) invoke-timeout schedule/cancel (default; JDK fallback). */
     private transient Timer wheelTimer;
+
+    /** Optional W2 ingress dispatcher; enabled only with ss7.tcap.w2Scheduler.enabled=true. */
+    private transient W2KeyedMailboxDispatcher w2IngressDispatcher;
 
     /** Cancellable handle abstracting a Netty {@link Timeout} or a JDK {@link Future}. */
     public interface TimerHandle { void cancel(); }
@@ -607,6 +613,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                 + " dialog-idle=JDK" + (stickyIdle ? "-sticky" : "-classic")
                 + " executorThreads=" + tcapExecThreads);
 
+        startW2IngressDispatcher();
         this.sccpProvider.registerSccpListener(ssn, this);
         logger.info("Registered SCCP listener with ssn " + ssn);
 
@@ -629,6 +636,10 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     }
 
     void stop() {
+        if (this.w2IngressDispatcher != null) {
+            this.w2IngressDispatcher.stop();
+            this.w2IngressDispatcher = null;
+        }
         stopNetworkIdStateList();
 
         if (this.wheelTimer != null) {
@@ -650,6 +661,24 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 
         this.dialogs.clear();
         this.dialogPreviewList.clear();
+    }
+
+    private void startW2IngressDispatcher() {
+        if (!Boolean.getBoolean("ss7.tcap.w2Scheduler.enabled")) {
+            return;
+        }
+        int capacity = Integer.getInteger("ss7.tcap.w2Scheduler.capacity", 100_000);
+        int workers = Integer.getInteger("ss7.tcap.w2Scheduler.workers",
+                Math.max(1, Runtime.getRuntime().availableProcessors()));
+        this.w2IngressDispatcher = new W2KeyedMailboxDispatcher(capacity, workers, "Tcap-W2-Ingress");
+        this.w2IngressDispatcher.start();
+        logger.info("W2 TCAP ingress scheduler enabled: capacity=" + capacity + " workers=" + workers
+                + " (per-SCCP-flow FIFO)");
+    }
+
+    private String w2FlowKey(SccpDataMessage message) {
+        return message.getNetworkId() + ":" + message.getIncomingOpc() + ":" + message.getSls() + ":"
+                + String.valueOf(message.getCallingPartyAddress()) + ":" + String.valueOf(message.getCalledPartyAddress());
     }
 
     protected void sendProviderAbort(PAbortCauseType providerAbortCause, byte[] remoteTransactionId, SccpAddress sccpCalledPartyAddress,
@@ -710,7 +739,21 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     }
 
     public void onMessage(SccpDataMessage sccpDataMessage) {
+        W2KeyedMailboxDispatcher dispatcher = this.w2IngressDispatcher;
+        if (dispatcher != null) {
+            String flowKey = w2FlowKey(sccpDataMessage);
+            W2Work<Runnable> work = new W2Work<>(flowKey, W2Priority.NORMAL, Long.MAX_VALUE,
+                    () -> processMessage(sccpDataMessage));
+            if (dispatcher.submit(work)) {
+                return;
+            }
+            logger.warn("W2 TCAP ingress queue is full; processing message inline to avoid dropping SCCP data: {}",
+                    flowKey);
+        }
+        processMessage(sccpDataMessage);
+    }
 
+    private void processMessage(SccpDataMessage sccpDataMessage) {
         try {
             byte[] data = sccpDataMessage.getData();
             SccpAddress sccpCallingPartyAddress = sccpDataMessage.getCalledPartyAddress();

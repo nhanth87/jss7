@@ -1,7 +1,9 @@
 package org.restcomm.protocols.ss7.scheduler.w2;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.locks.Condition;
@@ -15,8 +17,8 @@ import org.restcomm.protocols.ss7.scheduler.W2Work;
  *
  * <p>Policy chooses only the next eligible mailbox. Each mailbox has at most one
  * active drainer and its events remain FIFO, regardless of priority/deadline
- * metadata on later events. This class is protocol-neutral and is not wired to
- * the TCAP runtime yet.</p>
+ * metadata on later events. Multiple workers may drain different mailboxes in
+ * parallel. This class is protocol-neutral.</p>
  */
 public final class W2KeyedMailboxDispatcher implements AutoCloseable {
 
@@ -32,9 +34,11 @@ public final class W2KeyedMailboxDispatcher implements AutoCloseable {
     private final ReentrantLock lifecycleLock = new ReentrantLock();
     private final Condition workAvailable = lifecycleLock.newCondition();
     private final String workerName;
+    private final int workerCount;
+    private final List<Thread> workers = new ArrayList<>();
     private boolean accepting = true;
     private boolean running;
-    private Thread worker;
+    private int liveWorkers;
     private int depth;
     private long admitted;
     private long rejected;
@@ -42,23 +46,32 @@ public final class W2KeyedMailboxDispatcher implements AutoCloseable {
     private long failed;
 
     public W2KeyedMailboxDispatcher(int capacity) {
-        this(capacity, "w2-keyed-mailbox-dispatcher");
+        this(capacity, 1, "w2-keyed-mailbox-dispatcher");
     }
 
     public W2KeyedMailboxDispatcher(int capacity, String workerName) {
+        this(capacity, 1, workerName);
+    }
+
+    public W2KeyedMailboxDispatcher(int capacity, int workerCount, String workerName) {
         if (capacity <= 0) {
             throw new IllegalArgumentException("capacity must be positive");
+        }
+        if (workerCount <= 0) {
+            throw new IllegalArgumentException("workerCount must be positive");
         }
         if (workerName == null || workerName.isBlank()) {
             throw new IllegalArgumentException("workerName must not be blank");
         }
         this.capacity = capacity;
         this.eligibleMailboxes = new W2PriorityQueue<>(capacity);
+        this.workerCount = workerCount;
         this.workerName = workerName;
     }
 
     /**
-     * Admits an event to its dialog mailbox without blocking the caller.
+     * Admits an event to its ordering-key mailbox without blocking the caller. The key is a
+     * TCAP dialog for current SS7 callers but is general application scheduling metadata.
      *
      * @return true when accepted; false if stopped or the global event capacity is full
      */
@@ -70,12 +83,12 @@ public final class W2KeyedMailboxDispatcher implements AutoCloseable {
                 rejected++;
                 return false;
             }
-            Mailbox mailbox = mailboxes.computeIfAbsent(work.dialogKey(), ignored -> new Mailbox());
+            Mailbox mailbox = mailboxes.computeIfAbsent(work.orderingKey(), ignored -> new Mailbox());
             mailbox.events.addLast(work);
             depth++;
             admitted++;
             if (!mailbox.draining && !mailbox.eligible) {
-                makeEligible(work.dialogKey(), mailbox);
+                makeEligible(work.orderingKey(), mailbox);
             }
             workAvailable.signal();
             return true;
@@ -84,7 +97,7 @@ public final class W2KeyedMailboxDispatcher implements AutoCloseable {
         }
     }
 
-    /** Starts the sole local mailbox worker. Calling it more than once is harmless. */
+    /** Starts the local mailbox worker pool. Calling it more than once is harmless. */
     public void start() {
         lifecycleLock.lock();
         try {
@@ -94,7 +107,7 @@ public final class W2KeyedMailboxDispatcher implements AutoCloseable {
             if (!accepting) {
                 throw new IllegalStateException("dispatcher has been stopped");
             }
-            startWorker();
+            startWorkers();
         } finally {
             lifecycleLock.unlock();
         }
@@ -102,20 +115,22 @@ public final class W2KeyedMailboxDispatcher implements AutoCloseable {
 
     /** Stops admission, then drains all previously accepted mailbox events. */
     public void stop() {
-        Thread workerToJoin;
+        List<Thread> workersToJoin;
         lifecycleLock.lock();
         try {
             accepting = false;
             if (!running && depth > 0) {
-                startWorker();
+                startWorkers();
             }
             workAvailable.signalAll();
-            workerToJoin = worker;
+            workersToJoin = List.copyOf(workers);
         } finally {
             lifecycleLock.unlock();
         }
-        if (workerToJoin != null && workerToJoin != Thread.currentThread()) {
-            joinUninterruptibly(workerToJoin);
+        for (Thread worker : workersToJoin) {
+            if (worker != Thread.currentThread()) {
+                joinUninterruptibly(worker);
+            }
         }
     }
 
@@ -134,9 +149,14 @@ public final class W2KeyedMailboxDispatcher implements AutoCloseable {
         }
     }
 
-    private void startWorker() {
+    private void startWorkers() {
         running = true;
-        worker = Thread.ofPlatform().daemon().name(workerName).start(this::runWorker);
+        for (int i = 0; i < workerCount; i++) {
+            int workerIndex = i;
+            Thread worker = Thread.ofPlatform().daemon().name(workerName + "-" + workerIndex).start(this::runWorker);
+            workers.add(worker);
+            liveWorkers++;
+        }
     }
 
     private void makeEligible(String dialogKey, Mailbox mailbox) {
@@ -187,8 +207,10 @@ public final class W2KeyedMailboxDispatcher implements AutoCloseable {
                     return work;
                 }
                 if (!accepting) {
-                    running = false;
-                    worker = null;
+                    if (--liveWorkers == 0) {
+                        running = false;
+                        workers.clear();
+                    }
                     return null;
                 }
                 try {
