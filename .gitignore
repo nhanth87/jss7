@@ -3,6 +3,9 @@
 .min*/
 .*/**
 
+# Local Cline instructions
+/.clinerules
+
 # IDE
 .idea/
 .vscode/
