@@ -60,6 +60,8 @@
  		<module>asn</module>
 		<module>scheduler</module>
 		<module>congestion</module>
+		<module>w2-scheduler</module>
+
 		<module>statistics</module>
 		<module>management</module>
 		<module>ss7-ext</module>
@@ -130,6 +132,12 @@
 			<dependency>
 				<groupId>org.restcomm.protocols.ss7.scheduler</groupId>
 				<artifactId>scheduler</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<!-- W2 scheduler -->
+			<dependency>
+				<groupId>org.restcomm.protocols.ss7.scheduler</groupId>
+				<artifactId>w2-scheduler</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<!-- Clock -->
