@@ -1,22 +1,15 @@
 
 package org.restcomm.protocols.ss7.map.load.sms.mo;
 
-import com.google.common.util.concurrent.RateLimiter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mobicents.protocols.api.IpChannelType;
-import org.mobicents.protocols.sctp.netty.NettySctpManagementImpl;
+
+import com.google.common.util.concurrent.RateLimiter;
+
+import org.restcomm.protocols.ss7.config.Ss7Stack;
+import org.restcomm.protocols.ss7.config.Ss7StackBuilder;
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
 import org.restcomm.protocols.ss7.indicator.RoutingIndicator;
-import org.restcomm.protocols.ss7.m3ua.Asp;
-import org.restcomm.protocols.ss7.m3ua.ExchangeType;
-import org.restcomm.protocols.ss7.m3ua.Functionality;
-import org.restcomm.protocols.ss7.m3ua.IPSPType;
-import org.restcomm.protocols.ss7.m3ua.impl.M3UAManagementImpl;
-import org.restcomm.protocols.ss7.m3ua.parameter.NetworkAppearance;
-import org.restcomm.protocols.ss7.m3ua.parameter.RoutingContext;
-import org.restcomm.protocols.ss7.m3ua.parameter.TrafficModeType;
-import org.restcomm.protocols.ss7.map.MAPStackImpl;
 import org.restcomm.protocols.ss7.map.api.MAPApplicationContext;
 import org.restcomm.protocols.ss7.map.api.MAPApplicationContextName;
 import org.restcomm.protocols.ss7.map.api.MAPApplicationContextVersion;
@@ -29,7 +22,6 @@ import org.restcomm.protocols.ss7.map.api.dialog.MAPAbortSource;
 import org.restcomm.protocols.ss7.map.api.dialog.MAPNoticeProblemDiagnostic;
 import org.restcomm.protocols.ss7.map.api.dialog.MAPRefuseReason;
 import org.restcomm.protocols.ss7.map.api.dialog.MAPUserAbortChoice;
-import org.restcomm.protocols.ss7.map.api.dialog.ServingCheckData;
 import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessage;
 import org.restcomm.protocols.ss7.map.api.primitives.AddressNature;
 import org.restcomm.protocols.ss7.map.api.primitives.AddressString;
@@ -47,7 +39,6 @@ import org.restcomm.protocols.ss7.map.api.service.sms.InformServiceCentreRequest
 import org.restcomm.protocols.ss7.map.api.service.sms.IpSmGwGuidance;
 import org.restcomm.protocols.ss7.map.api.service.sms.LocationInfoWithLMSI;
 import org.restcomm.protocols.ss7.map.api.service.sms.MAPDialogSms;
-import org.restcomm.protocols.ss7.map.api.service.sms.MAPServiceSmsListener;
 import org.restcomm.protocols.ss7.map.api.service.sms.MoForwardShortMessageRequest;
 import org.restcomm.protocols.ss7.map.api.service.sms.MoForwardShortMessageResponse;
 import org.restcomm.protocols.ss7.map.api.service.sms.MtForwardShortMessageRequest;
@@ -65,11 +56,11 @@ import org.restcomm.protocols.ss7.map.api.smstpdu.AddressField;
 import org.restcomm.protocols.ss7.map.api.smstpdu.DataCodingScheme;
 import org.restcomm.protocols.ss7.map.api.smstpdu.NumberingPlanIdentification;
 import org.restcomm.protocols.ss7.map.api.smstpdu.ProtocolIdentifier;
-import org.restcomm.protocols.ss7.map.api.smstpdu.SmsTpduType;
 import org.restcomm.protocols.ss7.map.api.smstpdu.TypeOfNumber;
 import org.restcomm.protocols.ss7.map.api.smstpdu.UserData;
 import org.restcomm.protocols.ss7.map.api.smstpdu.UserDataHeader;
 import org.restcomm.protocols.ss7.map.api.smstpdu.ValidityPeriod;
+import org.restcomm.protocols.ss7.map.load.ConsoleTui;
 import org.restcomm.protocols.ss7.map.load.CsvWriter;
 import org.restcomm.protocols.ss7.map.primitives.AddressStringImpl;
 import org.restcomm.protocols.ss7.map.primitives.IMSIImpl;
@@ -87,69 +78,39 @@ import org.restcomm.protocols.ss7.map.smstpdu.SmsTpduImpl;
 import org.restcomm.protocols.ss7.map.smstpdu.UserDataHeaderImpl;
 import org.restcomm.protocols.ss7.map.smstpdu.UserDataImpl;
 import org.restcomm.protocols.ss7.map.smstpdu.ValidityPeriodImpl;
-import org.restcomm.protocols.ss7.sccp.LoadSharingAlgorithm;
 import org.restcomm.protocols.ss7.sccp.NetworkIdState;
-import org.restcomm.protocols.ss7.sccp.OriginationType;
-import org.restcomm.protocols.ss7.sccp.Router;
-import org.restcomm.protocols.ss7.sccp.RuleType;
-import org.restcomm.protocols.ss7.sccp.SccpResource;
-import org.restcomm.protocols.ss7.sccp.impl.SccpStackImpl;
 import org.restcomm.protocols.ss7.sccp.impl.parameter.BCDEvenEncodingScheme;
 import org.restcomm.protocols.ss7.sccp.impl.parameter.ParameterFactoryImpl;
-import org.restcomm.protocols.ss7.sccp.impl.parameter.SccpAddressImpl;
-import org.restcomm.protocols.ss7.sccp.parameter.EncodingScheme;
 import org.restcomm.protocols.ss7.sccp.parameter.GlobalTitle;
 import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
-import org.restcomm.protocols.ss7.sccpext.impl.SccpExtModuleImpl;
-import org.restcomm.protocols.ss7.sccpext.router.RouterExt;
-import org.restcomm.protocols.ss7.ss7ext.Ss7ExtInterface;
-import org.restcomm.protocols.ss7.ss7ext.Ss7ExtInterfaceImpl;
-import org.restcomm.protocols.ss7.tcap.TCAPStackImpl;
-import org.restcomm.protocols.ss7.tcap.api.TCAPStack;
 import org.restcomm.protocols.ss7.tcap.asn.ApplicationContextName;
 import org.restcomm.protocols.ss7.tcap.asn.ReturnResultLastImpl;
 import org.restcomm.protocols.ss7.tcap.asn.comp.Problem;
 import org.restcomm.protocols.ss7.tcap.asn.comp.ReturnResultLast;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Path;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * MAP MO-SMS Load Test Client — uses Ss7StackBuilder for stack init.
+ *
  * @modified <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
  */
 public class Client extends TestHarnessSmsMo {
 
     private static final Logger log = LogManager.getLogger(Client.class);
 
-    // TCAP
-    private TCAPStack tcapStack;
-
-    // MAP
-    private MAPStackImpl mapStack;
+    private Ss7Stack stack;
     private MAPProvider mapProvider;
 
-    // SCCP
-    SccpExtModuleImpl sccpExtModule;
-    private SccpStackImpl sccpStack;
-    private Router router;
-    private RouterExt routerExt;
-    private SccpResource sccpResource;
-
-    // M3UA
-    private M3UAManagementImpl clientM3UAMgmt;
-
-    // SCTP
-    private NettySctpManagementImpl sctpManagement;
-
-    // a ramp-up period is required for performance testing.
     final AtomicLong endCount = new AtomicLong();
     transient boolean endReportPrinted;
-
-    // AtomicInteger nbConcurrentDialogs = new AtomicInteger(0);
 
     volatile long start = 0L;
     volatile long prev = 0L;
@@ -157,556 +118,262 @@ public class Client extends TestHarnessSmsMo {
     private RateLimiter rateLimiterObj = null;
 
     private CsvWriter csvWriter;
+    private ConsoleTui tui;
 
-    private AtomicInteger messageReferenceForMo = new AtomicInteger(0);
-    private AtomicInteger counterIncrement = new AtomicInteger(0);
+    /** Dialogs that already failed (timeout/abort/reject) — Success only on clean release. */
+    private final Set<Long> failedDialogs = ConcurrentHashMap.newKeySet();
 
-    protected void initializeStack(IpChannelType ipChannelType) throws Exception {
+    private final AtomicInteger messageReferenceForMo = new AtomicInteger(0);
+    private final AtomicInteger counterIncrement = new AtomicInteger(0);
 
-        this.rateLimiterObj = RateLimiter.create(MAXCONCURRENTDIALOGS); // rate
+    // Constant per-run request objects — built once, reused every message.
+    private AddressString cOrigRef, cDestRef;
+    private SccpAddress cClientAddr, cServerAddr;
+    private MAPApplicationContext cAppCtx;
+    private AddressString cServiceCentreAddressDA;
+    private SM_RP_DA cSmRpDa;
 
-        this.initSCTP(ipChannelType);
+    /**
+     * Build stack from JSON, register listeners, start ASP, launch DialogInitiator threads.
+     */
+    void start(String configPath) throws Exception {
+        rateLimiterObj = RateLimiter.create(MAXCONCURRENTDIALOGS);
 
-        // Initialize M3UA first
-        this.initM3UA();
+        log.info("Building jSS7 stack from config: {}", configPath);
+        stack = Ss7StackBuilder.build(Path.of(configPath));
+        mapProvider = stack.mapProvider();
 
-        // Initialize SCCP
-        this.initSCCP();
+        // Build constant request objects once (addresses, app-context, SM_RP_DA).
+        this.cOrigRef = mapProvider.getMAPParameterFactory()
+                .createAddressString(AddressNature.international_number, NumberingPlan.ISDN, "12345");
+        this.cDestRef = mapProvider.getMAPParameterFactory()
+                .createAddressString(AddressNature.international_number, NumberingPlan.ISDN, "67890");
+        this.cClientAddr = createSccpAddress(ROUTING_INDICATOR, ORIGINATING_PC, SSN, SCCP_CLIENT_ADDRESS);
+        this.cServerAddr = createSccpAddress(ROUTING_INDICATOR, DESTINATION_PC, SSN, SCCP_SERVER_ADDRESS);
+        this.cAppCtx = MAPApplicationContext.getInstance(
+                MAPApplicationContextName.shortMsgMORelayContext, MAPApplicationContextVersion.version3);
+        this.cServiceCentreAddressDA = new AddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "5989900123");
+        this.cSmRpDa = new SM_RP_DAImpl(cServiceCentreAddressDA);
 
-        // Initialize TCAP
-        this.initTCAP();
+        // Register MAP listeners
+        mapProvider.addMAPDialogListener(this);
+        mapProvider.getMAPServiceSms().addMAPServiceListener(this);
+        mapProvider.getMAPServiceSms().activate();
+        log.info("MAP listeners registered");
 
-        // Initialize MAP
-        this.initMAP();
+        // Start ASP (startAsp internally starts the SCTP association)
+        stack.m3uaManagement().startAsp("clientLink-ASP");
+        log.info("ASP started");
 
-        // Finally, start the ASP
-        this.clientM3UAMgmt.startAsp("ASP1");
-
+        // CSV writer
         this.csvWriter = new CsvWriter("map");
         this.csvWriter.addCounter(CREATED_DIALOGS);
         this.csvWriter.addCounter(SUCCESSFUL_DIALOGS);
         this.csvWriter.addCounter(ERROR_DIALOGS);
         this.csvWriter.start(TEST_START_DELAY, PRINT_WRITER_PERIOD);
-    }
 
-    private void initSCTP(IpChannelType ipChannelType) throws Exception {
-        this.sctpManagement = new NettySctpManagementImpl("Client");
-        // this.sctpManagement.setSingleThread(false);
-        // boss-group thread count not configurable in Netty SCTP impl (removed)
-        this.sctpManagement.setWorkerThreads(16);
-        this.sctpManagement.setOptionSoSndbuf(8 * 1024 * 1024);
-        this.sctpManagement.setOptionSoRcvbuf(8 * 1024 * 1024);
-        this.sctpManagement.setOptionSctpInitMaxstreams_MaxInStreams(256);
-        this.sctpManagement.setOptionSctpInitMaxstreams_MaxOutStreams(256);
-        this.sctpManagement.start();
-        this.sctpManagement.setConnectDelay(1000);
-        this.sctpManagement.removeAllResources();
+        // Start live TUI
+        this.tui = new ConsoleTui("CLIENT", this.csvWriter, MAXCONCURRENTDIALOGS, System.err);
+        this.tui.start();
 
-        // 1. Create SCTP Association
-        if (EXTRA_HOST_ADDRESS.equals("-1"))
-            sctpManagement.addAssociation(HOST_IP, HOST_PORT, PEER_IP, PEER_PORT, CLIENT_ASSOCIATION_NAME, ipChannelType, null);
-        else
-            sctpManagement.addAssociation(HOST_IP, HOST_PORT, PEER_IP, PEER_PORT, CLIENT_ASSOCIATION_NAME, ipChannelType, new String[] { EXTRA_HOST_ADDRESS });
-    }
+        // Shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            terminate();
+            if (stack != null) stack.stop();
+            log.info("Client shutdown complete");
+        }, "client-shutdown"));
 
-    private void initM3UA() throws Exception {
-        this.clientM3UAMgmt = new M3UAManagementImpl("Client", null, new Ss7ExtInterfaceImpl());
-        this.clientM3UAMgmt.setTransportManagement(this.sctpManagement);
-        this.clientM3UAMgmt.setDeliveryMessageThreadCount(DELIVERY_TRANSFER_MESSAGE_THREAD_COUNT);
-        this.clientM3UAMgmt.start();
-        this.clientM3UAMgmt.removeAllResources();
+        // Wait for ramp-up
+        Thread.sleep(TEST_START_DELAY);
 
-        // m3ua as create rc <rc> <ras-name>
-        RoutingContext rc = factory.createRoutingContext(new long[] { ROUTING_CONTEXT });
-        TrafficModeType trafficModeType = factory.createTrafficModeType(TrafficModeType.Loadshare);
-        NetworkAppearance na = factory.createNetworkAppearance(NETWORK_APPEARANCE);
+        // Start DialogInitiator threads
+        Thread[] threads = new Thread[SENDING_MESSAGE_THREAD_COUNT];
+        for (int j = 0; j < SENDING_MESSAGE_THREAD_COUNT; j++) {
+            threads[j] = new Thread(this.new DialogInitiator());
+        }
+        for (int j = 0; j < SENDING_MESSAGE_THREAD_COUNT; j++) {
+            threads[j].start();
+        }
 
-        IPSPType ipspType = null;
-        if (AS_FUNCTIONALITY == Functionality.IPSP)
-            ipspType = IPSPType.CLIENT;
+        // Wait until target dialog count reached
+        while (this.endCount.get() < NDIALOGS) {
+            Thread.sleep(100);
+        }
 
-        // Step 1 : Create AS
-        this.clientM3UAMgmt.createAs("AS1", AS_FUNCTIONALITY, ExchangeType.SE, ipspType, rc, trafficModeType, 1, na);
-        // Step 2 : Create ASP
-        this.clientM3UAMgmt.createAspFactory("ASP1", CLIENT_ASSOCIATION_NAME);
-        // Step 3 : Assign ASP to AS
-        Asp asp = this.clientM3UAMgmt.assignAspToAs("AS1", "ASP1");
-        // Step 4 : Add Route. Remote point code is 2
-        this.clientM3UAMgmt.addRoute(DESTINATION_PC, ORIGINATING_PC, SERVICE_INDICATOR, "AS1");
-    }
-
-    private void initSCCP() throws Exception {
-        Ss7ExtInterface ss7ExtInterface = new Ss7ExtInterfaceImpl();
-        sccpExtModule = new SccpExtModuleImpl();
-        ss7ExtInterface.setSs7ExtSccpInterface(sccpExtModule);
-        this.sccpStack = new SccpStackImpl("MapLoadClientSccpStack", ss7ExtInterface);
-        this.sccpStack.setMtp3UserPart(1, this.clientM3UAMgmt);
-
-        // this.sccpStack.setCongControl_Algo(SccpCongestionControlAlgo.levelDepended);
-
-        this.sccpStack.start();
-        this.sccpStack.removeAllResources();
-
-        this.router = this.sccpStack.getRouter();
-        this.routerExt = sccpExtModule.getRouterExt();
-        this.sccpResource = this.sccpStack.getSccpResource();
-
-        this.sccpResource.addRemoteSpc(1, DESTINATION_PC, 0, 0);
-        this.sccpResource.addRemoteSsn(1, DESTINATION_PC, REMOTE_SSN, 0, false);
-        this.sccpResource.addRemoteSsn(2, DESTINATION_PC, 6, 0, false);
-
-        this.router.addMtp3ServiceAccessPoint(1, 1, ORIGINATING_PC, NETWORK_INDICATOR, 0, null);
-        this.router.addMtp3Destination(1, 1, DESTINATION_PC, DESTINATION_PC, 0, 255, 255);
-
-        ParameterFactoryImpl fact = new ParameterFactoryImpl();
-        EncodingScheme ec = new BCDEvenEncodingScheme();
-        GlobalTitle gt1 = fact.createGlobalTitle("-", 0, org.restcomm.protocols.ss7.indicator.NumberingPlan.ISDN_TELEPHONY, ec,
-                NatureOfAddress.INTERNATIONAL);
-        GlobalTitle gt2 = fact.createGlobalTitle("-", 0, org.restcomm.protocols.ss7.indicator.NumberingPlan.ISDN_TELEPHONY, ec,
-                NatureOfAddress.INTERNATIONAL);
-        SccpAddress localAddress = new SccpAddressImpl(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, gt1, ORIGINATING_PC, 0);
-        this.routerExt.addRoutingAddress(1, localAddress);
-        SccpAddress remoteAddress = new SccpAddressImpl(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, gt2, DESTINATION_PC, 0);
-        this.routerExt.addRoutingAddress(2, remoteAddress);
-
-        GlobalTitle gt = fact.createGlobalTitle("*", 0, org.restcomm.protocols.ss7.indicator.NumberingPlan.ISDN_TELEPHONY, ec,
-                NatureOfAddress.INTERNATIONAL);
-        SccpAddress pattern = new SccpAddressImpl(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, gt, 0, 0);
-        this.routerExt.addRule(1, RuleType.SOLITARY, LoadSharingAlgorithm.Bit0, OriginationType.REMOTE, pattern,
-                "K", 1, -1, null, 0, null);
-        this.routerExt.addRule(2, RuleType.SOLITARY, LoadSharingAlgorithm.Bit0, OriginationType.LOCAL, pattern, "K",
-                2, -1, null, 0, null);
-    }
-
-    private void initTCAP() throws Exception {
-        List<Integer> extraSsns = new ArrayList<Integer>();
-        extraSsns.add(6);
-
-        this.tcapStack = new TCAPStackImpl("Test", this.sccpStack.getSccpProvider(), SSN);
-        this.tcapStack.setExtraSsns(extraSsns);
-        this.tcapStack.start();
-        this.tcapStack.setDialogIdleTimeout(300000);
-        this.tcapStack.setInvokeTimeout(120000);
-        this.tcapStack.setMaxDialogs(MAX_DIALOGS);
-    }
-
-    private void initMAP() throws Exception {
-
-        // this.mapStack = new MAPStackImpl(this.sccpStack.getSccpProvider(), SSN);
-        this.mapStack = new MAPStackImpl("TestClient", this.tcapStack.getProvider());
-        this.mapProvider = this.mapStack.getMAPProvider();
-
-        this.mapProvider.addMAPDialogListener(this);
-        this.mapProvider.getMAPServiceSms().addMAPServiceListener(this);
-
-        this.mapProvider.getMAPServiceSms().activate();
-
-        this.mapStack.start();
+        terminate();
     }
 
     private void initiateSMS() throws MAPException {
-        NetworkIdState networkIdState = this.mapStack.getMAPProvider().getNetworkIdState(0);
-        int executorCongestionLevel = this.mapStack.getMAPProvider().getExecutorCongestionLevel();
+        NetworkIdState networkIdState = this.mapProvider.getNetworkIdState(0);
+        int executorCongestionLevel = this.mapProvider.getExecutorCongestionLevel();
         if (!(networkIdState == null
                 || networkIdState.isAvailable() && networkIdState.getCongLevel() <= 0 && executorCongestionLevel <= 0)) {
-            // congestion or unavailable
-            log.warn("**** Outgoing congestion control: MAP load test client: networkIdState=" + networkIdState
-                    + ", executorCongestionLevel=" + executorCongestionLevel);
+            log.warn("**** Outgoing congestion control: networkIdState={}, executorCongestionLevel={}",
+                    networkIdState, executorCongestionLevel);
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
 
         this.rateLimiterObj.acquire();
-        // System.out.println("initiateSMS");
 
-        // First create Dialog
-        AddressString origRef = this.mapProvider.getMAPParameterFactory()
-                .createAddressString(AddressNature.international_number, NumberingPlan.ISDN, "12345");
-        AddressString destRef = this.mapProvider.getMAPParameterFactory()
-                .createAddressString(AddressNature.international_number, NumberingPlan.ISDN, "67890");
+        MAPDialogSms mapDialogSms = this.mapProvider.getMAPServiceSms()
+                .createNewDialog(cAppCtx, cClientAddr, cOrigRef, cServerAddr, cDestRef);
 
-        SccpAddress clientSccpAddress = createSccpAddress(ROUTING_INDICATOR, ORIGINATING_PC, SSN, SCCP_CLIENT_ADDRESS);
-        SccpAddress serverSccpAddress = createSccpAddress(ROUTING_INDICATOR, DESTINATION_PC, SSN, SCCP_SERVER_ADDRESS);
-        MAPDialogSms mapDialogSms = this.mapProvider.getMAPServiceSms().createNewDialog(MAPApplicationContext
-                .getInstance(MAPApplicationContextName.shortMsgMORelayContext, MAPApplicationContextVersion.version3),
-                clientSccpAddress, origRef, serverSccpAddress, destRef);
-
-        AddressString serviceCentreAddressDA = new AddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "5989900123");
-        SM_RP_DA sm_rp_da = new SM_RP_DAImpl(serviceCentreAddressDA);
-
-        String uniqueMsisdn = "31" + String.format("%0" + 9 + "d", this.getCounterIncrement());
+        String uniqueMsisdn = "31" + String.format("%09d", this.getCounterIncrement());
         ISDNAddressString msisdn = this.mapProvider.getMAPParameterFactory()
-            .createISDNAddressString(AddressNature.international_number, NumberingPlan.ISDN, uniqueMsisdn);
-        SM_RP_OAImpl sm_rp_oa = new SM_RP_OAImpl();
-        sm_rp_oa.setMsisdn(msisdn);
+                .createISDNAddressString(AddressNature.international_number, NumberingPlan.ISDN, uniqueMsisdn);
+        SM_RP_OAImpl smRpOa = new SM_RP_OAImpl();
+        smRpOa.setMsisdn(msisdn);
 
         boolean rejectDuplicates = true;
         boolean replyPathExists = false;
         boolean statusReportRequest = STATUS_REPORT_REQUEST;
         int messageReference = messageReferenceForMo.incrementAndGet();
         AddressField destinationAddress = new AddressFieldImpl(TypeOfNumber.InternationalNumber,
-            NumberingPlanIdentification.ISDNTelephoneNumberingPlan, "59899077937");
+                NumberingPlanIdentification.ISDNTelephoneNumberingPlan, "59899077937");
         ProtocolIdentifier protocolIdentifier = new ProtocolIdentifierImpl(0);
         ValidityPeriod validityPeriod = new ValidityPeriodImpl(3);
-        SmsTpduType smsTpduType = SmsTpduType.SMS_SUBMIT;
         DataCodingScheme dataCodingScheme = new DataCodingSchemeImpl(0);
         UserDataHeader userDataHeader = new UserDataHeaderImpl();
         Charset gsm8Charset = Charset.defaultCharset();
         UserData userData = new UserDataImpl("SMS load test", dataCodingScheme, userDataHeader, gsm8Charset);
-        SmsTpduImpl smsTpdu = new SmsSubmitTpduImpl(rejectDuplicates, replyPathExists, statusReportRequest, messageReference, destinationAddress,
-            protocolIdentifier, validityPeriod, userData);
+        SmsTpduImpl smsTpdu = new SmsSubmitTpduImpl(rejectDuplicates, replyPathExists, statusReportRequest, messageReference,
+                destinationAddress, protocolIdentifier, validityPeriod, userData);
         SmsSignalInfo smsSignalInfo = new SmsSignalInfoImpl(smsTpdu, gsm8Charset);
         MAPExtensionContainer mapExtensionContainer = null;
 
-        String uniqueImsi = "712345" + String.format("%0" + 9 + "d", this.getCounterIncrement());
+        String uniqueImsi = "712345" + String.format("%09d", this.getCounterIncrement());
         IMSI imsi = new IMSIImpl(uniqueImsi);
 
-        mapDialogSms.addMoForwardShortMessageRequest(sm_rp_da, sm_rp_oa, smsSignalInfo, mapExtensionContainer, imsi, null, null);
+        mapDialogSms.addMoForwardShortMessageRequest(cSmRpDa, smRpOa, smsSignalInfo, mapExtensionContainer, imsi, null, null);
 
-        // nbConcurrentDialogs.incrementAndGet();
-
-        // This will initiate the TC-BEGIN with INVOKE component
         mapDialogSms.send();
 
         this.csvWriter.incrementCounter(CREATED_DIALOGS);
     }
 
+    private int getCounterIncrement() {
+        int x = counterIncrement.incrementAndGet();
+        if (x > 147483647) {
+            x = 1;
+            counterIncrement.set(x);
+        }
+        return x;
+    }
+
     private SccpAddress createSccpAddress(RoutingIndicator ri, int dpc, int ssn, String address) {
         ParameterFactoryImpl fact = new ParameterFactoryImpl();
         GlobalTitle gt = fact.createGlobalTitle(address, 0, org.restcomm.protocols.ss7.indicator.NumberingPlan.ISDN_TELEPHONY,
-        BCDEvenEncodingScheme.INSTANCE, NatureOfAddress.INTERNATIONAL);
-        if (ssn < 0) {
-            ssn = SSN;
-        }
+                BCDEvenEncodingScheme.INSTANCE, NatureOfAddress.INTERNATIONAL);
         return fact.createSccpAddress(ri, gt, dpc, ssn);
     }
 
     public void terminate() {
         try {
             this.csvWriter.stop(TEST_END_DELAY);
+            if (tui != null) tui.close();
         } catch (InterruptedException e) {
-            log.error("an error occurred while stopping csvWriter", e);
+            log.error("Error stopping csvWriter", e);
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        // JSON config path → use Ss7StackBuilder
-        if (args.length == 1 && args[0].endsWith(".json")) {
-            try {
-                new Client().startWithJson(args[0]);
-            } catch (Exception e) {
-                log.error("Failed to start client", e);
-                System.exit(1);
+    // ═══════════════════════════════════════════════════════════
+    // DialogInitiator
+    // ═══════════════════════════════════════════════════════════
+
+    public class DialogInitiator implements Runnable {
+        @Override
+        public void run() {
+            while (endCount.get() < NDIALOGS) {
+                if (endCount.get() < 0) {
+                    start = System.currentTimeMillis();
+                    prev = start;
+                }
+                try {
+                    initiateSMS();
+                } catch (MAPException ex) {
+                    // Transient (e.g. ASP not yet ACTIVE) — log and retry on the next iteration
+                    // instead of letting one failed send permanently kill this sender thread.
+                    log.error("Exception when sending a new MAP dialog", ex);
+                }
             }
-            return;
-        }
-
-        // JSON config path → use Ss7StackBuilder
-        if (args.length == 1 && args[0].endsWith(".json")) {
-            try {
-                new Client().startWithJson(args[0]);
-            } catch (Exception e) {
-                log.error("Failed to start client", e);
-                System.exit(1);
-            }
-            return;
-        }
-        int i = 0;
-        IpChannelType ipChannelType = IpChannelType.SCTP;
-
-        if (args.length >= 22) {
-            NDIALOGS = Integer.parseInt(args[i++]);
-            MAXCONCURRENTDIALOGS = Integer.parseInt(args[i++]);
-            if (args[i++].toLowerCase().equals("tcp"))
-                ipChannelType = IpChannelType.TCP;
-            HOST_IP = args[i++];
-            HOST_PORT = Integer.parseInt(args[i++]);
-            EXTRA_HOST_ADDRESS = args[i++];
-            PEER_IP = args[i++];
-            PEER_PORT = Integer.parseInt(args[i++]);
-            AS_FUNCTIONALITY = Functionality.valueOf(args[i++]);
-            ROUTING_CONTEXT = Integer.parseInt(args[i++]);
-            NETWORK_APPEARANCE = Integer.parseInt(args[i++]);
-            ORIGINATING_PC = Integer.parseInt(args[i++]);
-            DESTINATION_PC = Integer.parseInt(args[i++]);
-            SERVICE_INDICATOR = Integer.parseInt(args[i++]);
-            NETWORK_INDICATOR = Integer.parseInt(args[i++]);
-            SSN = Integer.parseInt(args[i++]);
-            REMOTE_SSN = Integer.parseInt(args[i++]);
-            SCCP_CLIENT_ADDRESS = args[i++];
-            SCCP_SERVER_ADDRESS = args[i++];
-            ROUTING_INDICATOR = RoutingIndicator.valueOf(Integer.parseInt(args[i++]));
-            DELIVERY_TRANSFER_MESSAGE_THREAD_COUNT = Integer.parseInt(args[i++]);
-            RAMP_UP_PERIOD = Integer.parseInt(args[i++]);
-
-            if (args.length >= 23) {
-                STATUS_REPORT_REQUEST = Boolean.parseBoolean(args[i++]);
-            }
-
-            System.out.println("IpChannelType = " + ipChannelType);
-            System.out.println("HOST_IP = " + HOST_IP);
-            System.out.println("HOST_PORT = " + HOST_PORT);
-            System.out.println("EXTRA_HOST_ADDRESS = " + EXTRA_HOST_ADDRESS);
-            System.out.println("PEER_IP = " + PEER_IP);
-            System.out.println("PEER_PORT = " + PEER_PORT);
-            System.out.println("AS_FUNCTIONALITY = " + AS_FUNCTIONALITY);
-            System.out.println("ROUTING_CONTEXT = " + ROUTING_CONTEXT);
-            System.out.println("NETWORK_APPEARANCE = " + NETWORK_APPEARANCE);
-            System.out.println("ORIGINATING_PC = " + ORIGINATING_PC);
-            System.out.println("DESTINATION_PC = " + DESTINATION_PC);
-            System.out.println("SERVICE_INDICATOR = " + SERVICE_INDICATOR);
-            System.out.println("NETWORK_INDICATOR = " + NETWORK_INDICATOR);
-            System.out.println("SSN = " + SSN);
-            System.out.println("REMOTE_SSN = " + REMOTE_SSN);
-            System.out.println("SCCP_CLIENT_ADDRESS = " + SCCP_CLIENT_ADDRESS);
-            System.out.println("SCCP_SERVER_ADDRESS = " + SCCP_SERVER_ADDRESS);
-            System.out.println("ROUTING_INDICATOR = " + ROUTING_INDICATOR);
-            System.out.println("DELIVERY_TRANSFER_MESSAGE_THREAD_COUNT = " + DELIVERY_TRANSFER_MESSAGE_THREAD_COUNT);
-            System.out.println("RAMP_UP_PERIOD = " + RAMP_UP_PERIOD);
-            System.out.println("SENDING_MESSAGE_THREAD_COUNT = " + SENDING_MESSAGE_THREAD_COUNT);
-            System.out.println("NDIALOGS = " + NDIALOGS);
-            System.out.println("MAXCONCURRENTDIALOGS = " + MAXCONCURRENTDIALOGS);
-            System.out.println("STATUS_REPORT_REQUEST = " + STATUS_REPORT_REQUEST);
-        }
-
-        final Client client = new Client();
-        client.endCount.set(RAMP_UP_PERIOD);
-        // SENDING_MESSAGE_THREAD_COUNT = 1; // use default from TestHarnessSmsMo
-
-        try {
-            client.initializeStack(ipChannelType);
-
-            Thread.sleep(TEST_START_DELAY);
-
-            client.start = System.currentTimeMillis();
-            client.prev = client.start;
-
-           // threads creating
-            Thread[] threads = new Thread[SENDING_MESSAGE_THREAD_COUNT];
-            for (int j = 0; j < SENDING_MESSAGE_THREAD_COUNT; j++) {
-                threads[j] = new Thread(client.new DialogInitiator());
-            }
-            for (int j = 0; j < SENDING_MESSAGE_THREAD_COUNT; j++) {
-                threads[j].start();
-            }
-
-            while (client.endCount.get() < NDIALOGS) {
-                Thread.sleep(100);
-                // while (client.nbConcurrentDialogs.intValue() >= MAXCONCURRENTDIALOGS) {
-
-                // log.warn("Number of concurrent MAP dialog's = " +
-                // client.nbConcurrentDialogs.intValue()
-                // + " Waiting for max dialog count to go down!");
-
-                // synchronized (client) {
-                // try {
-                // client.wait();
-                // } catch (Exception ex) {
-                // }
-                // }
-                // }// end of while (client.nbConcurrentDialogs.intValue() >= MAXCONCURRENTDIALOGS)
-
-                //if (client.endCount < 0) {
-                //    client.start = System.currentTimeMillis();
-                //    client.prev = client.start;
-                    // log.warn("StartTime = " + client.start);
-                //}
-
-               // client.initiateUSSD();
-            }
-
-            client.terminate();
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.restcomm.protocols.ss7.map.api.MAPServiceListener#onErrorComponent
-     * (org.restcomm.protocols.ss7.map.api.MAPDialog, java.lang.Long,
-     * org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessage)
-     */
-    @Override
-    public void onErrorComponent(MAPDialog mapDialog, Long invokeId, MAPErrorMessage mapErrorMessage) {
-        log.error(String.format("onErrorComponent for Dialog=%d and invokeId=%d MAPErrorMessage=%s",
-                mapDialog.getLocalDialogId(), invokeId, mapErrorMessage));
-    }
+    // ═══════════════════════════════════════════════════════════
+    // MAPDialogListener
+    // ═══════════════════════════════════════════════════════════
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.restcomm.protocols.ss7.map.api.MAPServiceListener#onRejectComponent
-     * (org.restcomm.protocols.ss7.map.api.MAPDialog, java.lang.Long, org.restcomm.protocols.ss7.tcap.asn.comp.Problem)
-     */
-    @Override
-    public void onRejectComponent(MAPDialog mapDialog, Long invokeId, Problem problem, boolean isLocalOriginated) {
-        log.error(String.format("onRejectComponent for Dialog=%d and invokeId=%d Problem=%s isLocalOriginated=%s",
-                mapDialog.getLocalDialogId(), invokeId, problem, isLocalOriginated));
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.restcomm.protocols.ss7.map.api.MAPServiceListener#onInvokeTimeout
-     * (org.restcomm.protocols.ss7.map.api.MAPDialog, java.lang.Long)
-     */
-    @Override
-    public void onInvokeTimeout(MAPDialog mapDialog, Long invokeId) {
-        log.error(String.format("onInvokeTimeout for Dialog=%d and invokeId=%d", mapDialog.getLocalDialogId(), invokeId));
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.restcomm.protocols.ss7.map.api.MAPDialogListener#onDialogDelimiter
-     * (org.restcomm.protocols.ss7.map.api.MAPDialog)
-     */
     @Override
     public void onDialogDelimiter(MAPDialog mapDialog) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("onDialogDelimiter for DialogId=%d", mapDialog.getLocalDialogId()));
-        }
+        if (log.isDebugEnabled())
+            log.debug("onDialogDelimiter DialogId={}", mapDialog.getLocalDialogId());
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.restcomm.protocols.ss7.map.api.MAPDialogListener#onDialogRequest
-     * (org.restcomm.protocols.ss7.map.api.MAPDialog, org.restcomm.protocols.ss7.map.api.primitives.AddressString,
-     * org.restcomm.protocols.ss7.map.api.primitives.AddressString,
-     * org.restcomm.protocols.ss7.map.api.primitives.MAPExtensionContainer)
-     */
     @Override
     public void onDialogRequest(MAPDialog mapDialog, AddressString destReference, AddressString origReference, MAPExtensionContainer extensionContainer) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format(
-                    "onDialogRequest for DialogId=%d DestinationReference=%s OriginReference=%s MAPExtensionContainer=%s",
-                    mapDialog.getLocalDialogId(), destReference, origReference, extensionContainer));
-        }
+        if (log.isDebugEnabled())
+            log.debug("onDialogRequest DialogId={} dest={} orig={}", mapDialog.getLocalDialogId(), destReference, origReference);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.restcomm.protocols.ss7.map.api.MAPDialogListener#onDialogRequestEricsson
-     * (org.restcomm.protocols.ss7.map.api.MAPDialog, org.restcomm.protocols.ss7.map.api.primitives.AddressString,
-     * org.restcomm.protocols.ss7.map.api.primitives.AddressString, org.restcomm.protocols.ss7.map.api.primitives.IMSI,
-     * org.restcomm.protocols.ss7.map.api.primitives.AddressString)
-     */
     @Override
     public void onDialogRequestEricsson(MAPDialog mapDialog, AddressString destReference, AddressString origReference, AddressString arg3,
                                         AddressString arg4) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("onDialogRequest for DialogId=%d DestinationReference=%s OriginReference=%s ",
-                    mapDialog.getLocalDialogId(), destReference, origReference));
-        }
+        if (log.isDebugEnabled())
+            log.debug("onDialogRequestEricsson DialogId={} dest={} orig={}", mapDialog.getLocalDialogId(), destReference, origReference);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.restcomm.protocols.ss7.map.api.MAPDialogListener#onDialogAccept( org.restcomm.protocols.ss7.map.api.MAPDialog,
-     * org.restcomm.protocols.ss7.map.api.primitives.MAPExtensionContainer)
-     */
     @Override
     public void onDialogAccept(MAPDialog mapDialog, MAPExtensionContainer extensionContainer) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("onDialogAccept for DialogId=%d MAPExtensionContainer=%s", mapDialog.getLocalDialogId(), extensionContainer));
-        }
+        if (log.isDebugEnabled())
+            log.debug("onDialogAccept DialogId={} ext={}", mapDialog.getLocalDialogId(), extensionContainer);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.restcomm.protocols.ss7.map.api.MAPDialogListener#onDialogReject( org.restcomm.protocols.ss7.map.api.MAPDialog,
-     * org.restcomm.protocols.ss7.map.api.dialog.MAPRefuseReason, org.restcomm.protocols.ss7.map.api.dialog.MAPProviderError,
-     * org.restcomm.protocols.ss7.tcap.asn.ApplicationContextName,
-     * org.restcomm.protocols.ss7.map.api.primitives.MAPExtensionContainer)
-     */
     @Override
     public void onDialogReject(MAPDialog mapDialog, MAPRefuseReason refuseReason, ApplicationContextName alternativeApplicationContext,
                                MAPExtensionContainer extensionContainer) {
-        log.error(String.format(
-                "onDialogReject for DialogId=%d MAPRefuseReason=%s ApplicationContextName=%s MAPExtensionContainer=%s",
-                mapDialog.getLocalDialogId(), refuseReason, alternativeApplicationContext, extensionContainer));
-        this.csvWriter.incrementCounter(ERROR_DIALOGS);
+        log.error("onDialogReject DialogId={} reason={} altCtx={} ext={}",
+                mapDialog.getLocalDialogId(), refuseReason, alternativeApplicationContext, extensionContainer);
+        markDialogFailed(mapDialog);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.restcomm.protocols.ss7.map.api.MAPDialogListener#onDialogUserAbort
-     * (org.restcomm.protocols.ss7.map.api.MAPDialog, org.restcomm.protocols.ss7.map.api.dialog.MAPUserAbortChoice,
-     * org.restcomm.protocols.ss7.map.api.primitives.MAPExtensionContainer)
-     */
     @Override
     public void onDialogUserAbort(MAPDialog mapDialog, MAPUserAbortChoice userReason, MAPExtensionContainer extensionContainer) {
-        log.error(String.format("onDialogUserAbort for DialogId=%d MAPUserAbortChoice=%s MAPExtensionContainer=%s",
-                mapDialog.getLocalDialogId(), userReason, extensionContainer));
-        this.csvWriter.incrementCounter(ERROR_DIALOGS);
+        log.error("onDialogUserAbort DialogId={} reason={} ext={}", mapDialog.getLocalDialogId(), userReason, extensionContainer);
+        markDialogFailed(mapDialog);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.restcomm.protocols.ss7.map.api.MAPDialogListener#onDialogProviderAbort
-     * (org.restcomm.protocols.ss7.map.api.MAPDialog, org.restcomm.protocols.ss7.map.api.dialog.MAPAbortProviderReason,
-     * org.restcomm.protocols.ss7.map.api.dialog.MAPAbortSource,
-     * org.restcomm.protocols.ss7.map.api.primitives.MAPExtensionContainer)
-     */
     @Override
     public void onDialogProviderAbort(MAPDialog mapDialog, MAPAbortProviderReason abortProviderReason, MAPAbortSource abortSource,
             MAPExtensionContainer extensionContainer) {
-        log.error(String.format(
-                "onDialogProviderAbort for DialogId=%d MAPAbortProviderReason=%s MAPAbortSource=%s MAPExtensionContainer=%s",
-                mapDialog.getLocalDialogId(), abortProviderReason, abortSource, extensionContainer));
-        this.csvWriter.incrementCounter(ERROR_DIALOGS);
+        log.error("onDialogProviderAbort DialogId={} reason={} source={} ext={}",
+                mapDialog.getLocalDialogId(), abortProviderReason, abortSource, extensionContainer);
+        markDialogFailed(mapDialog);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.restcomm.protocols.ss7.map.api.MAPDialogListener#onDialogClose(org .mobicents.protocols.ss7.map.api.MAPDialog)
-     */
     @Override
     public void onDialogClose(MAPDialog mapDialog) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("DialogClose for Dialog=%d", mapDialog.getLocalDialogId()));
-        }
+        if (log.isDebugEnabled())
+            log.debug("DialogClose for Dialog={}", mapDialog.getLocalDialogId());
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.restcomm.protocols.ss7.map.api.MAPDialogListener#onDialogNotice( org.restcomm.protocols.ss7.map.api.MAPDialog,
-     * org.restcomm.protocols.ss7.map.api.dialog.MAPNoticeProblemDiagnostic)
-     */
     @Override
     public void onDialogNotice(MAPDialog mapDialog, MAPNoticeProblemDiagnostic noticeProblemDiagnostic) {
-        log.error(String.format("onDialogNotice for DialogId=%d MAPNoticeProblemDiagnostic=%s ",
-                mapDialog.getLocalDialogId(), noticeProblemDiagnostic));
-        this.csvWriter.incrementCounter(ERROR_DIALOGS);
+        log.error("onDialogNotice DialogId={} diagnostic={}", mapDialog.getLocalDialogId(), noticeProblemDiagnostic);
+        markDialogFailed(mapDialog);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.restcomm.protocols.ss7.map.api.MAPDialogListener#onDialogResease
-     * (org.restcomm.protocols.ss7.map.api.MAPDialog)
-     */
     @Override
     public void onDialogRelease(MAPDialog mapDialog) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("onDialogRelease for DialogId=%d", mapDialog.getLocalDialogId()));
+        if (log.isDebugEnabled())
+            log.debug("onDialogRelease DialogId={}", mapDialog.getLocalDialogId());
+        // Success only if this dialog was not already marked failed (timeout/abort/reject).
+        if (!failedDialogs.remove(mapDialog.getLocalDialogId())) {
+            this.csvWriter.incrementCounter(SUCCESSFUL_DIALOGS);
         }
-        this.csvWriter.incrementCounter(SUCCESSFUL_DIALOGS);
         this.endCount.incrementAndGet();
 
         if (this.endCount.get() < NDIALOGS) {
@@ -714,65 +381,86 @@ public class Client extends TestHarnessSmsMo {
                 long current = System.currentTimeMillis();
                 float sec = (float) (current - prev) / 1000f;
                 prev = current;
-                log.warn("Completed 10000 Dialogs, dialogs per second: " + (float) (10000 / sec));
+                log.warn("Completed 10000 Dialogs, dialogs per second: {}", (float) (10000 / sec));
             }
         } else {
             if (this.endCount.get() >= NDIALOGS && !endReportPrinted) {
                 endReportPrinted = true;
+                if (tui != null) tui.close();
                 long current = System.currentTimeMillis();
-                log.warn("Start Time = " + start);
-                log.warn("Current Time = " + current);
+                log.warn("Start Time = {}", start);
+                log.warn("Current Time = {}", current);
                 float sec = (float) (current - start) / 1000f;
-
-                log.warn("Total time in sec = " + sec);
-                log.warn("Throughput = " + (float) (NDIALOGS / sec));
+                log.warn("Total time in sec = {}", sec);
+                log.warn("Throughput = {}", (float) (NDIALOGS / sec));
             }
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.restcomm.protocols.ss7.map.api.MAPDialogListener#onDialogTimeout
-     * (org.restcomm.protocols.ss7.map.api.MAPDialog)
-     */
     @Override
     public void onDialogTimeout(MAPDialog mapDialog) {
-        log.error(String.format("onDialogTimeout for DialogId=%d", mapDialog.getLocalDialogId()));
-        this.csvWriter.incrementCounter(ERROR_DIALOGS);
+        log.error("onDialogTimeout DialogId={}", mapDialog.getLocalDialogId());
+        markDialogFailed(mapDialog);
+    }
+
+    /** Count Error once per dialog; timeout+abort cascade must not double-count. */
+    private void markDialogFailed(MAPDialog mapDialog) {
+        if (failedDialogs.add(mapDialog.getLocalDialogId())) {
+            this.csvWriter.incrementCounter(ERROR_DIALOGS);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // MAPServiceListener
+    // ═══════════════════════════════════════════════════════════
+
+    @Override
+    public void onErrorComponent(MAPDialog mapDialog, Long invokeId, MAPErrorMessage mapErrorMessage) {
+        log.error("onErrorComponent Dialog={} invokeId={} error={}", mapDialog.getLocalDialogId(), invokeId, mapErrorMessage);
+        markDialogFailed(mapDialog);
     }
 
     @Override
-    public void onMAPMessage(MAPMessage mapMessage) {
-        // TODO Auto-generated method stub
-
+    public void onRejectComponent(MAPDialog mapDialog, Long invokeId, Problem problem, boolean isLocalOriginated) {
+        log.error("onRejectComponent Dialog={} invokeId={} problem={} local={}",
+                mapDialog.getLocalDialogId(), invokeId, problem, isLocalOriginated);
+        markDialogFailed(mapDialog);
     }
 
     @Override
-    public void onForwardShortMessageRequest(ForwardShortMessageRequest forwardShortMessageRequestIndication) {
-
+    public void onInvokeTimeout(MAPDialog mapDialog, Long invokeId) {
+        log.error("onInvokeTimeout Dialog={} invokeId={}", mapDialog.getLocalDialogId(), invokeId);
+        markDialogFailed(mapDialog);
     }
+
+    // ═══════════════════════════════════════════════════════════
+    // MAPServiceSmsListener — inbound (only exercised if used bidirectionally)
+    // ═══════════════════════════════════════════════════════════
 
     @Override
-    public void onForwardShortMessageResponse(ForwardShortMessageResponse forwardShortMessageResponseIndication) {
-
-    }
+    public void onMAPMessage(MAPMessage mapMessage) {}
 
     @Override
-    public void onMoForwardShortMessageRequest(MoForwardShortMessageRequest moForwardShortMessageRequestIndication) {
+    public void onForwardShortMessageRequest(ForwardShortMessageRequest forwardShortMessageRequestIndication) {}
 
-    }
+    @Override
+    public void onForwardShortMessageResponse(ForwardShortMessageResponse forwardShortMessageResponseIndication) {}
+
+    @Override
+    public void onMoForwardShortMessageRequest(MoForwardShortMessageRequest moForwardShortMessageRequestIndication) {}
 
     @Override
     public void onMoForwardShortMessageResponse(MoForwardShortMessageResponse moForwardShortMessageResponseIndication) {
-        System.out.println("[Client] Received MoForwardShortMessageResponse");
+        if (log.isDebugEnabled())
+            log.debug("Rx MoForwardShortMessageResponse DialogId={}",
+                    moForwardShortMessageResponseIndication.getMAPDialog().getLocalDialogId());
     }
 
     @Override
     public void onMtForwardShortMessageRequest(MtForwardShortMessageRequest mtForwardShortMessageRequestIndication) {
         if (log.isDebugEnabled()) {
-            log.debug(String.format("onMtForwardShortMessageRequest for DialogId=%d", mtForwardShortMessageRequestIndication
-                    .getMAPDialog().getLocalDialogId()));
+            log.debug("onMtForwardShortMessageRequest DialogId={}",
+                    mtForwardShortMessageRequestIndication.getMAPDialog().getLocalDialogId());
         }
         try {
             long invokeId = mtForwardShortMessageRequestIndication.getInvokeId();
@@ -783,25 +471,19 @@ public class Client extends TestHarnessSmsMo {
             returnResultLast.setInvokeId(invokeId);
             mapDialogSms.sendReturnResultLastComponent(returnResultLast);
             mapDialogSms.close(false);
-
         } catch (MAPException e) {
             log.error("Error while sending MtForwardShortMessageRequest result ", e);
         }
     }
 
     @Override
-    public void onMtForwardShortMessageResponse(MtForwardShortMessageResponse mtForwardShortMessageResponseIndication) {
-
-    }
+    public void onMtForwardShortMessageResponse(MtForwardShortMessageResponse mtForwardShortMessageResponseIndication) {}
 
     @Override
     public void onSendRoutingInfoForSMRequest(SendRoutingInfoForSMRequest sendRoutingInfoForSMRequestIndication) {
-        /**
-         * It is only used when the simulator is being used in client mode.
-         */
         if (log.isDebugEnabled()) {
-            log.debug(String.format("onSendRoutingInfoForSMRequest for DialogId=%d", sendRoutingInfoForSMRequestIndication
-                    .getMAPDialog().getLocalDialogId()));
+            log.debug("onSendRoutingInfoForSMRequest DialogId={}",
+                    sendRoutingInfoForSMRequestIndication.getMAPDialog().getLocalDialogId());
         }
         try {
             long invokeId = sendRoutingInfoForSMRequestIndication.getInvokeId();
@@ -809,26 +491,13 @@ public class Client extends TestHarnessSmsMo {
             mapDialogSms.setUserObject(invokeId);
             IMSI imsi = new IMSIImpl("748031234567890");
             ISDNAddressString networkNodeNumber = new ISDNAddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, "598991900032");
-            byte[] lmsiByte = null;
+            byte[] lmsiByte;
             Random rand = new Random();
-            int lmsiRandom = rand.nextInt(4) + 1;
-            switch (lmsiRandom) {
-                case 1:
-                    // char packet_bytes[] = {0x72, 0x02, 0xe9, 0x8c};
-                    lmsiByte = new byte[]{114, 2, (byte) 233, (byte) 140};
-                    break;
-                case 2:
-                    // char packet_bytes[] = {0x71, 0xff, 0xac, 0xce};
-                    lmsiByte = new byte[]{113, (byte) 255, (byte) 172, (byte) 206};
-                    break;
-                case 3:
-                    // char packet_bytes[] = {0x72, 0x02, 0xeb, 0x37};
-                    lmsiByte = new byte[]{114, 2, (byte) 235, 55};
-                    break;
-                case 4:
-                    // char packet_bytes[] = {0x72, 0x02, 0xe7, 0xd5};
-                    lmsiByte = new byte[]{114, 2, (byte) 231, (byte) 213};
-                    break;
+            switch (rand.nextInt(4) + 1) {
+                case 1: lmsiByte = new byte[]{114, 2, (byte) 233, (byte) 140}; break;
+                case 2: lmsiByte = new byte[]{113, (byte) 255, (byte) 172, (byte) 206}; break;
+                case 3: lmsiByte = new byte[]{114, 2, (byte) 235, 55}; break;
+                default: lmsiByte = new byte[]{114, 2, (byte) 231, (byte) 213}; break;
             }
             LMSI lmsi = new LMSIImpl(lmsiByte);
             MAPExtensionContainer mapExtensionContainer = null;
@@ -839,119 +508,70 @@ public class Client extends TestHarnessSmsMo {
             Boolean mwdSet = null;
             IpSmGwGuidance ipSmGwGuidance = null;
             mapDialogSms.addSendRoutingInfoForSMResponse(invokeId, imsi, locationInfoWithLMSI, mapExtensionContainer, mwdSet, ipSmGwGuidance);
-
             mapDialogSms.close(false);
-
         } catch (MAPException e) {
             log.error("Error while sending SendRoutingInfoForSMRequest ", e);
         }
     }
 
     @Override
-    public void onSendRoutingInfoForSMResponse(SendRoutingInfoForSMResponse sendRoutingInfoForSMResponseIndication) {
-
-    }
+    public void onSendRoutingInfoForSMResponse(SendRoutingInfoForSMResponse sendRoutingInfoForSMResponseIndication) {}
 
     @Override
-    public void onReportSMDeliveryStatusRequest(ReportSMDeliveryStatusRequest reportSMDeliveryStatusRequestIndication) {
-
-    }
+    public void onReportSMDeliveryStatusRequest(ReportSMDeliveryStatusRequest reportSMDeliveryStatusRequestIndication) {}
 
     @Override
-    public void onReportSMDeliveryStatusResponse(ReportSMDeliveryStatusResponse reportSMDeliveryStatusResponseIndication) {
-
-    }
+    public void onReportSMDeliveryStatusResponse(ReportSMDeliveryStatusResponse reportSMDeliveryStatusResponseIndication) {}
 
     @Override
-    public void onInformServiceCentreRequest(InformServiceCentreRequest informServiceCentreRequestIndication) {
-
-    }
+    public void onInformServiceCentreRequest(InformServiceCentreRequest informServiceCentreRequestIndication) {}
 
     @Override
-    public void onAlertServiceCentreRequest(AlertServiceCentreRequest alertServiceCentreRequestIndication) {
-
-    }
+    public void onAlertServiceCentreRequest(AlertServiceCentreRequest alertServiceCentreRequestIndication) {}
 
     @Override
-    public void onAlertServiceCentreResponse(AlertServiceCentreResponse alertServiceCentreResponseIndication) {
-
-    }
+    public void onAlertServiceCentreResponse(AlertServiceCentreResponse alertServiceCentreResponseIndication) {}
 
     @Override
-    public void onReadyForSMRequest(ReadyForSMRequest readyForSMRequest) {
-
-    }
+    public void onReadyForSMRequest(ReadyForSMRequest readyForSMRequest) {}
 
     @Override
-    public void onReadyForSMResponse(ReadyForSMResponse readyForSMResponse) {
-
-    }
+    public void onReadyForSMResponse(ReadyForSMResponse readyForSMResponse) {}
 
     @Override
-    public void onNoteSubscriberPresentRequest(NoteSubscriberPresentRequest noteSubscriberPresentRequest) {
+    public void onNoteSubscriberPresentRequest(NoteSubscriberPresentRequest noteSubscriberPresentRequest) {}
 
-    }
+    // ═══════════════════════════════════════════════════════════
+    // main
+    // ═══════════════════════════════════════════════════════════
 
-    public class DialogInitiator implements Runnable {
+    public static void main(String[] args) {
+        String configPath = args.length >= 1 ? args[0] : "ss7-mo-sms-client.json";
 
-        @Override
-        public void run() {
-            try {
-                while (endCount.get() < NDIALOGS) {
-                    // while (client.nbConcurrentDialogs.intValue() >= MAXCONCURRENTDIALOGS) {
+        NDIALOGS = Integer.getInteger("ss7.load.ndialogs", 60000);
+        MAXCONCURRENTDIALOGS = Integer.getInteger("ss7.load.rateLimit", 400);
+        RAMP_UP_PERIOD = Integer.getInteger("ss7.load.rampUp", 0);
+        SENDING_MESSAGE_THREAD_COUNT = Integer.getInteger("ss7.load.senderThreads",
+                Runtime.getRuntime().availableProcessors() * 2);
+        SCCP_CLIENT_ADDRESS = System.getProperty("ss7.load.clientAddress", "1111112");
+        SCCP_SERVER_ADDRESS = System.getProperty("ss7.load.serverAddress", "9960639999");
 
-                    // log.warn("Number of concurrent MAP dialog's = " +
-                    // client.nbConcurrentDialogs.intValue()
-                    // + " Waiting for max dialog count to go down!");
+        System.out.println("Config      : " + configPath);
+        System.out.println("NDIALOGS    : " + NDIALOGS);
+        System.out.println("Rate Limit  : " + MAXCONCURRENTDIALOGS);
+        System.out.println("Ramp-up     : " + RAMP_UP_PERIOD);
+        System.out.println("Sender threads: " + SENDING_MESSAGE_THREAD_COUNT);
+        System.out.println("Client addr : " + SCCP_CLIENT_ADDRESS);
+        System.out.println("Server addr : " + SCCP_SERVER_ADDRESS);
 
-                    // synchronized (client) {
-                    // try {
-                    // client.wait();
-                    // } catch (Exception ex) {
-                    // }
-                    // }
-                    // }// end of while (client.nbConcurrentDialogs.intValue() >=
-                    // MAXCONCURRENTDIALOGS)
+        final Client client = new Client();
+        client.endCount.set(RAMP_UP_PERIOD);
 
-                    if (endCount.get() < 0) {
-                        start = System.currentTimeMillis();
-                        prev = start;
-                        // log.warn("StartTime = " + client.start);
-                    }
-
-                    initiateSMS();
-                }
-            } catch (MAPException ex) {
-                log.error("Exception when sending a new MAP dialog", ex);
-            }
+        try {
+            client.start(configPath);
+        } catch (Exception e) {
+            log.error("Failed to start client", e);
+            System.exit(1);
         }
-
-    }
-
-    private int getCounterIncrement() {
-        int x = counterIncrement.incrementAndGet();
-        if (x > 147483647) {
-            x = 1;
-            counterIncrement.set(x);
-        }
-
-        return x;
-    }
-
-    /** Start client from JSON config via Ss7StackBuilder. */
-    public void startWithJson(String configPath) throws Exception {
-        log.info("Building jSS7 stack from config: {}", configPath);
-        var stack = org.restcomm.protocols.ss7.config.Ss7StackBuilder.build(java.nio.file.Path.of(configPath));
-        mapProvider = stack.mapProvider();
-        mapProvider.getMAPServiceSms().addMAPServiceListener(this);
-        mapProvider.getMAPServiceSms().activate();
-        log.info("SMS listeners registered");
-        mapStack = (org.restcomm.protocols.ss7.map.MAPStackImpl) stack.mapProvider().getMAPStack();
-        tcapStack = stack.tcapStack();
-        sccpStack = stack.sccpStack();
-        serverM3UAMgmt = stack.m3uaManagement();
-        stack.m3uaManagement().startAsp();
-        log.info("MO-SMS Client started");
-        Thread.currentThread().join();
     }
 }
