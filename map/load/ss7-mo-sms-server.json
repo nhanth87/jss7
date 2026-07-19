@@ -13,6 +13,7 @@
     "links": [
       {
         "name": "serverLink",
+        "type": "server",
         "local": "127.0.0.1:8011",
         "peer": "127.0.0.1:8012"
       }
