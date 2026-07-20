@@ -53,7 +53,13 @@ public class Scheduler implements SchedulerMBean {
     public static final Integer HEARTBEAT_QUEUE       = -1;
 
     private static final int QUEUE_COUNT      = 11;
-    private static final long TICK_NS         = 4_000_000L;
+    /**
+     * Agrona {@code DeadlineTimerWheel} requires the tick resolution to be a
+     * power of 2. 2^22 ns = 4_194_304 ns ≈ 4.19 ms is the closest power-of-2
+     * to the original 4 ms tick; a non-power-of-2 value makes the wheel
+     * constructor throw and silently kills the ticker thread.
+     */
+    private static final long TICK_NS         = 1L << 22;
     private static final int HEARTBEAT_EVERY  = 25;
 
     private final Logger logger = LogManager.getLogger(Scheduler.class);
