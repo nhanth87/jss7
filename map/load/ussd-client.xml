@@ -11,7 +11,7 @@
 
     <!-- Load test params (passed as JVM system properties) -->
     <property name="test.client.numOfDialogs"       value="300000"/>
-    <property name="test.client.concurrentDialog"   value="4000"/>
+    <property name="test.client.concurrentDialog"   value="5000"/>
     <property name="test.client.rampUpPeriod"       value="0"/>
 
     <!-- ASN.1 telemetry — OFF for throughput runs (costs ~42% decode). Turn on only to inspect codec/heap. -->
