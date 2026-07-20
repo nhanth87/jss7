@@ -1,9 +1,14 @@
 package org.restcomm.protocols.ss7.cap;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -50,6 +55,9 @@ import org.restcomm.protocols.ss7.isup.impl.message.parameter.ISUPParameterFacto
 import org.restcomm.protocols.ss7.map.MAPParameterFactoryImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParameterFactory;
 import org.restcomm.protocols.ss7.sccp.NetworkIdState;
+import org.restcomm.protocols.ss7.scheduler.W2Priority;
+import org.restcomm.protocols.ss7.scheduler.W2Work;
+import org.restcomm.protocols.ss7.scheduler.w2.W2KeyedMailboxDispatcher;
 import org.restcomm.protocols.ss7.tcap.DialogImpl;
 import org.restcomm.protocols.ss7.tcap.api.MessageType;
 import org.restcomm.protocols.ss7.tcap.api.TCAPProvider;
@@ -102,6 +110,11 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
 
 
     private final transient CopyOnWriteArrayList<CAPDialogListener> dialogListeners = new CopyOnWriteArrayList<>();
+    private transient Map<CAPDialogListener, CAPDialogListener> w2DialogListenerWrappers =
+            Collections.synchronizedMap(new IdentityHashMap<CAPDialogListener, CAPDialogListener>());
+
+    /** Default W2 CAP-user callback dispatcher; disable with ss7.cap.w2Scheduler.enabled=false. */
+    private transient W2KeyedMailboxDispatcher w2CallbackDispatcher;
 
 //    protected transient Map<Long, CAPDialogImpl> dialogs = new ConcurrentHashMap<Long, CAPDialogImpl>().shared();
     protected transient ConcurrentHashMap<Long, CAPDialogImpl> dialogs = new ConcurrentHashMap<Long, CAPDialogImpl>();
@@ -151,7 +164,7 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
 
     @Override
     public void addCAPDialogListener(CAPDialogListener capDialogListener) {
-        this.dialogListeners.add(capDialogListener);
+        this.dialogListeners.add(wrapDialogListener(capDialogListener));
     }
 
     @Override
@@ -181,7 +194,57 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
 
     @Override
     public void removeCAPDialogListener(CAPDialogListener capDialogListener) {
-        this.dialogListeners.remove(capDialogListener);
+        CAPDialogListener wrapper = this.w2DialogListenerWrappers.remove(capDialogListener);
+        this.dialogListeners.remove(wrapper != null ? wrapper : capDialogListener);
+    }
+
+    private CAPDialogListener wrapDialogListener(final CAPDialogListener listener) {
+        if (!Boolean.parseBoolean(System.getProperty("ss7.cap.w2Scheduler.enabled", "true"))) {
+            return listener;
+        }
+        CAPDialogListener existing = this.w2DialogListenerWrappers.get(listener);
+        if (existing != null) {
+            return existing;
+        }
+        CAPDialogListener wrapper = (CAPDialogListener) Proxy.newProxyInstance(CAPDialogListener.class.getClassLoader(),
+                new Class<?>[] { CAPDialogListener.class },
+                (proxy, method, args) -> dispatchDialogCallback(listener, method, args));
+        this.w2DialogListenerWrappers.put(listener, wrapper);
+        return wrapper;
+    }
+
+    private Object dispatchDialogCallback(CAPDialogListener listener, Method method, Object[] args) throws Throwable {
+        if (method.getDeclaringClass() == Object.class) {
+            return invokeDialogListener(listener, method, args);
+        }
+        W2KeyedMailboxDispatcher dispatcher = this.w2CallbackDispatcher;
+        if (dispatcher == null || args == null || args.length == 0 || !(args[0] instanceof CAPDialog)) {
+            return invokeDialogListener(listener, method, args);
+        }
+        CAPDialog dialog = (CAPDialog) args[0];
+        String dialogKey = String.valueOf(dialog.getLocalDialogId());
+        if (dispatcher.submit(new W2Work<Runnable>(dialogKey, W2Priority.NORMAL, Long.MAX_VALUE,
+                () -> invokeDialogListenerUnchecked(listener, method, args)))) {
+            return null;
+        }
+        loger.warn("W2 CAP callback queue is full; invoking callback inline for dialog {}", dialogKey);
+        return invokeDialogListener(listener, method, args);
+    }
+
+    private static Object invokeDialogListener(CAPDialogListener listener, Method method, Object[] args) throws Throwable {
+        try {
+            return method.invoke(listener, args);
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
+    }
+
+    private static void invokeDialogListenerUnchecked(CAPDialogListener listener, Method method, Object[] args) {
+        try {
+            invokeDialogListener(listener, method, args);
+        } catch (Throwable e) {
+            throw new RuntimeException("CAP dialog listener callback failed", e);
+        }
     }
 
     @Override
@@ -192,12 +255,29 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
     }
 
     public void start() {
+        this.startW2CallbackDispatcher();
         this.tcapProvider.addTCListener(this);
     }
 
     public void stop() {
         this.tcapProvider.removeTCListener(this);
+        if (this.w2CallbackDispatcher != null) {
+            this.w2CallbackDispatcher.stop();
+            this.w2CallbackDispatcher = null;
+        }
+    }
 
+    private void startW2CallbackDispatcher() {
+        if (!Boolean.parseBoolean(System.getProperty("ss7.cap.w2Scheduler.enabled", "true"))) {
+            return;
+        }
+        int capacity = Integer.getInteger("ss7.cap.w2Scheduler.capacity", 100_000);
+        int workers = Integer.getInteger("ss7.cap.w2Scheduler.workers",
+                Math.max(1, Runtime.getRuntime().availableProcessors()));
+        this.w2CallbackDispatcher = new W2KeyedMailboxDispatcher(capacity, workers, "Cap-W2-Callback");
+        this.w2CallbackDispatcher.start();
+        loger.info("W2 CAP callback scheduler enabled: capacity=" + capacity + " workers=" + workers
+                + " (per-dialog FIFO)");
     }
 
     protected void addDialog(CAPDialogImpl capDialog) {
@@ -210,6 +290,18 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
         //synchronized (this.dialogs) {
             return this.dialogs.remove(dialogId);
         //}
+    }
+
+    void dispatchApplicationCallback(CAPDialog dialog, W2Priority priority, Runnable callback) {
+        W2KeyedMailboxDispatcher dispatcher = this.w2CallbackDispatcher;
+        if (dispatcher == null || !dispatcher.submit(new W2Work<Runnable>(String.valueOf(dialog.getLocalDialogId()),
+                priority, Long.MAX_VALUE, callback))) {
+            callback.run();
+        }
+    }
+
+    void dispatchApplicationCallback(CAPDialog dialog, Runnable callback) {
+        dispatchApplicationCallback(dialog, W2Priority.NORMAL, callback);
     }
 
     private void SendUnsupportedAcn(ApplicationContextName acn, Dialog dialog, String cs) {

@@ -12,8 +12,8 @@
     <!-- ASN.1 telemetry -->
     <property name="test.server.asnTelemetry" value="true"/>
 
-    <!-- W2 TCAP ingress scheduler. Keep false for FIFO baseline; override with -Dtest.server.w2Scheduler=true. -->
-    <property name="test.server.w2Scheduler" value="false"/>
+    <!-- W2 TCAP ingress scheduler is the default. Use -Dtest.server.w2Scheduler=false for the Argona/FIFO baseline. -->
+    <property name="test.server.w2Scheduler" value="true"/>
     <property name="test.server.w2Workers" value="16"/>
     <property name="test.server.w2Capacity" value="100000"/>
 

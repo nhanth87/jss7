@@ -27,7 +27,9 @@ import org.mobicents.protocols.asn.AsnOutputStream;
 import org.mobicents.protocols.asn.Tag;
 import org.restcomm.protocols.ss7.sccp.NetworkIdState;
 import org.restcomm.protocols.ss7.sccp.RemoteSccpStatus;
+import org.restcomm.protocols.ss7.scheduler.TcapPackageKind;
 import org.restcomm.protocols.ss7.scheduler.W2Priority;
+import org.restcomm.protocols.ss7.scheduler.W2PriorityClassifier;
 import org.restcomm.protocols.ss7.scheduler.W2Work;
 import org.restcomm.protocols.ss7.scheduler.w2.W2KeyedMailboxDispatcher;
 import org.restcomm.protocols.ss7.sccp.SccpConnection;
@@ -104,7 +106,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     /** Netty hashed-wheel timer for O(1) invoke-timeout schedule/cancel (default; JDK fallback). */
     private transient Timer wheelTimer;
 
-    /** Optional W2 ingress dispatcher; enabled only with ss7.tcap.w2Scheduler.enabled=true. */
+    /** Default W2 ingress dispatcher; disable with ss7.tcap.w2Scheduler.enabled=false for Argona/FIFO. */
     private transient W2KeyedMailboxDispatcher w2IngressDispatcher;
 
     /** Cancellable handle abstracting a Netty {@link Timeout} or a JDK {@link Future}. */
@@ -664,7 +666,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     }
 
     private void startW2IngressDispatcher() {
-        if (!Boolean.getBoolean("ss7.tcap.w2Scheduler.enabled")) {
+        if (!Boolean.parseBoolean(System.getProperty("ss7.tcap.w2Scheduler.enabled", "true"))) {
             return;
         }
         int capacity = Integer.getInteger("ss7.tcap.w2Scheduler.capacity", 100_000);
@@ -679,6 +681,30 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     private String w2FlowKey(SccpDataMessage message) {
         return message.getNetworkId() + ":" + message.getIncomingOpc() + ":" + message.getSls() + ":"
                 + String.valueOf(message.getCallingPartyAddress()) + ":" + String.valueOf(message.getCalledPartyAddress());
+    }
+
+    /**
+     * Classifies only the outer TCAP package without ASN.1 decoding. This is safe
+     * predecode metadata: application context and component operation codes are
+     * deliberately unavailable here and therefore never guessed.
+     */
+    static W2Priority w2IngressPriority(byte[] data) {
+        return W2PriorityClassifier.classifyTcap(w2PackageKind(data), data == null ? 0 : data.length).priority();
+    }
+
+    private static TcapPackageKind w2PackageKind(byte[] data) {
+        if (data == null || data.length == 0) {
+            return TcapPackageKind.UNKNOWN;
+        }
+        // TCAP package tags are single-octet, constructed APPLICATION tags.
+        return switch (data[0] & 0xFF) {
+            case 0x61 -> TcapPackageKind.UNIDIRECTIONAL;
+            case 0x62 -> TcapPackageKind.BEGIN;
+            case 0x64 -> TcapPackageKind.END;
+            case 0x65 -> TcapPackageKind.CONTINUE;
+            case 0x67 -> TcapPackageKind.ABORT;
+            default -> TcapPackageKind.UNKNOWN;
+        };
     }
 
     protected void sendProviderAbort(PAbortCauseType providerAbortCause, byte[] remoteTransactionId, SccpAddress sccpCalledPartyAddress,
@@ -742,7 +768,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
         W2KeyedMailboxDispatcher dispatcher = this.w2IngressDispatcher;
         if (dispatcher != null) {
             String flowKey = w2FlowKey(sccpDataMessage);
-            W2Work<Runnable> work = new W2Work<>(flowKey, W2Priority.NORMAL, Long.MAX_VALUE,
+            W2Work<Runnable> work = new W2Work<>(flowKey, w2IngressPriority(sccpDataMessage.getData()), Long.MAX_VALUE,
                     () -> processMessage(sccpDataMessage));
             if (dispatcher.submit(work)) {
                 return;

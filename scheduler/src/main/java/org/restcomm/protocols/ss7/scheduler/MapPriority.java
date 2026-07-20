@@ -6,7 +6,12 @@ public enum MapPriority {
     CRITICAL(W2Priority.CRITICAL),
     NORMAL(W2Priority.HIGH),
     LOW(W2Priority.LOW),
-    UNSPECIFIED(W2Priority.LOW);
+    /**
+     * No application-specific policy matched.  This must remain serviceable:
+     * TCAP END/ABORT are the only default low-priority path, while an unknown
+     * decoded application operation is ordinary work.
+     */
+    UNSPECIFIED(W2Priority.NORMAL);
 
     private final W2Priority priority;
 

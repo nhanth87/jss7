@@ -27,8 +27,14 @@ public class W2PriorityClassifierTest {
                 W2PriorityClassifier.MAP_SEND_ROUTING_INFO_FOR_SM), MapPriority.NORMAL);
         assertEquals(W2PriorityClassifier.classifyApplication(Ss7ApplicationProtocol.MAP,
                 W2PriorityClassifier.MAP_MT_FORWARD_SM), MapPriority.NORMAL);
+        assertEquals(W2PriorityClassifier.classifyApplication(Ss7ApplicationProtocol.MAP,
+                W2PriorityClassifier.MAP_PROCESS_UNSTRUCTURED_SS_REQUEST), MapPriority.NORMAL);
+        assertEquals(W2PriorityClassifier.classifyApplication(Ss7ApplicationProtocol.MAP,
+                W2PriorityClassifier.MAP_UNSTRUCTURED_SS_REQUEST), MapPriority.NORMAL);
         assertEquals(W2PriorityClassifier.classifyApplication(Ss7ApplicationProtocol.MAP, 46L),
                 MapPriority.UNSPECIFIED);
+        assertEquals(W2PriorityClassifier.classify(TcapPackageKind.UNKNOWN,
+                0, Ss7ApplicationProtocol.MAP, 46L), W2Priority.NORMAL);
     }
 
     @Test

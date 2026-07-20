@@ -1,6 +1,6 @@
 # W2 Scheduler — Research & Design Log
 
-Thư mục này là hồ sơ bền vững cho nghiên cứu, thiết kế và implementation từng bước của **winwin scheduler (w2-scheduler)** cho jSS7. Module Maven hiện triển khai primitive dispatcher local (case 1), nhưng chưa được wire vào TCP/TCAP/MAP/CAP runtime nên chưa thay đổi hành vi protocol hiện tại.
+Thư mục này là hồ sơ bền vững cho nghiên cứu, thiết kế và implementation từng bước của **winwin scheduler (w2-scheduler)** cho jSS7. Module Maven triển khai local keyed dispatcher và được wire feature-flagged vào TCAP ingress cùng callback boundaries của MAP/CAP; không có distributed ownership/timer replacement trong phase này.
 
 ## Mục tiêu
 
@@ -21,13 +21,13 @@ Một SS7 operation có chi phí xử lý không đồng nhất: ví dụ MAP AT
 
 `org.restcomm.protocols.ss7.scheduler.w2.W2Dispatcher` consumes immutable `W2Work<Runnable>` from the foundation queue with strict **priority → monotonic deadline → FIFO** selection. It has one explicit daemon worker, non-blocking bounded admission, graceful drain on `stop()` (including work admitted before `start()`), exception isolation and a metrics snapshot.
 
-This is an infrastructure primitive only. It is deliberately not wired to TCAP/MAP/CAP.
+The primitive is protocol-neutral. TCAP uses it at ingress and MAP/CAP use it at decoded application-callback boundaries; the dispatcher itself has no SS7 dependency beyond the generic `W2Work` metadata.
 
 ### Case 2 — keyed mailbox and feature-flagged TCAP ingress (implemented)
 
 `W2KeyedMailboxDispatcher` provides a globally bounded, FIFO mailbox for each `W2Work.dialogKey`. It permits at most one active mailbox drainer per key, while a configurable worker pool drains different keys in parallel. W2 priority/deadline selection applies only among eligible mailbox heads; a later high-priority event can never overtake an earlier event from the same key.
 
-`TCAPProviderImpl` now has an opt-in ingress adapter (`-Dss7.tcap.w2Scheduler.enabled=true`). It keys pre-decode work by inbound SCCP flow (`networkId/opc/SLS/calling/called address`) and runs the existing TCAP decode/FSM unchanged inside the mailbox. This establishes an executable USSD/SMSC load-test path, but is **not yet MAP/CAP operation-aware**: MAP/CAP opcode and application context are unavailable until after TCAP parsing. Queue exhaustion logs a warning and processes the item inline rather than silently dropping SS7 traffic.
+`TCAPProviderImpl` enables the ingress adapter by default; set `-Dss7.tcap.w2Scheduler.enabled=false` for the Argona/FIFO path. It keys pre-decode work by inbound SCCP flow (`networkId/opc/SLS/calling/called address`) and runs the existing TCAP decode/FSM unchanged inside the mailbox. After a MAP/CAP message is decoded, `MAPServiceBaseImpl`/`CAPServiceBaseImpl` submit its application listener callback with classifier metadata, preserving per-dialog FIFO. Default MAP classifications are: Location Update and SendAuthenticationInfo = `CRITICAL`; USSD (Process/Unstructured SS), SMSC SRI-SM and MT-ForwardSM = `NORMAL` MAP tier (mapped to W2 `HIGH`); unknown decoded operations = W2 `NORMAL`. Queue exhaustion logs a warning and processes the item inline rather than silently dropping SS7 traffic.
 
 ## Kết luận hiện tại
 

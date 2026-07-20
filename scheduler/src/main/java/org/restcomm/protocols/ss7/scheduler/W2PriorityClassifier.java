@@ -17,6 +17,8 @@ public final class W2PriorityClassifier {
     public static final long MAP_MT_FORWARD_SM = 44L;
     public static final long MAP_SEND_ROUTING_INFO_FOR_SM = 45L;
     public static final long MAP_SEND_AUTHENTICATION_INFO = 56L;
+    public static final long MAP_PROCESS_UNSTRUCTURED_SS_REQUEST = 59L;
+    public static final long MAP_UNSTRUCTURED_SS_REQUEST = 60L;
 
     // 3GPP TS 29.078 CAP local operation codes used for online charging.
     public static final long CAP_APPLY_CHARGING = 35L;
@@ -65,7 +67,9 @@ public final class W2PriorityClassifier {
     private static MapPriority classifyMap(long localOperationCode) {
         return switch ((int) localOperationCode) {
             case (int) MAP_SEND_AUTHENTICATION_INFO, (int) MAP_UPDATE_LOCATION -> MapPriority.CRITICAL;
-            case (int) MAP_SEND_ROUTING_INFO_FOR_SM, (int) MAP_MT_FORWARD_SM -> MapPriority.NORMAL;
+            case (int) MAP_SEND_ROUTING_INFO_FOR_SM, (int) MAP_MT_FORWARD_SM,
+                    (int) MAP_PROCESS_UNSTRUCTURED_SS_REQUEST,
+                    (int) MAP_UNSTRUCTURED_SS_REQUEST -> MapPriority.NORMAL;
             default -> MapPriority.UNSPECIFIED;
         };
     }
