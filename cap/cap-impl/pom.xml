@@ -41,6 +41,11 @@
 			<artifactId>tcap-api</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.restcomm.protocols.ss7.scheduler</groupId>
+			<artifactId>w2-scheduler</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>cap-api</artifactId>
 			<version>${project.version}</version>

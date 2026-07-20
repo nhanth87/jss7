@@ -64,7 +64,7 @@ Chỉ cân nhắc sau local rollout. Bắt buộc có `dialogId → ownerNode, e
 
 ## Implementation decision — Case 2 (2026-07-19)
 
-`W2KeyedMailboxDispatcher` is the first local ordering primitive. It has a global bounded event capacity and an `ArrayDeque` FIFO per `dialogKey`; only a mailbox head is placed in the priority queue. Completion removes that head and makes the next head eligible. Therefore an event's priority/deadline is considered only after all preceding events from the same dialog complete. It is deliberately standalone and not yet called by `TCAPProviderImpl`.
+`W2KeyedMailboxDispatcher` is the first local ordering primitive. It has a global bounded event capacity and an `ArrayDeque` FIFO per `dialogKey`; only a mailbox head is placed in the priority queue. Completion removes that head and makes the next head eligible. Therefore an event's priority/deadline is considered only after all preceding events from the same dialog complete. It is wired as the default feature-configurable TCAP ingress dispatcher; pass `-Dss7.tcap.w2Scheduler.enabled=false` for the Argona/FIFO path. MAP/CAP decoded service callbacks are also feature-flagged (`ss7.map.w2Scheduler.enabled`, `ss7.cap.w2Scheduler.enabled`) and classed by actual operation code: MAP Location/Auth = CRITICAL; USSD/SMSC routing and MT forward = HIGH; CAP charging = CRITICAL. Classification affects only cross-dialog selection.
 
 ## Migration sequence
 

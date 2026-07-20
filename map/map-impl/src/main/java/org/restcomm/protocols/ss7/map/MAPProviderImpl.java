@@ -1,15 +1,16 @@
 package org.restcomm.protocols.ss7.map;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
-
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -64,6 +65,9 @@ import org.restcomm.protocols.ss7.map.service.oam.MAPServiceOamImpl;
 import org.restcomm.protocols.ss7.map.service.pdpContextActivation.MAPServicePdpContextActivationImpl;
 import org.restcomm.protocols.ss7.map.service.sms.MAPServiceSmsImpl;
 import org.restcomm.protocols.ss7.map.service.supplementary.MAPServiceSupplementaryImpl;
+import org.restcomm.protocols.ss7.scheduler.W2Priority;
+import org.restcomm.protocols.ss7.scheduler.W2Work;
+import org.restcomm.protocols.ss7.scheduler.w2.W2KeyedMailboxDispatcher;
 import org.restcomm.protocols.ss7.sccp.NetworkIdState;
 import org.restcomm.protocols.ss7.tcap.DialogImpl;
 import org.restcomm.protocols.ss7.tcap.api.MessageType;
@@ -121,6 +125,11 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
 
 
     private transient Collection<MAPDialogListener> dialogListeners = new java.util.concurrent.CopyOnWriteArrayList<MAPDialogListener>();
+    private transient Map<MAPDialogListener, MAPDialogListener> w2DialogListenerWrappers =
+            Collections.synchronizedMap(new IdentityHashMap<MAPDialogListener, MAPDialogListener>());
+
+    /** Default W2 MAP-user callback dispatcher; disable with ss7.map.w2Scheduler.enabled=false. */
+    private transient W2KeyedMailboxDispatcher w2CallbackDispatcher;
 
 //    protected transient ConcurrentHashMap<Long, MAPDialogImpl> dialogs = new ConcurrentHashMap<Long, MAPDialogImpl>().shared();
     protected transient ConcurrentHashMap<Long, MAPDialogImpl> dialogs = new ConcurrentHashMap<Long, MAPDialogImpl>();
@@ -197,7 +206,7 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
     }
 
     public void addMAPDialogListener(MAPDialogListener mapDialogListener) {
-        this.dialogListeners.add(mapDialogListener);
+        this.dialogListeners.add(wrapDialogListener(mapDialogListener));
     }
 
     public MAPParameterFactory getMAPParameterFactory() {
@@ -213,7 +222,68 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
     }
 
     public void removeMAPDialogListener(MAPDialogListener mapDialogListener) {
-        this.dialogListeners.remove(mapDialogListener);
+        MAPDialogListener wrapper = this.w2DialogListenerWrappers.remove(mapDialogListener);
+        this.dialogListeners.remove(wrapper != null ? wrapper : mapDialogListener);
+    }
+
+    private MAPDialogListener wrapDialogListener(final MAPDialogListener listener) {
+        if (!Boolean.parseBoolean(System.getProperty("ss7.map.w2Scheduler.enabled", "true"))) {
+            return listener;
+        }
+        MAPDialogListener existing = this.w2DialogListenerWrappers.get(listener);
+        if (existing != null) {
+            return existing;
+        }
+        MAPDialogListener wrapper = (MAPDialogListener) Proxy.newProxyInstance(MAPDialogListener.class.getClassLoader(),
+                new Class<?>[] { MAPDialogListener.class }, (proxy, method, args) -> dispatchDialogCallback(listener, method, args));
+        this.w2DialogListenerWrappers.put(listener, wrapper);
+        return wrapper;
+    }
+
+    private Object dispatchDialogCallback(MAPDialogListener listener, Method method, Object[] args) throws Throwable {
+        if (method.getDeclaringClass() == Object.class) {
+            return invokeDialogListener(listener, method, args);
+        }
+        W2KeyedMailboxDispatcher dispatcher = this.w2CallbackDispatcher;
+        if (dispatcher == null || args == null || args.length == 0 || !(args[0] instanceof MAPDialog)) {
+            return invokeDialogListener(listener, method, args);
+        }
+        MAPDialog dialog = (MAPDialog) args[0];
+        String dialogKey = String.valueOf(dialog.getLocalDialogId());
+        if (dispatcher.submit(new W2Work<Runnable>(dialogKey, W2Priority.NORMAL, Long.MAX_VALUE,
+                () -> invokeDialogListenerUnchecked(listener, method, args)))) {
+            return null;
+        }
+        loger.warn("W2 MAP callback queue is full; invoking callback inline for dialog {}", dialogKey);
+        return invokeDialogListener(listener, method, args);
+    }
+
+    private static Object invokeDialogListener(MAPDialogListener listener, Method method, Object[] args) throws Throwable {
+        try {
+            return method.invoke(listener, args);
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
+    }
+
+    private static void invokeDialogListenerUnchecked(MAPDialogListener listener, Method method, Object[] args) {
+        try {
+            invokeDialogListener(listener, method, args);
+        } catch (Throwable e) {
+            throw new RuntimeException("MAP dialog listener callback failed", e);
+        }
+    }
+
+    void dispatchApplicationCallback(MAPDialog dialog, W2Priority priority, Runnable callback) {
+        W2KeyedMailboxDispatcher dispatcher = this.w2CallbackDispatcher;
+        if (dispatcher == null || !dispatcher.submit(new W2Work<Runnable>(String.valueOf(dialog.getLocalDialogId()),
+                priority, Long.MAX_VALUE, callback))) {
+            callback.run();
+        }
+    }
+
+    void dispatchApplicationCallback(MAPDialog dialog, Runnable callback) {
+        dispatchApplicationCallback(dialog, W2Priority.NORMAL, callback);
     }
 
     public MAPDialog getMAPDialog(Long dialogId) {
@@ -223,13 +293,30 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
     }
 
     public void start() {
+        this.startW2CallbackDispatcher();
         this.tcapProvider.addTCListener(this);
     }
 
     public void stop() {
         this.tcapProvider.removeTCListener(this);
-
+        if (this.w2CallbackDispatcher != null) {
+            this.w2CallbackDispatcher.stop();
+            this.w2CallbackDispatcher = null;
+        }
         this.dialogs.clear();
+    }
+
+    private void startW2CallbackDispatcher() {
+        if (!Boolean.parseBoolean(System.getProperty("ss7.map.w2Scheduler.enabled", "true"))) {
+            return;
+        }
+        int capacity = Integer.getInteger("ss7.map.w2Scheduler.capacity", 100_000);
+        int workers = Integer.getInteger("ss7.map.w2Scheduler.workers",
+                Math.max(1, Runtime.getRuntime().availableProcessors()));
+        this.w2CallbackDispatcher = new W2KeyedMailboxDispatcher(capacity, workers, "Map-W2-Callback");
+        this.w2CallbackDispatcher.start();
+        loger.info("W2 MAP callback scheduler enabled: capacity=" + capacity + " workers=" + workers
+                + " (per-dialog FIFO)");
     }
 
     /**

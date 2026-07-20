@@ -21,6 +21,14 @@ target/
 *.log
 logs/
 
+# Local MAP-load / soak-run artifacts (generated at runtime; never source configuration)
+/map/load/map-*.csv
+/map/load/map-load-*.xml
+/map/load/*.jfr
+/map/load/soak-artifacts/
+/map/load/soak-runner.out
+/soak-runner.pid
+
 # OS
 .DS_Store
 Thumbs.db
