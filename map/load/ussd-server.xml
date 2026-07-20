@@ -17,6 +17,9 @@
     <property name="test.server.w2Workers" value="16"/>
     <property name="test.server.w2Capacity" value="100000"/>
 
+    <!-- Soak diagnostics: gc-server.log + server.jfr. Disable only for a pure throughput run. -->
+    <property name="test.server.monitor" value="true"/>
+
     <!-- JVM settings — 8g heap for gateway headroom under 4k TPS (avoid MEMORY congestion @77%) -->
     <property name="jvm.xms" value="8g"/>
     <property name="jvm.xmx" value="8g"/>
@@ -82,6 +85,10 @@
             <jvmarg value="-XX:+UseZGC"/>
             <jvmarg value="-XX:ConcGCThreads=4"/>
             <jvmarg value="-XX:ParallelGCThreads=8"/>
+            <jvmarg if:true="${test.server.monitor}" value="-Xlog:gc*,gc+heap=info,safepoint:file=gc-server.log:tags,uptime,level"/>
+            <jvmarg if:true="${test.server.monitor}" value="-XX:StartFlightRecording=settings=profile,filename=server.jfr,dumponexit=true,maxsize=512m"/>
+            <jvmarg if:true="${test.server.monitor}" value="-XX:+UnlockDiagnosticVMOptions"/>
+            <jvmarg if:true="${test.server.monitor}" value="-XX:NativeMemoryTracking=summary"/>
             <jvmarg value="-Dlog4j.defaultInitOverride=true"/>
             <jvmarg value="-Dlog4j.configurationFile=log4j2-server.xml"/>
             <jvmarg value="-Djava.net.preferIPv4Stack=true"/>

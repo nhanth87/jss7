@@ -36,7 +36,7 @@ cd jSS7/j25/map/load
 ant -f ussd-client.xml client
 ```
 
-The client runs for ~60 seconds (60,000 dialogs at 1,000 TPS).
+The default client profile runs for ~60 seconds (300,000 dialogs at 5,000 TPS).
 A live TUI shows real-time TPS, success rate, memory, and peak TPS.
 When complete, a final summary is printed.
 
@@ -55,8 +55,8 @@ Edit properties at the top of `ussd-client.xml` (or override in `client.properti
 
 | Property | Default | Description |
 |----------|---------|-------------|
-| `test.client.numOfDialogs` | `60000` | Total dialogs (60s × 1000tps) |
-| `test.client.concurrentDialog` | `1000` | Guava RateLimiter permits/sec = target TPS |
+| `test.client.numOfDialogs` | `300000` | Total dialogs (60s × 5000 TPS) |
+| `test.client.concurrentDialog` | `5000` | Guava RateLimiter permits/sec = target TPS |
 | `test.client.rampUpPeriod` | `0` | 0 = instant start. >0 = ramp over N seconds |
 | `test.client.deliveryThreads` | `16` | M3UA delivery thread pool |
 | `jvm.xmx` | `512m` | Max heap |

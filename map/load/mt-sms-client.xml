@@ -10,8 +10,8 @@
     <property name="test.client.config" value="ss7-mt-sms-client.json"/>
 
     <!-- Load test params (passed as JVM system properties) -->
-    <property name="test.client.numOfDialogs"     value="60000"/>
-    <property name="test.client.concurrentDialog" value="400"/>
+    <property name="test.client.numOfDialogs"     value="300000"/>
+    <property name="test.client.concurrentDialog" value="5000"/>
     <property name="test.client.rampUpPeriod"     value="0"/>
 
     <!-- ASN.1 telemetry -->
