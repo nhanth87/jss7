@@ -71,9 +71,16 @@ public class UssdMenuEngine {
      * Advances local menu state to mirror the gRPC {@code MenuEngine}.
      */
     public String nextInput(long dialogId, Profile profile) {
-        String nodeName = dialogNodes.getOrDefault(dialogId, root);
+        // Do not revive an ended dialog at root — that caused BALANCE to random-walk
+        // after script ["1","0"] and never reach TC-END under load.
+        // Return null so Client skips the MAP reply (avoids mis-routing leftover/wait prompts).
+        if (!dialogNodes.containsKey(dialogId)) {
+            return null;
+        }
+        String nodeName = dialogNodes.get(dialogId);
         MenuNode node = nodes.get(nodeName);
         if (node == null || node.finalNode || node.options.isEmpty()) {
+            dialogNodes.remove(dialogId);
             return null;
         }
         String choice = pickChoice(node, profile, dialogId);
@@ -86,10 +93,12 @@ public class UssdMenuEngine {
         }
         if ("__end__".equals(next)) {
             dialogNodes.remove(dialogId);
+            scriptIndexes.remove(dialogId);
         } else if (next != null) {
             MenuNode nxt = nodes.get(next);
             if (nxt != null && nxt.finalNode) {
                 dialogNodes.remove(dialogId);
+                scriptIndexes.remove(dialogId);
             } else {
                 dialogNodes.put(dialogId, next);
             }
@@ -126,6 +135,11 @@ public class UssdMenuEngine {
                     return digit;
                 }
             }
+            // Script exhausted or digit invalid: prefer exit, never random for scripted profiles.
+            if (node.options.containsKey("0")) {
+                return "0";
+            }
+            return null;
         }
         return randomChoice(node);
     }

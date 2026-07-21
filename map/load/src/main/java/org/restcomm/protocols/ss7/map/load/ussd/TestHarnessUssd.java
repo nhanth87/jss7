@@ -81,6 +81,9 @@ public abstract class TestHarnessUssd implements MAPDialogListener, MAPServiceSu
     // TCAP Details
     protected static final int MAX_DIALOGS = 500000;
 
+    /** Max in-flight MAP dialogs (backpressure gate). Set in Client.initializeStack(). */
+    protected static int MAX_INFLIGHT = 2000;
+
     protected static String SCCP_CLIENT_ADDRESS = "31628839999";
     protected static String SCCP_SERVER_ADDRESS = "1234567890";
 

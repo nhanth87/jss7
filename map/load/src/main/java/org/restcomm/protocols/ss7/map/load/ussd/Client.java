@@ -1,7 +1,15 @@
 
 package org.restcomm.protocols.ss7.map.load.ussd;
 
+import java.io.FileWriter;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import org.apache.log4j.Logger;
 import org.mobicents.protocols.api.IpChannelType;
 import org.mobicents.protocols.sctp.netty.NettySctpManagementImpl;
@@ -97,8 +105,6 @@ import org.restcomm.protocols.ss7.tcap.api.TCAPStack;
 import org.restcomm.protocols.ss7.tcap.asn.ApplicationContextName;
 import org.restcomm.protocols.ss7.tcap.asn.comp.Problem;
 
-import com.google.common.util.concurrent.RateLimiter;
-
 /**
  * @author amit bhayani
  * @modified <a href="mailto:fernando.mendioroz@gmail.com"> Fernando Mendioroz </a>
@@ -137,17 +143,68 @@ public class Client extends TestHarnessUssd {
     volatile long prev = 0L;
     volatile long loadStartMs = 0L;
 
-    private RateLimiter rateLimiterObj = null;
+    /** Zero-burst TPS gate (replaces Guava SmoothBursty which stamps after idle). */
+    private StrictTpsLimiter rateLimiterObj = null;
 
     private CsvWriter csvWriter;
+
+    private Semaphore inflightSem;
+    /** Dialog ids that currently hold an inflight permit (prevents double-release). */
+    private final ConcurrentHashMap<Long, Boolean> inflightDialogs = new ConcurrentHashMap<Long, Boolean>();
+    /** Ensures CompletedScenario/endCount increment once per dialog (Close and/or Release). */
+    private final ConcurrentHashMap<Long, Boolean> completedDialogs = new ConcurrentHashMap<Long, Boolean>();
+    /** Think-delay via schedule (must NOT block pool threads with Thread.sleep). */
+    private ScheduledExecutorService ussdReplyScheduler;
+    private final AtomicInteger createdCount = new AtomicInteger(0);
+    /** Dialogs that left inflight (success or error) — used to exit NDIALOGS mode without hanging. */
+    private final AtomicInteger finishedCount = new AtomicInteger(0);
+    // #region agent log
+    private static final AtomicLong AGENT_REPLY_SCHEDULED = new AtomicLong();
+    // #endregion
 
     private UssdMenuEngine menuEngine;
     private UssdMenuEngine.Profile menuProfile = UssdMenuEngine.Profile.RANDOM;
     private final Random thinkRandom = new Random();
 
+    // #region agent log
+    private static final String DEBUG_LOG_PATH = "/home/meodien/Desktop/ethiopia-working-dir/.cursor/debug-6dfc1e.log";
+
+    private static void agentDebugLog(String hypothesisId, String location, String message, String dataJson) {
+        // Default OFF: sync FileWriter per dialog dominates 1000 TPS runs. Enable: -DagentDebug=true
+        if (!Boolean.parseBoolean(System.getProperty("agentDebug", "false"))) {
+            return;
+        }
+        try (FileWriter fw = new FileWriter(DEBUG_LOG_PATH, true)) {
+            fw.write(String.format(
+                    "{\"sessionId\":\"6dfc1e\",\"runId\":\"post-fix\",\"hypothesisId\":\"%s\",\"location\":\"%s\",\"message\":\"%s\",\"data\":%s,\"timestamp\":%d}%n",
+                    hypothesisId, location, message, dataJson, System.currentTimeMillis()));
+        } catch (Exception ignored) {
+        }
+    }
+    // #endregion
+
     protected void initializeStack(IpChannelType ipChannelType) throws Exception {
 
-        this.rateLimiterObj = RateLimiter.create(MAXCONCURRENTDIALOGS); // rate
+        this.rateLimiterObj = new StrictTpsLimiter(MAXCONCURRENTDIALOGS);
+        // Backpressure: keep open dialogs near a few seconds of offered TPS.
+        // Previous duration formula (tps*15*1.5 ≈ 22.5k) let create race far ahead of complete.
+        // Override: -DmapLoadMaxInflight=N
+        String inflightProp = System.getProperty("mapLoadMaxInflight");
+        if (inflightProp != null && inflightProp.length() > 0) {
+            MAX_INFLIGHT = Math.max(1, Integer.parseInt(inflightProp));
+        } else if (DURATION_MINUTES <= 0) {
+            MAX_INFLIGHT = Math.max(MAXCONCURRENTDIALOGS, Math.min(500, MAXCONCURRENTDIALOGS * 3));
+        } else {
+            // Measured: completion saturates ~100 dialogs/s without fireEvent; gate (adaptive)
+            // releases MO before dialog/TCAP timeout under backlog. Allow ~1–1.5s backlog at
+            // target TPS once capacity rises: pad to 1500 for 1000 TPS create pacing.
+            MAX_INFLIGHT = Math.max(500, Math.min(1500, MAXCONCURRENTDIALOGS));
+        }
+        this.inflightSem = new Semaphore(MAX_INFLIGHT, true);
+        // Schedule think-delay (do not sleep on worker threads — that queued ~30s/dialog at 3k inflight).
+        int replyThreads = Math.max(32, Math.min(256, Math.max(SENDING_MESSAGE_THREAD_COUNT * 8, MAX_INFLIGHT / 20)));
+        this.ussdReplyScheduler = Executors.newScheduledThreadPool(replyThreads);
+        logger.warn("ussdReplyScheduler threads=" + replyThreads + " MAX_INFLIGHT=" + MAX_INFLIGHT);
 
         this.initSCTP(ipChannelType);
 
@@ -285,9 +342,81 @@ public class Client extends TestHarnessUssd {
     private void initTCAP() throws Exception {
         this.tcapStack = new TCAPStackImpl("Test", this.sccpStack.getSccpProvider(), MSC_SSN);
         this.tcapStack.start();
-        this.tcapStack.setDialogIdleTimeout(120000);
-        this.tcapStack.setInvokeTimeout(60000);
+        // Dialog first, then invoke (invoke must be ≤ current dialogTimeout).
+        this.tcapStack.setDialogIdleTimeout(45000);
+        this.tcapStack.setInvokeTimeout(30000);
         this.tcapStack.setMaxDialogs(MAX_DIALOGS);
+        this.tcapStack.setCongControl_ExecutorDelayThreshold_1(5.0);
+        this.tcapStack.setCongControl_ExecutorDelayThreshold_2(15.0);
+        this.tcapStack.setCongControl_ExecutorDelayThreshold_3(30.0);
+    }
+
+    private void releaseInflight(long dialogId) {
+        if (this.inflightSem != null && this.inflightDialogs.remove(dialogId) != null) {
+            this.finishedCount.incrementAndGet();
+            this.inflightSem.release();
+        }
+    }
+
+    /** Reserve a create slot for NDIALOGS mode (avoids multi-thread overshoot). */
+    private boolean tryReserveCreateSlot() {
+        if (DURATION_MINUTES > 0) {
+            createdCount.incrementAndGet();
+            return true;
+        }
+        while (true) {
+            int cur = createdCount.get();
+            if (cur >= NDIALOGS) {
+                return false;
+            }
+            if (createdCount.compareAndSet(cur, cur + 1)) {
+                return true;
+            }
+        }
+    }
+
+    /** Count a successful dialog once (TC-END may deliver Close without Release, or both). */
+    private void markDialogCompleted(long dialogId) {
+        if (this.completedDialogs.putIfAbsent(dialogId, Boolean.TRUE) != null) {
+            return;
+        }
+        this.menuEngine.clearDialog(dialogId);
+        releaseInflight(dialogId);
+        this.csvWriter.incrementCounter(SUCCESSFUL_DIALOGS);
+        this.endCount++;
+        // #region agent log
+        long elapsedMs = loadStartMs > 0 ? System.currentTimeMillis() - loadStartMs : -1;
+        agentDebugLog("H4", "Client.markDialogCompleted", "dialog completed",
+                String.format("{\"dialogId\":%d,\"endCount\":%d,\"elapsedSinceLoadMs\":%d}",
+                        dialogId, endCount, elapsedMs));
+        // #endregion
+
+        if (this.endCount < NDIALOGS && !isDurationExpired()) {
+            if ((this.endCount % 10000) == 0) {
+                long current = System.currentTimeMillis();
+                float sec = (float) (current - prev) / 1000f;
+                prev = current;
+                logger.warn("Completed 10000 Dialogs, dialogs per second: " + (float) (10000 / sec));
+            }
+        } else {
+            if ((this.endCount >= NDIALOGS || isDurationExpired()) && !endReportPrinted) {
+                endReportPrinted = true;
+                long current = System.currentTimeMillis();
+                logger.warn("Start Time = " + start);
+                logger.warn("Current Time = " + current);
+                float sec = (float) (current - start) / 1000f;
+                int completedDialogsCount = this.endCount - (RAMP_UP_PERIOD < 0 ? RAMP_UP_PERIOD : 0);
+                if (completedDialogsCount < 0) {
+                    completedDialogsCount = this.endCount;
+                }
+                logger.warn("Total time in sec = " + sec);
+                logger.warn("Total completed dialogs = " + completedDialogsCount);
+                logger.warn("Throughput = " + (float) (completedDialogsCount / sec));
+                if (isDurationMode()) {
+                    logger.warn("[DURATION MODE] Test completed after " + DURATION_MINUTES + " minute(s)");
+                }
+            }
+        }
     }
 
     private void initMAP() throws Exception {
@@ -305,7 +434,9 @@ public class Client extends TestHarnessUssd {
     }
 
     private void initiateUSSD() throws MAPException {
-        System.out.println("[DEBUG] initiateUSSD() called");
+        if (Boolean.parseBoolean(System.getProperty("mapLoadDebug", "false"))) {
+            System.out.println("[DEBUG] initiateUSSD() called");
+        }
         Random r = new Random();
         NetworkIdState networkIdState = this.mapStack.getMAPProvider().getNetworkIdState(0);
         int executorCongestionLevel = this.mapStack.getMAPProvider().getExecutorCongestionLevel();
@@ -315,21 +446,61 @@ public class Client extends TestHarnessUssd {
             // congestion or unavailable
             logger.warn("**** Outgoing congestion control: MAP load test client: networkIdState=" + networkIdState
                     + ", executorCongestionLevel=" + executorCongestionLevel);
+            long backoffMs = Math.min(50L * (1L << Math.min(executorCongestionLevel, 4)), 1000L);
+            // #region agent log
+            agentDebugLog("H3", "Client.initiateUSSD", "congestion backoff",
+                    String.format("{\"backoffMs\":%d,\"executorCongestionLevel\":%d,\"networkAvailable\":%b}",
+                            backoffMs, executorCongestionLevel,
+                            networkIdState != null && networkIdState.isAvailable()));
+            // #endregion
             try {
-                Thread.sleep(3000);
+                Thread.sleep(backoffMs);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
 
-        System.out.println("[DEBUG] Acquiring rate limiter...");
+        if (Boolean.parseBoolean(System.getProperty("mapLoadDebug", "false"))) {
+            System.out.println("[DEBUG] Acquiring rate limiter...");
+        }
         if (loadStartMs == 0L) {
             loadStartMs = System.currentTimeMillis();
         }
         long elapsed = System.currentTimeMillis() - loadStartMs;
-        this.rateLimiterObj.setRate(WarmupRateHelper.tpsAt(elapsed, MAXCONCURRENTDIALOGS));
-        this.rateLimiterObj.acquire();
-        System.out.println("[DEBUG] Rate limiter acquired");
+        double desiredRate = WarmupRateHelper.tpsAt(elapsed, MAXCONCURRENTDIALOGS);
+        if (Math.abs(this.rateLimiterObj.getRate() - desiredRate) > 0.01) {
+            this.rateLimiterObj.setRate(desiredRate);
+        }
+        long waitedMs;
+        try {
+            waitedMs = this.rateLimiterObj.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return;
+        }
+        // #region agent log
+        agentDebugLog("H7", "Client.initiateUSSD", "strict rate acquired",
+                String.format("{\"waitedMs\":%d,\"rate\":%.3f,\"desiredRate\":%.3f}",
+                        waitedMs, this.rateLimiterObj.getRate(), desiredRate));
+        // #endregion
+        try {
+            this.inflightSem.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return;
+        }
+        if (!tryReserveCreateSlot()) {
+            this.inflightSem.release();
+            return;
+        }
+        // #region agent log
+        agentDebugLog("H2", "Client.initiateUSSD", "dialog admitted",
+                String.format("{\"inflightRemaining\":%d,\"maxInflight\":%d,\"endCount\":%d,\"createdCount\":%d}",
+                        this.inflightSem.availablePermits(), MAX_INFLIGHT, endCount, createdCount.get()));
+        // #endregion
+        if (isMapLoadDebug()) {
+            System.out.println("[DEBUG] Rate limiter acquired");
+        }
         // System.out.println("initiateUSSD");
 
         // First create Dialog
@@ -346,40 +517,33 @@ public class Client extends TestHarnessUssd {
 
         CBSDataCodingScheme ussdDataCodingScheme = new CBSDataCodingSchemeImpl(0x0f);
 
-        // USSD String: *125*+31628839999#
-        // The Charset is null, here we let system use default Charset (UTF-7 as
-        // explained in GSM 03.38. However if MAP User wants, it can set its own
-        // impl of Charset
-        random = 8000000 + r.nextInt(1000000);
-
         USSDString ussdString = this.mapProvider.getMAPParameterFactory().createUSSDString(USSD_MESSAGE, null, null);
 
+        // Unique MSISDN per dialog — shared MSISDN collides with bridge markActive / session locks
+        // under concurrent load (and made failures harder to diagnose).
+        String msisdnDigits = String.valueOf(8000000000L + (Math.abs(r.nextLong()) % 1000000000L));
         ISDNAddressString msisdn = this.mapProvider.getMAPParameterFactory()
-                .createISDNAddressString(AddressNature.international_number, NumberingPlan.ISDN, "31628839999");
+                .createISDNAddressString(AddressNature.international_number, NumberingPlan.ISDN, msisdnDigits);
 
         mapDialog.addProcessUnstructuredSSRequest(ussdDataCodingScheme, ussdString, null, msisdn);
 
         // nbConcurrentDialogs.incrementAndGet();
 
         // This will initiate the TC-BEGIN with INVOKE component
-        System.out.println("[DEBUG] Sending mapDialog...");
-        mapDialog.send();
-        this.menuEngine.beginDialog(mapDialog.getLocalDialogId());
-
-        this.csvWriter.incrementCounter(CREATED_DIALOGS);
-    }
-
-    private void applyThinkDelay() {
-        if (THINK_MAX_MS <= 0) {
-            return;
+        if (isMapLoadDebug()) {
+            System.out.println("[DEBUG] Sending mapDialog...");
         }
-        int lo = Math.max(0, THINK_MIN_MS);
-        int hi = Math.max(lo, THINK_MAX_MS);
-        int delay = lo + thinkRandom.nextInt(hi - lo + 1);
         try {
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            mapDialog.send();
+            long dialogId = mapDialog.getLocalDialogId();
+            this.inflightDialogs.put(dialogId, Boolean.TRUE);
+            this.menuEngine.beginDialog(dialogId);
+            this.csvWriter.incrementCounter(CREATED_DIALOGS);
+        } catch (Exception e) {
+            // Permit + create slot were reserved before send; free both if dialog was never tracked.
+            createdCount.decrementAndGet();
+            this.inflightSem.release();
+            throw e;
         }
     }
 
@@ -396,9 +560,23 @@ public class Client extends TestHarnessUssd {
         } catch (InterruptedException e) {
             logger.error("an error occurred while stopping csvWriter", e);
         }
+        if (this.ussdReplyScheduler != null) {
+            this.ussdReplyScheduler.shutdownNow();
+        }
     }
 
     public static void main(String[] args) {
+        // #region agent log
+        {
+            Runtime rt = Runtime.getRuntime();
+            agentDebugLog("H6", "Client.main", "jvm heap at start",
+                    String.format("{\"maxMemoryMb\":%d,\"totalMemoryMb\":%d,\"freeMemoryMb\":%d,\"availableProcessors\":%d}",
+                            rt.maxMemory() / (1024 * 1024),
+                            rt.totalMemory() / (1024 * 1024),
+                            rt.freeMemory() / (1024 * 1024),
+                            rt.availableProcessors()));
+        }
+        // #endregion
         int i = 0;
         IpChannelType ipChannelType = IpChannelType.SCTP;
 
@@ -474,6 +652,12 @@ public class Client extends TestHarnessUssd {
             System.out.println("NDIALOGS = " + NDIALOGS);
             System.out.println("MAXCONCURRENTDIALOGS = " + MAXCONCURRENTDIALOGS);
             System.out.println(WarmupRateHelper.summary(MAXCONCURRENTDIALOGS));
+            // Avoid multi-thread stampede on NDIALOGS smoke; pace via rate limiter instead.
+            if (DURATION_MINUTES <= 0) {
+                SENDING_MESSAGE_THREAD_COUNT = Math.max(1, Math.min(SENDING_MESSAGE_THREAD_COUNT, MAXCONCURRENTDIALOGS));
+                System.out.println("SENDING_MESSAGE_THREAD_COUNT capped to " + SENDING_MESSAGE_THREAD_COUNT
+                        + " for NDIALOGS mode");
+            }
         }
 
         final Client client = new Client();
@@ -494,36 +678,53 @@ public class Client extends TestHarnessUssd {
                 threads[j].start();
             }
 
-            while (client.endCount < NDIALOGS && !client.isDurationExpired()) {
+            while (client.endCount < NDIALOGS && !client.isDurationExpired()
+                    && (DURATION_MINUTES > 0 || client.createdCount.get() < NDIALOGS
+                            || client.inflightDialogs.size() > 0)) {
                 Thread.sleep(100);
-                // while (client.nbConcurrentDialogs.intValue() >= MAXCONCURRENTDIALOGS) {
+                // NDIALOGS mode: stop waiting once all reserved dialogs finished (success or error).
+                if (DURATION_MINUTES <= 0 && client.createdCount.get() >= NDIALOGS
+                        && client.finishedCount.get() >= client.createdCount.get()) {
+                    break;
+                }
+                if (DURATION_MINUTES <= 0 && client.createdCount.get() >= NDIALOGS
+                        && client.inflightDialogs.isEmpty()) {
+                    break;
+                }
+                // Absolute cap: do not hang forever if a dialog loses its release callback.
+                if (DURATION_MINUTES <= 0 && client.loadStartMs > 0L
+                        && System.currentTimeMillis() - client.loadStartMs > 120000L) {
+                    System.err.println("[DEBUG] NDIALOGS absolute deadline reached; inflight="
+                            + client.inflightDialogs.size() + " finished=" + client.finishedCount.get()
+                            + " created=" + client.createdCount.get());
+                    break;
+                }
+            }
 
-                // logger.warn("Number of concurrent MAP dialog's = " +
-                // client.nbConcurrentDialogs.intValue()
-                // + " Waiting for max dialog count to go down!");
-
-                // synchronized (client) {
-                // try {
-                // client.wait();
-                // } catch (Exception ex) {
-                // }
-                // }
-                // }// end of while (client.nbConcurrentDialogs.intValue() >=
-                // MAXCONCURRENTDIALOGS)
-
-                //if (client.endCount < 0) {
-                //    client.start = System.currentTimeMillis();
-                //    client.prev = client.start;
-                    // logger.warn("StartTime = " + client.start);
-                //}
-
-               // client.initiateUSSD();
+            // Drain late completes: NDIALOGS always; duration mode after the offer window ends
+            // (otherwise CSV stops with gap ≈ MAX_INFLIGHT and under-counts Completed).
+            {
+                long drainMs = DURATION_MINUTES > 0 ? 45000L : 15000L;
+                long drainDeadline = System.currentTimeMillis() + drainMs;
+                while (System.currentTimeMillis() < drainDeadline && client.inflightDialogs.size() > 0) {
+                    Thread.sleep(200);
+                }
+                if (!client.inflightDialogs.isEmpty()) {
+                    System.err.println("[DEBUG] Clearing " + client.inflightDialogs.size()
+                            + " stuck inflight dialog(s) after drain");
+                    for (Long stuckId : new java.util.ArrayList<Long>(client.inflightDialogs.keySet())) {
+                        client.releaseInflight(stuckId);
+                    }
+                }
             }
 
             client.terminate();
+            // Non-daemon SCTP/TCAP/M3UA threads otherwise keep the JVM alive after main returns.
+            System.exit(0);
 
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -561,6 +762,10 @@ public class Client extends TestHarnessUssd {
     @Override
     public void onInvokeTimeout(MAPDialog mapDialog, Long invokeId) {
         logger.error(String.format("onInvokeTimeout for Dialog=%d and invokeId=%d", mapDialog.getLocalDialogId(), invokeId));
+        // #region agent log
+        agentDebugLog("H4", "Client.onInvokeTimeout", "invoke timeout",
+                String.format("{\"dialogId\":%d,\"invokeId\":%d}", mapDialog.getLocalDialogId(), invokeId));
+        // #endregion
     }
 
     /*
@@ -587,6 +792,12 @@ public class Client extends TestHarnessUssd {
      */
     @Override
     public void onProcessUnstructuredSSResponse(ProcessUnstructuredSSResponse processUnstructuredSSResponse) {
+        // #region agent log
+        agentDebugLog("H5", "Client.onProcessUnstructuredSSResponse", "final ussd response",
+                String.format("{\"dialogId\":%d,\"invokeId\":%d}",
+                        processUnstructuredSSResponse.getMAPDialog().getLocalDialogId(),
+                        processUnstructuredSSResponse.getInvokeId()));
+        // #endregion
         if (logger.isDebugEnabled()) {
             logger.debug(String.format("Rx ProcessUnstructuredSSResponseIndication. USSD String=%s",
                 processUnstructuredSSResponse.getUSSDString()));
@@ -605,26 +816,57 @@ public class Client extends TestHarnessUssd {
         if (logger.isDebugEnabled()) {
             logger.debug(String.format("Rx UnstructuredSSRequestIndication. USSD String=%s ", unstructuredSSRequest.getUSSDString()));
         }
-        MAPDialogSupplementary mapDialog = unstructuredSSRequest.getMAPDialog();
-        long dialogId = mapDialog.getLocalDialogId();
+        final MAPDialogSupplementary mapDialog = unstructuredSSRequest.getMAPDialog();
+        final long dialogId = mapDialog.getLocalDialogId();
+        final long invokeId = unstructuredSSRequest.getInvokeId();
 
+        if (THINK_MAX_MS <= 0) {
+            // Keep MAP reply on the delivery thread when no think-delay (avoids dialog races).
+            replyUnstructured(mapDialog, dialogId, invokeId);
+            return;
+        }
+
+        int lo = Math.max(0, THINK_MIN_MS);
+        int hi = Math.max(lo, THINK_MAX_MS);
+        final int delayMs = lo + thinkRandom.nextInt(hi - lo + 1);
+        // #region agent log
+        long n = AGENT_REPLY_SCHEDULED.incrementAndGet();
+        if (n == 1L || n % 500L == 0L) {
+            agentDebugLog("H5", "Client.onUnstructuredSSRequest", "reply scheduled",
+                    String.format("{\"scheduled\":%d,\"delayMs\":%d,\"dialogId\":%d}", n, delayMs, dialogId));
+        }
+        // #endregion
+        this.ussdReplyScheduler.schedule(new Runnable() {
+            @Override
+            public void run() {
+                replyUnstructured(mapDialog, dialogId, invokeId);
+            }
+        }, delayMs, TimeUnit.MILLISECONDS);
+    }
+
+    private void replyUnstructured(MAPDialogSupplementary mapDialog, long dialogId, long invokeId) {
         try {
-            applyThinkDelay();
-            String digit = this.menuEngine.nextInput(dialogId, this.menuProfile);
+            String digit = menuEngine.nextInput(dialogId, menuProfile);
+            // #region agent log
+            agentDebugLog("H1", "Client.onUnstructuredSSRequest", "menu reply",
+                    String.format("{\"dialogId\":%d,\"profile\":\"%s\",\"digit\":\"%s\"}",
+                            dialogId, menuProfile, digit == null ? "null" : digit));
+            // #endregion
             if (digit == null) {
                 logger.warn("No menu input for dialog " + dialogId + ", skipping response");
+                // #region agent log
+                agentDebugLog("H1", "Client.onUnstructuredSSRequest", "null digit skip",
+                        String.format("{\"dialogId\":%d}", dialogId));
+                // #endregion
                 return;
             }
 
             CBSDataCodingScheme ussdDataCodingScheme = new CBSDataCodingSchemeImpl(0x0f);
-            USSDString ussdString = this.mapProvider.getMAPParameterFactory().createUSSDString(digit, null, null);
-
-            mapDialog.addUnstructuredSSResponse(unstructuredSSRequest.getInvokeId(), ussdDataCodingScheme, ussdString);
+            USSDString ussdString = mapProvider.getMAPParameterFactory().createUSSDString(digit, null, null);
+            mapDialog.addUnstructuredSSResponse(invokeId, ussdDataCodingScheme, ussdString);
             mapDialog.send();
-
         } catch (MAPException e) {
-            logger.error(
-                    String.format("Error while sending UnstructuredSSResponse for Dialog=%d", mapDialog.getLocalDialogId()));
+            logger.error(String.format("Error while sending UnstructuredSSResponse for Dialog=%d", dialogId));
         }
     }
 
@@ -739,6 +981,8 @@ public class Client extends TestHarnessUssd {
         logger.error(String.format(
                 "onDialogReject for DialogId=%d MAPRefuseReason=%s ApplicationContextName=%s MAPExtensionContainer=%s",
                 mapDialog.getLocalDialogId(), refuseReason, alternativeApplicationContext, extensionContainer));
+        this.menuEngine.clearDialog(mapDialog.getLocalDialogId());
+        releaseInflight(mapDialog.getLocalDialogId());
         this.csvWriter.incrementCounter(ERROR_DIALOGS);
     }
 
@@ -753,6 +997,8 @@ public class Client extends TestHarnessUssd {
     public void onDialogUserAbort(MAPDialog mapDialog, MAPUserAbortChoice userReason, MAPExtensionContainer extensionContainer) {
         logger.error(String.format("onDialogUserAbort for DialogId=%d MAPUserAbortChoice=%s MAPExtensionContainer=%s",
                 mapDialog.getLocalDialogId(), userReason, extensionContainer));
+        this.menuEngine.clearDialog(mapDialog.getLocalDialogId());
+        releaseInflight(mapDialog.getLocalDialogId());
         this.csvWriter.incrementCounter(ERROR_DIALOGS);
     }
 
@@ -770,6 +1016,8 @@ public class Client extends TestHarnessUssd {
         logger.error(String.format(
                 "onDialogProviderAbort for DialogId=%d MAPAbortProviderReason=%s MAPAbortSource=%s MAPExtensionContainer=%s",
                 mapDialog.getLocalDialogId(), abortProviderReason, abortSource, extensionContainer));
+        this.menuEngine.clearDialog(mapDialog.getLocalDialogId());
+        releaseInflight(mapDialog.getLocalDialogId());
         this.csvWriter.incrementCounter(ERROR_DIALOGS);
     }
 
@@ -780,9 +1028,14 @@ public class Client extends TestHarnessUssd {
      */
     @Override
     public void onDialogClose(MAPDialog mapDialog) {
+        // #region agent log
+        agentDebugLog("H5", "Client.onDialogClose", "dialog close",
+                String.format("{\"dialogId\":%d}", mapDialog.getLocalDialogId()));
+        // #endregion
         if (logger.isDebugEnabled()) {
             logger.debug(String.format("DialogClose for Dialog=%d", mapDialog.getLocalDialogId()));
         }
+        markDialogCompleted(mapDialog.getLocalDialogId());
     }
 
     /*
@@ -795,6 +1048,8 @@ public class Client extends TestHarnessUssd {
     public void onDialogNotice(MAPDialog mapDialog, MAPNoticeProblemDiagnostic noticeProblemDiagnostic) {
         logger.error(String.format("onDialogNotice for DialogId=%d MAPNoticeProblemDiagnostic=%s ",
                 mapDialog.getLocalDialogId(), noticeProblemDiagnostic));
+        this.menuEngine.clearDialog(mapDialog.getLocalDialogId());
+        releaseInflight(mapDialog.getLocalDialogId());
         this.csvWriter.incrementCounter(ERROR_DIALOGS);
     }
 
@@ -809,35 +1064,7 @@ public class Client extends TestHarnessUssd {
         if (logger.isDebugEnabled()) {
             logger.debug(String.format("onDialogRelease for DialogId=%d", mapDialog.getLocalDialogId()));
         }
-        this.menuEngine.clearDialog(mapDialog.getLocalDialogId());
-        this.csvWriter.incrementCounter(SUCCESSFUL_DIALOGS);
-        this.endCount++;
-
-        if (this.endCount < NDIALOGS && !isDurationExpired()) {
-            if ((this.endCount % 10000) == 0) {
-                long current = System.currentTimeMillis();
-                float sec = (float) (current - prev) / 1000f;
-                prev = current;
-                logger.warn("Completed 10000 Dialogs, dialogs per second: " + (float) (10000 / sec));
-            }
-        } else {
-            if ((this.endCount >= NDIALOGS || isDurationExpired()) && !endReportPrinted) {
-                endReportPrinted = true;
-                long current = System.currentTimeMillis();
-                logger.warn("Start Time = " + start);
-                logger.warn("Current Time = " + current);
-                float sec = (float) (current - start) / 1000f;
-                int completedDialogs = this.endCount - (RAMP_UP_PERIOD < 0 ? RAMP_UP_PERIOD : 0);
-                if (completedDialogs < 0) completedDialogs = this.endCount;
-
-                logger.warn("Total time in sec = " + sec);
-                logger.warn("Total completed dialogs = " + completedDialogs);
-                logger.warn("Throughput = " + (float) (completedDialogs / sec));
-                if (isDurationMode()) {
-                    logger.warn("[DURATION MODE] Test completed after " + DURATION_MINUTES + " minute(s)");
-                }
-            }
-        }
+        markDialogCompleted(mapDialog.getLocalDialogId());
     }
 
     /*
@@ -848,8 +1075,19 @@ public class Client extends TestHarnessUssd {
      */
     @Override
     public void onDialogTimeout(MAPDialog mapDialog) {
-        logger.error(String.format("onDialogTimeout for DialogId=%d", mapDialog.getLocalDialogId()));
-        this.menuEngine.clearDialog(mapDialog.getLocalDialogId());
+        long dialogId = mapDialog.getLocalDialogId();
+        logger.error(String.format("onDialogTimeout for DialogId=%d", dialogId));
+        // #region agent log
+        agentDebugLog("H4", "Client.onDialogTimeout", "dialog timeout",
+                String.format("{\"dialogId\":%d,\"endCount\":%d}", dialogId, endCount));
+        // #endregion
+        this.menuEngine.clearDialog(dialogId);
+        // If already completed, do not double-count as Failed.
+        if (this.completedDialogs.containsKey(dialogId)) {
+            releaseInflight(dialogId);
+            return;
+        }
+        releaseInflight(dialogId);
         this.csvWriter.incrementCounter(ERROR_DIALOGS);
     }
 
@@ -948,22 +1186,32 @@ public class Client extends TestHarnessUssd {
         // TODO Auto-generated method stub
 
     }
+    private static boolean isMapLoadDebug() {
+        return Boolean.parseBoolean(System.getProperty("mapLoadDebug", "false"));
+    }
+
     public class DialogInitiator implements Runnable {
 
         @Override
         public void run() {
-            System.out.println("[DEBUG] DialogInitiator thread started, endCount=" + endCount + " NDIALOGS=" + NDIALOGS);
+            if (isMapLoadDebug()) {
+                System.out.println("[DEBUG] DialogInitiator thread started, endCount=" + endCount + " NDIALOGS=" + NDIALOGS);
+            }
             try {
-                while (endCount < NDIALOGS && !isDurationExpired()) {
+                while (endCount < NDIALOGS && createdCount.get() < NDIALOGS && !isDurationExpired()) {
                     if (endCount < 0 && loadStartMs == 0L) {
                         loadStartMs = System.currentTimeMillis();
                         start = loadStartMs;
                         prev = start;
                     }
-                    System.out.println("[DEBUG] Calling initiateUSSD(), endCount=" + endCount);
+                    if (isMapLoadDebug()) {
+                        System.out.println("[DEBUG] Calling initiateUSSD(), endCount=" + endCount);
+                    }
                     initiateUSSD();
                 }
-                System.out.println("[DEBUG] DialogInitiator loop ended, endCount=" + endCount + " expired=" + isDurationExpired());
+                if (isMapLoadDebug()) {
+                    System.out.println("[DEBUG] DialogInitiator loop ended, endCount=" + endCount + " expired=" + isDurationExpired());
+                }
             } catch (MAPException ex) {
                 System.err.println("[DEBUG] MAPException in DialogInitiator: " + ex.getMessage());
                 logger.error("Exception when sending a new MAP dialog", ex);
