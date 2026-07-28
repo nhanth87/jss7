@@ -139,7 +139,7 @@ public class SimulatorGuiForm extends JFrame implements NotificationListener {
 
         setTitle("SS7 Simulator: ");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 532, 277);
+        setBounds(80, 80, 532, 277);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -536,7 +536,15 @@ public class SimulatorGuiForm extends JFrame implements NotificationListener {
         this.tm = new javax.swing.Timer(500, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (hostImpl != null) {
-                    hostImpl.checkStore();
+                    // Persist off the EDT — Jackson/XML must not block UI
+                    final TesterHostInterface h = hostImpl;
+                    java.util.concurrent.CompletableFuture.runAsync(() -> {
+                        try {
+                            h.checkStore();
+                        } catch (Throwable t) {
+                            t.printStackTrace();
+                        }
+                    });
                     hostImpl.execute();
 
                     // TODO: extra action for updating GUI from host notifications if a host is local

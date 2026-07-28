@@ -27,12 +27,13 @@ public class MapConfigurationData {
 
     // private int localSsn;
     // private int remoteSsn;
-    private String remoteAddressDigits;
+    private String remoteAddressDigits = "";
 
-    private String origReference;
+    // Defaults match classic ussdgateway ss7-simulator/main_simulator2.xml
+    private String origReference = "111111";
     private AddressNature origReferenceAddressNature = AddressNature.international_number;
     private NumberingPlan origReferenceNumberingPlan = NumberingPlan.ISDN;
-    private String destReference;
+    private String destReference = "222222";
     private AddressNature destReferenceAddressNature = AddressNature.international_number;
     private NumberingPlan destReferenceNumberingPlan = NumberingPlan.ISDN;
 

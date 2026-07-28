@@ -1,4 +1,3 @@
-
 package org.restcomm.protocols.ss7.tools.simulator.common;
 
 import java.lang.reflect.Method;
@@ -8,6 +7,7 @@ import java.util.Hashtable;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.jdmk.Enumerated;
 
 /**
@@ -63,6 +63,11 @@ public abstract class EnumeratedBase extends Enumerated {
         return null;
     }
 
+    /**
+     * Combo-box helper only — must not be treated as a Jackson bean property
+     * (that causes infinite recursion: list → EnumeratedBase → list → …).
+     */
+    @JsonIgnore
     public EnumeratedBase[] getList() {
         Method[] mm = this.getClass().getMethods();
         Method mt = null;

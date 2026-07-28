@@ -20,18 +20,32 @@
 			<outputDirectory>/lib</outputDirectory>
 			<unpack>false</unpack>
 			<scope>runtime</scope>
+			<excludes>
+				<!-- Replaced by log4j-1.2-api bridge -->
+				<exclude>log4j:log4j</exclude>
+			</excludes>
 			<includes>
 				<!-- simulator libraries -->
 				<include>org.restcomm.protocols.ss7.tools.simulator:simulator-core</include>
 				<include>org.restcomm.protocols.ss7.tools.simulator:simulator-gui</include>
 
 				<!-- Common libraries -->
-				<include>log4j:log4j</include>
+				<include>org.apache.logging.log4j:log4j-api</include>
+				<include>org.apache.logging.log4j:log4j-core</include>
+				<!-- Bridge old org.apache.log4j.* callers (sctp/m3ua) onto Log4j2 -->
+				<include>org.apache.logging.log4j:log4j-1.2-api</include>
 				<include>urbanophile:java-getopt</include>
 				<include>com.sun.jdmk:jmxtools</include>
 
 				<!-- Not strictly SS7, But needed by SS7 -->
 				<include>javolution:javolution</include>
+				<include>org.jctools:jctools-core</include>
+				<include>com.fasterxml.jackson.core:jackson-core</include>
+				<include>com.fasterxml.jackson.core:jackson-annotations</include>
+				<include>com.fasterxml.jackson.core:jackson-databind</include>
+				<include>com.fasterxml.jackson.dataformat:jackson-dataformat-xml</include>
+				<include>com.fasterxml.woodstox:woodstox-core</include>
+				<include>org.codehaus.woodstox:stax2-api</include>
 				<include>io.netty:netty-common</include>
 				<include>io.netty:netty-buffer</include>
 				<include>io.netty:netty-transport</include>

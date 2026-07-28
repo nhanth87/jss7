@@ -213,8 +213,9 @@ public class TesterHostImpl extends NotificationBroadcasterSupport implements Te
 
         if (this.loadOld(fnOld)) {
             this.store();
-        } else {
-            this.load(fn);
+        } else if (!this.load(fn)) {
+            // No usable persist file: keep in-code defaults and write them out so next start loads XML.
+            this.store();
         }
         if (fnOld.exists())
             fnOld.delete();
@@ -875,6 +876,11 @@ public class TesterHostImpl extends NotificationBroadcasterSupport implements Te
 
         } catch (Exception ex) {
             this.sendNotif(SOURCE_NAME, "Error while reading the Host state from file", ex, Level.WARN);
+            Throwable root = ex;
+            while (root.getCause() != null) {
+                root = root.getCause();
+            }
+            logger.warn("Config load failed for " + fn + ": " + root);
             return false;
         }
     }

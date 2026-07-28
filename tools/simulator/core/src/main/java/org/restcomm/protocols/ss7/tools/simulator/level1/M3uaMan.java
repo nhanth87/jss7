@@ -619,7 +619,7 @@ public class M3uaMan implements M3uaManMBean, Stoppable {
 
         this.sctpManagement.start();
         this.sctpManagement.setConnectDelay(10000);
-        this.sctpManagement.removeAllResourses();
+        this.sctpManagement.removeAllResources();
         Thread.sleep(500); // waiting for freeing ip ports
 
         // init M3UA stack

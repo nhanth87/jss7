@@ -131,11 +131,17 @@ public final class Ss7StackBuilder {
                 sctp.addServerAssociation(HostPort.parse(link.peer()).host,
                         HostPort.parse(link.peer()).port, serverName,
                         link.name(), channel);
+                sctp.startServer(serverName);
             } else {
                 HostPort peer = HostPort.parse(link.peer());
                 sctp.addAssociation(local.host, local.port, peer.host, peer.port,
                         link.name(), channel, extra);
             }
+            // Bring the association up (server: wait for peer; client: dial).
+            sctp.startAssociation(link.name());
+            LOG.info("[ss7-config] SCTP link {} {} {}:{} ({}) started",
+                    link.name(), isServer ? "server" : "client",
+                    local.host, local.port, channel);
         }
         return sctp;
     }
@@ -204,6 +210,11 @@ public final class Ss7StackBuilder {
         }
         for (Ss7Config.Route r : m.routes()) {
             m3ua.addRoute(r.to().dpc(), r.to().opc(), r.to().si(), r.via());
+        }
+        // Activate ASPs so M3UA binds onto the (now started) SCTP associations.
+        for (String aspName : aspCreated) {
+            m3ua.startAsp(aspName);
+            LOG.info("[ss7-config] M3UA ASP {} started", aspName);
         }
         return m3ua;
     }

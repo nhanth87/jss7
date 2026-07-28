@@ -31,19 +31,20 @@ public class SccpConfigurationData {
     protected static final String CALLING_PARTY_ADDRESS_DIGITS = "callingPartyAddressDigits";
     protected static final String SCCP_PROTOCOL_VERSION = "sccpProtocolVersion";
 
-    private boolean routeOnGtMode;
-    private int remoteSpc = 0;
+    // Defaults match classic ussdgateway ss7-simulator/main_simulator2.xml
+    private boolean routeOnGtMode = true;
+    private int remoteSpc = 2;
     private int remoteSpc2 = 0;
-    private int localSpc = 0;
-    private int localSsn;
-    private int localSsn2;
-    private int remoteSsn;
-    private int ni = 0;
+    private int localSpc = 1;
+    private int localSsn = 8;
+    private int localSsn2 = 0;
+    private int remoteSsn = 8;
+    private int ni = 2;
     private GlobalTitleType globalTitleType = new GlobalTitleType(GlobalTitleType.VAL_TT_NP_ES_NOA);
     private NatureOfAddress natureOfAddress = NatureOfAddress.INTERNATIONAL;
-    private NumberingPlan numberingPlan = NumberingPlan.ISDN_MOBILE;
+    private NumberingPlan numberingPlan = NumberingPlan.ISDN_TELEPHONY;
     private int translationType = 0;
-    private String callingPartyAddressDigits = "";
+    private String callingPartyAddressDigits = "9960639902";
     private SccpProtocolVersion sccpProtocolVersion = SccpProtocolVersion.ITU;
 
     public boolean isRouteOnGtMode() {

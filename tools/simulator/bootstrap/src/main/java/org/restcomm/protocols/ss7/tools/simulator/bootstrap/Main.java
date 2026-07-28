@@ -24,7 +24,7 @@ public class Main {
 
     private static final String HOME_DIR = "SIMULATOR_HOME";
     private static final String LOG4J_URL = "/conf/log4j.properties";
-    private static final String LOG4J_URL_XML = "/conf/log4j.xml";
+    private static final String LOG4J_URL_XML = "/conf/log4j2.xml";
     public static final String SIMULATOR_HOME = "simulator.home.dir";
     public static final String SIMULATOR_DATA = "simulator.data.dir";
     private static int index = 0;

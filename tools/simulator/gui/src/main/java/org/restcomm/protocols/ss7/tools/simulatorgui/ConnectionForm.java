@@ -65,6 +65,7 @@ public class ConnectionForm extends JFrame {
     private JRadioButton rbLocal;
     private JLabel lblHostName;
     private JTextField tbAppName;
+    private JButton btStart;
 
     // public static void main(String[] args) {
     // EventQueue.invokeLater(new Runnable() {
@@ -85,7 +86,10 @@ public class ConnectionForm extends JFrame {
         setResizable(false);
         setTitle("Connecting to a testerHost ...");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 450, 212);
+        // Fixed top-left of primary X screen — setLocationRelativeTo(null) can place
+        // the window off-screen under Niri / multi-monitor virtual desktops.
+        setBounds(80, 80, 450, 212);
+        setAlwaysOnTop(true);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setLayout(new BorderLayout(0, 0));
@@ -126,7 +130,7 @@ public class ConnectionForm extends JFrame {
         panel.add(tbUrl);
         tbUrl.setColumns(10);
 
-        JButton btStart = new JButton("Start");
+        btStart = new JButton("Start");
         btStart.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (rbLocal.isSelected()) {
@@ -154,25 +158,50 @@ public class ConnectionForm extends JFrame {
     }
 
     private void startLocal(String appName) {
-        // creating a testerHost
+        btStart.setEnabled(false);
+        btStart.setText("Starting...");
+        System.out.println("SS7 Simulator: creating local TesterHost '" + appName + "' ...");
 
-        String sim_home = System.getenv(TesterHostInterface.SIMULATOR_HOME_VAR);
-        if (sim_home != null)
-            sim_home += File.separator + "data";
-        TesterHostInterface host = testerHostFactoryInterface.createTesterHost(appName, sim_home);
+        final ConnectionForm self = this;
+        new javax.swing.SwingWorker<TesterHostInterface, Void>() {
+            @Override
+            protected TesterHostInterface doInBackground() {
+                String sim_home = System.getenv(TesterHostInterface.SIMULATOR_HOME_VAR);
+                if (sim_home != null)
+                    sim_home += File.separator + "data";
+                return testerHostFactoryInterface.createTesterHost(appName, sim_home);
+            }
 
-        // starting the main form
-        SimulatorGuiForm frame = new SimulatorGuiForm();
-        host.addNotificationListener(frame, null, null);
-        frame.startHost(appName + "-local", false, host, host, host.getM3uaMan(), host.getDialogicMan(), host.getSccpMan(),
-                host.getMapMan(), host.getCapMan(), host.getTestUssdClientMan(), host.getTestUssdServerMan(),
-                host.getTestSmsClientMan(), host.getTestSmsServerMan(), host.getTestCapScfMan(), host.getTestCapSsfMan(),
-                host.getTestAtiClientMan(), host.getTestAtiServerMan(), host.getTestCheckImeiClientMan(),
-                host.getTestCheckImeiServerMan(), host.getTestLcsClientMan(), host.getTestLcsServerMan(), host.getTestPsiServerMan());
-        frame.setVisible(true);
-
-        // closing the connection form
-        this.dispose();
+            @Override
+            protected void done() {
+                try {
+                    TesterHostInterface host = get();
+                    SimulatorGuiForm frame = new SimulatorGuiForm();
+                    host.addNotificationListener(frame, null, null);
+                    frame.startHost(appName + "-local", false, host, host, host.getM3uaMan(), host.getDialogicMan(),
+                            host.getSccpMan(), host.getMapMan(), host.getCapMan(), host.getTestUssdClientMan(),
+                            host.getTestUssdServerMan(), host.getTestSmsClientMan(), host.getTestSmsServerMan(),
+                            host.getTestCapScfMan(), host.getTestCapSsfMan(), host.getTestAtiClientMan(),
+                            host.getTestAtiServerMan(), host.getTestCheckImeiClientMan(), host.getTestCheckImeiServerMan(),
+                            host.getTestLcsClientMan(), host.getTestLcsServerMan(), host.getTestPsiServerMan());
+                    frame.setLocation(80, 80);
+                    frame.setAlwaysOnTop(true);
+                    frame.setVisible(true);
+                    frame.toFront();
+                    System.out.println("SS7 Simulator: main window opened");
+                    // Drop always-on-top after a moment so it does not stick above everything
+                    javax.swing.Timer t = new javax.swing.Timer(3000, ev -> frame.setAlwaysOnTop(false));
+                    t.setRepeats(false);
+                    t.start();
+                    self.dispose();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    btStart.setEnabled(true);
+                    btStart.setText("Start");
+                    JOptionPane.showMessageDialog(self, "Failed to start local host: " + ex.getMessage());
+                }
+            }
+        }.execute();
     }
 
     private void startRemote(String appName, String urlString) {

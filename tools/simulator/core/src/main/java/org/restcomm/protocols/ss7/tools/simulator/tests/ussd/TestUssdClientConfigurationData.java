@@ -37,13 +37,14 @@ public class TestUssdClientConfigurationData {
     protected NumberingPlan msisdnNumberingPlan = NumberingPlan.ISDN;
     protected int dataCodingScheme = 0x0F;
     protected int alertingPattern = -1;
-    protected String sriResponseImsi = "";
-    protected String sriResponseVlr = "";
+    // Defaults match classic ussdgateway ss7-simulator/main_simulator2.xml
+    protected String sriResponseImsi = "404685505601234";
+    protected String sriResponseVlr = "9960639999";
     protected SRIReaction sriReaction = new SRIReaction(SRIReaction.VAL_RETURN_SUCCESS);
     protected boolean return20PersDeliveryErrors = false;
 
     protected UssdClientAction ussdClientAction = new UssdClientAction(UssdClientAction.VAL_MANUAL_OPERATION);
-    protected String autoRequestString = "???";
+    protected String autoRequestString = "";
     protected String autoResponseString = "";
     protected int maxConcurrentDialogs = 10;
     protected boolean oneNotificationFor100Dialogs = false;

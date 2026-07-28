@@ -57,10 +57,11 @@ public class ConfigurationData {
     public static final String TEST_MAP_LCS_SERVER = "testMapLcsServer";
     public static final String TEST_MAP_PSI_SERVER = "testMapPsiServer";
 
-    private Instance_L1 instance_L1 = new Instance_L1(Instance_L1.VAL_NO);
-    private Instance_L2 instance_L2 = new Instance_L2(Instance_L2.VAL_NO);
-    private Instance_L3 instance_L3 = new Instance_L3(Instance_L3.VAL_NO);
-    private Instance_TestTask instance_TestTask = new Instance_TestTask(Instance_TestTask.VAL_NO);
+    // Defaults match classic ussdgateway ss7-simulator/main_simulator2.xml
+    private Instance_L1 instance_L1 = new Instance_L1(Instance_L1.VAL_M3UA);
+    private Instance_L2 instance_L2 = new Instance_L2(Instance_L2.VAL_SCCP);
+    private Instance_L3 instance_L3 = new Instance_L3(Instance_L3.VAL_MAP);
+    private Instance_TestTask instance_TestTask = new Instance_TestTask(Instance_TestTask.VAL_USSD_TEST_CLIENT);
 
     private M3uaConfigurationData m3uaConfigurationData = new M3uaConfigurationData();
     private DialogicConfigurationData dialogicConfigurationData = new DialogicConfigurationData();

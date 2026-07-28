@@ -7,12 +7,53 @@
 
 		<!-- Conf -->
 		<file>
-			<source>src/main/config/log4j.xml</source>
+			<source>src/main/config/log4j2.xml</source>
+			<destName>conf/log4j2.xml</destName>
+		</file>
+		<!-- Keep legacy filename for older docs; content is Log4j2 -->
+		<file>
+			<source>src/main/config/log4j2.xml</source>
 			<destName>conf/log4j.xml</destName>
 		</file>
 		<file>
 			<source>src/main/config/data.txt</source>
 			<destName>data/data.txt</destName>
-		</file>		
+		</file>
+		<!-- Default simulator params (from classic ussdgateway ss7-simulator XML) -->
+		<file>
+			<source>src/main/config/main_simulator2.xml</source>
+			<destName>data/main_simulator2.xml</destName>
+		</file>
+		<file>
+			<source>src/main/config/win_simulator2.xml</source>
+			<destName>data/win_simulator2.xml</destName>
+		</file>
+		<!-- SMSC lab params (from classic smscgateway ss7-simulator XML); appName=main_smsc / win_smsc -->
+		<file>
+			<source>src/main/config/main_smsc_simulator2.xml</source>
+			<destName>data/main_smsc_simulator2.xml</destName>
+		</file>
+		<file>
+			<source>src/main/config/win_smsc_simulator2.xml</source>
+			<destName>data/win_smsc_simulator2.xml</destName>
+		</file>
+		<!-- GMLC/location lab (from classic gmlc ss7-simulator XML); appName=main_gmlc / win_gmlc -->
+		<file>
+			<source>src/main/config/main_gmlc_simulator2.xml</source>
+			<destName>data/main_gmlc_simulator2.xml</destName>
+		</file>
+		<file>
+			<source>src/main/config/win_gmlc_simulator2.xml</source>
+			<destName>data/win_gmlc_simulator2.xml</destName>
+		</file>
+		<!-- MAP-LCS profiles on same GMLC transport; appName=main_lcs / win_lcs -->
+		<file>
+			<source>src/main/config/main_lcs_simulator2.xml</source>
+			<destName>data/main_lcs_simulator2.xml</destName>
+		</file>
+		<file>
+			<source>src/main/config/win_lcs_simulator2.xml</source>
+			<destName>data/win_lcs_simulator2.xml</destName>
+		</file>
 	</files>
 </component>

@@ -944,26 +944,32 @@ public class TestPsiServerConfigurationData {
         return CONTINUE_DIALOG;
     }
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public static String getIMSI() {
         return IMSI;
     }
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public static String getLMSI() {
         return LMSI;
     }
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public static String getNetworkNodeNumberAddress() {
         return NETWORK_NODE_NUMBER_ADDRESS;
     }
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public static String getIMEI() {
         return IMEI;
     }
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public MAPParameterFactory getMapParameterFactory() {
         return mapParameterFactory;
     }
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     public void setMapParameterFactory(MAPParameterFactory mapParameterFactory) {
         this.mapParameterFactory = mapParameterFactory;
     }

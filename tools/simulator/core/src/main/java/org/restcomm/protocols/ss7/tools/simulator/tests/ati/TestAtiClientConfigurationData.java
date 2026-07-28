@@ -31,9 +31,10 @@ public class TestAtiClientConfigurationData {
     private AddressNature addressNature = AddressNature.international_number;
     private NumberingPlan numberingPlan = NumberingPlan.ISDN;
     private boolean subscriberIdentityTypeIsImsi = false;
-    private boolean getLocationInformation = false;
+    // Defaults oriented for GMLC/location lab (classic gmlc ss7-simulator)
+    private boolean getLocationInformation = true;
     private boolean getSubscriberState = false;
-    private boolean getCurrentLocation = false;
+    private boolean getCurrentLocation = true;
     private DomainType getRequestedDomain = null;
     private boolean getImei = false;
     private boolean getMsClassmark = false;

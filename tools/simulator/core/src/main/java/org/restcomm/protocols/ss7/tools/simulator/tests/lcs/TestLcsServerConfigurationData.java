@@ -240,10 +240,12 @@ public class TestLcsServerConfigurationData {
     this.lcsClientType = val;
   }
 
+  @com.fasterxml.jackson.annotation.JsonIgnore
   public ExtGeographicalInformation getLocationEstimate() {
     return this.locationEstimate;
   }
 
+  @com.fasterxml.jackson.annotation.JsonIgnore
   public void setLocationEstimate(ExtGeographicalInformation extGeographicalInformation) {
     this.locationEstimate = extGeographicalInformation;
   }
@@ -400,10 +402,12 @@ public class TestLcsServerConfigurationData {
     return networkNodeNumber;
   }
 
+  @com.fasterxml.jackson.annotation.JsonIgnore
   public String getImsi() {
     return imsi;
   }
 
+  @com.fasterxml.jackson.annotation.JsonIgnore
   public void setImsi(String imsi) {
     this.imsi = imsi;
   }
@@ -416,18 +420,22 @@ public class TestLcsServerConfigurationData {
     this.lmsi = lmsi;
   }
 
+  @com.fasterxml.jackson.annotation.JsonIgnore
   public String getImei() {
     return imei;
   }
 
+  @com.fasterxml.jackson.annotation.JsonIgnore
   public void setImei(String imei) {
     this.imei = imei;
   }
 
+  @com.fasterxml.jackson.annotation.JsonIgnore
   public String getMsisdn() {
     return msisdn;
   }
 
+  @com.fasterxml.jackson.annotation.JsonIgnore
   public void setMsisdn(String msisdn) {
     this.msisdn = msisdn;
   }

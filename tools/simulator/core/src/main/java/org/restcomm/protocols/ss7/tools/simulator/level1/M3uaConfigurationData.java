@@ -49,21 +49,22 @@ public class M3uaConfigurationData {
 
     private boolean storePcapTrace = false;
     private boolean isSctpServer = false;
-    private String localHost;
-    private int localPort;
-    private String remoteHost;
-    private int remotePort;
-    private String localHost2;
-    private int localPort2;
-    private String remoteHost2;
-    private int remotePort2;
-    private IpChannelType ipChannelType = IpChannelType.TCP;
+    // Defaults match classic ussdgateway ss7-simulator/main_simulator2.xml
+    private String localHost = "127.0.0.1";
+    private int localPort = 8011;
+    private String remoteHost = "127.0.0.1";
+    private int remotePort = 8012;
+    private String localHost2 = "";
+    private int localPort2 = 0;
+    private String remoteHost2 = "";
+    private int remotePort2 = 0;
+    private IpChannelType ipChannelType = IpChannelType.SCTP;
     private String[] extraHostAddresses = new String[0];
-    private int dpc = 0;
-    private int opc = -1;
+    private int dpc = 2;
+    private int opc = 1;
     private int dpc2 = 0;
     private int opc2 = 0;
-    private int si = -1;
+    private int si = 3;
     private long routingContext = 101;
     private long networkAppearance = 102;
     private int trafficModeType = TrafficModeType.Loadshare;

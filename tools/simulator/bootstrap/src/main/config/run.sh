@@ -130,9 +130,30 @@ if [ "x$SERVER_SET" = "x" ]; then
      fi
 fi
 
+# Force a working X11 display for Swing (Niri/xwayland-satellite often uses :0
+# while some shells inherit a stale DISPLAY=:1).
+if [ -S /tmp/.X11-unix/X0 ]; then
+    case "$DISPLAY" in
+        :0|:0.*) ;;
+        *)
+            if [ ! -S "/tmp/.X11-unix/X${DISPLAY#:}" ]; then
+                export DISPLAY=:0
+            fi
+            ;;
+    esac
+elif [ -z "$DISPLAY" ] && [ -S /tmp/.X11-unix/X0 ]; then
+    export DISPLAY=:0
+fi
+# Needed for many tiling Wayland compositors hosting Xwayland
+export _JAVA_AWT_WM_NONREPARENTING=1
+
 # Setup MMS specific properties
 JAVA_OPTS="-Dprogram.name=$PROGNAME $JAVA_OPTS"
 JAVA_OPTS="$JAVA_OPTS -Xms256m -Xmx512m -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000"
+# Log4j2 must be configured before Main.<clinit> loads LogManager
+JAVA_OPTS="$JAVA_OPTS -Dlog4j.configurationFile=file:$SIMULATOR_HOME/conf/log4j2.xml"
+# Prefer X11 toolkit path for Swing under Wayland compositors
+JAVA_OPTS="$JAVA_OPTS -Djava.awt.headless=false -Dsun.java2d.xrender=true -Dawt.useSystemAAFontSettings=on"
 #JAVA_OPTS="$JAVA_OPTS -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n"
 # Setup the java endorsed dirs
 SIMULATOR_ENDORSED_DIRS="$SIMULATOR_HOME/lib"

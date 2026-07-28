@@ -41,12 +41,13 @@ public class TestSmsClientConfigurationData {
 
     protected AddressNature addressNature = AddressNature.international_number;
     protected NumberingPlan numberingPlan = NumberingPlan.ISDN;
-    protected String serviceCenterAddress = "";
+    // Defaults match classic smscgateway ss7-simulator/main_simulator2.xml
+    protected String serviceCenterAddress = "22220";
     protected MapProtocolVersion mapProtocolVersion = new MapProtocolVersion(MapProtocolVersion.VAL_MAP_V3);
-    protected String sriResponseImsi = "";
-    protected String sriResponseVlr = "";
+    protected String sriResponseImsi = "555667";
+    protected String sriResponseVlr = "888801";
     protected int smscSsn = 8;
-    protected TypeOfNumber typeOfNumber = TypeOfNumber.InternationalNumber;
+    protected TypeOfNumber typeOfNumber = TypeOfNumber.Unknown;
     protected NumberingPlanIdentification numberingPlanIdentification = NumberingPlanIdentification.ISDNTelephoneNumberingPlan;
     protected SmsCodingType smsCodingType = new SmsCodingType(SmsCodingType.VAL_GSM7);
     protected int nationalLanguageCode = 0;
