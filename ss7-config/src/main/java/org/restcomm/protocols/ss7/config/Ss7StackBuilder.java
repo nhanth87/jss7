@@ -89,16 +89,32 @@ public final class Ss7StackBuilder {
     // ── the compile ───────────────────────────────────────────
     private Ss7Stack doBuild() throws Exception {
         LOG.info("[ss7-config] compiling jSS7 stack '{}'", cfg.stackName());
-        Management sctp = initSctp();
-        M3UAManagementImpl m3ua = initM3ua(sctp);
-        SccpExtModuleImpl sccpExt = new SccpExtModuleImpl();
-        SccpStackImpl sccp = initSccp(m3ua, sccpExt);
-        TCAPStack tcap = initTcap(sccp);
-        MAPStack map = cfg.protocols().map() ? initMap(tcap) : null;
-        CAPStack cap = cfg.protocols().cap() ? initCap(tcap) : null;
-        LOG.info("[ss7-config] jSS7 stack '{}' STARTED (map={} cap={})",
-                cfg.stackName(), map != null, cap != null);
-        return new Ss7Stack(sctp, m3ua, sccp, sccpExt, tcap, map, cap);
+        Management sctp = null;
+        try {
+            sctp = initSctp();
+            M3UAManagementImpl m3ua = initM3ua(sctp);
+            // Bind/listen only AFTER createAspFactory: M3UA refuses associations that are
+            // already started, and Netty startServer() auto-starts server associations.
+            startSctpAndM3ua(sctp, m3ua);
+            SccpExtModuleImpl sccpExt = new SccpExtModuleImpl();
+            SccpStackImpl sccp = initSccp(m3ua, sccpExt);
+            TCAPStack tcap = initTcap(sccp);
+            MAPStack map = cfg.protocols().map() ? initMap(tcap) : null;
+            CAPStack cap = cfg.protocols().cap() ? initCap(tcap) : null;
+            LOG.info("[ss7-config] jSS7 stack '{}' STARTED (map={} cap={})",
+                    cfg.stackName(), map != null, cap != null);
+            return new Ss7Stack(sctp, m3ua, sccp, sccpExt, tcap, map, cap);
+        } catch (Exception ex) {
+            // Avoid orphan SCTP listeners (e.g. :2905) when M3UA/SCCP fails mid-build.
+            if (sctp != null) {
+                try {
+                    sctp.stop();
+                } catch (Exception stopEx) {
+                    LOG.warn("[ss7-config] SCTP cleanup after build failure: {}", stopEx.getMessage());
+                }
+            }
+            throw ex;
+        }
     }
 
     // ── SCTP ──────────────────────────────────────────────────
@@ -131,15 +147,12 @@ public final class Ss7StackBuilder {
                 sctp.addServerAssociation(HostPort.parse(link.peer()).host,
                         HostPort.parse(link.peer()).port, serverName,
                         link.name(), channel);
-                sctp.startServer(serverName);
             } else {
                 HostPort peer = HostPort.parse(link.peer());
                 sctp.addAssociation(local.host, local.port, peer.host, peer.port,
                         link.name(), channel, extra);
             }
-            // Bring the association up (server: wait for peer; client: dial).
-            sctp.startAssociation(link.name());
-            LOG.info("[ss7-config] SCTP link {} {} {}:{} ({}) started",
+            LOG.info("[ss7-config] SCTP link {} {} {}:{} ({}) configured (start deferred)",
                     link.name(), isServer ? "server" : "client",
                     local.host, local.port, channel);
         }
@@ -211,12 +224,42 @@ public final class Ss7StackBuilder {
         for (Ss7Config.Route r : m.routes()) {
             m3ua.addRoute(r.to().dpc(), r.to().opc(), r.to().si(), r.via());
         }
-        // Activate ASPs so M3UA binds onto the (now started) SCTP associations.
-        for (String aspName : aspCreated) {
-            m3ua.startAsp(aspName);
-            LOG.info("[ss7-config] M3UA ASP {} started", aspName);
-        }
+        // Transport start (startServer / startAsp) happens in startSctpAndM3ua() after
+        // createAspFactory — M3UA requires associations to be stopped at factory create time.
         return m3ua;
+    }
+
+    /**
+     * Bring SCTP servers/associations and M3UA ASPs up. Order matters for Netty SCTP:
+     * {@code startServer} auto-starts server associations, so ASP factories must already exist.
+     */
+    private void startSctpAndM3ua(Management sctp, M3UAManagementImpl m3ua) throws Exception {
+        for (Ss7Config.Link link : cfg.sctp().links()) {
+            if (!"SERVER".equalsIgnoreCase(link.type())) {
+                continue;
+            }
+            String serverName = link.name() + "-srv";
+            sctp.startServer(serverName);
+            HostPort local = HostPort.parse(link.local());
+            LOG.info("[ss7-config] SCTP server {} listening {}:{}",
+                    serverName, local.host, local.port);
+        }
+        java.util.Set<String> aspNames = new java.util.LinkedHashSet<>();
+        for (Ss7Config.As as : cfg.m3ua().as()) {
+            for (String linkName : as.links()) {
+                aspNames.add(linkName + "-ASP");
+            }
+        }
+        for (String aspName : aspNames) {
+            try {
+                m3ua.startAsp(aspName);
+                LOG.info("[ss7-config] M3UA ASP {} started", aspName);
+            } catch (Exception ex) {
+                // Server ASP may stay COMM_DOWN until peer connects — still treat as wired.
+                LOG.warn("[ss7-config] M3UA ASP {} start deferred/failed (peer may be down): {}",
+                        aspName, ex.getMessage());
+            }
+        }
     }
 
     // ── SCCP (+ ext) ──────────────────────────────────────────
