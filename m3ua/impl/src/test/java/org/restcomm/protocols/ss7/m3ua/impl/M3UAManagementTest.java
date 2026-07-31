@@ -142,6 +142,48 @@ public class M3UAManagementTest {
 
     }
 
+    /**
+     * Scalar-only persist (Jackson LinkedHashMap store without route/aspFactories/appServers)
+     * must not NPE on start/stop — reproduces SS7 simulator Layer-1 start failure.
+     */
+    @Test
+    public void testLoadPartialPersistWithoutRoute() throws Exception {
+        String name = "PartialPersistNoRoute";
+        String persistDir = Util.getTmpTestDir();
+        File f = new File(persistDir, name + "_m3ua1.xml");
+        if (f.exists()) {
+            f.delete();
+        }
+        String partialXml =
+                "<?xml version='1.0' encoding='UTF-8'?>\n"
+                        + "<LinkedHashMap>\n"
+                        + "  <timeBetweenHeartbeat>10000</timeBetweenHeartbeat>\n"
+                        + "  <statisticsEnabled>false</statisticsEnabled>\n"
+                        + "  <statisticsTaskDelay>5000</statisticsTaskDelay>\n"
+                        + "  <statisticsTaskPeriod>5000</statisticsTaskPeriod>\n"
+                        + "  <routingKeyManagementEnabled>false</routingKeyManagementEnabled>\n"
+                        + "  <useLsbForLinksetSelection>false</useLsbForLinksetSelection>\n"
+                        + "</LinkedHashMap>\n";
+        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f)))) {
+            bw.write(partialXml);
+        }
+
+        M3UAManagementImpl m3uaMgmt1 = new M3UAManagementImpl(name, null, null);
+        m3uaMgmt1.setPersistDir(persistDir);
+        m3uaMgmt1.setTransportManagement(this.transportManagement);
+        m3uaMgmt1.start();
+
+        assertNotNull(m3uaMgmt1.getAppServers());
+        assertNotNull(m3uaMgmt1.getAspfactories());
+        assertNotNull(m3uaMgmt1.getRoute());
+        assertEquals(0, m3uaMgmt1.getAppServers().size());
+        assertEquals(0, m3uaMgmt1.getAspfactories().size());
+        assertEquals(0, m3uaMgmt1.getRoute().size());
+
+        // stop must not NPE on null aspFactories
+        m3uaMgmt1.stop();
+    }
+
     @Test
     public void testSerializationFromOldVerToNewVers() throws Exception {
         // Prepare path for file

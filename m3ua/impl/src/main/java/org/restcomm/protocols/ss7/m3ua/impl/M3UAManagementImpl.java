@@ -900,6 +900,10 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
     }
 
     private void stopFactories() throws Exception {
+        if (this.aspFactories == null) {
+            this.aspFactories = new CopyOnWriteArrayList<AspFactory>();
+            return;
+        }
         // Stopping asp factories
         boolean someFactoriesIsStopped = false;
         for (AspFactory aspFact : this.aspFactories) {
@@ -1081,9 +1085,27 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         } catch (Exception e) {
         }
 
-        aspFactories = config.aspFactories;
-        appServers = config.appServers;
-        this.routeManagement.route = config.route;
+        // Partial persist (e.g. Jackson LinkedHashMap store with only scalars) leaves these null.
+        // Never assign null into live collections — load must tolerate incomplete XML.
+        if (config.aspFactories != null) {
+            aspFactories = config.aspFactories;
+        } else if (aspFactories == null) {
+            aspFactories = new CopyOnWriteArrayList<AspFactory>();
+        } else {
+            aspFactories.clear();
+        }
+        if (config.appServers != null) {
+            appServers = config.appServers;
+        } else if (appServers == null) {
+            appServers = new CopyOnWriteArrayList<As>();
+        } else {
+            appServers.clear();
+        }
+        if (config.route != null) {
+            this.routeManagement.route = config.route;
+        } else {
+            this.routeManagement.route = new RouteMap<String, RouteAsImpl>();
+        }
 
         this.routeManagement.reset();
 

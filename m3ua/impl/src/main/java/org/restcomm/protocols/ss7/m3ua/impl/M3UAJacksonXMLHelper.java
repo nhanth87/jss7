@@ -108,23 +108,26 @@ public class M3UAJacksonXMLHelper {
             cleanConfig.put("routingKeyManagementEnabled", config.routingKeyManagementEnabled);
             cleanConfig.put("useLsbForLinksetSelection", config.useLsbForLinksetSelection);
 
-            // For aspFactories, we need simple representations
+            // Always emit lists (possibly empty) so reload never sees missing → null fields.
+            java.util.List<java.util.Map<String, Object>> factories = new java.util.ArrayList<>();
             if (config.aspFactories != null) {
-                java.util.List<java.util.Map<String, Object>> factories = new java.util.ArrayList<>();
                 for (Object factory : config.aspFactories) {
                     factories.add(createSimpleAspFactory(factory));
                 }
-                cleanConfig.put("aspFactories", factories);
             }
+            cleanConfig.put("aspFactories", factories);
 
-            // For appServers, we need simple representations
+            java.util.List<java.util.Map<String, Object>> servers = new java.util.ArrayList<>();
             if (config.appServers != null) {
-                java.util.List<java.util.Map<String, Object>> servers = new java.util.ArrayList<>();
                 for (Object server : config.appServers) {
                     servers.add(createSimpleAs(server));
                 }
-                cleanConfig.put("appServers", servers);
             }
+            cleanConfig.put("appServers", servers);
+
+            // Route map is rebuilt by management APIs after load in many tools; emit empty
+            // placeholder so Jackson does not leave route null on next start.
+            cleanConfig.put("route", new java.util.LinkedHashMap<String, Object>());
 
             return cleanConfig;
         } catch (Exception e) {

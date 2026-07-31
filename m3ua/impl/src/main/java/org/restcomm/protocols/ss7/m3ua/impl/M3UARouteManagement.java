@@ -137,6 +137,11 @@ public class M3UARouteManagement {
      * Reset the routeTable. Called after the persistence state of route is read from xml file.
      */
     protected void reset() {
+        // Partial / scalar-only persist files (Jackson LinkedHashMap store) may leave route null.
+        if (this.route == null) {
+            this.route = new RouteMap<String, RouteAsImpl>();
+            return;
+        }
         for (RouteAsImpl routeAs : this.route.values()) {
             routeAs.setM3uaManagement(this.m3uaManagement);
             routeAs.reset();
