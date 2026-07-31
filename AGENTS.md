@@ -524,6 +524,10 @@ c.registerRa(ra, ra);
 
 ### 11.1 Java 25 via mise
 
+**Branch rule:** `j25` / coral-valley jSS7-NG = **Java 25 only** (mise zulu-25). Do not build this tree with Java 8.
+
+**Workspace mix:** classic jSS7 (`build-projects/jSS7` / `master`) and WF10 USSD GW may still be Java 8. **Ask before building** when the target tree/branch is unclear. For this coral-valley `j25` worktree, always use Java 25 via mise — no re-ask once confirmed.
+
 ```bash
 # Java 25 is managed via mise (Zulu 25.34.17)
 export JAVA_HOME=/home/meodien/.local/share/mise/installs/java/zulu-25.34.17.0
