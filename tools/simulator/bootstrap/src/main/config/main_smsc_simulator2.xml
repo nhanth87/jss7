@@ -3,26 +3,28 @@
   <instance_L1>M3UA</instance_L1>
   <instance_L2>SCCP</instance_L2>
   <instance_L3>TCAP+MAP</instance_L3>
-  <instance_TestTask>SMS_TEST_CLIENT</instance_TestTask>
+  <!-- SMS_TEST_SERVER for OTA lab (answer SRI/MT). Same L1 as main_simulator2. -->
+  <instance_TestTask>SMS_TEST_SERVER</instance_TestTask>
+  <!-- OTA SMSC-GW lab peer (same L1 as main_simulator2): client :8014 → OTA :8013, PC=2→1, RC=0. -->
   <m3uaConfigurationData>
     <storePcapTrace>false</storePcapTrace>
     <isSctpServer>false</isSctpServer>
     <localHost>127.0.0.1</localHost>
-    <localPort>8011</localPort>
+    <localPort>8014</localPort>
     <remoteHost>127.0.0.1</remoteHost>
-    <remotePort>8012</remotePort>
+    <remotePort>8013</remotePort>
     <localHost2></localHost2>
     <localPort2>0</localPort2>
     <remoteHost2></remoteHost2>
     <remotePort2>0</remotePort2>
     <ipChannelType>SCTP</ipChannelType>
-    <dpc>2</dpc>
-    <opc>1</opc>
+    <dpc>1</dpc>
+    <opc>2</opc>
     <dpc2>0</dpc2>
     <opc2>0</opc2>
     <si>3</si>
-    <routingContext>101</routingContext>
-    <networkAppearance>102</networkAppearance>
+    <routingContext>0</routingContext>
+    <networkAppearance>0</networkAppearance>
     <trafficModeType>2</trafficModeType>
     <m3uaFunctionality>IPSP</m3uaFunctionality>
     <m3uaExchangeType>SE</m3uaExchangeType>
@@ -36,9 +38,9 @@
   </dialogicConfigurationData>
   <sccpConfigurationData>
     <routeOnGtMode>true</routeOnGtMode>
-    <remoteSpc>2</remoteSpc>
+    <remoteSpc>1</remoteSpc>
     <remoteSpc2>0</remoteSpc2>
-    <localSpc>1</localSpc>
+    <localSpc>2</localSpc>
     <localSsn>8</localSsn>
     <localSsn2>6</localSsn2>
     <remoteSsn>8</remoteSsn>
@@ -47,7 +49,7 @@
     <natureOfAddress>INTERNATIONAL</natureOfAddress>
     <numberingPlan>ISDN_TELEPHONY</numberingPlan>
     <translationType>0</translationType>
-    <callingPartyAddressDigits>888800</callingPartyAddressDigits>
+    <callingPartyAddressDigits>251911000000</callingPartyAddressDigits>
     <sccpProtocolVersion>ITU</sccpProtocolVersion>
   </sccpConfigurationData>
   <mapConfigurationData>
@@ -65,10 +67,10 @@
   <testSmsClientConfigurationData>
     <addressNature>international_number</addressNature>
     <numberingPlan>ISDN</numberingPlan>
-    <serviceCenterAddress>22220</serviceCenterAddress>
+    <serviceCenterAddress>251911000001</serviceCenterAddress>
     <mapProtocolVersion>MAP protocol version 3</mapProtocolVersion>
     <sriResponseImsi>555667</sriResponseImsi>
-    <sriResponseVlr>888801</sriResponseVlr>
+    <sriResponseVlr>251911000000</sriResponseVlr>
     <smscSsn>8</smscSsn>
     <typeOfNumber>Unknown</typeOfNumber>
     <numberingPlanIdentification>ISDNTelephoneNumberingPlan</numberingPlanIdentification>
@@ -104,7 +106,7 @@
     <dataCodingScheme>15</dataCodingScheme>
     <alertingPattern>-1</alertingPattern>
     <sriResponseImsi>404685505601234</sriResponseImsi>
-    <sriResponseVlr>9960639999</sriResponseVlr>
+    <sriResponseVlr>251911000000</sriResponseVlr>
     <return20PersDeliveryErrors>false</return20PersDeliveryErrors>
     <ussdClientAction>Manual operation</ussdClientAction>
     <autoRequestString></autoRequestString>
