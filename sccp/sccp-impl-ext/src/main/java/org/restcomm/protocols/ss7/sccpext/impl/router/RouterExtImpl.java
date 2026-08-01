@@ -754,7 +754,8 @@ public class RouterExtImpl implements RouterExt {
             config.routingAddresses = this.routingAddresses;
 
             try (Writer writer = new FileWriter(persistFile.toString())) {
-                SCCPJacksonXMLHelper.getXmlMapper().writeValue(writer, config);
+                // Use helper (Integer map keys → <kN>), not raw XmlMapper.
+                SCCPJacksonXMLHelper.toXML(config, writer);
             }
         } catch (Exception e) {
             logger.error("Error while persisting the Rule state in file", e);
@@ -771,7 +772,8 @@ public class RouterExtImpl implements RouterExt {
         }
 
         try (Reader reader = new FileReader(f)) {
-            RouterConfig config = SCCPJacksonXMLHelper.getXmlMapper().readValue(reader, RouterConfig.class);
+            // fromXML sanitizes legacy illegal <N> map-key element names → <kN>.
+            RouterConfig config = SCCPJacksonXMLHelper.fromXML(reader, RouterConfig.class);
             if (config != null) {
                 if (config.rulesMap != null) {
                     this.rulesMap = config.rulesMap;

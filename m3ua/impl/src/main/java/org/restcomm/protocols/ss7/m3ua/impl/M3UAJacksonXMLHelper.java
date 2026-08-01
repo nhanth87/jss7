@@ -108,27 +108,10 @@ public class M3UAJacksonXMLHelper {
             cleanConfig.put("routingKeyManagementEnabled", config.routingKeyManagementEnabled);
             cleanConfig.put("useLsbForLinksetSelection", config.useLsbForLinksetSelection);
 
-            // Always emit lists (possibly empty) so reload never sees missing → null fields.
-            java.util.List<java.util.Map<String, Object>> factories = new java.util.ArrayList<>();
-            if (config.aspFactories != null) {
-                for (Object factory : config.aspFactories) {
-                    factories.add(createSimpleAspFactory(factory));
-                }
-            }
-            cleanConfig.put("aspFactories", factories);
-
-            java.util.List<java.util.Map<String, Object>> servers = new java.util.ArrayList<>();
-            if (config.appServers != null) {
-                for (Object server : config.appServers) {
-                    servers.add(createSimpleAs(server));
-                }
-            }
-            cleanConfig.put("appServers", servers);
-
-            // Route map is rebuilt by management APIs after load in many tools; emit empty
-            // placeholder so Jackson does not leave route null on next start.
-            cleanConfig.put("route", new java.util.LinkedHashMap<String, Object>());
-
+            // Scalars only. Incomplete aspFactories/appServers maps (name/timers without
+            // associationName / concrete @class) cannot rehydrate AspFactory/As and caused
+            // ERROR "Cannot construct instance of AspFactory" on every cold Start.
+            // ASPs/ASes/routes are rebuilt by Ss7StackBuilder Apply / management APIs.
             return cleanConfig;
         } catch (Exception e) {
             // Return minimal config if anything fails

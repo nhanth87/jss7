@@ -1042,7 +1042,15 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         } catch (FileNotFoundException e) {
             logger.warn(String.format("Failed to load the M3UA configuration file. \n%s", e.getMessage()));
         } catch (IOException e) {
-            logger.error(String.format("Failed to load the M3UA configuration file. \n%s", e.getMessage()));
+            // Legacy stub XML (LinkedHashMap with incomplete aspFactories) cannot construct
+            // abstract AspFactory — stack Apply rebuilds ASPs. Do not ERROR-spam cold Start.
+            String msg = e.getMessage() != null ? e.getMessage() : "";
+            if (msg.contains("AspFactory") || msg.contains("abstract types")) {
+                logger.warn(String.format(
+                        "Ignoring non-reloadable M3UA persist stub (ASPs rebuilt by Apply). %s", msg));
+            } else {
+                logger.error(String.format("Failed to load the M3UA configuration file. \n%s", msg), e);
+            }
         }
     }
 
