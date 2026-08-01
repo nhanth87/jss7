@@ -103,7 +103,10 @@ public class TestLcsServerConfigurationData {
   private ExtGeographicalInformation locationEstimate;
   private Integer ageOfLocationEstimate = 0;
 
-  {
+  private void ensureDefaultLocationEstimate() {
+    if (locationEstimate != null) {
+      return;
+    }
     try {
       locationEstimate = new ExtGeographicalInformationImpl(typeOfShape, latitude, longitude, uncertainty, uncertaintySemiMajorAxis,
               uncertaintySemiMinorAxis, angleOfMajorAxis, confidence, altitude, uncertaintyAltitude, innerRadius, uncertaintyRadius, offsetAngle, includedAngle);
@@ -240,6 +243,7 @@ public class TestLcsServerConfigurationData {
   }
 
   public ExtGeographicalInformation getLocationEstimate() {
+    ensureDefaultLocationEstimate();
     return this.locationEstimate;
   }
 

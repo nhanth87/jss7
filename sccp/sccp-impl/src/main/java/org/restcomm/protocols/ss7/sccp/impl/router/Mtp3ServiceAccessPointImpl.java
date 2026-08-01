@@ -7,7 +7,9 @@ import org.restcomm.protocols.ss7.sccp.Mtp3Destination;
 import org.restcomm.protocols.ss7.sccp.Mtp3ServiceAccessPoint;
 import org.restcomm.protocols.ss7.sccp.impl.oam.SccpOAMMessage;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
@@ -28,7 +30,9 @@ public class Mtp3ServiceAccessPointImpl implements Mtp3ServiceAccessPoint {
     @JacksonXmlProperty private int networkId;
     @JacksonXmlProperty private String localGtDigits;
 
-    @JacksonXmlProperty private Mtp3DestinationMap<Integer, Mtp3Destination> dpcList = new Mtp3DestinationMap<Integer, Mtp3Destination>();
+    @JacksonXmlProperty
+    @JsonDeserialize(contentAs = Mtp3DestinationImpl.class)
+    private Mtp3DestinationMap<Integer, Mtp3Destination> dpcList = new Mtp3DestinationMap<Integer, Mtp3Destination>();
 
     public Mtp3ServiceAccessPointImpl() {
     }
@@ -78,6 +82,7 @@ public class Mtp3ServiceAccessPointImpl implements Mtp3ServiceAccessPoint {
         return this.dpcList.get(destId);
     }
 
+    @JsonIgnore
     public Map<Integer, Mtp3Destination> getMtp3Destinations() {
         Map<Integer, Mtp3Destination> dpcListTmp = new HashMap<Integer, Mtp3Destination>();
         dpcListTmp.putAll(dpcList);

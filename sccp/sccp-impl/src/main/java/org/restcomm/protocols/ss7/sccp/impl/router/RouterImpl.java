@@ -1,11 +1,14 @@
 package org.restcomm.protocols.ss7.sccp.impl.router;
 
+import java.util.Set;
+
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.restcomm.protocols.ss7.sccp.impl.SCCPJacksonXMLHelper;
 import org.restcomm.protocols.ss7.sccp.LongMessageRule;
 import org.restcomm.protocols.ss7.sccp.LongMessageRuleType;
-import org.restcomm.protocols.ss7.sccp.Mtp3Destination;
 import org.restcomm.protocols.ss7.sccp.Mtp3ServiceAccessPoint;
 import org.restcomm.protocols.ss7.sccp.Router;
 import org.restcomm.protocols.ss7.sccp.SccpStack;
@@ -23,7 +26,11 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 /**
  * <p>
@@ -150,7 +157,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RouterImpl implements Router {
 
-    private static final Logger logger = Logger.getLogger(RouterImpl.class);
+    private static final Logger logger = LogManager.getLogger(RouterImpl.class);
 
     private static final String SCCP_ROUTER_PERSIST_DIR_KEY = "sccprouter.persist.dir";
     private static final String USER_DIR_KEY = "user.dir";
@@ -165,8 +172,8 @@ public class RouterImpl implements Router {
 
     private String persistDir = null;
 
-    private ConcurrentHashMap<Integer, LongMessageRule> longMessageRules = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<Integer, Mtp3ServiceAccessPoint> saps = new ConcurrentHashMap<>();
+    private LongMessageRuleMap<Integer, LongMessageRule> longMessageRules = new LongMessageRuleMap<>();
+    private Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> saps = new Mtp3ServiceAccessPointMap<>();
 
     private final String name;
     private final SccpStack sccpStack;
@@ -282,9 +289,6 @@ public class RouterImpl implements Router {
                 return true;
             }
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug(String.format("JENNY-SPC-IS-LOCAL-FALSE: spc=%d sapsSize=%d saps=%s", spc, this.saps.size(), this.saps));
-        }
         return false;
     }
 
@@ -319,7 +323,10 @@ public class RouterImpl implements Router {
         LongMessageRuleImpl longMessageRule = new LongMessageRuleImpl(firstSpc, lastSpc, ruleType);
 
         synchronized (this) {
-            this.longMessageRules.put(id, longMessageRule);
+            LongMessageRuleMap<Integer, LongMessageRule> newLongMessageRule = new LongMessageRuleMap<>();
+            newLongMessageRule.putAll(this.longMessageRules);
+            newLongMessageRule.put(id, longMessageRule);
+            this.longMessageRules = newLongMessageRule;
             this.store();
         }
     }
@@ -332,7 +339,10 @@ public class RouterImpl implements Router {
         LongMessageRuleImpl longMessageRule = new LongMessageRuleImpl(firstSpc, lastSpc, ruleType);
 
         synchronized (this) {
-            this.longMessageRules.put(id, longMessageRule);
+            LongMessageRuleMap<Integer, LongMessageRule> newLongMessageRule = new LongMessageRuleMap<>();
+            newLongMessageRule.putAll(this.longMessageRules);
+            newLongMessageRule.put(id, longMessageRule);
+            this.longMessageRules = newLongMessageRule;
             this.store();
         }
     }
@@ -353,7 +363,10 @@ public class RouterImpl implements Router {
         LongMessageRuleImpl longMessageRule = new LongMessageRuleImpl(firstSpc, lastSpc, ruleType);
 
         synchronized (this) {
-            this.longMessageRules.put(id, longMessageRule);
+            LongMessageRuleMap<Integer, LongMessageRule> newLongMessageRule = new LongMessageRuleMap<>();
+            newLongMessageRule.putAll(this.longMessageRules);
+            newLongMessageRule.put(id, longMessageRule);
+            this.longMessageRules = newLongMessageRule;
             this.store();
         }
     }
@@ -364,7 +377,10 @@ public class RouterImpl implements Router {
         }
 
         synchronized (this) {
-            this.longMessageRules.remove(id);
+            LongMessageRuleMap<Integer, LongMessageRule> newLongMessageRule = new LongMessageRuleMap<>();
+            newLongMessageRule.putAll(this.longMessageRules);
+            newLongMessageRule.remove(id);
+            this.longMessageRules = newLongMessageRule;
             this.store();
         }
     }
@@ -432,7 +448,10 @@ public class RouterImpl implements Router {
 
         Mtp3ServiceAccessPointImpl sap = new Mtp3ServiceAccessPointImpl(mtp3Id, opc, ni, this.name, networkId, localGtDigits);
         synchronized (this) {
-            this.saps.put(id, sap);
+            Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> newSap = new Mtp3ServiceAccessPointMap<>();
+            newSap.putAll(this.saps);
+            newSap.put(id, sap);
+            this.saps = newSap;
             this.store();
         }
     }
@@ -463,7 +482,10 @@ public class RouterImpl implements Router {
 
         Mtp3ServiceAccessPointImpl newSap = new Mtp3ServiceAccessPointImpl(mtp3Id, opc, ni, this.name, networkId, localGtDigits);
         synchronized (this) {
-            this.saps.put(id, newSap);
+            Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> newSaps = new Mtp3ServiceAccessPointMap<>();
+            newSaps.putAll(this.saps);
+            newSaps.put(id, newSap);
+            this.saps = newSaps;
             this.store();
         }
     }
@@ -495,7 +517,11 @@ public class RouterImpl implements Router {
         Mtp3ServiceAccessPointImpl newSap = new Mtp3ServiceAccessPointImpl(mtp3Id, opc, ni, this.name, networkId, localGtDigits);
 
         synchronized (this) {
-            this.saps.put(id, newSap);
+            Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> newSaps = new Mtp3ServiceAccessPointMap<>();
+            newSaps.putAll(this.saps);
+            newSaps.put(id, newSap);
+            this.saps = newSaps;
+            this.store();
             this.store();
         }
     }
@@ -507,7 +533,10 @@ public class RouterImpl implements Router {
         }
 
         synchronized (this) {
-            this.saps.remove(id);
+            Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> newSap = new Mtp3ServiceAccessPointMap<>();
+            newSap.putAll(this.saps);
+            newSap.remove(id);
+            this.saps = newSap;
             this.store();
         }
     }
@@ -519,8 +548,8 @@ public class RouterImpl implements Router {
                 // no resources allocated - nothing to do
                 return;
 
-            longMessageRules = new ConcurrentHashMap<>();
-            saps = new ConcurrentHashMap<>();
+            longMessageRules = new LongMessageRuleMap<>();
+            saps = new Mtp3ServiceAccessPointMap<>();
 
             // We store the cleared state
             this.store();
@@ -532,72 +561,32 @@ public class RouterImpl implements Router {
      */
     public void store() {
         try {
-            javax.xml.stream.XMLOutputFactory factory = javax.xml.stream.XMLOutputFactory.newInstance();
-            javax.xml.stream.XMLStreamWriter writer = factory.createXMLStreamWriter(new FileWriter(this.persistFile));
-            writer.writeStartDocument("UTF-8", "1.0");
-            writer.writeCharacters("\n");
-            writer.writeStartElement("RouterConfig");
-            writer.writeCharacters("\n");
+            RouterConfig config = new RouterConfig();
+            config.longMessageRules = this.longMessageRules;
+            config.saps = this.saps;
 
-            writer.writeStartElement("longMessageRules");
-            writer.writeCharacters("\n");
-            for (Map.Entry<Integer, LongMessageRule> e : this.longMessageRules.entrySet()) {
-                LongMessageRuleImpl v = (LongMessageRuleImpl) e.getValue();
-                writer.writeStartElement("longMessageRule");
-                writer.writeAttribute("id", String.valueOf(e.getKey()));
-                writer.writeAttribute("firstSpc", String.valueOf(v.getFirstSpc()));
-                writer.writeAttribute("lastSpc", String.valueOf(v.getLastSpc()));
-                writer.writeAttribute("ruleType", v.getLongMessageRuleType().toString());
-                writer.writeEndElement();
-                writer.writeCharacters("\n");
+            String xml = SCCPJacksonXMLHelper.toXML(config);
+            try (FileWriter writer = new FileWriter(this.persistFile)) {
+                writer.write(xml);
             }
-            writer.writeEndElement();
-            writer.writeCharacters("\n");
-
-            writer.writeStartElement("saps");
-            writer.writeCharacters("\n");
-            for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
-                Mtp3ServiceAccessPointImpl v = (Mtp3ServiceAccessPointImpl) e.getValue();
-                writer.writeStartElement("mtp3ServiceAccessPoint");
-                writer.writeAttribute("id", String.valueOf(e.getKey()));
-                writer.writeAttribute("mtp3Id", String.valueOf(v.getMtp3Id()));
-                writer.writeAttribute("opc", String.valueOf(v.getOpc()));
-                writer.writeAttribute("ni", String.valueOf(v.getNi()));
-                writer.writeAttribute("networkId", String.valueOf(v.getNetworkId()));
-                String localGt = v.getLocalGtDigits();
-                if (localGt != null) {
-                    writer.writeAttribute("localGtDigits", localGt);
-                }
-                writer.writeCharacters("\n");
-                writer.writeStartElement("mtp3DestinationMap");
-                writer.writeCharacters("\n");
-                for (Map.Entry<Integer, Mtp3Destination> de : v.getMtp3Destinations().entrySet()) {
-                    Mtp3DestinationImpl d = (Mtp3DestinationImpl) de.getValue();
-                    writer.writeStartElement("mtp3Destination");
-                    writer.writeAttribute("id", String.valueOf(de.getKey()));
-                    writer.writeAttribute("firstDpc", String.valueOf(d.getFirstDpc()));
-                    writer.writeAttribute("lastDpc", String.valueOf(d.getLastDpc()));
-                    writer.writeAttribute("firstSls", String.valueOf(d.getFirstSls()));
-                    writer.writeAttribute("lastSls", String.valueOf(d.getLastSls()));
-                    writer.writeAttribute("slsMask", String.valueOf(d.getSlsMask()));
-                    writer.writeEndElement();
-                    writer.writeCharacters("\n");
-                }
-                writer.writeEndElement();
-                writer.writeCharacters("\n");
-                writer.writeEndElement();
-                writer.writeCharacters("\n");
-            }
-            writer.writeEndElement();
-            writer.writeCharacters("\n");
-
-            writer.writeEndElement();
-            writer.writeCharacters("\n");
-            writer.writeEndDocument();
-            writer.close();
         } catch (Exception e) {
             logger.error("Error while persisting the Rule state in file", e);
         }
+    }
+
+    /**
+     * Configuration class for Router persistence
+     */
+    @JacksonXmlRootElement(localName = "RouterConfig")
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class RouterConfig {
+        @JacksonXmlProperty
+        @JsonDeserialize(contentAs = LongMessageRuleImpl.class)
+        public LongMessageRuleMap<Integer, LongMessageRule> longMessageRules;
+
+        @JacksonXmlProperty
+        @JsonDeserialize(contentAs = Mtp3ServiceAccessPointImpl.class)
+        public Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> saps;
     }
 
     /**
@@ -607,8 +596,10 @@ public class RouterImpl implements Router {
         try {
             File f = new File(this.persistFile);
             if (f.exists()) {
+                // we have V4 config (XStream format)
                 loadVer4(this.persistFile);
             } else {
+                // Try legacy formats
                 String s1 = this.persistFile.replace("4.xml", "3.xml");
                 f = new File(s1);
                 if (f.exists()) {
@@ -644,79 +635,18 @@ public class RouterImpl implements Router {
 
     protected void loadVer4(FileReader reader) throws FileNotFoundException {
         try {
-            javax.xml.stream.XMLInputFactory factory = javax.xml.stream.XMLInputFactory.newInstance();
-            factory.setProperty(javax.xml.stream.XMLInputFactory.SUPPORT_DTD, false);
-            javax.xml.stream.XMLStreamReader r = factory.createXMLStreamReader(reader);
-            ConcurrentHashMap<Integer, LongMessageRule> newLongMessageRules = new ConcurrentHashMap<>();
-            ConcurrentHashMap<Integer, Mtp3ServiceAccessPoint> newSaps = new ConcurrentHashMap<>();
+            RouterConfig config = SCCPJacksonXMLHelper.fromXML(reader, RouterConfig.class);
+            if (config != null) {
+                longMessageRules = config.longMessageRules;
+                saps = config.saps;
 
-            while (r.hasNext()) {
-                int event = r.next();
-                if (event == javax.xml.stream.XMLStreamConstants.START_ELEMENT) {
-                    String name = r.getLocalName();
-                    if ("longMessageRules".equals(name)) {
-                        while (r.hasNext()) {
-                            event = r.next();
-                            if (event == javax.xml.stream.XMLStreamConstants.END_ELEMENT && "longMessageRules".equals(r.getLocalName())) break;
-                            if (event == javax.xml.stream.XMLStreamConstants.START_ELEMENT && "longMessageRule".equals(r.getLocalName())) {
-                                int id = Integer.parseInt(r.getAttributeValue(null, "id"));
-                                int firstSpc = Integer.parseInt(r.getAttributeValue(null, "firstSpc"));
-                                int lastSpc = Integer.parseInt(r.getAttributeValue(null, "lastSpc"));
-                                LongMessageRuleType ruleType = LongMessageRuleType.valueOf(r.getAttributeValue(null, "ruleType"));
-                                LongMessageRuleImpl v = new LongMessageRuleImpl(firstSpc, lastSpc, ruleType);
-                                newLongMessageRules.put(id, v);
-                            }
-                        }
-                    } else if ("saps".equals(name)) {
-                        while (r.hasNext()) {
-                            event = r.next();
-                            if (event == javax.xml.stream.XMLStreamConstants.END_ELEMENT && "saps".equals(r.getLocalName())) break;
-                            if (event == javax.xml.stream.XMLStreamConstants.START_ELEMENT && "mtp3ServiceAccessPoint".equals(r.getLocalName())) {
-                                int id = Integer.parseInt(r.getAttributeValue(null, "id"));
-                                int mtp3Id = Integer.parseInt(r.getAttributeValue(null, "mtp3Id"));
-                                int opc = Integer.parseInt(r.getAttributeValue(null, "opc"));
-                                int ni = Integer.parseInt(r.getAttributeValue(null, "ni"));
-                                int networkId = Integer.parseInt(r.getAttributeValue(null, "networkId"));
-                                String localGtDigits = r.getAttributeValue(null, "localGtDigits");
-                                Mtp3ServiceAccessPointImpl v = new Mtp3ServiceAccessPointImpl(mtp3Id, opc, ni, null, networkId, localGtDigits);
-                                while (r.hasNext()) {
-                                    event = r.next();
-                                    if (event == javax.xml.stream.XMLStreamConstants.END_ELEMENT && "mtp3ServiceAccessPoint".equals(r.getLocalName())) break;
-                                    if (event == javax.xml.stream.XMLStreamConstants.START_ELEMENT && "mtp3DestinationMap".equals(r.getLocalName())) {
-                                        while (r.hasNext()) {
-                                            event = r.next();
-                                            if (event == javax.xml.stream.XMLStreamConstants.END_ELEMENT && "mtp3DestinationMap".equals(r.getLocalName())) break;
-                                            if (event == javax.xml.stream.XMLStreamConstants.START_ELEMENT && "mtp3Destination".equals(r.getLocalName())) {
-                                                int destId = Integer.parseInt(r.getAttributeValue(null, "id"));
-                                                int firstDpc = Integer.parseInt(r.getAttributeValue(null, "firstDpc"));
-                                                int lastDpc = Integer.parseInt(r.getAttributeValue(null, "lastDpc"));
-                                                int firstSls = Integer.parseInt(r.getAttributeValue(null, "firstSls"));
-                                                int lastSls = Integer.parseInt(r.getAttributeValue(null, "lastSls"));
-                                                int slsMask = Integer.parseInt(r.getAttributeValue(null, "slsMask"));
-                                                try {
-                                                    v.addMtp3Destination(destId, firstDpc, lastDpc, firstSls, lastSls, slsMask);
-                                                } catch (Exception ex) {
-                                                    logger.error("Failed to add destination", ex);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                newSaps.put(id, v);
-                            }
-                        }
-                    }
+                for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
+                    Mtp3ServiceAccessPoint sap = e.getValue();
+                    ((Mtp3ServiceAccessPointImpl)sap).setStackName(name);
                 }
             }
-            r.close();
-            this.longMessageRules = newLongMessageRules;
-            this.saps = newSaps;
-            for (Map.Entry<Integer, Mtp3ServiceAccessPoint> e : this.saps.entrySet()) {
-                Mtp3ServiceAccessPoint sap = e.getValue();
-                ((Mtp3ServiceAccessPointImpl)sap).setStackName(name);
-            }
-        } catch (Exception e) {
-            logger.error("Failed to parse RouterConfig from XML", e);
+        } catch (IOException e) {
+            logger.error(String.format("Failed to parse RouterConfig from XML"), e);
         }
     }
 }

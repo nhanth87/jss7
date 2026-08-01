@@ -7,8 +7,6 @@ import java.io.ByteArrayOutputStream;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 import org.restcomm.protocols.ss7.sccp.SccpProtocolVersion;
 import org.restcomm.protocols.ss7.sccp.message.ParseException;
@@ -21,24 +19,27 @@ import org.restcomm.protocols.ss7.sccp.parameter.ParameterFactory;
  */
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.PROPERTY,
-    property = "type"
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "globalTitleIndicator",
+    visible = true
 )
 @JsonSubTypes({
-    @JsonSubTypes.Type(value = GlobalTitle0100Impl.class, name = "GlobalTitle0100Impl"),
-    @JsonSubTypes.Type(value = GlobalTitle0011Impl.class, name = "GlobalTitle0011Impl"),
-    @JsonSubTypes.Type(value = GlobalTitle0010Impl.class, name = "GlobalTitle0010Impl"),
-    @JsonSubTypes.Type(value = GlobalTitle0001Impl.class, name = "GlobalTitle0001Impl"),
-    @JsonSubTypes.Type(value = NoGlobalTitle.class, name = "NoGlobalTitle")
+    @JsonSubTypes.Type(value = GlobalTitle0100Impl.class,
+            name = "GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_ENCODING_SCHEME_AND_NATURE_OF_ADDRESS"),
+    @JsonSubTypes.Type(value = GlobalTitle0011Impl.class,
+            name = "GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_NUMBERING_PLAN_AND_ENCODING_SCHEME"),
+    @JsonSubTypes.Type(value = GlobalTitle0010Impl.class,
+            name = "GLOBAL_TITLE_INCLUDES_TRANSLATION_TYPE_ONLY"),
+    @JsonSubTypes.Type(value = GlobalTitle0001Impl.class,
+            name = "GLOBAL_TITLE_INCLUDES_NATURE_OF_ADDRESS_INDICATOR_ONLY"),
+    @JsonSubTypes.Type(value = NoGlobalTitle.class, name = "NO_GLOBAL_TITLE_INCLUDED")
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class AbstractGlobalTitle extends AbstractParameter implements GlobalTitle {
 
-    @JacksonXmlProperty(localName = "digits", isAttribute = false)
     protected String digits;
 
     //not codable, just used to encode/decode digits in a common way.
-    @JsonDeserialize(as = DefaultEncodingScheme.class)
     protected EncodingScheme encodingScheme;
 
     protected static final String GLOBAL_TITLE_INDICATOR = "gti";
