@@ -1,10 +1,14 @@
 
 package org.restcomm.protocols.ss7.tools.simulator.tests.sms;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Optional;
 
 import org.restcomm.protocols.ss7.map.api.MAPApplicationContext;
 import org.restcomm.protocols.ss7.map.api.MAPApplicationContextName;
@@ -48,6 +52,7 @@ import org.restcomm.protocols.ss7.map.api.service.sms.SmsSignalInfo;
 import org.restcomm.protocols.ss7.map.api.smstpdu.AbsoluteTimeStamp;
 import org.restcomm.protocols.ss7.map.api.smstpdu.AddressField;
 import org.restcomm.protocols.ss7.map.api.smstpdu.CharacterSet;
+import org.restcomm.protocols.ss7.map.api.smstpdu.ConcatenatedShortMessagesIdentifier;
 import org.restcomm.protocols.ss7.map.api.smstpdu.DataCodingScheme;
 import org.restcomm.protocols.ss7.map.api.smstpdu.NumberingPlanIdentification;
 import org.restcomm.protocols.ss7.map.api.smstpdu.ProtocolIdentifier;
@@ -85,10 +90,16 @@ public class TestSmsServerMan extends TesterBase implements TestSmsServerManMBea
 
     public static String SOURCE_NAME = "TestSmsServer";
 
+    private static final Logger LOG = LogManager.getLogger(TestSmsServerMan.class);
+
+    /** SIM Data Download (TS 23.040) — OTA SMS-PP uses PID 0x7F. */
+    private static final int PID_SIM_DATA_DOWNLOAD = 0x7F;
+
     private final String name;
     private MapMan mapMan;
 
     private boolean isStarted = false;
+    private volatile OtaReceivedCapReassembler capReassembler;
     private int countSriReq = 0;
     private int countSriResp = 0;
     private int countMtFsmReq = 0;
@@ -379,11 +390,14 @@ public class TestSmsServerMan extends TesterBase implements TestSmsServerManMBea
         this.countAscReq = 0;
         this.countAscResp = 0;
 
+        this.capReassembler = createCapReassembler();
+
         MAPProvider mapProvider = this.mapMan.getMAPStack().getMAPProvider();
         mapProvider.getMAPServiceSms().activate();
         mapProvider.getMAPServiceSms().addMAPServiceListener(this);
         mapProvider.addMAPDialogListener(this);
-        this.testerHost.sendNotif(SOURCE_NAME, "SMS Server has been started", "", Level.INFO);
+        this.testerHost.sendNotif(SOURCE_NAME, "SMS Server has been started",
+                "received-caps dir=" + (capReassembler != null ? capReassembler.getOutputDir() : "n/a"), Level.INFO);
         isStarted = true;
 
         return true;
@@ -396,7 +410,27 @@ public class TestSmsServerMan extends TesterBase implements TestSmsServerManMBea
         mapProvider.getMAPServiceSms().deactivate();
         mapProvider.getMAPServiceSms().removeMAPServiceListener(this);
         mapProvider.removeMAPDialogListener(this);
+        OtaReceivedCapReassembler r = this.capReassembler;
+        if (r != null) {
+            r.clear();
+        }
+        this.capReassembler = null;
         this.testerHost.sendNotif(SOURCE_NAME, "SMS Server has been stopped", "", Level.INFO);
+    }
+
+    private OtaReceivedCapReassembler createCapReassembler() {
+        try {
+            String persist = this.testerHost.getPersistDir();
+            Path base = (persist != null && !persist.isBlank())
+                    ? Path.of(persist)
+                    : Path.of(System.getProperty("user.dir", "."));
+            OtaReceivedCapReassembler r = new OtaReceivedCapReassembler(base);
+            LOG.info("OTA CAP reassembler ready outputDir={}", r.getOutputDir().toAbsolutePath());
+            return r;
+        } catch (RuntimeException ex) {
+            LOG.warn("OTA CAP reassembler init failed: {}", ex.toString());
+            return null;
+        }
     }
 
     @Override
@@ -819,6 +853,14 @@ public class TestSmsServerMan extends TesterBase implements TestSmsServerManMBea
         MAPDialogSms curDialog = mtForwSmInd.getMAPDialog();
         this.testerHost.sendNotif(SOURCE_NAME, "Rcvd: mtReq", "", Level.DEBUG);
 
+        // Capture/reassemble OTA CAP (SMS-PP) — never fail the MAP success path
+        try {
+            captureReceivedOtaPayload(mtForwSmInd);
+        } catch (Throwable t) {
+            LOG.warn("OTA CAP capture failed: {}", t.toString());
+            this.testerHost.sendNotif(SOURCE_NAME, "OTA CAP capture failed: " + t.getMessage(), "", Level.WARN);
+        }
+
         try {
             curDialog.addMtForwardShortMessageResponse(mtForwSmInd.getInvokeId(), null, null);
             this.countMtFsmResp++;
@@ -827,6 +869,113 @@ public class TestSmsServerMan extends TesterBase implements TestSmsServerManMBea
         } catch (MAPException e) {
             this.testerHost.sendNotif(SOURCE_NAME, "Exception when invoking addMtForwardShortMessageResponse() : " + e.getMessage(), e,
                     Level.ERROR);
+        }
+    }
+
+    /**
+     * Decode SMS-DELIVER TP-UD, buffer concat segments, write merged secured packet when complete.
+     */
+    private void captureReceivedOtaPayload(MtForwardShortMessageRequest ind) throws MAPException {
+        OtaReceivedCapReassembler reassembler = this.capReassembler;
+        if (reassembler == null || ind == null) {
+            return;
+        }
+
+        String imsi = null;
+        SM_RP_DA da = ind.getSM_RP_DA();
+        if (da != null && da.getIMSI() != null) {
+            imsi = da.getIMSI().getData();
+        }
+
+        SmsSignalInfo si = ind.getSM_RP_UI();
+        if (si == null) {
+            return;
+        }
+        si.setGsm8Charset(isoCharset);
+        SmsTpdu tpdu = si.decodeTpdu(false);
+        if (!(tpdu instanceof SmsDeliverTpdu)) {
+            return;
+        }
+        SmsDeliverTpdu dTpdu = (SmsDeliverTpdu) tpdu;
+        UserData ud = dTpdu.getUserData();
+        if (ud == null) {
+            return;
+        }
+        ud.decode();
+
+        byte[] encoded = ud.getEncodedData();
+        if (encoded == null || encoded.length == 0) {
+            return;
+        }
+
+        boolean udhi = ud.getEncodedUserDataHeaderIndicator();
+        int offset = 0;
+        UserDataHeader udh = ud.getDecodedUserDataHeader();
+        if (udhi) {
+            offset = (encoded[0] & 0xFF) + 1;
+            if (offset > encoded.length) {
+                return;
+            }
+            if (udh == null) {
+                udh = new UserDataHeaderImpl(encoded);
+            }
+        }
+
+        int udLen = ud.getEncodedUserDataLength();
+        if (udLen > encoded.length) {
+            udLen = encoded.length;
+        }
+        if (offset > udLen) {
+            return;
+        }
+        byte[] payload = new byte[udLen - offset];
+        System.arraycopy(encoded, offset, payload, 0, payload.length);
+
+        boolean otaHint = false;
+        ProtocolIdentifier pid = dTpdu.getProtocolIdentifier();
+        if (pid != null && (pid.getCode() & 0xFF) == PID_SIM_DATA_DOWNLOAD) {
+            otaHint = true;
+        }
+        Integer concatRef = null;
+        boolean ref16 = false;
+        int seq = 1;
+        int total = 1;
+        if (udh != null) {
+            if (udh.getInformationElementData(OtaReceivedCapReassembler.IEI_COMMAND_PACKET) != null) {
+                otaHint = true;
+            }
+            ConcatenatedShortMessagesIdentifier concat = udh.getConcatenatedShortMessagesIdentifier();
+            if (concat != null) {
+                concatRef = concat.getReference();
+                ref16 = concat.getReferenceIs16bit();
+                seq = concat.getMessageSegmentNumber();
+                total = concat.getMessageSegmentCount();
+                otaHint = true; // multi-part binary lab traffic treated as OTA candidate
+            }
+        }
+
+        if (!otaHint && concatRef == null) {
+            return;
+        }
+
+        String subscriber = (imsi != null && !imsi.isBlank()) ? imsi : "unknown";
+        Optional<Path> written = reassembler.offer(subscriber, concatRef, ref16, seq, total, payload, otaHint);
+        if (written.isPresent()) {
+            Path p = written.get();
+            String msg = "OTA CAP written path=" + p.toAbsolutePath() + " size=" + fileSize(p) + " bytes";
+            this.testerHost.sendNotif(SOURCE_NAME, msg, "", Level.INFO);
+        } else if (concatRef != null) {
+            this.testerHost.sendNotif(SOURCE_NAME,
+                    "OTA CAP buffered seq=" + seq + "/" + total + " ref=" + concatRef + " imsi=" + subscriber,
+                    "", Level.DEBUG);
+        }
+    }
+
+    private static long fileSize(Path p) {
+        try {
+            return java.nio.file.Files.size(p);
+        } catch (Exception e) {
+            return -1L;
         }
     }
 
@@ -870,6 +1019,10 @@ public class TestSmsServerMan extends TesterBase implements TestSmsServerManMBea
                     null, null, null, null, null, false, null, null, null, null, false, false);
             curDialog.addSendRoutingInfoForSMResponse(invokeId, imsi, li, null, null, null);
             this.countSriResp++;
+            OtaReceivedCapReassembler r = this.capReassembler;
+            if (r != null && msisdn != null && !msisdn.isBlank()) {
+                r.rememberSubscriber(imsi.getData(), msisdn);
+            }
             this.testerHost.sendNotif(SOURCE_NAME, "Sent: sriResp",
                     "msisdn=" + msisdn + " imsi=" + imsi.getData() + " vlr=" + cfg.getSriResponseVlr(), Level.INFO);
             this.needSendClose = true;

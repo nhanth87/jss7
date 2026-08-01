@@ -700,3 +700,32 @@ That is **peer/OTA down** (no LISTEN on `:8013`), **not** an SCCP XML parse bug.
 ## 12. (cont.) Related OTA lab
 
 OTA peer docs: `worktrees/ota-service/ota-sim-push/docs/agents/ss7-lab-pair.md`. Same persist-XML hygiene applies to any `ota-ss7-sccp_*.xml` under OTA `dist/`.
+
+### SMS_TEST_SERVER — receive OTA CAP (reassemble to disk)
+
+When task = **SMS_TEST_SERVER**, inbound MAP **MT-ForwardSM** carrying concatenated SMS-PP (OTA install) is buffered and merged by `OtaReceivedCapReassembler` (wired from `TestSmsServerMan`).
+
+| Item | Detail |
+|------|--------|
+| Output dir | `tools/simulator/bootstrap/target/simulator-ss7/data/received-caps/` |
+| Filename | `{msisdn}_{yyyyMMdd-HHmmss}_ref{N}_n{total}.cap` (MSISDN from prior SRI; else `imsi…`) |
+| Content | Merged SMS-PP **secured packet** body (UDH stripped) — not decrypted GP CAP |
+| Log line | `OTA CAP written path=… size=N bytes subscriber=… msisdn=… ref=… segments=…` (log4j + simulator notif) |
+| Incomplete | Out-of-order OK; timeout 5 min discards buffer — **no** partial `.cap` (atomic `.tmp`→rename) |
+| MAP | SRI/MT success responses unchanged (capture failures never reject MT) |
+
+**Lab test** (OTA `:8013` + sim `:8014`, both up):
+
+```bash
+# OTA side
+curl -sS -X POST -H 'X-OTA-Tenant: lab-default' \
+  'http://localhost:8088/sendota?msisdn=251911000001&mode=install&app=DigicomSatSysmo.cap'
+
+# Sim side — wait for all segments, then:
+ls -la tools/simulator/bootstrap/target/simulator-ss7/data/received-caps/
+grep 'OTA CAP written' tools/simulator/bootstrap/target/simulator-ss7/log/server.log
+```
+
+After code change: rebuild `simulator-core` and copy jar into `simulator-ss7/lib/`, then restart the simulator JVM.
+
+---
