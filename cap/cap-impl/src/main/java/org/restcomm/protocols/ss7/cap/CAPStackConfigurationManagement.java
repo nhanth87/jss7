@@ -10,9 +10,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 public class CAPStackConfigurationManagement {
-    private static final String PERSIST_FILE_NAME = "management.xml";
+    /**
+     * Distinct from MAP/TCAP {@code *_management.xml} — simulator shares stack name
+     * {@code Simulator} across layers.
+     */
+    private static final String PERSIST_FILE_NAME = "capmanagement.xml";
+    private static final String LEGACY_PERSIST_FILE_NAME = "management.xml";
     private static final String CAP_MANAGEMENT_PERSIST_DIR_KEY = "capmanagement.persist.dir";
     private static final String USER_DIR_KEY = "user.dir";
     private static final String DEFAULT_CONFIG_FILE_NAME = "CapStack";
@@ -78,8 +85,8 @@ public class CAPStackConfigurationManagement {
     public void load() {
         try {
             setPersistFile();
-            File file = new File(persistFile.toString());
-            if (!file.exists()) {
+            File file = resolvePersistFileForLoad();
+            if (file == null) {
                 return;
             }
             try (Reader reader = new FileReader(file)) {
@@ -91,9 +98,45 @@ public class CAPStackConfigurationManagement {
                 this._Timer_Sms_Short = loaded._Timer_Sms_Short;
                 this._Timer_Gprs_Short = loaded._Timer_Gprs_Short;
             }
+            if (!file.getPath().equals(persistFile.toString())) {
+                store();
+            }
         } catch (Exception e) {
             System.err.println(String.format("Error while load the CAP Resource state from file=%s", persistFile.toString()));
             e.printStackTrace();
+        }
+    }
+
+    File resolvePersistFileForLoad() {
+        File primary = new File(persistFile.toString());
+        if (primary.exists()) {
+            return primary;
+        }
+        File legacy = legacyPersistFile();
+        if (legacy.exists() && looksLikeCapPersist(legacy)) {
+            return legacy;
+        }
+        return null;
+    }
+
+    private File legacyPersistFile() {
+        String dir = persistDir != null
+                ? persistDir
+                : System.getProperty(CAP_MANAGEMENT_PERSIST_DIR_KEY, System.getProperty(USER_DIR_KEY));
+        return new File(dir, this.configFileName + "_" + LEGACY_PERSIST_FILE_NAME);
+    }
+
+    static boolean looksLikeCapPersist(File file) {
+        try {
+            String xml = Files.readString(file.toPath(), StandardCharsets.UTF_8);
+            if (xml.contains("mapStackConfiguration") || xml.contains("TCAPConfig")
+                    || xml.contains("<shortTimer")) {
+                return false;
+            }
+            return xml.contains("timercircuitswitchedcallcontrol") || xml.contains("timersmsshort")
+                    || xml.contains("timergprsshort") || xml.contains("CAPStackConfiguration");
+        } catch (Exception e) {
+            return false;
         }
     }
 

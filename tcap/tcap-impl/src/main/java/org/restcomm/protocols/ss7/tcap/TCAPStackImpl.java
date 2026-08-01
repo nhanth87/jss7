@@ -5,11 +5,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.List;
 
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
@@ -34,7 +37,13 @@ public class TCAPStackImpl implements TCAPStack {
 
     protected static final String TCAP_MANAGEMENT_PERSIST_DIR_KEY = "tcapmanagement.persist.dir";
     protected static final String USER_DIR_KEY = "user.dir";
-    protected static final String PERSIST_FILE_NAME = "management.xml";
+    /**
+     * Distinct from MAP/CAP {@code *_management.xml} — simulator names all three stacks
+     * {@code Simulator}, so a shared suffix made TCAP load MAP timer XML (shortTimer) and fail.
+     */
+    protected static final String PERSIST_FILE_NAME = "tcapmanagement.xml";
+    /** Pre-split shared name; only migrated when content looks like TCAP. */
+    protected static final String LEGACY_PERSIST_FILE_NAME = "management.xml";
     private static final String TAB_INDENT = "\t";
     private static final String CLASS_ATTRIBUTE = "type";
 
@@ -739,6 +748,7 @@ public class TCAPStackImpl implements TCAPStack {
      * Configuration class for TCAP persistence
      */
     @JsonRootName("TCAPConfig")
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TCAPConfig {
         @JsonProperty("dialogTimeout")
         public long dialogTimeout;
@@ -785,19 +795,61 @@ public class TCAPStackImpl implements TCAPStack {
      */
     protected void load() throws FileNotFoundException {
         try {
-            File f = new File(persistFile.toString());
-            if (!f.exists()) {
+            File f = resolvePersistFileForLoad();
+            if (f == null) {
                 return;
             }
-            try (FileReader reader = new FileReader(persistFile.toString())) {
+            try (FileReader reader = new FileReader(f)) {
                 TCAPConfig config = (TCAPConfig) TCAPJacksonXMLHelper.fromXML(reader);
                 if (config != null) {
                     load(config);
                 }
             }
+            // If we loaded a legacy shared file, rewrite under the TCAP-specific name.
+            if (!f.getPath().equals(persistFile.toString())) {
+                store();
+            }
         } catch (Exception ex) {
             this.logger.error(
                     String.format("Error while reading the TCAP Resource state in file=%s", persistFile), ex);
+        }
+    }
+
+    /**
+     * Prefer {@code {name}_tcapmanagement.xml}. Fall back to legacy
+     * {@code {name}_management.xml} only when the file is TCAP-shaped — never MAP/CAP.
+     */
+    File resolvePersistFileForLoad() {
+        File primary = new File(persistFile.toString());
+        if (primary.exists()) {
+            return primary;
+        }
+        File legacy = legacyPersistFile();
+        if (legacy.exists() && looksLikeTcapPersist(legacy)) {
+            logger.info("Migrating legacy TCAP persist {} -> {}", legacy.getName(), primary.getName());
+            return legacy;
+        }
+        return null;
+    }
+
+    private File legacyPersistFile() {
+        String dir = persistDir != null
+                ? persistDir
+                : System.getProperty(TCAP_MANAGEMENT_PERSIST_DIR_KEY, System.getProperty(USER_DIR_KEY));
+        return new File(dir, this.name + "_" + LEGACY_PERSIST_FILE_NAME);
+    }
+
+    static boolean looksLikeTcapPersist(File file) {
+        try {
+            String xml = Files.readString(file.toPath(), StandardCharsets.UTF_8);
+            if (xml.contains("mapStackConfiguration") || xml.contains("<shortTimer")
+                    || xml.contains("timercircuitswitchedcallcontrol")) {
+                return false;
+            }
+            return xml.contains("TCAPConfig") || xml.contains("<dialogTimeout")
+                    || xml.contains("<invokeTimeout") || xml.contains("<maxDialogs");
+        } catch (Exception e) {
+            return false;
         }
     }
 

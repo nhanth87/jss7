@@ -11,6 +11,8 @@ import java.util.List;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.restcomm.protocols.ss7.sccp.SccpProvider;
@@ -31,7 +33,8 @@ public class TCAPStackImpl implements TCAPStack {
 
     protected static final String TCAP_MANAGEMENT_PERSIST_DIR_KEY = "tcapmanagement.persist.dir";
     protected static final String USER_DIR_KEY = "user.dir";
-    protected static final String PERSIST_FILE_NAME = "management.xml";
+    /** Distinct from MAP/CAP shared legacy {@code management.xml}. */
+    protected static final String PERSIST_FILE_NAME = "tcapmanagement.xml";
     private static final String TAB_INDENT = "\t";
     private static final String CLASS_ATTRIBUTE = "type";
 
@@ -683,6 +686,7 @@ public class TCAPStackImpl implements TCAPStack {
     /**
      * Configuration class for TCAP ANSI persistence
      */
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TCAPConfig {
         public long dialogTimeout;
         public long invokeTimeout;

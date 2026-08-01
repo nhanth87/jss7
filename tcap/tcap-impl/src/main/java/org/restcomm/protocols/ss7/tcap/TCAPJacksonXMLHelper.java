@@ -1,5 +1,6 @@
 package org.restcomm.protocols.ss7.tcap;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
@@ -19,6 +20,8 @@ public class TCAPJacksonXMLHelper {
         xmlMapper.enable(SerializationFeature.INDENT_OUTPUT);
         xmlMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_1_1, true);
+        // Legacy / foreign-layer XML must not abort TCAP start.
+        xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public static XmlMapper getXmlMapper() {
