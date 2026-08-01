@@ -745,6 +745,10 @@ public class RouterExtImpl implements RouterExt {
      */
     public void store() {
         try {
+            if (persistFile.length() == 0) {
+                logger.warn("Skipping SCCP RouterExt persist: persist path not initialized (call start() first)");
+                return;
+            }
             RouterConfig config = new RouterConfig();
             config.rulesMap = this.rulesMap;
             config.routingAddresses = this.routingAddresses;

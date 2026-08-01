@@ -78,6 +78,9 @@
 				<include>org.restcomm.protocols.ss7.m3ua:m3ua-impl</include>
 				<include>org.restcomm.protocols.ss7.mtp:mtp</include>
 				<include>org.restcomm.protocols.ss7.mtp:mtp-api</include>
+				<!-- MAP/TCAP W2 callback dispatcher (required by map-impl / tcap-impl on j25) -->
+				<include>org.restcomm.protocols.ss7.scheduler:scheduler</include>
+				<include>org.restcomm.protocols.ss7.scheduler:w2-scheduler</include>
 				<!-- <include>org.restcomm.protocols.ss7.hardware:restcomm-dahdi</include> -->
 				<include>org.restcomm.protocols.ss7.hardware:restcomm-dialogic</include>
 				<include>org.restcomm.protocols.ss7.congestion:congestion</include>

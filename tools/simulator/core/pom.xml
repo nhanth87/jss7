@@ -109,6 +109,17 @@
 			<version>9.2.8-j25</version>
 			<scope>compile</scope>
 		</dependency>
+		<!-- Explicit: assembly descriptor uses an include-list and would omit these otherwise -->
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.scheduler</groupId>
+			<artifactId>scheduler</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7.scheduler</groupId>
+			<artifactId>w2-scheduler</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
