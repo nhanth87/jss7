@@ -661,3 +661,42 @@ Client MUST bind to a specific port matching server's `peerPort`.
 
 Old `src/main/resources/log4j.properties` was deleted — it caused log4j 1.x `FileNotFoundException` warnings.
 Only `log4j2-server.xml` / `log4j2-client.xml` are used, loaded via `-Dlog4j.configurationFile=` JVM arg.
+
+---
+
+## 12. SIMULATOR-SS7 PERSIST XML — HARD LAW (never break Start)
+
+**Path:** `tools/simulator/bootstrap/target/simulator-ss7/data/` (and any `*sccp*.xml` / M3UA/SCTP persist beside it).
+
+### Never
+
+1. **Never leave corrupt persist XML** in `simulator-ss7/data/`. If a file fails Jackson/Woodstox load, it is **not** “fixed”.
+2. **Never hand-edit** persist XML into illegal element names: **no `<1>` / `</1>`**, no unescaped `<` in text, no half-written files.
+3. **Never** claim a SCCP/M3UA/MAP/SCTP config write is done without **validating** the file parses (Jackson XML / Woodstox) **before** telling the user it is fixed.
+4. **Never** “fix” link/status / GTT / SSN by rewriting peer persist files and walking away while `Failed to load the SS7 configuration file` / `JsonParseException` / `Unexpected character '1'` still appears on Start.
+5. **One fix must not spawn the next.** After any change under `data/*.xml` or `lib/sccp-*.jar`: **smoke Start** (or at least load the touched XML with `SCCPJacksonXMLHelper.fromXML`) and confirm **no** `Failed to load the SS7 configuration file` / parse ERROR in `log/server.log`.
+6. Quarantine alone is **not** a fix: move bad files to `data/.bak-*` **and** replace with known-good seed **or** regenerate valid Jackson XML (Integer map keys as `<kN>`, not `<N>`).
+
+### Root cause (do not reintroduce)
+
+Default Jackson XML uses map keys as element names → Integer key `1` becomes **illegal XML** `<1>`. Woodstox then throws at line ~4 col 7. **Writer fix** lives in `SCCPJacksonXMLHelper` (`k` + id key serializer + sanitize-on-read). After code change, copy rebuilt `sccp-impl-*-j25.jar` into `simulator-ss7/lib/` and **restart** the simulator JVM.
+
+### SCTP `ChannelUnregistered` Ass_main 8014→8013
+
+That is **peer/OTA down** (no LISTEN on `:8013`), **not** an SCCP XML parse bug. Fix XML first so Start is clean; then ensure OTA `./run.sh` is up and `ss` shows `:8013` before expecting M3UA/AS ACTIVE.
+
+### Agent checklist (mandatory)
+
+```
+[ ] Inspect all data/*sccp*.xml (+ related persist) for </?\d+> or parse errors
+[ ] Quarantine corrupt → .bak-* AND replace/regenerate valid XML
+[ ] If writer produced garbage → fix Java (SCCPJacksonXMLHelper / contentAs / mix-ins), rebuild, install jar
+[ ] Validate parse (helper or Start) — zero "Failed to load SS7 configuration"
+[ ] Note SCTP separately if Ass_main dies while OTA :8013 is down
+```
+
+---
+
+## 12. (cont.) Related OTA lab
+
+OTA peer docs: `worktrees/ota-service/ota-sim-push/docs/agents/ss7-lab-pair.md`. Same persist-XML hygiene applies to any `ota-ss7-sccp_*.xml` under OTA `dist/`.

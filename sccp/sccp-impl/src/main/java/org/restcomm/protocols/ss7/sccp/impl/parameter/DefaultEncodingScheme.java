@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import org.restcomm.protocols.ss7.sccp.message.ParseException;
@@ -18,7 +19,17 @@ import org.restcomm.protocols.ss7.sccp.parameter.EncodingSchemeType;
  * @author sergey vetyutnev
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "type",
+    visible = true
+)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = BCDOddEncodingScheme.class, name = "BCD_ODD"),
+    @JsonSubTypes.Type(value = BCDEvenEncodingScheme.class, name = "BCD_EVEN"),
+    @JsonSubTypes.Type(value = DefaultEncodingScheme.class, name = "UNKNOWN")
+})
 public class DefaultEncodingScheme implements EncodingScheme {
 
     public static final EncodingScheme INSTANCE = new DefaultEncodingScheme();

@@ -379,20 +379,37 @@ public class SccpMan implements SccpManMBean, Stoppable {
             // an unstarted RouterExtImpl (persistFile empty → FileNotFoundException on store).
             this.router = sccpExtModule.getRouterExt();
 
+            int hlrSsn = this.testerHost.getConfigurationData().getSccpConfigurationData().getLocalSsn2();
+            if (hlrSsn <= 0) {
+                hlrSsn = 6;
+            }
+
             SccpAddress sccpAddress1 = parameterFactory.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, this.createGlobalTitle(""), dpc, 0);
             SccpAddress sccpAddress2 = parameterFactory.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_DPC_AND_SSN, this.createGlobalTitle(""), opc, localSsn);
+            SccpAddress sccpAddress3 = parameterFactory.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_DPC_AND_SSN, this.createGlobalTitle(""), opc, hlrSsn);
 
-            SccpAddress pattern = parameterFactory.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, this.createGlobalTitle("*"), 0,
-                0);
+            SccpAddress patternAny = parameterFactory.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, this.createGlobalTitle("*"), 0, 0);
             String mask = "K";
 
             this.router.addRoutingAddress(1, sccpAddress1);
             this.router.addRoutingAddress(2, sccpAddress2);
-            this.router.addRule(1, RuleType.SOLITARY, null, OriginationType.LOCAL, pattern, mask, 1,
-                -1, null, 0, createCallingPartyAddress1());
-            pattern = parameterFactory.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, this.createGlobalTitle("*"), 0, 0);
-            this.router.addRule(2, RuleType.SOLITARY, null, OriginationType.REMOTE, pattern, mask, 2,
-                -1, null, 0, createCallingPartyAddress1());
+            this.router.addRoutingAddress(3, sccpAddress3);
+
+            // Outbound (sim → OTA peer) — no calling-party filter (HLR SSN 6 and MSC SSN 8 both egress)
+            this.router.addRule(1, RuleType.SOLITARY, null, OriginationType.LOCAL, patternAny, mask, 1,
+                -1, null, 0, null);
+
+            // Inbound OTA SRI → local HLR (SSN 6, e.g. GT 251911000000)
+            SccpAddress patternHlr = parameterFactory.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE,
+                    this.createGlobalTitle("*"), 0, hlrSsn);
+            this.router.addRule(2, RuleType.SOLITARY, null, OriginationType.REMOTE, patternHlr, mask, 3,
+                -1, null, 0, null);
+
+            // Inbound OTA MT-ForwardSM → local MSC (SSN 8)
+            SccpAddress patternMsc = parameterFactory.createSccpAddress(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE,
+                    this.createGlobalTitle("*"), 0, localSsn);
+            this.router.addRule(3, RuleType.SOLITARY, null, OriginationType.REMOTE, patternMsc, mask, 2,
+                -1, null, 0, null);
         }
     }
 

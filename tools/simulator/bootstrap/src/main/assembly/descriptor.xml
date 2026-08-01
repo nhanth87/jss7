@@ -13,6 +13,7 @@
 		<file>
 			<source>src/main/config/run.sh</source>
 			<destName>bin/run.sh</destName>
+			<fileMode>0755</fileMode>
 		</file>
 	</files>
 	<dependencySets>

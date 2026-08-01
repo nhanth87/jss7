@@ -13,6 +13,7 @@ import org.restcomm.protocols.ss7.sccp.SccpResource;
 import org.restcomm.protocols.ss7.sccp.impl.oam.SccpOAMMessage;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
@@ -338,9 +339,17 @@ public class SccpResourceImpl implements SccpResource {
         @JacksonXmlRootElement(localName = "ResourcesConfig")
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class ResourcesConfig {
-            @JacksonXmlProperty public RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsns;
-            @JacksonXmlProperty public RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcs;
-            @JacksonXmlProperty public ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode> concernedSpcs;
+            @JacksonXmlProperty
+            @JsonDeserialize(contentAs = RemoteSubSystemImpl.class)
+            public RemoteSubSystemMap<Integer, RemoteSubSystem> remoteSsns;
+
+            @JacksonXmlProperty
+            @JsonDeserialize(contentAs = RemoteSignalingPointCodeImpl.class)
+            public RemoteSignalingPointCodeMap<Integer, RemoteSignalingPointCode> remoteSpcs;
+
+            @JacksonXmlProperty
+            @JsonDeserialize(contentAs = ConcernedSignalingPointCodeImpl.class)
+            public ConcernedSignalingPointCodeMap<Integer, ConcernedSignalingPointCode> concernedSpcs;
         }
 
         /**

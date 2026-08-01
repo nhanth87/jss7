@@ -74,6 +74,7 @@ import org.restcomm.protocols.ss7.tools.simulator.level3.MapMan;
 import org.restcomm.protocols.ss7.tools.simulator.level3.MapProtocolVersion;
 import org.restcomm.protocols.ss7.tools.simulator.level3.NumberingPlanMapType;
 import org.restcomm.protocols.ss7.tools.simulator.management.TesterHostInterface;
+import org.restcomm.protocols.ss7.tools.simulator.tests.sms.TestSmsClientConfigurationData;
 
 /**
  *
@@ -811,8 +812,22 @@ public class TestSmsServerMan extends TesterBase implements TestSmsServerManMBea
 
     @Override
     public void onMtForwardShortMessageRequest(MtForwardShortMessageRequest mtForwSmInd) {
-        // TODO Auto-generated method stub
+        if (!isStarted)
+            return;
 
+        this.countMtFsmReq++;
+        MAPDialogSms curDialog = mtForwSmInd.getMAPDialog();
+        this.testerHost.sendNotif(SOURCE_NAME, "Rcvd: mtReq", "", Level.DEBUG);
+
+        try {
+            curDialog.addMtForwardShortMessageResponse(mtForwSmInd.getInvokeId(), null, null);
+            this.countMtFsmResp++;
+            this.testerHost.sendNotif(SOURCE_NAME, "Sent: mtResp", "", Level.DEBUG);
+            this.needSendClose = true;
+        } catch (MAPException e) {
+            this.testerHost.sendNotif(SOURCE_NAME, "Exception when invoking addMtForwardShortMessageResponse() : " + e.getMessage(), e,
+                    Level.ERROR);
+        }
     }
 
     @Override
@@ -834,8 +849,34 @@ public class TestSmsServerMan extends TesterBase implements TestSmsServerManMBea
 
     @Override
     public void onSendRoutingInfoForSMRequest(SendRoutingInfoForSMRequest sendRoutingInfoForSMInd) {
-        // TODO Auto-generated method stub
+        if (!isStarted)
+            return;
 
+        this.countSriReq++;
+
+        MAPProvider mapProvider = this.mapMan.getMAPStack().getMAPProvider();
+        MAPDialogSms curDialog = sendRoutingInfoForSMInd.getMAPDialog();
+        long invokeId = sendRoutingInfoForSMInd.getInvokeId();
+        TestSmsClientConfigurationData cfg = this.testerHost.getConfigurationData().getTestSmsClientConfigurationData();
+
+        String msisdn = sendRoutingInfoForSMInd.getMsisdn() != null ? sendRoutingInfoForSMInd.getMsisdn().getAddress() : "";
+        this.testerHost.sendNotif(SOURCE_NAME, "Rcvd: sriReq", "msisdn=" + msisdn, Level.INFO);
+
+        try {
+            IMSI imsi = mapProvider.getMAPParameterFactory().createIMSI(cfg.getSriResponseImsi());
+            ISDNAddressString networkNodeNumber = mapProvider.getMAPParameterFactory().createISDNAddressString(cfg.getAddressNature(),
+                    cfg.getNumberingPlan(), cfg.getSriResponseVlr());
+            LocationInfoWithLMSI li = mapProvider.getMAPParameterFactory().createLocationInfoWithLMSI(networkNodeNumber, null, null, false,
+                    null, null, null, null, null, false, null, null, null, null, false, false);
+            curDialog.addSendRoutingInfoForSMResponse(invokeId, imsi, li, null, null, null);
+            this.countSriResp++;
+            this.testerHost.sendNotif(SOURCE_NAME, "Sent: sriResp",
+                    "msisdn=" + msisdn + " imsi=" + imsi.getData() + " vlr=" + cfg.getSriResponseVlr(), Level.INFO);
+            this.needSendClose = true;
+        } catch (MAPException e) {
+            this.testerHost.sendNotif(SOURCE_NAME, "Exception when invoking addSendRoutingInfoForSMResponse() : " + e.getMessage(), e,
+                    Level.ERROR);
+        }
     }
 
     @Override

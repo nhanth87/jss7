@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
@@ -579,8 +580,13 @@ public class RouterImpl implements Router {
     @JacksonXmlRootElement(localName = "RouterConfig")
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class RouterConfig {
-        @JacksonXmlProperty public LongMessageRuleMap<Integer, LongMessageRule> longMessageRules;
-        @JacksonXmlProperty public Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> saps;
+        @JacksonXmlProperty
+        @JsonDeserialize(contentAs = LongMessageRuleImpl.class)
+        public LongMessageRuleMap<Integer, LongMessageRule> longMessageRules;
+
+        @JacksonXmlProperty
+        @JsonDeserialize(contentAs = Mtp3ServiceAccessPointImpl.class)
+        public Mtp3ServiceAccessPointMap<Integer, Mtp3ServiceAccessPoint> saps;
     }
 
     /**

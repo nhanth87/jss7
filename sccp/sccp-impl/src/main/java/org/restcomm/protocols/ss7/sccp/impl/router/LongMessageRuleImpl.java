@@ -3,6 +3,7 @@ package org.restcomm.protocols.ss7.sccp.impl.router;
 import org.restcomm.protocols.ss7.sccp.LongMessageRule;
 import org.restcomm.protocols.ss7.sccp.LongMessageRuleType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
@@ -30,6 +31,7 @@ public class LongMessageRuleImpl implements LongMessageRule {
         this.ruleType = ruleType;
     }
 
+    @JsonIgnore
     public LongMessageRuleType getLongMessageRuleType() {
         return this.ruleType;
     }
