@@ -1,5 +1,7 @@
 # AGENTS.md — jSS7-NG: Upgrade to Java 25 + micro-jainslee RA Integration
 
+**JDK: Java 25 only** (j25 — `maven.compiler.release=25`, mise **zulu-25**). Do not use Java 8/11/17/21 for this tree.
+
 > **MISSION:** Upgrade jSS7 from Java 11 → Java 25 for maximum performance, then wrap as a micro-jainslee 3-port Resource Adaptor.
 > **Target State:** jSS7 runs on ZGC + Virtual Threads + Log4j2 Async, exposes SS7 events via `RaBootstrapPort.fireEvent()` into the LMAX Disruptor-based `EventRouter`.
 > **Baseline:** jSS7 9.2.8 | 4,337 Java files | 18 modules | Java 11 | log4j 1.2.14 | junit 3.8.1 | JCTools 4.0.3 | Netty 4.2.11
@@ -525,8 +527,6 @@ c.registerRa(ra, ra);
 ### 11.1 Java 25 via mise
 
 **Branch rule:** `j25` / coral-valley jSS7-NG = **Java 25 only** (mise zulu-25). Do not build this tree with Java 8.
-
-**Workspace mix:** classic jSS7 (`build-projects/jSS7` / `master`) and WF10 USSD GW may still be Java 8. **Ask before building** when the target tree/branch is unclear. For this coral-valley `j25` worktree, always use Java 25 via mise — no re-ask once confirmed.
 
 ```bash
 # Java 25 is managed via mise (Zulu 25.34.17)
