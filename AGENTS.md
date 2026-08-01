@@ -708,11 +708,12 @@ When task = **SMS_TEST_SERVER**, inbound MAP **MT-ForwardSM** carrying concatena
 | Item | Detail |
 |------|--------|
 | Output dir | `tools/simulator/bootstrap/target/simulator-ss7/data/received-caps/` |
-| Filename | `{msisdn}_{yyyyMMdd-HHmmss}_ref{N}_n{total}.cap` (MSISDN from prior SRI; else `imsi…`) |
+| Filename | `{msisdn}_{yyyyMMdd-HHmmss-SSS}_ref{N}_n{total}.cap` (MSISDN from prior SRI; else `imsi…`) |
 | Content | Merged SMS-PP **secured packet** body (UDH stripped) — not decrypted GP CAP |
 | Log line | `OTA CAP written path=… size=N bytes subscriber=… msisdn=… ref=… segments=…` (log4j + simulator notif) |
 | Incomplete | Out-of-order OK; timeout 5 min discards buffer — **no** partial `.cap` (atomic `.tmp`→rename) |
 | MAP | SRI/MT success responses unchanged (capture failures never reject MT) |
+| OTA send UDH | `ra-jss7` `MapSmsOutbound` must pass **UDHL-prefixed** TP-UD to `createUserDataHeader` (IE body alone makes concat IEI `0x00` look like UDHL=0 → empty UDH → each segment written as `ref0_n1`) |
 
 **Lab test** (OTA `:8013` + sim `:8014`, both up):
 

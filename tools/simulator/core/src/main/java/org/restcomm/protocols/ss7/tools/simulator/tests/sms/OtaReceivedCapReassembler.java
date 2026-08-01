@@ -42,7 +42,7 @@ public final class OtaReceivedCapReassembler {
 
     private static final Logger LOG = LogManager.getLogger(OtaReceivedCapReassembler.class);
     private static final DateTimeFormatter TS =
-            DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss").withZone(ZoneOffset.UTC);
+            DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-SSS").withZone(ZoneOffset.UTC);
 
     private final Path outputDir;
     private final long timeoutMs;

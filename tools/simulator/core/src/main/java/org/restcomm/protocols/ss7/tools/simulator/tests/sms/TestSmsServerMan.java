@@ -910,15 +910,15 @@ public class TestSmsServerMan extends TesterBase implements TestSmsServerManMBea
 
         boolean udhi = ud.getEncodedUserDataHeaderIndicator();
         int offset = 0;
-        UserDataHeader udh = ud.getDecodedUserDataHeader();
+        // Always parse UDH from raw TP-UD octets when UDHI is set — do not trust a
+        // possibly empty decoded header (concat IEI 0x00 is easy to drop upstream).
+        UserDataHeader udh = null;
         if (udhi) {
             offset = (encoded[0] & 0xFF) + 1;
             if (offset > encoded.length) {
                 return;
             }
-            if (udh == null) {
-                udh = new UserDataHeaderImpl(encoded);
-            }
+            udh = new UserDataHeaderImpl(encoded);
         }
 
         int udLen = ud.getEncodedUserDataLength();
