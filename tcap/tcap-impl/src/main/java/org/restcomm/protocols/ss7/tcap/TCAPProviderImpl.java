@@ -648,15 +648,23 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
             try { this.wheelTimer.stop(); } catch (Exception ignore) { }
             this.wheelTimer = null;
         }
-        this._EXECUTOR.shutdown();
-        this.sccpProvider.deregisterSccpListener(ssn);
+        // Idempotent: start() may never have run (e.g. MapMan after MAP skipped
+        // TCAP start), or stop() may be invoked twice (Ss7Stack stops MAP then TCAP).
+        ScheduledExecutorService executor = this._EXECUTOR;
+        if (executor != null) {
+            executor.shutdown();
+            this._EXECUTOR = null;
+        }
+        if (this.sccpProvider != null) {
+            this.sccpProvider.deregisterSccpListener(ssn);
 
-        List<Integer> extraSsns = this.stack.getExtraSsns();
-        if (extraSsns != null) {
-            for (Integer I1 : extraSsns) {
-                if (I1 != null) {
-                    int extraSsn = I1;
-                    this.sccpProvider.deregisterSccpListener(extraSsn);
+            List<Integer> extraSsns = this.stack.getExtraSsns();
+            if (extraSsns != null) {
+                for (Integer I1 : extraSsns) {
+                    if (I1 != null) {
+                        int extraSsn = I1;
+                        this.sccpProvider.deregisterSccpListener(extraSsn);
+                    }
                 }
             }
         }

@@ -66,7 +66,11 @@ public class CAPStackImpl implements CAPStack {
         if (state != State.CONFIGURED) {
             throw new IllegalStateException("Stack has not been configured or is already running!");
         }
-        // TCAP is already started by the builder before CAP; skip re-start.
+        // Ss7StackBuilder starts TCAP before CAP — do not double-start.
+        // Paths that construct CAP with an owned TCAP still need start here.
+        if (tcapStack != null && !tcapStack.isStarted()) {
+            this.tcapStack.start();
+        }
         this.capProvider.start();
 
         this.state = State.RUNNING;

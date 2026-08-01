@@ -65,7 +65,11 @@ public class MAPStackImpl implements MAPStack {
         if (state != State.CONFIGURED) {
             throw new IllegalStateException("Stack has not been configured or is already running!");
         }
-        // TCAP is already started by the builder before MAP; skip re-start.
+        // Ss7StackBuilder starts TCAP before MAP — do not double-start.
+        // Simulator MapMan (and CAP/MAP owning their own TCAP) still need start here.
+        if (tcapStack != null && !tcapStack.isStarted()) {
+            this.tcapStack.start();
+        }
         this.mapProvider.start();
 
         this.state = State.RUNNING;

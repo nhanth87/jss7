@@ -230,6 +230,13 @@ public class TCAPStackImpl implements TCAPStack {
     }
 
     public void stop() {
+        if (!this.started) {
+            // Never started, or already stopped — keep stop idempotent (MapMan / Ss7Stack).
+            if (this.tcapProvider != null) {
+                this.tcapProvider.stop();
+            }
+            return;
+        }
         this.tcapProvider.stop();
         this.started = false;
 

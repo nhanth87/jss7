@@ -252,6 +252,13 @@ public class MapMan implements MapManMBean, Stoppable {
             this.mapStack.getTCAPStack().setExtraSsns(extraSsnsNew);
         }
 
+        // Simulator owns TCAP via MAPStackImpl(name, sccp, ssn). Explicitly start TCAP so
+        // TCAPProviderImpl._EXECUTOR is assigned before any dialog (SRI/MT). MAPStackImpl.start()
+        // also starts TCAP when !isStarted(); this call makes the requirement obvious and safe
+        // even if an older map-impl that skipped TCAP start is on the classpath.
+        if (!this.mapStack.getTCAPStack().isStarted()) {
+            this.mapStack.getTCAPStack().start();
+        }
         this.mapStack.start();
     }
 
