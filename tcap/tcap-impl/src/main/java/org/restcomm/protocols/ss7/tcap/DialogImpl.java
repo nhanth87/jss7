@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.mobicents.protocols.asn.AsnOutputStream;
 import org.restcomm.protocols.ss7.sccp.parameter.SccpAddress;
 import org.restcomm.protocols.ss7.tcap.api.TCAPException;
+import org.restcomm.protocols.ss7.tcap.api.TcapDialogSnapshot;
 import org.restcomm.protocols.ss7.tcap.api.TCAPSendException;
 import org.restcomm.protocols.ss7.tcap.api.TCAPStack;
 import org.restcomm.protocols.ss7.tcap.api.tc.component.InvokeClass;
@@ -2257,6 +2258,83 @@ public class DialogImpl implements Dialog {
 
     public long getStartTimeDialog() {
         return this.startDialogTime;
+    }
+
+    /**
+     * SPIKE: build a portable snapshot for CONTINUE takeover. Does not include
+     * live invoke operation objects or scheduled timer tasks.
+     */
+    TcapDialogSnapshot exportSnapshot() {
+        try {
+            this.dialogLock.lock();
+            long[] acnOid = null;
+            if (this.lastACN != null) {
+                acnOid = this.lastACN.getOid();
+            }
+            return new TcapDialogSnapshot(this.localTransactionId, this.remoteTransactionId, this.localAddress,
+                    this.remoteAddress, this.state, acnOid, this.idleDeadlineNanos, this.networkId, this.localSsn,
+                    this.remotePc, this.seqControl, this.dpSentInBegin, this.invokeIDTable);
+        } finally {
+            this.dialogLock.unlock();
+        }
+    }
+
+    /**
+     * SPIKE: restore dialog fields from a snapshot after construction / map registration.
+     * Restarts idle timer based on remaining deadline when possible.
+     */
+    void applyImportedSnapshot(TcapDialogSnapshot snapshot) {
+        if (snapshot == null) {
+            throw new NullPointerException("snapshot");
+        }
+        try {
+            this.dialogLock.lock();
+            this.setRemoteTransactionId(snapshot.getRemoteOtid());
+            this.remoteTransactionIdObject = null;
+            this.localAddress = snapshot.getLocalAddress();
+            this.remoteAddress = snapshot.getRemoteAddress();
+            this.networkId = snapshot.getNetworkId();
+            this.localSsn = snapshot.getLocalSsn();
+            this.remotePc = snapshot.getRemotePc();
+            this.seqControl = snapshot.getSeqControl();
+            this.dpSentInBegin = snapshot.isDpSentInBegin();
+            long[] oid = snapshot.getApplicationContextOid();
+            if (oid != null) {
+                this.lastACN = TcapFactory.createApplicationContextName(oid);
+            } else {
+                this.lastACN = null;
+            }
+            boolean[] taken = snapshot.getInvokeIdTaken();
+            if (taken != null && taken.length == this.invokeIDTable.length) {
+                System.arraycopy(taken, 0, this.invokeIDTable, 0, taken.length);
+                int free = 0;
+                for (boolean b : this.invokeIDTable) {
+                    if (!b) {
+                        free++;
+                    }
+                }
+                this.freeCount = free;
+            }
+            // assign state without Expunged side-effects
+            if (this.state != TRPseudoState.Expunged) {
+                this.state = snapshot.getState() == null ? TRPseudoState.Idle : snapshot.getState();
+            }
+            // Re-arm idle timer: constructor already scheduled one; cancel before restore.
+            this.idleDeadlineNanos = 0L;
+            if (this.idleTimerFuture != null) {
+                this.idleTimerFuture.cancel(false);
+                this.idleTimerFuture = null;
+            }
+            long deadline = snapshot.getIdleDeadlineNanos();
+            if (deadline > System.nanoTime()) {
+                this.idleDeadlineNanos = deadline;
+            } else {
+                bumpIdleDeadlineLocked();
+            }
+            scheduleIdleTimerLocked();
+        } finally {
+            this.dialogLock.unlock();
+        }
     }
 
     /*

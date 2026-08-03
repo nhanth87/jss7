@@ -53,6 +53,7 @@ import org.restcomm.protocols.ss7.tcap.api.DialogPrimitiveFactory;
 import org.restcomm.protocols.ss7.tcap.api.MessageType;
 import org.restcomm.protocols.ss7.tcap.api.TCAPException;
 import org.restcomm.protocols.ss7.tcap.api.TCAPProvider;
+import org.restcomm.protocols.ss7.tcap.api.TcapDialogSnapshot;
 import org.restcomm.protocols.ss7.tcap.api.TCListener;
 import org.restcomm.protocols.ss7.tcap.api.tc.dialog.Dialog;
 import org.restcomm.protocols.ss7.tcap.api.tc.dialog.TRPseudoState;
@@ -383,6 +384,59 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     @Override
     public int getCurrentDialogsCount() {
         return this.dialogs.size();
+    }
+
+    @Override
+    public TcapDialogSnapshot exportDialog(long localOtid) {
+        DialogImpl dialog = this.dialogs.get(localOtid);
+        if (dialog == null) {
+            return null;
+        }
+        return dialog.exportSnapshot();
+    }
+
+    @Override
+    public Dialog importDialog(TcapDialogSnapshot snapshot) throws TCAPException {
+        if (snapshot == null) {
+            throw new TCAPException("TcapDialogSnapshot must not be null");
+        }
+        if (this.stack.getPreviewMode()) {
+            throw new TCAPException("Can not import a Dialog in a PreviewMode");
+        }
+        if (snapshot.getLocalAddress() == null) {
+            throw new TCAPException("Snapshot localAddress must not be null");
+        }
+        if (snapshot.getState() == TRPseudoState.Expunged) {
+            throw new TCAPException("Cannot import Expunged dialog snapshot");
+        }
+        Long id = snapshot.getLocalOtid();
+        if (!checkAvailableTxId(id)) {
+            throw new TCAPException("Suggested local TransactionId is already present in system: " + id);
+        }
+        if (this.dialogs.size() >= this.stack.getMaxDialogs()) {
+            throw new TCAPException("Current dialog count exceeds its maximum value");
+        }
+
+        DialogImpl dialog = new DialogImpl(snapshot.getLocalAddress(), snapshot.getRemoteAddress(), id, true, this._EXECUTOR,
+                this, snapshot.getSeqControl(), this.stack.getPreviewMode());
+        dialog.applyImportedSnapshot(snapshot);
+        this.setSsnToDialog(dialog, snapshot.getLocalSsn() > 0 ? snapshot.getLocalSsn() : this.ssn);
+        this.dialogs.put(id, dialog);
+        if (this.stack.getStatisticsEnabled()) {
+            this.stack.getCounterProviderImpl().updateMinDialogsCount(this.dialogs.size());
+            this.stack.getCounterProviderImpl().updateMaxDialogsCount(this.dialogs.size());
+        }
+        return dialog;
+    }
+
+    /**
+     * Package helper for spike tests: locally drop a dialog (Expunge) without sending P-Abort.
+     */
+    void detachDialogForFailover(long localOtid) {
+        DialogImpl dialog = this.dialogs.get(localOtid);
+        if (dialog != null) {
+            dialog.setState(TRPseudoState.Expunged);
+        }
     }
 
     public void send(byte[] data, boolean returnMessageOnError, SccpAddress destinationAddress, SccpAddress originatingAddress,

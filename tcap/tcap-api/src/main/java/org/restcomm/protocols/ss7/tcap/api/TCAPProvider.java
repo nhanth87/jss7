@@ -118,6 +118,31 @@ public interface TCAPProvider extends Serializable {
     int getCurrentDialogsCount();
 
     /**
+     * Export a portable snapshot of a live structured dialog (SPIKE for CONTINUE takeover).
+     * Returns {@code null} when no dialog exists for {@code localOtid}.
+     * <p>
+     * Does not remove the dialog from the local {@code dialogs} map.
+     *
+     * @param localOtid local transaction / dialog id
+     * @return snapshot or {@code null}
+     */
+    TcapDialogSnapshot exportDialog(long localOtid);
+
+    /**
+     * Rehydrate a dialog from a snapshot into this provider's {@code dialogs} map
+     * (SPIKE for CONTINUE takeover after ownership move).
+     * <p>
+     * Restores enough state for an inbound TC-CONTINUE / TC-END path to find the
+     * dialog (avoids {@code PAbortCauseType.UnrecognizedTxID}). Does <strong>not</strong>
+     * restore live invoke operation objects or MAP dialogue state.
+     *
+     * @param snapshot portable dialog fields
+     * @return the rehydrated dialog
+     * @throws TCAPException if snapshot is invalid or local OTID is already present
+     */
+    Dialog importDialog(TcapDialogSnapshot snapshot) throws TCAPException;
+
+    /**
      * Parsing of encoded TCAP message for getting only message type, origination/destination dialogId
      *
      * @param data
