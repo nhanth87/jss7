@@ -143,6 +143,17 @@ public interface TCAPProvider extends Serializable {
     Dialog importDialog(TcapDialogSnapshot snapshot) throws TCAPException;
 
     /**
+     * Optional resolver for inbound CONTINUE when local OTID is unknown.
+     * {@code null} restores default UnrecognizedTxID P-Abort.
+     */
+    void setMissingDialogResolver(TcapMissingDialogResolver resolver);
+
+    /**
+     * @return current missing-dialog resolver, or {@code null}
+     */
+    TcapMissingDialogResolver getMissingDialogResolver();
+
+    /**
      * Parsing of encoded TCAP message for getting only message type, origination/destination dialogId
      *
      * @param data

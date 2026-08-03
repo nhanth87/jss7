@@ -54,6 +54,7 @@ import org.restcomm.protocols.ss7.tcap.api.MessageType;
 import org.restcomm.protocols.ss7.tcap.api.TCAPException;
 import org.restcomm.protocols.ss7.tcap.api.TCAPProvider;
 import org.restcomm.protocols.ss7.tcap.api.TcapDialogSnapshot;
+import org.restcomm.protocols.ss7.tcap.api.TcapMissingDialogResolver;
 import org.restcomm.protocols.ss7.tcap.api.TCListener;
 import org.restcomm.protocols.ss7.tcap.api.tc.dialog.Dialog;
 import org.restcomm.protocols.ss7.tcap.api.tc.dialog.TRPseudoState;
@@ -128,6 +129,9 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 
 //    private transient Map<Long, DialogImpl> dialogs = new FastMap <Long, DialogImpl>();
     private transient NonBlockingHashMap<Long, DialogImpl> dialogs = new NonBlockingHashMap<>();
+
+    /** Optional CONTINUE miss → import hook (SPIKE failover). */
+    private transient volatile TcapMissingDialogResolver missingDialogResolver;
 
 //    protected transient Map<PrevewDialogDataKey, PreviewDialogData> dialogPreviewList = new ConcurrentHashMap<PrevewDialogDataKey, PrevewDialogData>();
     protected transient NonBlockingHashMap<PreviewDialogDataKey, PreviewDialogData> dialogPreviewList = new NonBlockingHashMap<>();
@@ -427,6 +431,39 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
             this.stack.getCounterProviderImpl().updateMaxDialogsCount(this.dialogs.size());
         }
         return dialog;
+    }
+
+    @Override
+    public void setMissingDialogResolver(TcapMissingDialogResolver resolver) {
+        this.missingDialogResolver = resolver;
+    }
+
+    @Override
+    public TcapMissingDialogResolver getMissingDialogResolver() {
+        return this.missingDialogResolver;
+    }
+
+    /**
+     * CONTINUE miss: ask optional resolver for a snapshot and import it.
+     * Returns {@code null} when no resolver / no snapshot / import fails.
+     * Package-visible for unit tests.
+     */
+    DialogImpl tryImportMissingDialog(long localOtid) {
+        TcapMissingDialogResolver resolver = this.missingDialogResolver;
+        if (resolver == null) {
+            return null;
+        }
+        try {
+            TcapDialogSnapshot snapshot = resolver.resolve(localOtid);
+            if (snapshot == null) {
+                return null;
+            }
+            logger.info("TC-CONTINUE: importing missing dialog id={} via MissingDialogResolver", localOtid);
+            return (DialogImpl) this.importDialog(snapshot);
+        } catch (Exception e) {
+            logger.warn("TC-CONTINUE: MissingDialogResolver failed for id=" + localOtid + ": " + e.getMessage(), e);
+            return null;
+        }
     }
 
     /**
@@ -911,6 +948,9 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                         setSsnToDialog(dialog, sccpDataMessage.getCalledPartyAddress().getSubsystemNumber());
                     } else {
                         dialog = this.dialogs.get(dialogId);
+                        if (dialog == null) {
+                            dialog = tryImportMissingDialog(dialogId);
+                        }
                     }
                     if (dialog == null) {
                         logger.warn("TC-CONTINUE: No dialog/transaction for id: " + dialogId);

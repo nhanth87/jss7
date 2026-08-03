@@ -162,6 +162,41 @@ public class TcapDialogExportImportTest extends SccpHarness {
         assertEquals(probeB.pAbortCount.get(), 0);
     }
 
+    @Test(groups = { "functional.flow" })
+    public void missingDialogResolverImportsBeforeContinue() throws Exception {
+        TCAPProviderImpl providerA = (TCAPProviderImpl) this.stackA.getProvider();
+        TCAPProviderImpl providerB = (TCAPProviderImpl) this.stackB.getProvider();
+        ContinueProbe probeB = new ContinueProbe();
+        providerB.addTCListener(probeB);
+
+        Dialog dialog = providerA.getNewDialog(peer1Address, peer2Address, 77L);
+        byte[] remoteOtid = Utils.encodeTransactionId(7700L, this.stackA.getSwapTcapIdBytes());
+        DialogImpl live = (DialogImpl) dialog;
+        live.setRemoteTransactionId(remoteOtid);
+        live.setRemotePc(2);
+        live.setState(TRPseudoState.Active);
+
+        TcapDialogSnapshot snapshot = providerA.exportDialog(77L);
+        assertNotNull(snapshot);
+        providerA.detachDialogForFailover(77L);
+
+        providerB.setMissingDialogResolver(otid -> otid == 77L ? snapshot : null);
+
+        assertNull(providerB.exportDialog(77L));
+        DialogImpl imported = providerB.tryImportMissingDialog(77L);
+        assertNotNull(imported);
+        assertEquals(imported.getLocalDialogId().longValue(), 77L);
+
+        TCContinueMessage continueMessage = TcapFactory.createTCContinueMessage();
+        continueMessage.setOriginatingTransactionId(remoteOtid);
+        continueMessage.setDestinationTransactionId(
+                Utils.encodeTransactionId(77L, this.stackB.getSwapTcapIdBytes()));
+        imported.processContinue(continueMessage, peer2Address, peer1Address);
+
+        assertEquals(probeB.continueCount.get(), 1);
+        assertEquals(probeB.pAbortCount.get(), 0);
+    }
+
     private static final class ContinueProbe implements TCListener {
         final AtomicInteger continueCount = new AtomicInteger();
         final AtomicInteger pAbortCount = new AtomicInteger();
