@@ -9,6 +9,10 @@ import junit.framework.TestCase;
 
 /**
  * Unit tests for {@link OtaReceivedCapReassembler} (out-of-order, timeout, atomic write).
+ *
+ * <p>Payloads here are not real secured packets, so verification is expected to
+ * fail and only the {@code .otapkt} capture is produced. Round-trip recovery of
+ * a real CAP is covered by {@link OtaSecuredPacketVerifierTest}.
  */
 public class OtaReceivedCapReassemblerTest extends TestCase {
 
@@ -24,18 +28,34 @@ public class OtaReceivedCapReassemblerTest extends TestCase {
 
         assertFalse(r.offer("246020000000001", 7, false, 2, 3, p2, true).isPresent());
         assertFalse(r.offer("246020000000001", 7, false, 3, 3, p3, true).isPresent());
-        Optional<Path> done = r.offer("246020000000001", 7, false, 1, 3, p1, true);
+        Optional<OtaReceivedCapReassembler.Completed> done =
+                r.offer("246020000000001", 7, false, 1, 3, p1, true);
         assertTrue(done.isPresent());
 
-        byte[] merged = Files.readAllBytes(done.get());
+        Path packet = done.get().packetPath();
+        byte[] merged = Files.readAllBytes(packet);
         assertEquals(6, merged.length);
         assertEquals(0x01, merged[0] & 0xFF);
         assertEquals(0x06, merged[5] & 0xFF);
-        assertTrue(done.get().getFileName().toString().contains("251911000001"));
-        assertTrue(done.get().getFileName().toString().endsWith(".cap"));
+        assertTrue(packet.getFileName().toString().contains("251911000001"));
+        assertTrue(packet.getFileName().toString().endsWith(OtaReceivedCapReassembler.EXT_PACKET));
         assertEquals(1L, r.getWrittenCount());
         assertFalse(Files.exists(dir.resolve(OtaReceivedCapReassembler.SUBDIR)
-                .resolve(done.get().getFileName().toString() + ".tmp")));
+                .resolve(packet.getFileName().toString() + ".tmp")));
+    }
+
+    public void testGarbagePayloadYieldsCaptureButNoCap() throws Exception {
+        Path dir = Files.createTempDirectory("ota-cap-nocap");
+        OtaReceivedCapReassembler r = new OtaReceivedCapReassembler(dir);
+        Optional<OtaReceivedCapReassembler.Completed> done =
+                r.offer("1", null, false, 1, 1, new byte[] { 0x01, 0x02, 0x03, 0x04 }, true);
+
+        assertTrue(done.isPresent());
+        assertNull(done.get().capPath());
+        assertEquals(done.get().packetPath(), done.get().primaryPath());
+        assertEquals(0L, r.getVerifiedCount());
+        assertNotNull(done.get().verification());
+        assertFalse(done.get().verification().ok());
     }
 
     public void testTimeoutDiscardsIncomplete() throws Exception {
@@ -61,8 +81,9 @@ public class OtaReceivedCapReassemblerTest extends TestCase {
         Path dir = Files.createTempDirectory("ota-cap-single");
         OtaReceivedCapReassembler r = new OtaReceivedCapReassembler(dir);
         assertFalse(r.offer("1", null, false, 1, 1, new byte[] { 0x01 }, false).isPresent());
-        Optional<Path> done = r.offer("1", null, false, 1, 1, new byte[] { 0x01, 0x02 }, true);
+        Optional<OtaReceivedCapReassembler.Completed> done =
+                r.offer("1", null, false, 1, 1, new byte[] { 0x01, 0x02 }, true);
         assertTrue(done.isPresent());
-        assertEquals(2, Files.readAllBytes(done.get()).length);
+        assertEquals(2, Files.readAllBytes(done.get().packetPath()).length);
     }
 }

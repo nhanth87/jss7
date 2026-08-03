@@ -8,24 +8,39 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.LongSupplier;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
  * Lab helper: reassemble concatenated SMS-PP (OTA install) payloads received on
- * MAP MT-ForwardSM and write the complete binary to disk under
- * {@code <persistDir>/received-caps/}.
+ * MAP MT-ForwardSM and write them to disk under {@code <persistDir>/received-caps/}.
  *
- * <p>What is written is the merged SMS-PP <em>secured packet</em> body (UDH
- * stripped, segments concatenated in order) — not a decrypted GlobalPlatform
- * CAP. Extension {@code .cap} is used for lab convenience.
+ * <p>Two artefacts per completed assembly:
+ *
+ * <ul>
+ *   <li><b>{@code .otapkt}</b> — the merged SMS-PP body exactly as it arrived
+ *       (UDH stripped, segments concatenated in order). This is a TS 102.225
+ *       <em>secured packet</em>, so it is longer than the pushed CAP and its
+ *       payload is enciphered. Its hash will never match the CAP file.</li>
+ *   <li><b>{@code .cap}</b> — written only when {@link OtaSecuredPacketVerifier}
+ *       manages to decipher under KIc, verify the checksum under KID, and un-frame
+ *       the GlobalPlatform LOAD blocks. This one <em>is</em> byte-identical to the
+ *       pushed CAP, so its SHA-256 matches.</li>
+ * </ul>
+ *
+ * <p>Set {@code -Dota.verify.reference-dir=<dir>} to have each recovered CAP
+ * matched by hash against the CAP files that were pushed (typically
+ * {@code dist/simmapps}); the result is logged as MATCH or NO-MATCH.
  *
  * <p>Incomplete / timed-out assemblies are discarded; files are written
  * atomically ({@code .tmp} → rename) so partial content never lands as the
@@ -34,8 +49,14 @@ import org.apache.logging.log4j.Logger;
 public final class OtaReceivedCapReassembler {
 
     public static final String SUBDIR = "received-caps";
+    /** Extension for the merged secured packet — deliberately not {@code .cap}. */
+    public static final String EXT_PACKET = ".otapkt";
+    /** Extension for a fully recovered, hash-comparable CAP. */
+    public static final String EXT_CAP = ".cap";
     /** Default drop incomplete assemblies after 5 minutes. */
     public static final long DEFAULT_TIMEOUT_MS = 5L * 60L * 1000L;
+    /** Directory of pushed CAP files to hash-match recovered CAPs against. */
+    public static final String PROP_REFERENCE_DIR = "ota.verify.reference-dir";
 
     /** TS 31.115 Command Packet Identifier IEI. */
     public static final int IEI_COMMAND_PACKET = 0x70;
@@ -47,21 +68,46 @@ public final class OtaReceivedCapReassembler {
     private final Path outputDir;
     private final long timeoutMs;
     private final LongSupplier clockMs;
+    /** Null when verification is disabled or unavailable — capture still works. */
+    private final OtaSecuredPacketVerifier verifier;
     private final ConcurrentHashMap<String, Assembly> assemblies = new ConcurrentHashMap<>();
     /** IMSI → last MSISDN seen on SRI (lab naming). */
     private final ConcurrentHashMap<String, String> imsiToMsisdn = new ConcurrentHashMap<>();
     private final AtomicLong writtenCount = new AtomicLong();
+    private final AtomicLong verifiedCount = new AtomicLong();
+    /** sha256 → pushed CAP name; built once, off the per-segment path. */
+    private final AtomicReference<Map<String, String>> referenceIndex = new AtomicReference<>();
 
     public OtaReceivedCapReassembler(Path persistDir) {
         this(persistDir, DEFAULT_TIMEOUT_MS, System::currentTimeMillis);
     }
 
     public OtaReceivedCapReassembler(Path persistDir, long timeoutMs, LongSupplier clockMs) {
+        this(persistDir, timeoutMs, clockMs, defaultVerifier());
+    }
+
+    public OtaReceivedCapReassembler(Path persistDir, long timeoutMs, LongSupplier clockMs,
+            OtaSecuredPacketVerifier verifier) {
         Objects.requireNonNull(persistDir, "persistDir");
         Objects.requireNonNull(clockMs, "clockMs");
         this.outputDir = persistDir.resolve(SUBDIR);
         this.timeoutMs = timeoutMs <= 0 ? DEFAULT_TIMEOUT_MS : timeoutMs;
         this.clockMs = clockMs;
+        this.verifier = verifier;
+    }
+
+    private static OtaSecuredPacketVerifier defaultVerifier() {
+        if (!OtaSecuredPacketVerifier.enabled()) {
+            LOG.info("OTA secured-packet verification disabled via {}",
+                    OtaSecuredPacketVerifier.PROP_ENABLED);
+            return null;
+        }
+        try {
+            return new OtaSecuredPacketVerifier();
+        } catch (RuntimeException ex) {
+            LOG.warn("OTA secured-packet verifier unavailable ({}) — capture only", ex.toString());
+            return null;
+        }
     }
 
     public Path getOutputDir() {
@@ -70,6 +116,11 @@ public final class OtaReceivedCapReassembler {
 
     public long getWrittenCount() {
         return writtenCount.get();
+    }
+
+    /** How many assemblies yielded a CAP that survived decipher + checksum. */
+    public long getVerifiedCount() {
+        return verifiedCount.get();
     }
 
     /** Remember MSISDN from SRI-for-SM so MT (IMSI-keyed) files get a friendly name. */
@@ -97,9 +148,9 @@ public final class OtaReceivedCapReassembler {
      * @param total         total segments (ignored for single-part)
      * @param payload       binary body after UDH
      * @param otaHint       true when UDH carries IEI 0x70 or PID suggests SMS-PP
-     * @return path of written file when assembly completes; empty otherwise
+     * @return what was written when the assembly completes; empty otherwise
      */
-    public Optional<Path> offer(String subscriberKey, Integer concatRef, boolean ref16bit,
+    public Optional<Completed> offer(String subscriberKey, Integer concatRef, boolean ref16bit,
             int seq, int total, byte[] payload, boolean otaHint) {
         purgeExpired();
         if (payload == null || payload.length == 0) {
@@ -113,7 +164,8 @@ public final class OtaReceivedCapReassembler {
             if (!otaHint) {
                 return Optional.empty();
             }
-            return Optional.ofNullable(writeComplete(sub, 0, false, 1, new byte[][] { payload }));
+            return Optional.ofNullable(
+                    writeComplete(sub, 0, false, 1, new byte[][] { payload }));
         }
 
         if (total < 1 || total > 255 || seq < 1 || seq > total) {
@@ -156,8 +208,8 @@ public final class OtaReceivedCapReassembler {
 
             // Complete — remove before write so concurrent offers cannot double-write
             assemblies.remove(key, asm);
-            Path written = writeComplete(asm.subscriber, asm.ref, asm.ref16bit, asm.total, asm.parts);
-            return Optional.ofNullable(written);
+            return Optional.ofNullable(
+                    writeComplete(asm.subscriber, asm.ref, asm.ref16bit, asm.total, asm.parts));
         }
     }
 
@@ -178,11 +230,12 @@ public final class OtaReceivedCapReassembler {
         }
     }
 
-    private Path writeComplete(String subscriber, int ref, boolean ref16bit, int total, byte[][] parts) {
+    private Completed writeComplete(String subscriber, int ref, boolean ref16bit, int total,
+            byte[][] parts) {
         int size = 0;
         for (byte[] p : parts) {
             if (p == null) {
-                LOG.warn("OTA CAP incomplete slot while writing subscriber={} — abort", subscriber);
+                LOG.warn("OTA capture incomplete slot while writing subscriber={} — abort", subscriber);
                 return null;
             }
             size += p.length;
@@ -194,31 +247,151 @@ public final class OtaReceivedCapReassembler {
             off += p.length;
         }
 
+        String msisdn = lookupMsisdn(subscriber);
+        String label = (msisdn != null && !msisdn.isBlank()) ? msisdn : ("imsi" + subscriber);
+        String ts = TS.format(Instant.ofEpochMilli(clockMs.getAsLong()));
+        String base = label + "_" + ts + "_ref" + ref + (ref16bit ? "x16" : "") + "_n" + total;
+
+        Path packetPath;
         try {
             Files.createDirectories(outputDir);
-            String msisdn = lookupMsisdn(subscriber);
-            String label = (msisdn != null && !msisdn.isBlank()) ? msisdn : ("imsi" + subscriber);
-            String ts = TS.format(Instant.ofEpochMilli(clockMs.getAsLong()));
-            String name = label + "_" + ts + "_ref" + ref + (ref16bit ? "x16" : "")
-                    + "_n" + total + ".cap";
-            Path finalPath = outputDir.resolve(name);
-            Path tmp = outputDir.resolve(name + ".tmp");
-            Files.write(tmp, merged);
-            try {
-                Files.move(tmp, finalPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (IOException atomicFail) {
-                Files.move(tmp, finalPath, StandardCopyOption.REPLACE_EXISTING);
-            }
-            writtenCount.incrementAndGet();
-            String msg = "OTA CAP written path=" + finalPath.toAbsolutePath()
-                    + " size=" + merged.length + " bytes subscriber=" + subscriber
-                    + (msisdn != null ? " msisdn=" + msisdn : "")
-                    + " ref=" + ref + " segments=" + total;
-            LOG.info(msg);
-            return finalPath;
+            packetPath = writeAtomic(base + EXT_PACKET, merged);
         } catch (IOException ex) {
-            LOG.error("OTA CAP write failed subscriber={} size={}: {}", subscriber, size, ex.toString(), ex);
+            LOG.error("OTA capture write failed subscriber={} size={}: {}", subscriber, size,
+                    ex.toString(), ex);
             return null;
+        }
+        writtenCount.incrementAndGet();
+        LOG.info("OTA secured packet written path={} size={} bytes (NOT the CAP — enciphered "
+                        + "TS 102.225 packet) subscriber={}{} ref={} segments={}",
+                packetPath.toAbsolutePath(), merged.length, subscriber,
+                msisdn != null ? " msisdn=" + msisdn : "", ref, total);
+
+        OtaSecuredPacketVerifier v = this.verifier;
+        if (v == null) {
+            return new Completed(packetPath, null, null, null);
+        }
+
+        OtaSecuredPacketVerifier.Result result = v.verify(merged);
+        if (!result.ok()) {
+            LOG.warn("OTA secured packet NOT unwound path={} — {}", packetPath.getFileName(),
+                    result.summary());
+            return new Completed(packetPath, null, result, null);
+        }
+
+        Path capPath;
+        try {
+            capPath = writeAtomic(base + EXT_CAP, result.cap());
+        } catch (IOException ex) {
+            LOG.error("OTA CAP write failed subscriber={}: {}", subscriber, ex.toString(), ex);
+            return new Completed(packetPath, null, result, null);
+        }
+        verifiedCount.incrementAndGet();
+
+        String match = matchAgainstReference(result.capSha256());
+        LOG.info("OTA CAP recovered path={} {}{}", capPath.toAbsolutePath(), result.summary(),
+                match != null ? " reference=" + match : "");
+        return new Completed(packetPath, capPath, result, match);
+    }
+
+    private Path writeAtomic(String name, byte[] content) throws IOException {
+        Path finalPath = outputDir.resolve(name);
+        Path tmp = outputDir.resolve(name + ".tmp");
+        Files.write(tmp, content);
+        try {
+            Files.move(tmp, finalPath, StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.ATOMIC_MOVE);
+        } catch (IOException atomicFail) {
+            Files.move(tmp, finalPath, StandardCopyOption.REPLACE_EXISTING);
+        }
+        return finalPath;
+    }
+
+    /**
+     * Reports which pushed CAP the recovered one equals. Returns {@code null} when
+     * no reference dir is configured, so the caller can stay quiet about it.
+     *
+     * <p>This runs on the MAP callback thread, before the simulator sends the
+     * MT-ForwardSM response, and only on the final segment of an assembly. The
+     * SHA-256 index is therefore built once and reused: re-reading the directory
+     * per assembly would put unbounded disk IO in front of that last response, and
+     * a slow response there makes the sender time out and re-send the final segment.
+     */
+    private String matchAgainstReference(String capSha256) {
+        String dir = System.getProperty(PROP_REFERENCE_DIR);
+        if (dir == null || dir.isBlank() || capSha256 == null) {
+            return null;
+        }
+        Map<String, String> index = referenceIndex.get();
+        if (index == null) {
+            index = buildReferenceIndex(Path.of(dir.trim()));
+            referenceIndex.set(index);
+        }
+        String name = index.get(capSha256.toLowerCase());
+        if (name != null) {
+            return "MATCH " + name;
+        }
+        return index.isEmpty()
+                ? "NO-MATCH (no readable CAP in " + dir + ")"
+                : "NO-MATCH (none of " + index.size() + " reference CAPs has this hash)";
+    }
+
+    /** sha256 → file name for every {@code *.cap} in {@code refDir}. Never throws. */
+    private static Map<String, String> buildReferenceIndex(Path refDir) {
+        Map<String, String> index = new HashMap<>();
+        if (!Files.isDirectory(refDir)) {
+            LOG.warn("OTA verify reference dir not found: {}", refDir);
+            return index;
+        }
+        try (Stream<Path> files = Files.list(refDir)) {
+            for (Path f : files.filter(Files::isRegularFile).toList()) {
+                if (!f.getFileName().toString().endsWith(EXT_CAP)) {
+                    continue;
+                }
+                try {
+                    index.put(OtaSecuredPacketVerifier.sha256Hex(Files.readAllBytes(f)).toLowerCase(),
+                            f.getFileName().toString());
+                } catch (IOException perFile) {
+                    LOG.warn("OTA verify cannot hash reference {}: {}", f.getFileName(), perFile.toString());
+                }
+            }
+        } catch (IOException ex) {
+            LOG.warn("OTA verify reference scan failed for {}: {}", refDir, ex.toString());
+        }
+        LOG.info("OTA verify reference index built from {} — {} CAP(s)", refDir, index.size());
+        return index;
+    }
+
+    /**
+     * What landed on disk for one completed assembly.
+     *
+     * @param packetPath   the merged secured packet, always present
+     * @param capPath      the recovered CAP, or {@code null} when unwinding failed
+     * @param verification verifier outcome, or {@code null} when verification is off
+     * @param referenceMatch result of the hash comparison, or {@code null} when not configured
+     */
+    public record Completed(Path packetPath, Path capPath,
+            OtaSecuredPacketVerifier.Result verification, String referenceMatch) {
+
+        /** The most useful artefact: the CAP when we have it, else the raw packet. */
+        public Path primaryPath() {
+            return capPath != null ? capPath : packetPath;
+        }
+
+        /** One-line, key-free description for logs and the simulator GUI. */
+        public String summary() {
+            StringBuilder b = new StringBuilder(200);
+            b.append("packet=").append(packetPath.getFileName());
+            if (capPath != null) {
+                b.append(" cap=").append(capPath.getFileName());
+            }
+            if (verification != null) {
+                b.append(' ').append(verification.summary());
+            }
+            if (referenceMatch != null) {
+                b.append(" reference=").append(referenceMatch);
+            }
+            return b.toString();
         }
     }
 

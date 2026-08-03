@@ -708,12 +708,17 @@ When task = **SMS_TEST_SERVER**, inbound MAP **MT-ForwardSM** carrying concatena
 | Item | Detail |
 |------|--------|
 | Output dir | `tools/simulator/bootstrap/target/simulator-ss7/data/received-caps/` |
-| Filename | `{msisdn}_{yyyyMMdd-HHmmss-SSS}_ref{N}_n{total}.cap` (MSISDN from prior SRI; else `imsi…`) |
-| Content | Merged SMS-PP **secured packet** body (UDH stripped) — not decrypted GP CAP |
-| Log line | `OTA CAP written path=… size=N bytes subscriber=… msisdn=… ref=… segments=…` (log4j + simulator notif) |
-| Incomplete | Out-of-order OK; timeout 5 min discards buffer — **no** partial `.cap` (atomic `.tmp`→rename) |
-| MAP | SRI/MT success responses unchanged (capture failures never reject MT) |
+| Base name | `{msisdn}_{yyyyMMdd-HHmmss-SSS}_ref{N}_n{total}` (MSISDN from prior SRI; else `imsi…`) |
+| `…​.otapkt` | Merged SMS-PP **secured packet** (UDH stripped). Always written. Enciphered + longer than the CAP — **its hash never matches the pushed `.cap`** |
+| `…​.cap` | The **recovered** CAP, written only when `OtaSecuredPacketVerifier` deciphers under KIc, verifies CC under KID, and un-frames the GP LOAD `C4` blocks. This one is byte-identical to the pushed file |
+| Log lines | `OTA secured packet written path=… (NOT the CAP …)` then `OTA CAP recovered path=… cc=VALID cap=NB sha256=… reference=MATCH …` |
+| Incomplete | Out-of-order OK; timeout 5 min discards buffer — **no** partial file (atomic `.tmp`→rename) |
+| MAP | SRI/MT success responses unchanged (capture/verify failures never reject MT) |
 | OTA send UDH | `ra-jss7` `MapSmsOutbound` must pass **UDHL-prefixed** TP-UD to `createUserDataHeader` (IE body alone makes concat IEI `0x00` look like UDHL=0 → empty UDH → each segment written as `ref0_n1`) |
+
+**Hash truth (non-negotiable).** Never compare the pushed CAP against `*.otapkt` and call the mismatch a bug. Three sender stages sit in between — GP RAM APDU framing, TS 102.225 ciphering, SMS-PP segmentation — so for a 12849-octet CAP the capture is 13274 octets of ciphertext. Compare against the recovered `*.cap`. A missing `.cap`, `cc=INVALID`, or `reference=NO-MATCH` is a **real** defect (key mismatch or packing regression); never "fix" it by switching which file you hash. Full accounting: OTA [`ota-uicc-profile.md`](../../../ota-service/ota-sim-push/docs/agents/ota-uicc-profile.md).
+
+Verifier knobs (simulator JVM): `ota.verify.enabled=false` to skip; `ota.verify.kic` / `ota.verify.kid` hex overrides (default = lab demo keyset); `ota.verify.reference-dir=<dir>` to hash-match against pushed CAPs. AES-CMAC is RFC 4493 on the JDK AES primitive — **do not add BouncyCastle to the simulator**.
 
 **Lab test** (OTA `:8013` + sim `:8014`, both up):
 
@@ -724,7 +729,11 @@ curl -sS -X POST -H 'X-OTA-Tenant: lab-default' \
 
 # Sim side — wait for all segments, then:
 ls -la tools/simulator/bootstrap/target/simulator-ss7/data/received-caps/
-grep 'OTA CAP written' tools/simulator/bootstrap/target/simulator-ss7/log/server.log
+grep -E 'OTA (secured packet|CAP recovered)' tools/simulator/bootstrap/target/simulator-ss7/log/server.log
+
+# Byte-exact proof against the pushed CAP:
+sha256sum .../received-caps/*.cap \
+  /home/meodien/Desktop/ethiopia-working-dir/worktrees/ota-service/ota-sim-push/dist/simmapps/DigicomSatSysmo.cap
 ```
 
 After code change: rebuild `simulator-core` and copy jar into `simulator-ss7/lib/`, then restart the simulator JVM.

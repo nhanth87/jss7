@@ -959,11 +959,17 @@ public class TestSmsServerMan extends TesterBase implements TestSmsServerManMBea
         }
 
         String subscriber = (imsi != null && !imsi.isBlank()) ? imsi : "unknown";
-        Optional<Path> written = reassembler.offer(subscriber, concatRef, ref16, seq, total, payload, otaHint);
+        Optional<OtaReceivedCapReassembler.Completed> written =
+                reassembler.offer(subscriber, concatRef, ref16, seq, total, payload, otaHint);
         if (written.isPresent()) {
-            Path p = written.get();
-            String msg = "OTA CAP written path=" + p.toAbsolutePath() + " size=" + fileSize(p) + " bytes";
-            this.testerHost.sendNotif(SOURCE_NAME, msg, "", Level.INFO);
+            OtaReceivedCapReassembler.Completed done = written.get();
+            Path packet = done.packetPath();
+            String head = done.capPath() != null
+                    ? "OTA CAP recovered path=" + done.capPath().toAbsolutePath()
+                            + " size=" + fileSize(done.capPath()) + " bytes"
+                    : "OTA secured packet captured path=" + packet.toAbsolutePath()
+                            + " size=" + fileSize(packet) + " bytes (CAP not recovered)";
+            this.testerHost.sendNotif(SOURCE_NAME, head, done.summary(), Level.INFO);
         } else if (concatRef != null) {
             this.testerHost.sendNotif(SOURCE_NAME,
                     "OTA CAP buffered seq=" + seq + "/" + total + " ref=" + concatRef + " imsi=" + subscriber,
