@@ -7,11 +7,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import javolution.xml.XMLObjectReader;
-import javolution.xml.XMLObjectWriter;
-
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
 import org.restcomm.protocols.ss7.sccp.SccpProtocolVersion;
+import org.restcomm.protocols.ss7.sccp.impl.SCCPJacksonXMLHelper;
 import org.restcomm.protocols.ss7.sccp.impl.parameter.GlobalTitle0001Impl;
 import org.restcomm.protocols.ss7.sccp.impl.parameter.ParameterFactoryImpl;
 import org.testng.annotations.AfterClass;
@@ -119,19 +117,9 @@ public class GT0001Test {
     public void testSerialization() throws Exception {
         GlobalTitle0001Impl gt = new GlobalTitle0001Impl("9023629581",NatureOfAddress.NATIONAL);
 
-        // Writes
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        XMLObjectWriter writer = XMLObjectWriter.newInstance(output);
-        writer.setIndentation("\t"); // Optional (use tabulation for
-        // indentation).
-        writer.write(gt, "GT0001", GlobalTitle0001Impl.class);
-        writer.close();
-
-        System.out.println(output.toString());
-
-        ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
-        XMLObjectReader reader = XMLObjectReader.newInstance(input);
-        GlobalTitle0001Impl aiOut = reader.read("GT0001", GlobalTitle0001Impl.class);
+        // Phase 3 preferred path: Jackson (SCCPJacksonXMLHelper), not javolution.xml
+        String xml = SCCPJacksonXMLHelper.toXML(gt);
+        GlobalTitle0001Impl aiOut = SCCPJacksonXMLHelper.fromXML(xml, GlobalTitle0001Impl.class);
 
         // check results
         assertEquals(aiOut.getNatureOfAddress(), NatureOfAddress.NATIONAL);

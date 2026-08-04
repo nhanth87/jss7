@@ -131,7 +131,12 @@ Scheduler.java
 
 ## 4. TARGET STATE — Phase Roadmap
 
-### Phase 1: Java 25 Build (CRITICAL — ~5 days)
+> **Snapshot 2026-08-04:** Phase 1–2 done. Phase 3 **main** done (Jackson + JCTools; BOM has no javolution).
+> Phase 3 **test** debt: ~186 files still import `javolution.xml.*` — use Jackson helpers / test-support shim
+> (do **not** re-add the real javolution artifact). Phase 4: see `docs/vt-zgc-audit.md`.
+> Phase 5: micro-jainslee `vendor-ras/ra-jss7` (not a second `ra-ss7` under this tree).
+
+### Phase 1: Java 25 Build (CRITICAL — ~5 days) — DONE
 
 **Goal:** `mvn clean install -DskipTests` passes on Java 25
 
@@ -147,7 +152,7 @@ Scheduler.java
 5. **Remove SecurityManager** usage
 6. **Build baseline:** `mvn clean install -DskipTests` must pass
 
-### Phase 2: Test Modernization (~3 days)
+### Phase 2: Test Modernization (~3 days) — DONE (partial legacy TestNG/JUnit3 remain)
 
 1. **Migrate junit 3 → JUnit 5**:
    - `extends TestCase` → `@Test` annotations
@@ -155,25 +160,25 @@ Scheduler.java
 2. **Run all tests:** `mvn test` — fix failures
 3. **Remove testng 6.2** or bump to 7.10.x
 
-### Phase 3: Javolution Complete Removal (~3 days)
+### Phase 3: Javolution Complete Removal (~3 days) — MAIN DONE / TEST IN PROGRESS
 
-1. **Finish XStream migration:** 279 remaining Javolution XML → XStream annotations
-2. **Replace Javolution collections** (~98 usages):
-   - `FastMap` → `NonBlockingHashMap` (JCTools) or `ConcurrentHashMap`
-   - `FastList` → `MpscArrayQueue` (JCTools) or `ArrayList` + `synchronized`
-   - `FastSet` → `NonBlockingHashSet` (JCTools) or `ConcurrentHashMap.newKeySet()`
-3. **Remove javolution dependency** from all pom.xml
+1. **Finish XML migration:** persist path uses Jackson (`SCCPJacksonXMLHelper`, etc.) — not XStream for new code
+2. **Replace Javolution collections** in main: NonBlockingHashMap / ConcurrentHashMap (hot paths)
+3. **Remove javolution dependency** from all pom.xml — **done**
+4. **Test sources:** replace `javolution.xml.XMLObjectReader/Writer` with Jackson round-trip helpers
+   (`test-support` Jackson shim under package `javolution.xml` is transitional — prefer direct Jackson)
 
-### Phase 4: Virtual Thread + ZGC Safety (~5 days)
+### Phase 4: Virtual Thread + ZGC Safety (~5 days) — AUDIT CHECKLIST
 
-1. **ThreadLocal → ScopedValue audit** for hot-path TX context
+1. **ThreadLocal → ScopedValue audit** for hot-path TX context — see `docs/vt-zgc-audit.md`
 2. **Replace synchronized with ReentrantLock** where VT pinning risk exists
 3. **Add ZGC tuning flags:**
    `-XX:+UseZGC -XX:+ZGenerational -XX:+UseVirtualThreads -Djdk.virtualThreadScheduler.maxPoolSize=512`
 
-### Phase 5: RA Wrapper (~7 days)
+### Phase 5: RA Wrapper (~7 days) — DONE (micro-jainslee ra-jss7)
 
-**Goal:** `vendor-ras/ra-ss7/` module wrapping jSS7 as micro-jainslee 3-port RA
+**Goal:** wrap jSS7 as micro-jainslee 3-port RA — delivered as
+`jain-slee/jain-slee/vendor-ras/ra-jss7` (WRAPPER+DELEGATE, sticky P1, TCAP failover P2 wire).
 
 #### 5.1 Package Structure
 
@@ -439,11 +444,11 @@ separate OAM-only task, no SS7-data-path benefit; deferred.
 
 ## 7. EXECUTION ORDER
 
-1. **Phase 1** — Java 25 build (pom.xml bulk update + log4j2 migration) → `mvn clean install -DskipTests` passes
-2. **Phase 2** — JUnit 5 migration → `mvn test` passes with same/similar test count
-3. **Phase 3** — Javolution removal (XStream completion + collections → JCTools) → zero javolution imports
-4. **Phase 4** — Virtual Thread safety audit (ThreadLocal → ScopedValue, synchronized → ReentrantLock)
-5. **Phase 5** — RA wrapper (vendor-ras/ra-ss7/) → compile + integration test:
+1. **Phase 1** — Java 25 build (pom.xml bulk update + log4j2 migration) → **DONE**
+2. **Phase 2** — JUnit 5 migration → **DONE** (legacy pockets remain)
+3. **Phase 3** — Javolution removal → **main DONE**; test XML → Jackson / shim **IN PROGRESS**
+4. **Phase 4** — Virtual Thread safety audit → checklist `docs/vt-zgc-audit.md`
+5. **Phase 5** — RA wrapper → **DONE** as micro-jainslee `vendor-ras/ra-jss7`
 
 ```java
 // Integration test: bootstrap micro-jainslee + jSS7 RA
@@ -518,9 +523,9 @@ c.registerRa(ra, ra);
 
 ---
 
-**Last Updated:** 2026-07-12  
-**Team:** `jss7-architect` + `java25-upgrader` + `ra-designer` (3 multi-agents)  
-**Status:** Phase 1-2 complete; Phase 3-5 pending. Ant builds fixed for Java 25 + Log4j2 + Lombok.
+**Last Updated:** 2026-08-04  
+**Team:** `jss7-architect` + `java25-upgrader` + `ra-designer`  
+**Status:** Phase 1–2 **complete**. Phase 3 **main complete** (0 `import javolution` under `src/main`); test XML still uses legacy `javolution.xml.*` API names (~186 files) — migrate to Jackson / test-support shim. Phase 4 = VT/ZGC audit checklist (`docs/vt-zgc-audit.md`). Phase 5 RA = **shipped** as micro-jainslee `vendor-ras/ra-jss7` (sticky P1 + TCAP export/import CONTINUE-miss P2 wire; multi-ASP lab still open). Recent: Java 25 toolchain hardening, JCTools/Agrona cleanup, `MissingDialogResolver`, TCAP export/import.
 
 ---
 

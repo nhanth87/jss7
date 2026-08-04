@@ -37,7 +37,9 @@
 		<junit.jupiter.version>5.11.4</junit.jupiter.version>
 		<testng.version>6.2</testng.version>
 		<jctools.version>4.0.5</jctools.version>
+		<jackson.version>2.15.2</jackson.version>
 		<!-- javolution removed from main BOM (Jackson + JCTools). Legacy test XML helpers must not reintroduce it. -->
+		<!-- Use ss7-test-xml-support (Jackson shim under package javolution.xml) for Phase-3 test debt. -->
 		<guava.version>33.4.7-jre</guava.version>
 		<jakarta.xml.bind-api.version>4.0.2</jakarta.xml.bind-api.version>
 		<infinispan.version>15.0.0.Final</infinispan.version>
@@ -62,6 +64,7 @@
 
 	<modules>
  		<module>asn</module>
+		<module>test-support</module>
 		<module>scheduler</module>
 		<module>congestion</module>
 		<module>w2-scheduler</module>
@@ -87,6 +90,12 @@
 	<!-- declare our babies -->
 	<dependencyManagement>
 		<dependencies>
+			<!-- Phase 3: Jackson shim for legacy javolution.xml test imports -->
+			<dependency>
+				<groupId>org.restcomm.protocols.ss7</groupId>
+				<artifactId>ss7-test-xml-support</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 			<!-- ASN -->
 			<dependency>
 				<groupId>org.mobicents.protocols.asn</groupId>

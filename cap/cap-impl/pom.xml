@@ -12,7 +12,13 @@
 	<name>Restcomm jSS7 :: CAP :: Impl :: ${project.artifactId}</name>
 	<dependencyManagement>
 		<dependencies>
-		</dependencies>
+		
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7</groupId>
+			<artifactId>ss7-test-xml-support</artifactId>
+			<scope>test</scope>
+		</dependency>
+</dependencies>
 	</dependencyManagement>
 	<properties>
 		<log.file.name>tests.log</log.file.name>

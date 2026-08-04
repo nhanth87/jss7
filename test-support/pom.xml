@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.restcomm.protocols.ss7</groupId>
+        <artifactId>ss7-parent</artifactId>
+        <version>9.2.8-j25</version>
+    </parent>
+    <artifactId>ss7-test-xml-support</artifactId>
+    <packaging>jar</packaging>
+    <name>RestComm jSS7 :: test-xml-support (Jackson shim for legacy javolution.xml tests)</name>
+    <description>
+        Phase 3 transitional test helper: Jackson-backed classes under package
+        javolution.xml so legacy unit tests compile without the real javolution
+        artifact. Prefer migrating tests to module Jackson helpers
+        (e.g. SCCPJacksonXMLHelper) and deleting the shim import.
+    </description>
+    <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.15.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>2.15.2</version>
+        </dependency>
+    </dependencies>
+</project>

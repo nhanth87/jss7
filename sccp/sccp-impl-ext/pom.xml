@@ -76,7 +76,13 @@
 		</dependency>
 
 
-	</dependencies>
+	
+		<dependency>
+			<groupId>org.restcomm.protocols.ss7</groupId>
+			<artifactId>ss7-test-xml-support</artifactId>
+			<scope>test</scope>
+		</dependency>
+</dependencies>
 
 	<build>
 		<finalName>${project.artifactId}-${project.version}</finalName>
