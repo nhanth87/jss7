@@ -2,7 +2,8 @@
 package org.restcomm.protocols.ss7.isup.impl;
 
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentHashMap;
+
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.restcomm.protocols.ss7.isup.CircuitManager;
 
@@ -14,7 +15,7 @@ public class CircuitManagerImpl implements CircuitManager {
 
     // ansi allows 14 bits for cic and 24 bits for point code = 38 bits
     // itu allows 12 bits for cic and 14 bits for point code = 26 bits
-    protected ConcurrentHashMap<Long, Integer> cicMap = new ConcurrentHashMap<Long, Integer>();
+    protected NonBlockingHashMap<Long, Integer> cicMap = new NonBlockingHashMap<>();
 
     /*
      * (non-Javadoc)

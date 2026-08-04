@@ -13,6 +13,15 @@ import org.testng.annotations.Test;
 public class W2ClusterCoordinatorTest {
 
     @Test
+    public void shouldRoundTripLeaseBinaryEncodingWithoutJavaSerialization() {
+        W2Lease lease = new W2Lease("node-a", 7L, 1_234_567L);
+        W2Lease decoded = W2Lease.decode(lease.encode());
+        assertEquals(decoded.ownerNodeId(), "node-a");
+        assertEquals(decoded.epoch(), 7L);
+        assertEquals(decoded.expiresAtEpochMs(), 1_234_567L);
+    }
+
+    @Test
     public void shouldFenceAnExpiredOwnerAndRejectStaleRelease() throws Exception {
         AtomicLong clock = new AtomicLong(1_000L);
         try (DefaultCacheManager manager = clusteredManager()) {

@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import org.jctools.maps.NonBlockingHashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -31,9 +31,9 @@ public class M3UAErrorManagementState {
     private static final Logger logger = LogManager.getLogger(M3UAErrorManagementState.class);
     private static M3UAErrorManagementState sInstance;
     // errorCode, action
-    private final Map<Integer, ErrorRetryAction> eMap = new ConcurrentHashMap<>();
+    private final Map<Integer, ErrorRetryAction> eMap = new NonBlockingHashMap<>();
     // errorCode, count
-    private final Map<Integer, Integer> errorCount = new ConcurrentHashMap<>();
+    private final Map<Integer, Integer> errorCount = new NonBlockingHashMap<>();
     private String pathName;
 
     private M3UAErrorManagementState() {

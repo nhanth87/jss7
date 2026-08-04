@@ -29,7 +29,8 @@
 				<include>urbanophile:java-getopt</include>
 
 				<!-- Not strictly SS7, But needed by SS7 -->
-				<include>javolution:javolution</include>
+				<include>org.jctools:jctools-core</include>
+				<include>org.agrona:agrona</include>
 				<include>io.netty:netty-common</include>
 				<include>io.netty:netty-buffer</include>
 				<include>io.netty:netty-transport</include>

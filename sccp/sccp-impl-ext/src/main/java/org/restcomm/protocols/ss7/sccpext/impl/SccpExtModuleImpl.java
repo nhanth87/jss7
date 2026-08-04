@@ -1,7 +1,6 @@
 
 package org.restcomm.protocols.ss7.sccpext.impl;
 
-import java.util.concurrent.ConcurrentHashMap;
 
 import java.util.Map;
 import org.jctools.maps.NonBlockingHashMap;
@@ -53,7 +52,7 @@ public class SccpExtModuleImpl implements SccpExtModule {
     protected RouterExtImpl routerExt;
     protected SccpCongestionControl sccpCongestionControl;
 
-    private ConcurrentHashMap<Integer, Long> prohibitedSpcs = new ConcurrentHashMap<>();
+    private NonBlockingHashMap<Integer, Long> prohibitedSpcs = new NonBlockingHashMap<>();
 
     public SccpExtModuleImpl() {
     }

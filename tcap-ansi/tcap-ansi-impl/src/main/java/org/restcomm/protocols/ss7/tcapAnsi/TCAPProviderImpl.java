@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -109,9 +108,9 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     // explicitly...
 
 //    private transient Map<Long, DialogImpl> dialogs = new ConcurrentHashMap<Long, DialogImpl>();
-    private transient ConcurrentHashMap<Long, DialogImpl> dialogs = new ConcurrentHashMap<Long, DialogImpl>();
+    private transient NonBlockingHashMap<Long, DialogImpl> dialogs = new NonBlockingHashMap<>();
 //    protected transient Map<PrevewDialogDataKey, PreviewDialogData> dialogPreviewList = new ConcurrentHashMap<PrevewDialogDataKey, PreviewDialogData>();
-    protected transient ConcurrentHashMap<PreviewDialogDataKey, PreviewDialogData> dialogPreviewList = new ConcurrentHashMap<PreviewDialogDataKey, PreviewDialogData>();
+    protected transient NonBlockingHashMap<PreviewDialogDataKey, PreviewDialogData> dialogPreviewList = new NonBlockingHashMap<>();
 
     private transient Map<Integer, NetworkIdState> networkIdStateList = new NonBlockingHashMap<Integer, NetworkIdState>();
     private NetworkIdStateListUpdater currentNetworkIdStateListUpdater;

@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import org.jctools.maps.NonBlockingHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -97,7 +97,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
     protected CopyOnWriteArrayList<AspFactory> aspFactories = new CopyOnWriteArrayList<AspFactory>();
     
     // Congestion tracking per DPC
-    private ConcurrentHashMap<Integer, AtomicInteger> congDpcList = new ConcurrentHashMap<Integer, AtomicInteger>();
+    private NonBlockingHashMap<Integer, AtomicInteger> congDpcList = new NonBlockingHashMap<>();
 
     protected M3UAScheduler m3uaScheduler = new M3UAScheduler();
     protected M3UACounterProviderImpl m3uaCounterProvider;
@@ -357,7 +357,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         return routeTmp;
     }
     
-    public ConcurrentHashMap<Integer, AtomicInteger> getCongDpcList() {
+    public NonBlockingHashMap<Integer, AtomicInteger> getCongDpcList() {
         return congDpcList;
     }
 

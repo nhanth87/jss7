@@ -64,7 +64,7 @@ import static org.restcomm.protocols.ss7.sccp.parameter.ErrorCauseValue.LRN_MISM
 import static org.restcomm.protocols.ss7.sccp.parameter.ErrorCauseValue.SERVICE_CLASS_MISMATCH;
 import static org.restcomm.protocols.ss7.sccp.parameter.ReleaseCauseValue.SCCP_FAILURE;
 
-import java.util.concurrent.ConcurrentHashMap;
+import org.jctools.maps.NonBlockingHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -83,7 +83,7 @@ public class SccpRoutingControl implements SccpRoutingCtxInterface {
     private SccpManagement sccpManagement = null;
 
     private MessageFactoryImpl messageFactory;
-    private ConcurrentHashMap<Integer, AtomicInteger> opcSscCounters = new ConcurrentHashMap<>();
+    private NonBlockingHashMap<Integer, AtomicInteger> opcSscCounters = new NonBlockingHashMap<>();
 
     public SccpRoutingControl(SccpProviderImpl sccpProviderImpl, SccpStackImpl sccpStackImpl) {
         this.messageFactory = sccpStackImpl.messageFactory;

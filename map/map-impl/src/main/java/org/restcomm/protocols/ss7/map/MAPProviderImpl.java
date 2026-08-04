@@ -10,7 +10,8 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -132,7 +133,7 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
     private transient W2KeyedMailboxDispatcher w2CallbackDispatcher;
 
 //    protected transient ConcurrentHashMap<Long, MAPDialogImpl> dialogs = new ConcurrentHashMap<Long, MAPDialogImpl>().shared();
-    protected transient ConcurrentHashMap<Long, MAPDialogImpl> dialogs = new ConcurrentHashMap<Long, MAPDialogImpl>();
+    protected transient NonBlockingHashMap<Long, MAPDialogImpl> dialogs = new NonBlockingHashMap<>();
 
 //    /**
 //     * Congestion sources name list. Congestion is where this collection is not empty

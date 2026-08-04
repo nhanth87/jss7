@@ -161,7 +161,7 @@ public class Scheduler implements SchedulerMBean {
         for (ConcurrentLinkedQueue<Task> q : taskQueues) q.clear();
         heartBeatQueue.clear();
 
-        logger.info("Stopped HashedWheelTimer scheduler");
+        logger.info("Stopped Agrona DeadlineTimerWheel scheduler");
     }
 
     @Override

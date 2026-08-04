@@ -1,10 +1,11 @@
 package org.restcomm.protocols.ss7.isup.impl;
 
 import java.io.IOException;
-import java.util.Enumeration;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -38,7 +39,7 @@ public class ISUPProviderImpl implements ISUPProvider {
     protected final transient ISUPParameterFactory parameterFactory;
     protected final transient Scheduler scheduler;
 
-    protected final transient ConcurrentHashMap<Long, Circuit> cic2Circuit = new ConcurrentHashMap<Long, Circuit>();
+    protected final transient NonBlockingHashMap<Long, Circuit> cic2Circuit = new NonBlockingHashMap<>();
     protected final int ni;
     protected final int localSpc;
     protected final boolean automaticTimerMessages;
@@ -177,10 +178,12 @@ public class ISUPProviderImpl implements ISUPProvider {
     }
 
     public void stop() {
-        Enumeration<Long> keys = cic2Circuit.keys();
-        while (keys.hasMoreElements()) {
+        for (Long key : new ArrayList<>(cic2Circuit.keySet())) {
             try {
-                cic2Circuit.remove(keys.nextElement()).onStop();
+                Circuit c = cic2Circuit.remove(key);
+                if (c != null) {
+                    c.onStop();
+                }
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

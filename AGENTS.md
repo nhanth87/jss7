@@ -4,7 +4,9 @@
 
 > **MISSION:** Upgrade jSS7 from Java 11 → Java 25 for maximum performance, then wrap as a micro-jainslee 3-port Resource Adaptor.
 > **Target State:** jSS7 runs on ZGC + Virtual Threads + Log4j2 Async, exposes SS7 events via `RaBootstrapPort.fireEvent()` into the LMAX Disruptor-based `EventRouter`.
-> **Baseline:** jSS7 9.2.8 | 4,337 Java files | 18 modules | Java 11 | log4j 1.2.14 | junit 3.8.1 | JCTools 4.0.3 | Netty 4.2.11
+> **Baseline:** jSS7 9.2.8-j25 | Java **25** (`maven.compiler.release=25`, mise zulu-25) | Log4j2 2.23.1 | JCTools **4.0.5** | Agrona **1.23.1** | Infinispan **15.0.0** | JUnit Jupiter **5.11.4** (BOM; legacy junit 3 / TestNG still present) | Netty 4.2.11
+>
+> Javolution removed from parent BOM and simulator/trace-parser assemblies. Legacy `import javolution` in **test** sources is Phase-3 debt (do not re-add the dependency).
 
 ---
 
@@ -121,7 +123,7 @@ Scheduler.java
 | `org.apache.logging.log4j:log4j-core` | — | 2.23.1 | Async logging |
 | `junit:junit` | 3.8.1 | REMOVE | Legacy test |
 | `org.junit.jupiter:junit-jupiter` | — | 5.11.x | Modern testing |
-| `org.jctools:jctools-core` | 4.0.3 | 4.0.5+ | Latest |
+| `org.jctools:jctools-core` | 4.0.5 | 4.0.5+ | Current |
 | `netty-transport-sctp` | 4.2.11.Final | Keep | Already current |
 | `concurrent:concurrent` | 1.3.4 | REMOVE | Built-in since Java 5 |
 

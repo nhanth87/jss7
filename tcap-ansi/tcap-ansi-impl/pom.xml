@@ -13,6 +13,10 @@
 	<dependencies>
 
 		<dependency>
+			<groupId>org.jctools</groupId>
+			<artifactId>jctools-core</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.mobicents.protocols.asn</groupId>
 			<artifactId>asn</artifactId>
 		</dependency>

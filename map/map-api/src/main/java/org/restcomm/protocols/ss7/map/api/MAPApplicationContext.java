@@ -3,7 +3,7 @@ package org.restcomm.protocols.ss7.map.api;
 import java.io.Serializable;
 import java.util.Arrays;
 
-import java.util.concurrent.ConcurrentHashMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 /**
  *
@@ -15,7 +15,7 @@ public class MAPApplicationContext implements Serializable {
 
     private static long[] oidTemplate = new long[] { 0, 4, 0, 0, 1, 0, 0, 0 };
 
-    private static ConcurrentHashMap<MAPApplicationContextName, ConcurrentHashMap<MAPApplicationContextVersion, MAPApplicationContext>> appContextCache = new ConcurrentHashMap<MAPApplicationContextName, ConcurrentHashMap<MAPApplicationContextVersion, MAPApplicationContext>>();
+    private static NonBlockingHashMap<MAPApplicationContextName, NonBlockingHashMap<MAPApplicationContextVersion, MAPApplicationContext>> appContextCache = new NonBlockingHashMap<>();
 
     private MAPApplicationContextName contextName;
     private MAPApplicationContextVersion contextVersion;
@@ -45,10 +45,10 @@ public class MAPApplicationContext implements Serializable {
 
     private static MAPApplicationContext getMAPApplicationContext(MAPApplicationContextName contextName,
             MAPApplicationContextVersion contextVersion) {
-        ConcurrentHashMap<MAPApplicationContextVersion, MAPApplicationContext> verCache = appContextCache.get(contextName);
+        NonBlockingHashMap<MAPApplicationContextVersion, MAPApplicationContext> verCache = appContextCache.get(contextName);
 
         if (verCache == null) {
-            verCache = new ConcurrentHashMap<MAPApplicationContextVersion, MAPApplicationContext>();
+            verCache = new NonBlockingHashMap<>();
             appContextCache.put(contextName, verCache);
         }
 

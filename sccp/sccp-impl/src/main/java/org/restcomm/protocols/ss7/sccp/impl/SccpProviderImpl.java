@@ -55,7 +55,7 @@ public class SccpProviderImpl implements SccpProvider, Serializable {
     private ParameterFactoryImpl parameterFactory;
 
     //<ssn - congestion level>
-    private ConcurrentHashMap<Integer, Integer> congestionSsn = new ConcurrentHashMap<Integer, Integer>();
+    private NonBlockingHashMap<Integer, Integer> congestionSsn = new NonBlockingHashMap<>();
 
     SccpProviderImpl(SccpStackImpl stack) {
         this.stack = stack;
@@ -213,7 +213,7 @@ public class SccpProviderImpl implements SccpProvider, Serializable {
         return this.stack;
     }
 
-    public ConcurrentHashMap<Integer, Integer> getCongestionSsn() {
+    public NonBlockingHashMap<Integer, Integer> getCongestionSsn() {
         return this.congestionSsn;
     }
 

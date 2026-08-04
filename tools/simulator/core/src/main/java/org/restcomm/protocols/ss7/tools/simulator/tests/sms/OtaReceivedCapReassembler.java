@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import org.jctools.maps.NonBlockingHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.LongSupplier;
@@ -70,9 +70,9 @@ public final class OtaReceivedCapReassembler {
     private final LongSupplier clockMs;
     /** Null when verification is disabled or unavailable — capture still works. */
     private final OtaSecuredPacketVerifier verifier;
-    private final ConcurrentHashMap<String, Assembly> assemblies = new ConcurrentHashMap<>();
+    private final NonBlockingHashMap<String, Assembly> assemblies = new NonBlockingHashMap<>();
     /** IMSI → last MSISDN seen on SRI (lab naming). */
-    private final ConcurrentHashMap<String, String> imsiToMsisdn = new ConcurrentHashMap<>();
+    private final NonBlockingHashMap<String, String> imsiToMsisdn = new NonBlockingHashMap<>();
     private final AtomicLong writtenCount = new AtomicLong();
     private final AtomicLong verifiedCount = new AtomicLong();
     /** sha256 → pushed CAP name; built once, off the per-segment path. */

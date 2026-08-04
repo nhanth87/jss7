@@ -12,10 +12,10 @@ import org.infinispan.manager.EmbeddedCacheManager;
 /**
  * Infinispan-backed control plane for W2 ordering-key ownership.
  *
- * <p>This coordinator persists only small lease metadata. Work payloads and local mailboxes
- * remain local and are deliberately never used as a distributed priority queue. Lease updates
- * use Infinispan conditional compare-and-set operations. An execution integration must reject
- * side effects made with a stale lease epoch.</p>
+ * <p>This coordinator persists only small lease metadata as opaque bytes (see {@link W2Lease#encode()}).
+ * Work payloads and local mailboxes remain local and are deliberately never used as a distributed
+ * priority queue. Lease updates use Infinispan conditional compare-and-set operations. An execution
+ * integration must reject side effects made with a stale lease epoch.</p>
  */
 public final class W2ClusterCoordinator {
 
@@ -24,7 +24,7 @@ public final class W2ClusterCoordinator {
     private final String nodeId;
     private final long leaseDurationMs;
     private final LongSupplier clockEpochMs;
-    private final AdvancedCache<String, W2Lease> leases;
+    private final AdvancedCache<String, byte[]> leases;
 
     public W2ClusterCoordinator(EmbeddedCacheManager cacheManager, String nodeId, long leaseDurationMs) {
         this(cacheManager, DEFAULT_LEASE_CACHE, nodeId, leaseDurationMs, System::currentTimeMillis);
@@ -49,7 +49,7 @@ public final class W2ClusterCoordinator {
             cacheManager.defineConfiguration(cacheName, new ConfigurationBuilder()
                     .clustering().cacheMode(CacheMode.REPL_SYNC).build());
         }
-        Cache<String, W2Lease> cache = cacheManager.getCache(cacheName);
+        Cache<String, byte[]> cache = cacheManager.getCache(cacheName);
         this.leases = cache.getAdvancedCache();
     }
 
@@ -58,14 +58,19 @@ public final class W2ClusterCoordinator {
         requireOrderingKey(orderingKey);
         for (;;) {
             long now = clockEpochMs.getAsLong();
-            W2Lease current = leases.get(orderingKey);
+            byte[] currentBytes = leases.get(orderingKey);
+            W2Lease current = currentBytes == null ? null : W2Lease.decode(currentBytes);
             if (current != null && !current.isExpired(now) && !current.ownerNodeId().equals(nodeId)) {
                 return W2LeaseResult.denied(current);
             }
             long epoch = current != null && current.ownerNodeId().equals(nodeId) ? current.epoch()
                     : current == null ? 1L : current.epoch() + 1L;
             W2Lease next = new W2Lease(nodeId, epoch, Math.addExact(now, leaseDurationMs));
-            if (current == null ? leases.putIfAbsent(orderingKey, next) == null : leases.replace(orderingKey, current, next)) {
+            byte[] nextBytes = next.encode();
+            boolean ok = currentBytes == null
+                    ? leases.putIfAbsent(orderingKey, nextBytes) == null
+                    : leases.replace(orderingKey, currentBytes, nextBytes);
+            if (ok) {
                 return W2LeaseResult.acquired(next);
             }
         }
@@ -74,21 +79,30 @@ public final class W2ClusterCoordinator {
     /** Returns true only when this node still holds the supplied fencing epoch. */
     public boolean owns(String orderingKey, long epoch) {
         requireOrderingKey(orderingKey);
-        W2Lease lease = leases.get(orderingKey);
-        return lease != null && lease.isHeldBy(nodeId, epoch, clockEpochMs.getAsLong());
+        byte[] encoded = leases.get(orderingKey);
+        if (encoded == null) {
+            return false;
+        }
+        W2Lease lease = W2Lease.decode(encoded);
+        return lease.isHeldBy(nodeId, epoch, clockEpochMs.getAsLong());
     }
 
     /** Removes only this node's current epoch; it cannot erase a newer owner's lease. */
     public boolean release(String orderingKey, long epoch) {
         requireOrderingKey(orderingKey);
-        W2Lease current = leases.get(orderingKey);
-        return current != null && current.ownerNodeId().equals(nodeId) && current.epoch() == epoch
-                && leases.remove(orderingKey, current);
+        byte[] currentBytes = leases.get(orderingKey);
+        if (currentBytes == null) {
+            return false;
+        }
+        W2Lease current = W2Lease.decode(currentBytes);
+        return current.ownerNodeId().equals(nodeId) && current.epoch() == epoch
+                && leases.remove(orderingKey, currentBytes);
     }
 
     public W2Lease currentLease(String orderingKey) {
         requireOrderingKey(orderingKey);
-        return leases.get(orderingKey);
+        byte[] encoded = leases.get(orderingKey);
+        return encoded == null ? null : W2Lease.decode(encoded);
     }
 
     private static void requireOrderingKey(String orderingKey) {

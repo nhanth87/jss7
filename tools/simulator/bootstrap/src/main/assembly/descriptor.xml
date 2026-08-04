@@ -39,8 +39,8 @@
 				<include>com.sun.jdmk:jmxtools</include>
 
 				<!-- Not strictly SS7, But needed by SS7 -->
-				<include>javolution:javolution</include>
 				<include>org.jctools:jctools-core</include>
+				<include>org.agrona:agrona</include>
 				<include>com.fasterxml.jackson.core:jackson-core</include>
 				<include>com.fasterxml.jackson.core:jackson-annotations</include>
 				<include>com.fasterxml.jackson.core:jackson-databind</include>

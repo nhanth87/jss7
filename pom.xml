@@ -32,13 +32,16 @@
 		<maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version> <!-- 2.4.2 -->
 		<maven-bundle-plugin.skip>true</maven-bundle-plugin.skip>
 		<log4j2.version>2.23.1</log4j2.version>
+		<!-- Phase 2: prefer JUnit 5; junit 3 kept only for legacy TestCase modules not yet migrated -->
 		<junit.version>3.8.1</junit.version>
+		<junit.jupiter.version>5.11.4</junit.jupiter.version>
 		<testng.version>6.2</testng.version>
-		<jctools.version>4.0.3</jctools.version>
-		<javolution.version>5.5.1</javolution.version>
+		<jctools.version>4.0.5</jctools.version>
+		<!-- javolution removed from main BOM (Jackson + JCTools). Legacy test XML helpers must not reintroduce it. -->
 		<guava.version>33.4.7-jre</guava.version>
 		<jakarta.xml.bind-api.version>4.0.2</jakarta.xml.bind-api.version>
 		<infinispan.version>15.0.0.Final</infinispan.version>
+		<agrona.version>1.23.1</agrona.version>
 
 		<compiler.plugin.version>3.13.0</compiler.plugin.version>
 		<compile.source>25</compile.source>
@@ -288,11 +291,6 @@
 
 			<!-- 3rd PARTY -->
 			<dependency>
-				<groupId>javolution</groupId>
-				<artifactId>javolution</artifactId>
-				<version>${javolution.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>jakarta.xml.bind</groupId>
 				<artifactId>jakarta.xml.bind-api</artifactId>
 				<version>${jakarta.xml.bind-api.version}</version>
@@ -320,6 +318,12 @@
 				<version>${junit.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter</artifactId>
+				<version>${junit.jupiter.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
 				<groupId>org.testng</groupId>
 				<artifactId>testng</artifactId>
 				<version>${testng.version}</version>
@@ -329,6 +333,16 @@
 				<groupId>org.jctools</groupId>
 				<artifactId>jctools-core</artifactId>
 				<version>${jctools.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.agrona</groupId>
+				<artifactId>agrona</artifactId>
+				<version>${agrona.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.infinispan</groupId>
+				<artifactId>infinispan-core</artifactId>
+				<version>${infinispan.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -547,6 +561,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${compiler.plugin.version}</version>
 				<configuration>
+					<release>${maven.compiler.release}</release>
 					<source>${compile.source}</source>
 					<target>${compile.source}</target>
 					<debug>${compile.debug}</debug>

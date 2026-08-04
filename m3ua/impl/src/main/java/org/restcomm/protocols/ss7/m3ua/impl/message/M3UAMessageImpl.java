@@ -3,7 +3,7 @@ package org.restcomm.protocols.ss7.m3ua.impl.message;
 
 import io.netty.buffer.ByteBuf;
 
-import java.util.concurrent.ConcurrentHashMap;
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.restcomm.protocols.ss7.m3ua.impl.parameter.ParameterFactoryImpl;
 import org.restcomm.protocols.ss7.m3ua.message.M3UAMessage;
@@ -21,7 +21,7 @@ public abstract class M3UAMessageImpl implements M3UAMessage {
     private int messageType;
 
     private String message;
-    protected final ConcurrentHashMap<Short, Parameter> parameters = new ConcurrentHashMap<Short, Parameter>();
+    protected final NonBlockingHashMap<Short, Parameter> parameters = new NonBlockingHashMap<>();
 
     private ParameterFactoryImpl factory = new ParameterFactoryImpl();
 

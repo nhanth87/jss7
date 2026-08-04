@@ -10,10 +10,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.jctools.maps.NonBlockingHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -117,7 +118,7 @@ public class CAPProviderImpl implements CAPProvider, TCListener {
     private transient W2KeyedMailboxDispatcher w2CallbackDispatcher;
 
 //    protected transient Map<Long, CAPDialogImpl> dialogs = new ConcurrentHashMap<Long, CAPDialogImpl>().shared();
-    protected transient ConcurrentHashMap<Long, CAPDialogImpl> dialogs = new ConcurrentHashMap<Long, CAPDialogImpl>();
+    protected transient NonBlockingHashMap<Long, CAPDialogImpl> dialogs = new NonBlockingHashMap<>();
 
     private transient TCAPProvider tcapProvider = null;
 
