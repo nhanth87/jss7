@@ -1,7 +1,8 @@
 
 package org.restcomm.protocols.ss7.tools.simulator.common;
 
-
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.restcomm.protocols.ss7.tools.simulator.level1.DialogicConfigurationData;
 import org.restcomm.protocols.ss7.tools.simulator.level1.M3uaConfigurationData;
@@ -57,11 +58,10 @@ public class ConfigurationData {
     public static final String TEST_MAP_LCS_SERVER = "testMapLcsServer";
     public static final String TEST_MAP_PSI_SERVER = "testMapPsiServer";
 
-    // Defaults match classic ussdgateway ss7-simulator/main_simulator2.xml
-    private Instance_L1 instance_L1 = new Instance_L1(Instance_L1.VAL_M3UA);
-    private Instance_L2 instance_L2 = new Instance_L2(Instance_L2.VAL_SCCP);
-    private Instance_L3 instance_L3 = new Instance_L3(Instance_L3.VAL_MAP);
-    private Instance_TestTask instance_TestTask = new Instance_TestTask(Instance_TestTask.VAL_USSD_TEST_CLIENT);
+    private Instance_L1 instance_L1 = new Instance_L1(Instance_L1.VAL_NO);
+    private Instance_L2 instance_L2 = new Instance_L2(Instance_L2.VAL_NO);
+    private Instance_L3 instance_L3 = new Instance_L3(Instance_L3.VAL_NO);
+    private Instance_TestTask instance_TestTask = new Instance_TestTask(Instance_TestTask.VAL_NO);
 
     private M3uaConfigurationData m3uaConfigurationData = new M3uaConfigurationData();
     private DialogicConfigurationData dialogicConfigurationData = new DialogicConfigurationData();
@@ -116,149 +116,200 @@ public class ConfigurationData {
         instance_TestTask = val;
     }
 
+    @JsonProperty(M3UA)
+    @JsonAlias("m3uaConfigurationData")
     public M3uaConfigurationData getM3uaConfigurationData() {
         return m3uaConfigurationData;
     }
 
+    @JsonProperty(M3UA)
     public void setM3uaConfigurationData(M3uaConfigurationData m3uaConfigurationData) {
         this.m3uaConfigurationData = m3uaConfigurationData;
     }
 
+    @JsonProperty(DIALOGIC)
+    @JsonAlias("dialogicConfigurationData")
     public DialogicConfigurationData getDialogicConfigurationData() {
         return dialogicConfigurationData;
     }
 
+    @JsonProperty(DIALOGIC)
     public void setDialogicConfigurationData(DialogicConfigurationData dialogicConfigurationData) {
         this.dialogicConfigurationData = dialogicConfigurationData;
     }
 
+    @JsonProperty(SCCP)
+    @JsonAlias("sccpConfigurationData")
     public SccpConfigurationData getSccpConfigurationData() {
         return sccpConfigurationData;
     }
 
+    @JsonProperty(SCCP)
     public void setSccpConfigurationData(SccpConfigurationData sccpConfigurationData) {
         this.sccpConfigurationData = sccpConfigurationData;
     }
 
+    @JsonProperty(MAP)
+    @JsonAlias("mapConfigurationData")
     public MapConfigurationData getMapConfigurationData() {
         return mapConfigurationData;
     }
 
+    @JsonProperty(MAP)
     public void setMapConfigurationData(MapConfigurationData mapConfigurationData) {
         this.mapConfigurationData = mapConfigurationData;
     }
 
+    @JsonProperty(CAP)
+    @JsonAlias("capConfigurationData")
     public CapConfigurationData getCapConfigurationData() {
         return capConfigurationData;
     }
 
+    @JsonProperty(CAP)
     public void setCapConfigurationData(CapConfigurationData capConfigurationData) {
         this.capConfigurationData = capConfigurationData;
     }
 
+    @JsonProperty(TEST_SMS_CLIENT)
+    @JsonAlias("testSmsClientConfigurationData")
     public TestSmsClientConfigurationData getTestSmsClientConfigurationData() {
         return testSmsClientConfigurationData;
     }
 
+    @JsonProperty(TEST_SMS_CLIENT)
     public void setTestSmsClientConfigurationData(TestSmsClientConfigurationData testSmsClientConfigurationData) {
         this.testSmsClientConfigurationData = testSmsClientConfigurationData;
     }
 
+    @JsonProperty(TEST_SMS_SERVER)
+    @JsonAlias("testSmsServerConfigurationData")
     public TestSmsServerConfigurationData getTestSmsServerConfigurationData() {
         return testSmsServerConfigurationData;
     }
 
+    @JsonProperty(TEST_SMS_SERVER)
     public void setTestSmsServerConfigurationData(TestSmsServerConfigurationData testSmsServerConfigurationData) {
         this.testSmsServerConfigurationData = testSmsServerConfigurationData;
     }
 
+    @JsonProperty(TEST_USSD_CLIENT)
+    @JsonAlias("testUssdClientConfigurationData")
     public TestUssdClientConfigurationData getTestUssdClientConfigurationData() {
         return testUssdClientConfigurationData;
     }
 
+    @JsonProperty(TEST_USSD_CLIENT)
     public void setTestUssdClientConfigurationData(TestUssdClientConfigurationData testUssdClientConfigurationData) {
         this.testUssdClientConfigurationData = testUssdClientConfigurationData;
     }
 
+    @JsonProperty(TEST_USSD_SERVER)
+    @JsonAlias("testUssdServerConfigurationData")
     public TestUssdServerConfigurationData getTestUssdServerConfigurationData() {
         return testUssdServerConfigurationData;
     }
 
+    @JsonProperty(TEST_USSD_SERVER)
     public void setTestUssdServerConfigurationData(TestUssdServerConfigurationData testUssdServerConfigurationData) {
         this.testUssdServerConfigurationData = testUssdServerConfigurationData;
     }
 
+    @JsonProperty(TEST_CAP_SCF)
+    @JsonAlias("testCapScfConfigurationData")
     public TestCapScfConfigurationData getTestCapScfConfigurationData() {
         return testCapScfConfigurationData;
     }
 
+    @JsonProperty(TEST_CAP_SCF)
     public void setTestCapScfConfigurationData(TestCapScfConfigurationData testCapScfConfigurationData) {
         this.testCapScfConfigurationData = testCapScfConfigurationData;
     }
 
+    @JsonProperty(TEST_CAP_SSF)
+    @JsonAlias("testCapSsfConfigurationData")
     public TestCapSsfConfigurationData getTestCapSsfConfigurationData() {
         return testCapSsfConfigurationData;
     }
 
+    @JsonProperty(TEST_CAP_SSF)
     public void setTestCapSsfConfigurationData(TestCapSsfConfigurationData testCapSsfConfigurationData) {
         this.testCapSsfConfigurationData = testCapSsfConfigurationData;
     }
 
+    @JsonProperty(TEST_ATI_CLIENT)
+    @JsonAlias("testAtiClientConfigurationData")
     public TestAtiClientConfigurationData getTestAtiClientConfigurationData() {
         return testAtiClientConfigurationData;
     }
 
+    @JsonProperty(TEST_ATI_CLIENT)
     public void setTestAtiClientConfigurationData(TestAtiClientConfigurationData testAtiClientConfigurationData) {
         this.testAtiClientConfigurationData = testAtiClientConfigurationData;
     }
 
+    @JsonProperty(TEST_ATI_SERVER)
+    @JsonAlias("testAtiServerConfigurationData")
     public TestAtiServerConfigurationData getTestAtiServerConfigurationData() {
         return testAtiServerConfigurationData;
     }
 
+    @JsonProperty(TEST_ATI_SERVER)
     public void setTestAtiServerConfigurationData(TestAtiServerConfigurationData testAtiServerConfigurationData) {
         this.testAtiServerConfigurationData = testAtiServerConfigurationData;
     }
 
+    @JsonProperty(TEST_CHECK_IMEI_CLIENT)
+    @JsonAlias("testCheckImeiClientConfigurationData")
     public TestCheckImeiClientConfigurationData getTestCheckImeiClientConfigurationData() {
         return testCheckImeiClientConfigurationData;
     }
 
+    @JsonProperty(TEST_CHECK_IMEI_CLIENT)
     public void setTestCheckImeiClientConfigurationData(TestCheckImeiClientConfigurationData testCheckImeiClientConfigurationData) {
         this.testCheckImeiClientConfigurationData = testCheckImeiClientConfigurationData;
     }
 
+    @JsonProperty(TEST_CHECK_IMEI_SERVER)
+    @JsonAlias("testCheckImeiServerConfigurationData")
     public TestCheckImeiServerConfigurationData getTestCheckImeiServerConfigurationData() {
         return testCheckImeiServerConfigurationData;
     }
 
+    @JsonProperty(TEST_CHECK_IMEI_SERVER)
     public void setTestCheckImeiServerConfigurationData(TestCheckImeiServerConfigurationData testCheckImeiServerConfigurationData) {
         this.testCheckImeiServerConfigurationData = testCheckImeiServerConfigurationData;
     }
 
-
+    @JsonProperty(TEST_MAP_LCS_SERVER)
+    @JsonAlias("testLcsServerConfigurationData")
     public TestLcsServerConfigurationData getTestLcsServerConfigurationData() {
         return testLcsServerConfigurationData;
     }
 
+    @JsonProperty(TEST_MAP_LCS_SERVER)
     public void setTestLcsServerConfigurationData(TestLcsServerConfigurationData testLcsServerConfigurationData) {
         this.testLcsServerConfigurationData = testLcsServerConfigurationData;
     }
 
-
+    @JsonProperty(TEST_MAP_LCS_CLIENT)
+    @JsonAlias("testLcsClientConfigurationData")
     public TestLcsClientConfigurationData getTestLcsClientConfigurationData() {
         return testLcsClientConfigurationData;
     }
 
+    @JsonProperty(TEST_MAP_LCS_CLIENT)
     public void setTestLcsClientConfigurationData(TestLcsClientConfigurationData testLcsClientConfigurationData) {
         this.testLcsClientConfigurationData = testLcsClientConfigurationData;
     }
 
-
+    @JsonProperty(TEST_MAP_PSI_SERVER)
+    @JsonAlias("testPsiServerConfigurationData")
     public TestPsiServerConfigurationData getTestPsiServerConfigurationData() {
         return testPsiServerConfigurationData;
     }
 
+    @JsonProperty(TEST_MAP_PSI_SERVER)
     public void setTestPsiServerConfigurationData(TestPsiServerConfigurationData testPsiServerConfigurationData) {
         this.testPsiServerConfigurationData = testPsiServerConfigurationData;
     }

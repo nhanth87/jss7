@@ -1,5 +1,7 @@
 package org.restcomm.protocols.ss7.tools.simulator.tests.psi;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 
@@ -316,10 +318,12 @@ public class TestPsiServerConfigurationData {
         this.lmsi = lmsi;
     }
 
+    @JsonIgnore
     public org.restcomm.protocols.ss7.map.api.primitives.IMEI getiMei() {
         return iMei;
     }
 
+    @JsonIgnore
     public void setiMei(org.restcomm.protocols.ss7.map.api.primitives.IMEI iMei) {
         this.iMei = iMei;
     }

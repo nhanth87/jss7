@@ -1,10 +1,14 @@
 
 package org.restcomm.protocols.ss7.tools.simulator.level1;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javolution.text.CharArray;
+import javolution.xml.XMLFormat;
 import java.util.ArrayList;
 import java.util.List;
+import javolution.xml.stream.XMLStreamException;
 
 import org.mobicents.protocols.api.IpChannelType;
 import org.restcomm.protocols.ss7.m3ua.ExchangeType;
@@ -18,7 +22,6 @@ import org.restcomm.protocols.ss7.mtp.RoutingLabelFormat;
  * @author sergey vetyutnev
  *
  */
-@JacksonXmlRootElement(localName = "m3uaConfigurationData")
 public class M3uaConfigurationData {
 
     protected static final String STORE_PCAP_TRACE = "storePcapTrace";
@@ -49,22 +52,21 @@ public class M3uaConfigurationData {
 
     private boolean storePcapTrace = false;
     private boolean isSctpServer = false;
-    // Defaults match classic ussdgateway ss7-simulator/main_simulator2.xml
-    private String localHost = "127.0.0.1";
-    private int localPort = 8011;
-    private String remoteHost = "127.0.0.1";
-    private int remotePort = 8012;
-    private String localHost2 = "";
-    private int localPort2 = 0;
-    private String remoteHost2 = "";
-    private int remotePort2 = 0;
-    private IpChannelType ipChannelType = IpChannelType.SCTP;
+    private String localHost;
+    private int localPort;
+    private String remoteHost;
+    private int remotePort;
+    private String localHost2;
+    private int localPort2;
+    private String remoteHost2;
+    private int remotePort2;
+    private IpChannelType ipChannelType = IpChannelType.TCP;
     private String[] extraHostAddresses = new String[0];
-    private int dpc = 2;
-    private int opc = 1;
+    private int dpc = 0;
+    private int opc = -1;
     private int dpc2 = 0;
     private int opc2 = 0;
-    private int si = 3;
+    private int si = -1;
     private long routingContext = 101;
     private long networkAppearance = 102;
     private int trafficModeType = TrafficModeType.Loadshare;
@@ -239,10 +241,14 @@ public class M3uaConfigurationData {
         si = val;
     }
 
+    /** Wire name is the historic typo {@code routingConext} (Javolution XML). */
+    @JsonProperty(ROUTING_CONTEXT)
+    @JsonAlias("routingContext")
     public long getRoutingContext() {
         return routingContext;
     }
 
+    @JsonProperty(ROUTING_CONTEXT)
     public void setRoutingContext(long val) {
         routingContext = val;
     }
@@ -295,4 +301,92 @@ public class M3uaConfigurationData {
         routingLabelFormat = val;
     }
 
+    protected static final XMLFormat<M3uaConfigurationData> XML = new XMLFormat<M3uaConfigurationData>(
+            M3uaConfigurationData.class) {
+
+        public void write(M3uaConfigurationData m3ua, OutputElement xml) throws XMLStreamException {
+            xml.setAttribute(STORE_PCAP_TRACE, m3ua.storePcapTrace);
+            xml.setAttribute(IS_SCTP_SERVER, m3ua.isSctpServer);
+            xml.setAttribute(LOCAL_PORT, m3ua.localPort);
+            xml.setAttribute(LOCAL_PORT_2, m3ua.localPort2);
+            xml.setAttribute(REMOTE_PORT, m3ua.remotePort);
+            xml.setAttribute(REMOTE_PORT_2, m3ua.remotePort2);
+            xml.setAttribute(IP_CHANNEL_TYPE, m3ua.ipChannelType.toString());
+            xml.setAttribute(DPC, m3ua.dpc);
+            xml.setAttribute(DPC_2, m3ua.dpc2);
+            xml.setAttribute(OPC, m3ua.opc);
+            xml.setAttribute(OPC_2, m3ua.opc2);
+            xml.setAttribute(SI, m3ua.si);
+            xml.setAttribute(ROUTING_CONTEXT, m3ua.routingContext);
+            xml.setAttribute(NETWORK_APPEARANCE, m3ua.networkAppearance);
+            xml.setAttribute(TRAFFIC_MODE_TYPE, m3ua.trafficModeType);
+            xml.setAttribute(M3UA_FUNCTIONALITY, m3ua.m3uaFunctionality.toString());
+            xml.setAttribute(M3UA_EXCHANGE_TYPE, m3ua.m3uaExchangeType.toString());
+            xml.setAttribute(ROUTING_LABEL_FORMAT, m3ua.routingLabelFormat.toString());
+            xml.setAttribute(M3UA_IPSPType, m3ua.m3uaIPSPType.toString());
+
+            xml.add(m3ua.localHost, LOCAL_HOST, String.class);
+            xml.add(m3ua.localHost2, LOCAL_HOST_2, String.class);
+            xml.add(m3ua.remoteHost, REMOTE_HOST, String.class);
+            xml.add(m3ua.remoteHost2, REMOTE_HOST_2, String.class);
+            if (m3ua.getSctpExtraHostAddresses() != null && !m3ua.getSctpExtraHostAddresses().equals("")) {
+                xml.add(m3ua.getSctpExtraHostAddresses(), EXTRA_HOST_ADDRESSES, String.class);
+            }
+        }
+
+        public void read(InputElement xml, M3uaConfigurationData m3ua) throws XMLStreamException {
+            CharArray ca = xml.getAttribute(STORE_PCAP_TRACE);
+            if (ca != null)
+                m3ua.storePcapTrace = ca.toBoolean();
+
+            m3ua.isSctpServer = xml.getAttribute(IS_SCTP_SERVER).toBoolean();
+
+            m3ua.localPort = xml.getAttribute(LOCAL_PORT).toInt();
+            ca = xml.getAttribute(LOCAL_PORT_2);
+            if (ca != null)
+                m3ua.localPort2 = ca.toInt();
+            m3ua.remotePort = xml.getAttribute(REMOTE_PORT).toInt();
+            ca = xml.getAttribute(REMOTE_PORT_2);
+            if (ca != null)
+                m3ua.remotePort2 = ca.toInt();
+
+            String str = xml.getAttribute(IP_CHANNEL_TYPE).toString();
+            m3ua.ipChannelType = IpChannelType.valueOf(str);
+
+            m3ua.dpc = xml.getAttribute(DPC).toInt();
+            ca = xml.getAttribute(DPC_2);
+            if (ca != null)
+                m3ua.dpc2 = ca.toInt();
+            m3ua.opc = xml.getAttribute(OPC).toInt();
+            ca = xml.getAttribute(OPC_2);
+            if (ca != null)
+                m3ua.opc2 = ca.toInt();
+
+            m3ua.si = xml.getAttribute(SI).toInt();
+            m3ua.routingContext = xml.getAttribute(ROUTING_CONTEXT).toInt();
+            m3ua.networkAppearance = xml.getAttribute(NETWORK_APPEARANCE).toInt();
+            ca = xml.getAttribute(TRAFFIC_MODE_TYPE);
+            if (ca != null)
+                m3ua.trafficModeType = ca.toInt();
+
+            str = xml.getAttribute(M3UA_FUNCTIONALITY).toString();
+            m3ua.m3uaFunctionality = Functionality.valueOf(str);
+            str = xml.getAttribute(M3UA_EXCHANGE_TYPE).toString();
+            m3ua.m3uaExchangeType = ExchangeType.valueOf(str);
+            ca = xml.getAttribute(ROUTING_LABEL_FORMAT);
+            if (ca != null) {
+                str = ca.toString();
+                m3ua.routingLabelFormat = RoutingLabelFormat.valueOf(str);
+            }
+
+            str = xml.getAttribute(M3UA_IPSPType).toString();
+            m3ua.m3uaIPSPType = IPSPType.valueOf(str);
+
+            m3ua.localHost = (String) xml.get(LOCAL_HOST, String.class);
+            m3ua.localHost2 = (String) xml.get(LOCAL_HOST_2, String.class);
+            m3ua.remoteHost = (String) xml.get(REMOTE_HOST, String.class);
+            m3ua.remoteHost2 = (String) xml.get(REMOTE_HOST_2, String.class);
+            m3ua.setSctpExtraHostAddresses((String) xml.get(EXTRA_HOST_ADDRESSES, String.class));
+        }
+    };
 }

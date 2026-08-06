@@ -89,10 +89,49 @@ public final class EnumeratedBaseJacksonModule {
             if (t != null && t.isNumeric()) {
                 return constructInt(p.getIntValue());
             }
+            // Legacy XStream / simulator XML: <instance_X value="NAME"/> → START_OBJECT { "value": "NAME" }
+            if (t == JsonToken.START_OBJECT) {
+                return fromAttributeObject(p);
+            }
             String text = p.getValueAsString();
             if (text == null) {
                 return null;
             }
+            return fromScalarText(text);
+        }
+
+        /**
+         * Accept both modern scalar text ({@code <e>NAME</e>}) and legacy attribute form
+         * ({@code <e value="NAME"/>}).
+         */
+        private EnumeratedBase fromAttributeObject(JsonParser p) throws IOException {
+            String chosen = null;
+            while (p.nextToken() != JsonToken.END_OBJECT) {
+                if (p.currentToken() != JsonToken.FIELD_NAME) {
+                    continue;
+                }
+                String field = p.currentName();
+                p.nextToken();
+                String v = p.getValueAsString();
+                if (v == null) {
+                    p.skipChildren();
+                    continue;
+                }
+                v = v.trim();
+                if (v.isEmpty()) {
+                    continue;
+                }
+                if ("value".equals(field) || chosen == null) {
+                    chosen = v;
+                }
+            }
+            if (chosen == null) {
+                return null;
+            }
+            return fromScalarText(chosen);
+        }
+
+        private EnumeratedBase fromScalarText(String text) throws IOException {
             text = text.trim();
             if (text.isEmpty()) {
                 return null;

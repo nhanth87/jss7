@@ -1,5 +1,6 @@
 package org.restcomm.protocols.ss7.tools.simulator.tests.lcs;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import org.restcomm.protocols.ss7.map.api.primitives.AddressNature;
@@ -45,42 +46,52 @@ public class TestLcsClientConfigurationData {
     private Integer ageOfLocationEstimate = 1;
     private LCSEvent lcsEvent = LCSEvent.emergencyCallOrigination;
 
+    @JsonProperty(IMEI)
     public String getIMEI() {
         return imei;
     }
 
+    @JsonProperty(IMEI)
     public void setIMEI(String imei) {
         this.imei = imei;
     }
 
+    @JsonProperty(HGMLC_ADDRESS)
     public String getHGMLCAddress() {
         return hgmlcAddress;
     }
 
+    @JsonProperty(HGMLC_ADDRESS)
     public void setHGMLCAddress(String hgmlcAddress) {
         this.hgmlcAddress = hgmlcAddress;
     }
 
+    @JsonProperty(MCC)
     public Integer getMCC() {
         return mcc;
     }
 
+    @JsonProperty(MCC)
     public void setMCC(Integer mcc) {
         this.mcc = mcc;
     }
 
+    @JsonProperty(MNC)
     public Integer getMNC() {
         return mnc;
     }
 
+    @JsonProperty(MNC)
     public void setMNC(Integer mnc) {
         this.mnc = mnc;
     }
 
+    @JsonProperty(LAC)
     public Integer getLAC() {
         return lac;
     }
 
+    @JsonProperty(LAC)
     public void setLAC(Integer lac) {
         this.lac = lac;
     }
@@ -93,10 +104,12 @@ public class TestLcsClientConfigurationData {
         this.cellId = cellId;
     }
 
+    @JsonProperty(LCS_REFERENCE_NUMBER)
     public Integer getLCSReferenceNumber() {
         return lcsReferenceNumber;
     }
 
+    @JsonProperty(LCS_REFERENCE_NUMBER)
     public void setLCSReferenceNumber(Integer lcsReferenceNumber) {
         this.lcsReferenceNumber = lcsReferenceNumber;
     }
@@ -109,10 +122,12 @@ public class TestLcsClientConfigurationData {
         this.ageOfLocationEstimate = ageOfLocationEstimate;
     }
 
+    @JsonProperty(LCS_EVENT)
     public LCSEvent getLCSEvent() {
         return lcsEvent;
     }
 
+    @JsonProperty(LCS_EVENT)
     public void setLCSEvent(LCSEvent lcsEvent) {
         this.lcsEvent = lcsEvent;
     }
@@ -141,18 +156,22 @@ public class TestLcsClientConfigurationData {
         this.numberingPlanType = numberingPlan;
     }
 
+    @JsonProperty(MSISDN)
     public String getMSISDN() {
         return msisdn;
     }
 
+    @JsonProperty(MSISDN)
     public void setMSISDN(String msisdn) {
         this.msisdn = msisdn;
     }
 
+    @JsonProperty(IMSI)
     public void setIMSI(String data) {
         this.imsi = data;
     }
 
+    @JsonProperty(IMSI)
     public String getIMSI() {
         return imsi;
     }
@@ -172,6 +191,5 @@ public class TestLcsClientConfigurationData {
     public void setNaESRKAddress(String naESRKAddress) {
         this.naESRKAddress = naESRDAddress;
     }
-
 
 }

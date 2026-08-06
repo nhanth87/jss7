@@ -1,7 +1,7 @@
 package org.restcomm.protocols.ss7.tools.simulator.tests.lcs;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-
 
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.MAPParameterFactory;
@@ -163,42 +163,52 @@ public class TestLcsServerConfigurationData {
     this.mlcNumber = mlcNumber;
   }
 
+  @JsonProperty(IMEI)
   public String getIMEI() {
     return imei;
   }
 
+  @JsonProperty(IMEI)
   public void setIMEI(String imei) {
     this.imei = imei;
   }
 
+  @JsonProperty(HGMLC_ADDRESS)
   public String getHGMLCAddress() {
     return hgmlcAddress;
   }
 
+  @JsonProperty(HGMLC_ADDRESS)
   public void setHGMLCAddress(String hgmlcAddress) {
     this.hgmlcAddress = hgmlcAddress;
   }
 
+  @JsonProperty(MCC)
   public Integer getMCC() {
     return mcc;
   }
 
+  @JsonProperty(MCC)
   public void setMCC(Integer mcc) {
     this.mcc = mcc;
   }
 
+  @JsonProperty(MNC)
   public Integer getMNC() {
     return mnc;
   }
 
+  @JsonProperty(MNC)
   public void setMNC(Integer mnc) {
     this.mnc = mnc;
   }
 
+  @JsonProperty(LAC)
   public Integer getLAC() {
     return lac;
   }
 
+  @JsonProperty(LAC)
   public void setLAC(Integer lac) {
     this.lac = lac;
   }
@@ -211,10 +221,12 @@ public class TestLcsServerConfigurationData {
     this.cellId = cellId;
   }
 
+  @JsonProperty(LCS_REFERENCE_NUMBER)
   public Integer getLCSReferenceNumber() {
     return lcsReferenceNumber;
   }
 
+  @JsonProperty(LCS_REFERENCE_NUMBER)
   public void setLCSReferenceNumber(Integer lcsReferenceNumber) {
     this.lcsReferenceNumber = lcsReferenceNumber;
   }
@@ -227,10 +239,12 @@ public class TestLcsServerConfigurationData {
     this.ageOfLocationEstimate = ageOfLocationEstimate;
   }
 
+  @JsonProperty(LCS_EVENT)
   public LCSEvent getLCSEvent() {
     return lcsEvent;
   }
 
+  @JsonProperty(LCS_EVENT)
   public void setLCSEvent(LCSEvent lcsEvent) {
     this.lcsEvent = lcsEvent;
   }
@@ -342,10 +356,12 @@ public class TestLcsServerConfigurationData {
     return dataCodingScheme;
   }
 
+  @JsonProperty(LMSI)
   public String getLMSI() {
     return this.lmsi;
   }
 
+  @JsonProperty(LMSI)
   public void setLMSI(String lmsi) {
     this.lmsi = lmsi;
   }
@@ -358,10 +374,12 @@ public class TestLcsServerConfigurationData {
     this.naESRDAddress = naESRDAddress;
   }
 
+  @JsonProperty(MSISDN)
   public String getMSISDN() {
     return msisdn;
   }
 
+  @JsonProperty(MSISDN)
   public void setMSISDN(String msisdn) {
     this.msisdn = msisdn;
   }
@@ -390,10 +408,12 @@ public class TestLcsServerConfigurationData {
     return numberingPlan;
   }
 
+  @JsonProperty(IMSI)
   public void setIMSI(String data) {
     this.imsi = data;
   }
 
+  @JsonProperty(IMSI)
   public String getIMSI() {
     return imsi;
   }
@@ -404,92 +424,6 @@ public class TestLcsServerConfigurationData {
 
   public String getNetworkNodeNumber() {
     return networkNodeNumber;
-  }
-
-  @com.fasterxml.jackson.annotation.JsonIgnore
-  public String getImsi() {
-    return imsi;
-  }
-
-  @com.fasterxml.jackson.annotation.JsonIgnore
-  public void setImsi(String imsi) {
-    this.imsi = imsi;
-  }
-
-  public String getLmsi() {
-    return lmsi;
-  }
-
-  public void setLmsi(String lmsi) {
-    this.lmsi = lmsi;
-  }
-
-  @com.fasterxml.jackson.annotation.JsonIgnore
-  public String getImei() {
-    return imei;
-  }
-
-  @com.fasterxml.jackson.annotation.JsonIgnore
-  public void setImei(String imei) {
-    this.imei = imei;
-  }
-
-  @com.fasterxml.jackson.annotation.JsonIgnore
-  public String getMsisdn() {
-    return msisdn;
-  }
-
-  @com.fasterxml.jackson.annotation.JsonIgnore
-  public void setMsisdn(String msisdn) {
-    this.msisdn = msisdn;
-  }
-
-  public String getHgmlcAddress() {
-    return hgmlcAddress;
-  }
-
-  public void setHgmlcAddress(String hgmlcAddress) {
-    this.hgmlcAddress = hgmlcAddress;
-  }
-
-  public Integer getMcc() {
-    return mcc;
-  }
-
-  public void setMcc(Integer mcc) {
-    this.mcc = mcc;
-  }
-
-  public Integer getMnc() {
-    return mnc;
-  }
-
-  public void setMnc(Integer mnc) {
-    this.mnc = mnc;
-  }
-
-  public Integer getLac() {
-    return lac;
-  }
-
-  public void setLac(Integer lac) {
-    this.lac = lac;
-  }
-
-  public Integer getLcsReferenceNumber() {
-    return lcsReferenceNumber;
-  }
-
-  public void setLcsReferenceNumber(Integer lcsReferenceNumber) {
-    this.lcsReferenceNumber = lcsReferenceNumber;
-  }
-
-  public LCSEvent getLcsEvent() {
-    return lcsEvent;
-  }
-
-  public void setLcsEvent(LCSEvent lcsEvent) {
-    this.lcsEvent = lcsEvent;
   }
 
   public TypeOfShape getTypeOfShape() {
@@ -623,6 +557,5 @@ public class TestLcsServerConfigurationData {
   public String getCodeWordUSSDString() {
     return this.codeWordUSSDString;
   }
-
 
 }

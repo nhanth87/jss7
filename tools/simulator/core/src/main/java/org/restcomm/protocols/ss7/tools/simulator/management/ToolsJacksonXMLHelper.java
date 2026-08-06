@@ -79,6 +79,7 @@ public class ToolsJacksonXMLHelper {
         xmlMapper.configure(MapperFeature.USE_STD_BEAN_NAMING, true);
         xmlMapper.setAnnotationIntrospector(new SkipProtocolApiIntrospector());
         xmlMapper.registerModule(EnumeratedBaseJacksonModule.create());
+        xmlMapper.registerModule(XmlValueAttributeStringModule.create());
     }
 
     public static XmlMapper getXmlMapper() {
