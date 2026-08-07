@@ -2,7 +2,12 @@
 package org.restcomm.protocols.ss7.tools.simulator.tests.ussd;
 import org.apache.logging.log4j.Level;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.restcomm.protocols.ss7.map.api.MAPApplicationContext;
@@ -113,6 +118,30 @@ public class TestUssdClientMan extends TesterBase implements TestUssdClientManMB
     private MessageSender sender = null;
 
     private int ussdEmptyDialogBeginFlag;
+
+    private final Map<Long, AtomicInteger> autoDigitIndexByDialog = new ConcurrentHashMap<>();
+    private final Map<Long, Long> pendingInvokeByDialog = new ConcurrentHashMap<>();
+    private final AtomicInteger msisdnRotate = new AtomicInteger();
+    private final ScheduledExecutorService autoDigitScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+        Thread t = new Thread(r, "ussd-auto-digit");
+        t.setDaemon(true);
+        return t;
+    });
+
+    private String resolveMsisdnForDialog() {
+        String list = System.getProperty("ussd.sim.msisdnList");
+        if (list == null || list.isBlank()) {
+            list = System.getenv("USSD_SIM_MSISDNS");
+        }
+        if (list != null && !list.isBlank()) {
+            String[] parts = list.split("[,;]");
+            if (parts.length > 0) {
+                int i = Math.floorMod(msisdnRotate.getAndIncrement(), parts.length);
+                return parts[i].trim();
+            }
+        }
+        return this.testerHost.getConfigurationData().getTestUssdClientConfigurationData().getMsisdnAddress();
+    }
 
     public TestUssdClientMan() {
         super(SOURCE_NAME);
@@ -436,6 +465,8 @@ public class TestUssdClientMan extends TesterBase implements TestUssdClientManMB
         }
 
         this.doRemoveDialog();
+        autoDigitIndexByDialog.clear();
+        pendingInvokeByDialog.clear();
         mapProvider.getMAPServiceSupplementary().deactivate();
         mapProvider.getMAPServiceSupplementary().removeMAPServiceListener(this);
         mapProvider.removeMAPDialogListener(this);
@@ -471,8 +502,98 @@ public class TestUssdClientMan extends TesterBase implements TestUssdClientManMB
     }
 
     private void doRemoveDialog() {
+        if (currentDialog != null) {
+            long id = currentDialog.getLocalDialogId();
+            autoDigitIndexByDialog.remove(id);
+            pendingInvokeByDialog.remove(id);
+        }
         currentDialog = null;
         // currentRequestDef = "";
+    }
+
+    /**
+     * Resolve auto-response payload. Supports a single string (classic) or a comma/pipe/semicolon
+     * sequence that advances per UnstructuredSS-Request on the same MAP dialog
+     * (e.g. {@code 1,2,3,4}). Override via {@code -Dussd.sim.autoResponseSequence=1,2,3,4}.
+     */
+    private String resolveAutoResponseSequence() {
+        String prop = System.getProperty("ussd.sim.autoResponseSequence");
+        if (prop != null && !prop.isBlank()) {
+            return prop.trim();
+        }
+        String env = System.getenv("USSD_SIM_AUTO_DIGITS");
+        if (env != null && !env.isBlank()) {
+            return env.trim();
+        }
+        return this.testerHost.getConfigurationData().getTestUssdClientConfigurationData().getAutoResponseString();
+    }
+
+    private int resolveAutoResponseDelayMs() {
+        String prop = System.getProperty("ussd.sim.autoResponseDelayMs");
+        if (prop != null && !prop.isBlank()) {
+            try {
+                return Math.max(0, Integer.parseInt(prop.trim()));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        String env = System.getenv("DIGIT_DELAY_MS");
+        if (env != null && !env.isBlank()) {
+            try {
+                return Math.max(0, Integer.parseInt(env.trim()));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return 300;
+    }
+
+    private String nextAutoDigit(long dialogId) {
+        String raw = resolveAutoResponseSequence();
+        if (raw == null || raw.isEmpty()) {
+            return "1";
+        }
+        String[] parts = raw.split("[,|;]");
+        if (parts.length <= 1) {
+            return raw.trim();
+        }
+        AtomicInteger idx = autoDigitIndexByDialog.computeIfAbsent(dialogId, id -> new AtomicInteger(0));
+        int i = idx.getAndIncrement();
+        if (i >= parts.length) {
+            // Stay on last digit if menu keeps asking.
+            i = parts.length - 1;
+            idx.set(parts.length);
+        }
+        return parts[i].trim();
+    }
+
+    private void sendUnstructuredResponseOnDialog(MAPDialogSupplementary curDialog, Long invId, String msg) {
+        if (curDialog == null || invId == null) {
+            return;
+        }
+        MAPProvider mapProvider = this.mapMan.getMAPStack().getMAPProvider();
+        USSDString ussdString = null;
+        if (msg != null && !msg.equals("")) {
+            try {
+                ussdString = mapProvider.getMAPParameterFactory().createUSSDString(msg,
+                        new CBSDataCodingSchemeImpl(this.testerHost.getConfigurationData()
+                                .getTestUssdClientConfigurationData().getDataCodingScheme()),
+                        null);
+            } catch (MAPException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            curDialog.addUnstructuredSSResponse(invId, new CBSDataCodingSchemeImpl(this.testerHost.getConfigurationData()
+                    .getTestUssdClientConfigurationData().getDataCodingScheme()), ussdString);
+            curDialog.send();
+            this.countUnstResp++;
+            String uData = this.createUssdMessageData(curDialog.getLocalDialogId(), this.testerHost.getConfigurationData()
+                    .getTestUssdClientConfigurationData().getDataCodingScheme(), null, null);
+            this.testerHost.sendNotif(SOURCE_NAME, "Sent: unstrSsResp: " + msg, uData, Level.DEBUG);
+            currentRequestDef += "Sent unstrSsResp=\"" + msg + "\";";
+        } catch (MAPException ex) {
+            this.testerHost.sendNotif(SOURCE_NAME,
+                    "Exception when sending UnstructuredSSResponse: " + ex.toString(), ex, Level.ERROR);
+        }
     }
 
     @Override
@@ -528,13 +649,12 @@ public class TestUssdClientMan extends TesterBase implements TestUssdClientManMB
             }
 
             ISDNAddressString msisdn = null;
-            if (this.testerHost.getConfigurationData().getTestUssdClientConfigurationData().getMsisdnAddress() != null
-                    && !this.testerHost.getConfigurationData().getTestUssdClientConfigurationData().getMsisdnAddress()
-                            .equals("")) {
+            String msisdnAddr = resolveMsisdnForDialog();
+            if (msisdnAddr != null && !msisdnAddr.equals("")) {
                 msisdn = mapProvider.getMAPParameterFactory().createISDNAddressString(
                         this.testerHost.getConfigurationData().getTestUssdClientConfigurationData().getMsisdnAddressNature(),
                         this.testerHost.getConfigurationData().getTestUssdClientConfigurationData().getMsisdnNumberingPlan(),
-                        this.testerHost.getConfigurationData().getTestUssdClientConfigurationData().getMsisdnAddress());
+                        msisdnAddr);
             }
 
             AlertingPattern alPattern = null;
@@ -729,36 +849,59 @@ public class TestUssdClientMan extends TesterBase implements TestUssdClientManMB
         if (!isStarted)
             return;
 
+        MAPDialogSupplementary dlg = ind.getMAPDialog();
+        long dialogId = dlg.getLocalDialogId();
+        pendingInvokeByDialog.put(dialogId, ind.getInvokeId());
+
         if (currentDialog == null) {
-            currentDialog = ind.getMAPDialog();
+            currentDialog = dlg;
         }
-        MAPDialogSupplementary curDialog = currentDialog;
-        if (curDialog != ind.getMAPDialog()) {
-            return;
+        // Manual mode still tracks "current" dialog; concurrent auto-digit uses per-dialog maps.
+        if (currentDialog == dlg) {
+            invokeId = ind.getInvokeId();
         }
 
         ussdEmptyDialogBeginFlag = 2;
-        invokeId = ind.getInvokeId();
 
         try {
             currentRequestDef += "Rcvd: unstrSsReq=\"" + ind.getUSSDString().getString(null) + "\";";
         } catch (MAPException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
         this.countUnstReq++;
         String uData = this
-                .createUssdMessageData(curDialog.getLocalDialogId(), ind.getDataCodingScheme().getCode(), null, null);
+                .createUssdMessageData(dialogId, ind.getDataCodingScheme().getCode(), null, null);
         try {
             this.testerHost.sendNotif(SOURCE_NAME, "Rcvd: unstrSsReq: " + ind.getUSSDString().getString(null), uData,
                     Level.DEBUG);
         } catch (MAPException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        if(this.testerHost.getConfigurationData().getTestUssdClientConfigurationData().isAutoResponseOnUnstructuredSSRequests()) {
-            performUnstructuredResponse(this.testerHost.getConfigurationData().getTestUssdClientConfigurationData().getAutoResponseString());
+        if (this.testerHost.getConfigurationData().getTestUssdClientConfigurationData()
+                .isAutoResponseOnUnstructuredSSRequests()) {
+            String digit = nextAutoDigit(dialogId);
+            Long inv = pendingInvokeByDialog.remove(dialogId);
+            if (inv == null) {
+                inv = ind.getInvokeId();
+            }
+            if (currentDialog == dlg) {
+                invokeId = null;
+            }
+            int delayMs = resolveAutoResponseDelayMs();
+            final Long invFinal = inv;
+            final MAPDialogSupplementary dlgFinal = dlg;
+            final String digitFinal = digit;
+            if (delayMs <= 0) {
+                sendUnstructuredResponseOnDialog(dlgFinal, invFinal, digitFinal);
+            } else {
+                this.testerHost.sendNotif(SOURCE_NAME,
+                        "Auto-digit scheduled digit=" + digitFinal + " delayMs=" + delayMs + " dialogId=" + dialogId,
+                        uData, Level.INFO);
+                autoDigitScheduler.schedule(
+                        () -> sendUnstructuredResponseOnDialog(dlgFinal, invFinal, digitFinal), delayMs,
+                        TimeUnit.MILLISECONDS);
+            }
         }
     }
 
@@ -845,6 +988,11 @@ public class TestUssdClientMan extends TesterBase implements TestUssdClientManMB
 
     @Override
     public void onDialogRelease(MAPDialog mapDialog) {
+        if (mapDialog != null) {
+            long id = mapDialog.getLocalDialogId();
+            autoDigitIndexByDialog.remove(id);
+            pendingInvokeByDialog.remove(id);
+        }
         if (this.currentDialog == mapDialog)
             this.doRemoveDialog();
 

@@ -78,9 +78,9 @@ import org.restcomm.protocols.ss7.tcap.asn.ApplicationContextName;
 import org.restcomm.protocols.ss7.tcap.asn.comp.Problem;
 
 import java.nio.file.Path;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import org.restcomm.protocols.ss7.map.load.ConsoleTui;
 
@@ -111,6 +111,9 @@ public class Client extends TestHarnessUssd {
     /** Dialogs that already failed (timeout/abort/reject) — Success only on clean release. */
     private final Set<Long> failedDialogs = ConcurrentHashMap.newKeySet();
 
+    /** Per-dialog index into {@link #DIGIT_SEQ} for UnstructuredSS-Request auto replies. */
+    private final ConcurrentHashMap<Long, AtomicInteger> digitIndexByDialog = new ConcurrentHashMap<>();
+
     // Constant per-run request objects — built once, reused every message (avoids re-creating
     // addresses/global-titles/app-context on each initiateUSSD). Only the random MSISDN/USSD
     // string is built per message.
@@ -118,6 +121,13 @@ public class Client extends TestHarnessUssd {
     private SccpAddress cClientAddr, cServerAddr;
     private MAPApplicationContext cAppCtx;
     private CBSDataCodingScheme cDcs;
+
+    /** USSD MO string; if it contains {@code %}, formatted with a random int (load uniqueness). */
+    private static String SHORT_CODE = System.getProperty("ss7.load.shortCode", "*125*+3162%06d#");
+    /** Comma-separated DT replies on UnstructuredSS-Request (cycles / last-wins when exhausted). */
+    private static String[] DIGIT_SEQ = parseDigitSeq(System.getProperty("ss7.load.digits", "1"));
+    /** Empty = random MSISDN per dialog; else fixed. */
+    private static String FIXED_MSISDN = System.getProperty("ss7.load.msisdn", "");
 
     /**
      * Build stack from JSON, register listeners, start ASP, launch DialogInitiator threads.
@@ -207,10 +217,14 @@ public class Client extends TestHarnessUssd {
                 .createNewDialog(cAppCtx, cClientAddr, cOrigRef, cServerAddr, cDestRef);
 
         int random = 8000000 + java.util.concurrent.ThreadLocalRandom.current().nextInt(1000000);
-        USSDString ussdString = this.mapProvider.getMAPParameterFactory().createUSSDString("*125*+3162" + random + "#", null, null);
+        String ussdText = formatShortCode(SHORT_CODE, random);
+        USSDString ussdString = this.mapProvider.getMAPParameterFactory().createUSSDString(ussdText, null, null);
 
+        String msisdnDigits = (FIXED_MSISDN == null || FIXED_MSISDN.isBlank())
+                ? ("3162" + random)
+                : FIXED_MSISDN.trim();
         ISDNAddressString msisdn = this.mapProvider.getMAPParameterFactory()
-                .createISDNAddressString(AddressNature.international_number, NumberingPlan.ISDN, "3162" + random);
+                .createISDNAddressString(AddressNature.international_number, NumberingPlan.ISDN, msisdnDigits);
 
         mapDialog.addProcessUnstructuredSSRequest(cDcs, ussdString, null, msisdn);
 
@@ -331,6 +345,7 @@ public class Client extends TestHarnessUssd {
         if (!failedDialogs.remove(mapDialog.getLocalDialogId())) {
             this.csvWriter.incrementCounter(SUCCESSFUL_DIALOGS);
         }
+        digitIndexByDialog.remove(mapDialog.getLocalDialogId());
         this.endCount.incrementAndGet();
 
         if (this.endCount.get() < NDIALOGS) {
@@ -391,18 +406,55 @@ public class Client extends TestHarnessUssd {
 
         try {
             CBSDataCodingScheme ussdDataCodingScheme = new CBSDataCodingSchemeImpl(0x0f);
-            USSDString ussdString = this.mapProvider.getMAPParameterFactory().createUSSDString("1", null, null);
-            AddressString msisdn = this.mapProvider.getMAPParameterFactory()
-                    .createAddressString(AddressNature.international_number, NumberingPlan.ISDN, "31628838002");
+            String digit = nextDigit(mapDialog.getLocalDialogId());
+            USSDString ussdString = this.mapProvider.getMAPParameterFactory().createUSSDString(digit, null, null);
 
             mapDialog.addUnstructuredSSResponse(unstructuredSSRequest.getInvokeId(), ussdDataCodingScheme, ussdString);
             mapDialog.send();
             if (java.util.concurrent.ThreadLocalRandom.current().nextInt(100) == 0) {
-                log.info("Sent USSD dialog to DPC={} SSN={}", DESTINATION_PC, USSD_SSN);
+                log.info("Sent USSD DT digit={} to DPC={} SSN={}", digit, DESTINATION_PC, USSD_SSN);
             }
         } catch (MAPException e) {
             log.error("Error sending UnstructuredSSResponse Dialog={}", mapDialog.getLocalDialogId());
         }
+    }
+
+    private static String formatShortCode(String template, int random) {
+        if (template == null || template.isBlank()) {
+            return "*125#";
+        }
+        if (template.indexOf('%') >= 0) {
+            try {
+                return String.format(template, random);
+            } catch (Exception e) {
+                return template;
+            }
+        }
+        return template;
+    }
+
+    private static String[] parseDigitSeq(String csv) {
+        if (csv == null || csv.isBlank()) {
+            return new String[] { "1" };
+        }
+        String[] parts = csv.split(",");
+        java.util.ArrayList<String> out = new java.util.ArrayList<>();
+        for (String p : parts) {
+            String t = p.trim();
+            if (!t.isEmpty()) {
+                out.add(t);
+            }
+        }
+        return out.isEmpty() ? new String[] { "1" } : out.toArray(new String[0]);
+    }
+
+    private String nextDigit(long dialogId) {
+        AtomicInteger idx = digitIndexByDialog.computeIfAbsent(dialogId, id -> new AtomicInteger(0));
+        int i = idx.getAndIncrement();
+        if (i >= DIGIT_SEQ.length) {
+            return DIGIT_SEQ[DIGIT_SEQ.length - 1];
+        }
+        return DIGIT_SEQ[i];
     }
 
     @Override
@@ -497,6 +549,13 @@ public class Client extends TestHarnessUssd {
                 Runtime.getRuntime().availableProcessors() * 2);
         SCCP_CLIENT_ADDRESS = System.getProperty("ss7.load.clientAddress", "1111112");
         SCCP_SERVER_ADDRESS = System.getProperty("ss7.load.serverAddress", "9960639999");
+        ORIGINATING_PC = Integer.getInteger("ss7.load.origPc", ORIGINATING_PC);
+        DESTINATION_PC = Integer.getInteger("ss7.load.destPc", DESTINATION_PC);
+        USSD_SSN = Integer.getInteger("ss7.load.ussdSsn", USSD_SSN);
+        MSC_SSN = Integer.getInteger("ss7.load.mscSsn", MSC_SSN);
+        SHORT_CODE = System.getProperty("ss7.load.shortCode", SHORT_CODE);
+        DIGIT_SEQ = parseDigitSeq(System.getProperty("ss7.load.digits", "1"));
+        FIXED_MSISDN = System.getProperty("ss7.load.msisdn", FIXED_MSISDN);
 
         System.out.println("Config      : " + configPath);
         System.out.println("NDIALOGS    : " + NDIALOGS);
@@ -505,6 +564,10 @@ public class Client extends TestHarnessUssd {
         System.out.println("Sender threads: " + SENDING_MESSAGE_THREAD_COUNT);
         System.out.println("Client addr : " + SCCP_CLIENT_ADDRESS);
         System.out.println("Server addr : " + SCCP_SERVER_ADDRESS);
+        System.out.println("shortCode   : " + SHORT_CODE);
+        System.out.println("digits      : " + String.join(",", DIGIT_SEQ));
+        System.out.println("msisdn      : " + (FIXED_MSISDN == null || FIXED_MSISDN.isBlank() ? "(random)" : FIXED_MSISDN));
+        System.out.println("OPC/DPC/SSN : " + ORIGINATING_PC + "/" + DESTINATION_PC + "/ussd=" + USSD_SSN);
 
         final Client client = new Client();
         client.endCount.set(RAMP_UP_PERIOD);
