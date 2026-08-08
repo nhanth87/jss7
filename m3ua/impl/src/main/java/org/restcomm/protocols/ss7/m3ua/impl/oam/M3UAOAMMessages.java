@@ -50,6 +50,8 @@ public interface M3UAOAMMessages {
 
     String CREATE_AS_FAIL_NAME_EXIST = "Creation of AS failed. Other AS with name=%s already exist";
 
+    String CREATE_AS_FAIL_RC_EXIST = "Creation of AS failed. Routing Context=%d already taken by AS name=%s";
+
     String CREATE_ASP_SUCCESSFUL = "Successfully created ASP name=%s on stack=%s";
 
     String DESTROY_ASP_SUCCESSFUL = "Successfully destroyed ASP name=%s from stack=%s";

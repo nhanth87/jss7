@@ -147,6 +147,7 @@ public final class Ss7ConfigLoader {
                     orDefault(a.functionality(), "as"), a.ipsp(),
                     orDefault(a.exchangeType(), "se"),
                     a.routingContext() == null ? 0L : a.routingContext(),
+                    nz(a.routingContexts()),
                     a.networkAppearance(),
                     a.minAspActiveForLb() > 0 ? a.minAspActiveForLb() : 1,
                     nz(a.links())));

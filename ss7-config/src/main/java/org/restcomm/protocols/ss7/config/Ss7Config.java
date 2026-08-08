@@ -102,7 +102,8 @@ public record Ss7Config(
             @JsonProperty("functionality")    String functionality, // as | sgw | ipsp   (default as)
             @JsonProperty("ipsp")             String ipsp,          // client | server | null
             @JsonProperty("exchangeType")     String exchangeType,  // se | de   (default se)
-            @JsonProperty("routingContext")   Long routingContext,
+            @JsonProperty("routingContext")   Long routingContext,  // single RC (legacy); ignored when routingContexts set
+            @JsonProperty("routingContexts")  List<Long> routingContexts, // multi-RC bind; preferred when non-empty
             @JsonProperty("networkAppearance") Long networkAppearance,
             @JsonProperty("minAspActiveForLb") int minAspActiveForLb,
             @JsonProperty("links")            List<String> links    // FK -> Link.name

@@ -396,7 +396,23 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
             throw new Exception(String.format(M3UAOAMMessages.CREATE_AS_FAIL_NAME_EXIST, asName));
         }
 
-        // TODO check if RC is already taken?
+        // Enforce 1 RC → at most 1 AS so inbound getAsp(rc) stays deterministic.
+        if (routingContext != null && routingContext.getRoutingContexts() != null) {
+            for (long newRc : routingContext.getRoutingContexts()) {
+                for (As existing : this.appServers) {
+                    RoutingContext existingRc = existing.getRoutingContext();
+                    if (existingRc == null || existingRc.getRoutingContexts() == null) {
+                        continue;
+                    }
+                    for (long taken : existingRc.getRoutingContexts()) {
+                        if (taken == newRc) {
+                            throw new Exception(String.format(M3UAOAMMessages.CREATE_AS_FAIL_RC_EXIST, newRc,
+                                    existing.getName()));
+                        }
+                    }
+                }
+            }
+        }
 
         if (exchangeType == null) {
             exchangeType = ExchangeType.SE;
@@ -1181,6 +1197,15 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
         }
     }
 
+    /**
+     * Send an MTP3 transfer message over M3UA.
+     * <p>
+     * Outbound DATA currently copies the AS's full {@link RoutingContext} parameter
+     * (which may contain multiple RC values when the AS is multi-RC bound). RFC 4666
+     * recommends a single RC per DATA message; selecting one RC (e.g. {@code rcs[0]}
+     * or a route→RC map) is left as a follow-up. Behavior is intentionally unchanged
+     * for backward compatibility.
+     */
     @Override
     public void sendMessage(Mtp3TransferPrimitive mtp3TransferPrimitive) throws IOException {
         ProtocolData data = this.parameterFactory.createProtocolData(mtp3TransferPrimitive.getOpc(),

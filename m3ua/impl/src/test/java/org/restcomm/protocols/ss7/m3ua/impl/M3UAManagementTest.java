@@ -3,6 +3,9 @@ package org.restcomm.protocols.ss7.m3ua.impl;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 import io.netty.buffer.ByteBufAllocator;
 
 import java.io.BufferedWriter;
@@ -140,6 +143,48 @@ public class M3UAManagementTest {
 
         m3uaMgmt1.destroyAs("AS1");
 
+    }
+
+    /**
+     * Multi-RC bind: getAsp must match any RC owned by the AS, not only rcs[0].
+     */
+    @Test
+    public void testMultiRcGetAspResolvesAnyRc() throws Exception {
+        this.transportManagement.addAssociation(null, 0, null, 0, "ASPAssocMulti");
+
+        RoutingContext rc = factory.createRoutingContext(new long[] { 12, 13 });
+        this.m3uaMgmt.createAs("AS-MULTI", Functionality.AS, ExchangeType.SE, null, rc, null, 1, null);
+        AspFactoryImpl aspFactory = (AspFactoryImpl) this.m3uaMgmt.createAspFactory("ASP-MULTI", "ASPAssocMulti", false);
+        this.m3uaMgmt.assignAspToAs("AS-MULTI", "ASP-MULTI");
+
+        assertNotNull(aspFactory.getAsp(12));
+        assertNotNull(aspFactory.getAsp(13));
+        assertNull(aspFactory.getAsp(99));
+        assertEquals("AS-MULTI", aspFactory.getAsp(13).getAs().getName());
+    }
+
+    /**
+     * Two AS must not share any Routing Context value.
+     */
+    @Test
+    public void testCreateAsRejectsDuplicateRoutingContext() throws Exception {
+        RoutingContext rc1 = factory.createRoutingContext(new long[] { 12, 13 });
+        this.m3uaMgmt.createAs("AS-RC-A", Functionality.AS, ExchangeType.SE, null, rc1, null, 1, null);
+
+        try {
+            RoutingContext overlap = factory.createRoutingContext(new long[] { 13 });
+            this.m3uaMgmt.createAs("AS-RC-B", Functionality.AS, ExchangeType.SE, null, overlap, null, 1, null);
+            fail("expected Exception for duplicate RC 13");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("13"), "message should mention RC 13: " + e.getMessage());
+            assertTrue(e.getMessage().contains("AS-RC-A"), "message should mention owning AS: " + e.getMessage());
+        }
+
+        // Non-overlapping RC is fine
+        RoutingContext rc2 = factory.createRoutingContext(new long[] { 14 });
+        As asB = this.m3uaMgmt.createAs("AS-RC-B", Functionality.AS, ExchangeType.SE, null, rc2, null, 1, null);
+        assertNotNull(asB);
+        assertEquals(2, this.m3uaMgmt.getAppServers().size());
     }
 
     /**

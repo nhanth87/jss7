@@ -61,6 +61,51 @@ public class Ss7ConfigLoaderTest extends TestCase {
         assertEquals(List.of(8), Ss7ConfigLoader.extraSsns(c));
     }
 
+    // ── multi-RC bind (routingContexts preferred over single routingContext) ──
+    public void testRoutingContextsPreferredOverSingle() {
+        String json = """
+            {
+              "sctp": { "links": [ { "name": "L1", "local": "1.1.1.1:1", "peer": "2.2.2.2:2" } ] },
+              "m3ua": { "as": [ {
+                  "name": "AS1", "mode": "loadshare", "links": ["L1"],
+                  "routingContext": 12,
+                  "routingContexts": [12, 13]
+                } ] },
+              "sccp": { "localPoints": [ { "pc": 1, "networkId": 0 } ], "routing": [] },
+              "services": [ { "name": "s", "ssn": 6, "protocol": "map" } ]
+            }
+            """;
+        Ss7Config c = Ss7ConfigLoader.parse(json);
+        Ss7Config.As as = c.m3ua().as().get(0);
+        assertEquals(Long.valueOf(12L), as.routingContext());
+        assertEquals(List.of(12L, 13L), as.routingContexts());
+        long[] resolved = Ss7StackBuilder.resolveRoutingContexts(as);
+        assertEquals(2, resolved.length);
+        assertEquals(12L, resolved[0]);
+        assertEquals(13L, resolved[1]);
+    }
+
+    public void testSingleRoutingContextFallback() {
+        String json = """
+            {
+              "sctp": { "links": [ { "name": "L1", "local": "1.1.1.1:1", "peer": "2.2.2.2:2" } ] },
+              "m3ua": { "as": [ {
+                  "name": "AS1", "mode": "loadshare", "links": ["L1"],
+                  "routingContext": 12
+                } ] },
+              "sccp": { "localPoints": [ { "pc": 1, "networkId": 0 } ], "routing": [] },
+              "services": [ { "name": "s", "ssn": 6, "protocol": "map" } ]
+            }
+            """;
+        Ss7Config c = Ss7ConfigLoader.parse(json);
+        Ss7Config.As as = c.m3ua().as().get(0);
+        assertEquals(Long.valueOf(12L), as.routingContext());
+        assertTrue(as.routingContexts() == null || as.routingContexts().isEmpty());
+        long[] resolved = Ss7StackBuilder.resolveRoutingContexts(as);
+        assertEquals(1, resolved.length);
+        assertEquals(12L, resolved[0]);
+    }
+
     // ── derived defaults ──────────────────────────────────────
     public void testDefaultsApplied() {
         String json = """

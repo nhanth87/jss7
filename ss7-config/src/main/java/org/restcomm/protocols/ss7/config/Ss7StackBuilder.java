@@ -202,7 +202,7 @@ public final class Ss7StackBuilder {
         int aspIdSeq = 1;
 
         for (Ss7Config.As as : m.as()) {
-            RoutingContext rc = factory.createRoutingContext(new long[] { as.routingContext() });
+            RoutingContext rc = factory.createRoutingContext(resolveRoutingContexts(as));
             TrafficModeType tmt = factory.createTrafficModeType(trafficMode(as.mode()));
             NetworkAppearance na = as.networkAppearance() == null ? null
                     : factory.createNetworkAppearance(as.networkAppearance());
@@ -430,6 +430,22 @@ public final class Ss7StackBuilder {
             case "unknown"    -> NatureOfAddress.UNKNOWN;
             default           -> NatureOfAddress.INTERNATIONAL;
         };
+    }
+
+    /**
+     * Prefer multi-RC list when non-empty; otherwise fall back to the legacy single
+     * {@code routingContext} field (0 when null).
+     */
+    static long[] resolveRoutingContexts(Ss7Config.As as) {
+        if (as.routingContexts() != null && !as.routingContexts().isEmpty()) {
+            long[] rcs = new long[as.routingContexts().size()];
+            for (int i = 0; i < rcs.length; i++) {
+                Long v = as.routingContexts().get(i);
+                rcs[i] = v == null ? 0L : v;
+            }
+            return rcs;
+        }
+        return new long[] { as.routingContext() == null ? 0L : as.routingContext() };
     }
 
     // ── "ip:port" ─────────────────────────────────────────────

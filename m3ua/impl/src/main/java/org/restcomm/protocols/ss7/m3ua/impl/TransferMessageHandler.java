@@ -3,6 +3,8 @@ package org.restcomm.protocols.ss7.m3ua.impl;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.restcomm.protocols.ss7.m3ua.As;
+import org.restcomm.protocols.ss7.m3ua.State;
 import org.restcomm.protocols.ss7.m3ua.impl.fsm.FSM;
 import org.restcomm.protocols.ss7.m3ua.message.transfer.PayloadData;
 import org.restcomm.protocols.ss7.m3ua.parameter.ErrorCode;
@@ -45,21 +47,7 @@ public class TransferMessageHandler extends MessageHandler {
                 return;
             }
 
-            FSM fsm = getAspFSMForRxPayload(aspImpl);
-            AspState aspState = AspState.getState(fsm.getState().getName());
-
-            if (aspState == AspState.ACTIVE) {
-                ProtocolData protocolData = payload.getData();
-                Mtp3TransferPrimitive mtp3TransferPrimitive = this.mtp3TransferPrimitiveFactory.createMtp3TransferPrimitive(
-                        protocolData.getSI(), protocolData.getNI(), protocolData.getMP(), protocolData.getOpc(),
-                        protocolData.getDpc(), protocolData.getSLS(), protocolData.getData());
-                ((AsImpl) aspImpl.getAs()).getM3UAManagement().sendTransferMessageToLocalUser(mtp3TransferPrimitive,
-                        payload.getData().getSLS());
-            } else {
-                logger.error(String.format(
-                        "Rx : PayloadData for Aspfactory=%s with null RoutingContext. But ASP State=%s. Message=%s",
-                        this.aspFactoryImpl.getName(), aspState, payload));
-            }
+            deliverIfAllowed(aspImpl, payload, null);
 
         } else {
             // Payload is always for single AS
@@ -78,21 +66,53 @@ public class TransferMessageHandler extends MessageHandler {
                 return;
             }
 
-            FSM fsm = getAspFSMForRxPayload(aspImpl);
-            AspState aspState = AspState.getState(fsm.getState().getName());
-
-            if (aspState == AspState.ACTIVE) {
-                ProtocolData protocolData = payload.getData();
-                Mtp3TransferPrimitive mtp3TransferPrimitive = this.mtp3TransferPrimitiveFactory.createMtp3TransferPrimitive(
-                        protocolData.getSI(), protocolData.getNI(), protocolData.getMP(), protocolData.getOpc(),
-                        protocolData.getDpc(), protocolData.getSLS(), protocolData.getData());
-                ((AsImpl) aspImpl.getAs()).getM3UAManagement().sendTransferMessageToLocalUser(mtp3TransferPrimitive,
-                        payload.getData().getSLS());
-            } else {
-                logger.error(String.format(
-                        "Rx : PayloadData for Aspfactory=%s for RoutingContext=%s. But ASP State=%s. Message=%s",
-                        this.aspFactoryImpl.getName(), rc, aspState, payload));
-            }
+            deliverIfAllowed(aspImpl, payload, rc);
         }
+    }
+
+    /**
+     * Deliver MTP3 user data when this ASP is ACTIVE, or when the parent AS is already ACTIVE
+     * via another ASP (dual-homed / loadshare). Peers often return TCAP on a different SCTP
+     * association than the outbound request; dropping that PayloadData because the receive-side
+     * ASP FSM is still DOWN/INACTIVE black-holes SRI-SM answers while {@code ss7.live} stays true
+     * on the ACTIVE sibling.
+     */
+    private void deliverIfAllowed(AspImpl aspImpl, PayloadData payload, RoutingContext rc) {
+        FSM fsm = getAspFSMForRxPayload(aspImpl);
+        AspState aspState = AspState.getState(fsm.getState().getName());
+
+        if (aspState == AspState.ACTIVE || asActive(aspImpl)) {
+            if (aspState != AspState.ACTIVE && logger.isWarnEnabled()) {
+                logger.warn(String.format(
+                        "Rx : PayloadData for Aspfactory=%s ASP State=%s but AS ACTIVE — delivering (dual-homed). Message=%s",
+                        this.aspFactoryImpl.getName(), aspState, payload));
+            }
+            ProtocolData protocolData = payload.getData();
+            Mtp3TransferPrimitive mtp3TransferPrimitive = this.mtp3TransferPrimitiveFactory.createMtp3TransferPrimitive(
+                    protocolData.getSI(), protocolData.getNI(), protocolData.getMP(), protocolData.getOpc(),
+                    protocolData.getDpc(), protocolData.getSLS(), protocolData.getData());
+            ((AsImpl) aspImpl.getAs()).getM3UAManagement().sendTransferMessageToLocalUser(mtp3TransferPrimitive,
+                    payload.getData().getSLS());
+            return;
+        }
+
+        if (rc == null) {
+            logger.error(String.format(
+                    "Rx : PayloadData for Aspfactory=%s with null RoutingContext. But ASP State=%s. Message=%s",
+                    this.aspFactoryImpl.getName(), aspState, payload));
+        } else {
+            logger.error(String.format(
+                    "Rx : PayloadData for Aspfactory=%s for RoutingContext=%s. But ASP State=%s. Message=%s",
+                    this.aspFactoryImpl.getName(), rc, aspState, payload));
+        }
+    }
+
+    private static boolean asActive(AspImpl aspImpl) {
+        As as = aspImpl.getAs();
+        if (as == null) {
+            return false;
+        }
+        State state = as.getState();
+        return state != null && AsState.ACTIVE.getName().equals(state.getName());
     }
 }

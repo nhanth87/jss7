@@ -60,6 +60,7 @@ import org.restcomm.protocols.ss7.m3ua.message.ssnm.SignallingCongestion;
 import org.restcomm.protocols.ss7.m3ua.message.transfer.PayloadData;
 import org.restcomm.protocols.ss7.m3ua.parameter.ASPIdentifier;
 import org.restcomm.protocols.ss7.m3ua.parameter.ParameterFactory;
+import org.restcomm.protocols.ss7.m3ua.parameter.RoutingContext;
 import org.restcomm.protocols.ss7.mtp.Mtp3EndCongestionPrimitive;
 import org.restcomm.protocols.ss7.mtp.Mtp3StatusCause;
 import org.restcomm.protocols.ss7.mtp.Mtp3StatusPrimitive;
@@ -669,12 +670,25 @@ public class AspFactoryImpl implements AssociationListener, AspFactory {
         return new CopyOnWriteArrayList<Asp>(this.aspList);
     }
 
+    /**
+     * Resolve the ASP whose AS owns {@code rc}. An AS may bind multiple Routing
+     * Contexts (N:1); any listed value matches.
+     */
     protected AspImpl getAsp(long rc) {
         for (Asp asp : aspList) {
             AspImpl aspImpl = (AspImpl) asp;
-            if (aspImpl.getAs().getRoutingContext() != null
-                    && aspImpl.getAs().getRoutingContext().getRoutingContexts()[0] == rc) {
-                return aspImpl;
+            RoutingContext arc = aspImpl.getAs().getRoutingContext();
+            if (arc == null) {
+                continue;
+            }
+            long[] rcs = arc.getRoutingContexts();
+            if (rcs == null) {
+                continue;
+            }
+            for (long v : rcs) {
+                if (v == rc) {
+                    return aspImpl;
+                }
             }
         }
         return null;
