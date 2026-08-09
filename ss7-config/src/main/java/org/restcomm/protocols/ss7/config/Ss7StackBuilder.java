@@ -300,17 +300,20 @@ public final class Ss7StackBuilder {
         // routing: each rule declares its own translation target inline
         int addrId = 1, ruleId = 1;
         for (Ss7Config.Rule rule : s.routing()) {
-            SccpAddress primary = toSccpAddress(rule.to());
+            // Routing-address networkId must match the rule — inbound GTT copies
+            // address.networkId onto the message (SccpExtModuleImpl), and wiping it
+            // to 0 breaks multi-plane stacks (Digicom live=0 / lab=1).
+            SccpAddress primary = toSccpAddress(rule.to(), rule.networkId());
             int primaryId = addrId++;
             routerExt.addRoutingAddress(primaryId, primary);
 
             int secondaryId = -1;
             if (rule.backup() != null) {
                 secondaryId = addrId++;
-                routerExt.addRoutingAddress(secondaryId, toSccpAddress(rule.backup()));
+                routerExt.addRoutingAddress(secondaryId, toSccpAddress(rule.backup(), rule.networkId()));
             }
 
-            SccpAddress pattern = toSccpAddress(rule.match());
+            SccpAddress pattern = toSccpAddress(rule.match(), rule.networkId());
             RuleType rt = secondaryId >= 0 ? RuleType.DOMINANT : RuleType.SOLITARY;
             String mask = rule.mask() != null ? rule.mask() : "K";
             routerExt.addRule(ruleId++, rt, LoadSharingAlgorithm.Bit0, origination(rule.from()),
@@ -346,14 +349,18 @@ public final class Ss7StackBuilder {
 
     // ── address building (derives the SCCP address indicator) ──
     private SccpAddress toSccpAddress(Ss7Config.Addr a) {
+        return toSccpAddress(a, 0);
+    }
+
+    private SccpAddress toSccpAddress(Ss7Config.Addr a, int networkId) {
         int pc = a.pc() == null ? 0 : a.pc();
         int ssn = a.ssn() == null ? 0 : a.ssn();
         boolean hasGt = a.gt() != null && !a.gt().isBlank();
         if (hasGt) {
             GlobalTitle gt = globalTitle(a);
-            return new SccpAddressImpl(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, gt, pc, ssn);
+            return new SccpAddressImpl(RoutingIndicator.ROUTING_BASED_ON_GLOBAL_TITLE, gt, pc, ssn, networkId);
         }
-        return new SccpAddressImpl(RoutingIndicator.ROUTING_BASED_ON_DPC_AND_SSN, null, pc, ssn);
+        return new SccpAddressImpl(RoutingIndicator.ROUTING_BASED_ON_DPC_AND_SSN, null, pc, ssn, networkId);
     }
 
     private GlobalTitle globalTitle(Ss7Config.Addr a) {
