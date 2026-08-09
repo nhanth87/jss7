@@ -13,6 +13,7 @@ import org.restcomm.protocols.ss7.map.api.service.pdpContextActivation.MAPServic
 import org.restcomm.protocols.ss7.map.api.service.sms.MAPServiceSms;
 import org.restcomm.protocols.ss7.map.api.service.supplementary.MAPServiceSupplementary;
 import org.restcomm.protocols.ss7.sccp.NetworkIdState;
+import org.restcomm.protocols.ss7.tcap.api.tc.dialog.Dialog;
 
 /**
  *
@@ -58,6 +59,19 @@ public interface MAPProvider extends Serializable {
      * @return
      */
     MAPDialog getMAPDialog(Long dialogId);
+
+    /**
+     * After TCAP {@code importDialog}: create a minimal MAP dialog wrapper for
+     * the already-imported TCAP dialog so CONTINUE can be processed.
+     *
+     * <p>Does <strong>not</strong> restore MAP invoke timers or outstanding
+     * MAP operations — only the wrapper + ACN association.
+     *
+     * @param tcapDialog imported TCAP dialog (must already be in TCAP provider)
+     * @return existing MAP dialog if present; otherwise a new ACTIVE wrapper
+     * @throws MAPException when ACN missing / unsupported / service inactive
+     */
+    MAPDialog rehydrateDialogFromTcap(Dialog tcapDialog) throws MAPException;
 
     /**
      *

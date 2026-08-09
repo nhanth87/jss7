@@ -39,6 +39,7 @@ import org.restcomm.protocols.ss7.map.api.dialog.MAPRefuseReason;
 import org.restcomm.protocols.ss7.map.api.dialog.MAPUserAbortChoice;
 import org.restcomm.protocols.ss7.map.api.dialog.Reason;
 import org.restcomm.protocols.ss7.map.api.dialog.ServingCheckData;
+import org.restcomm.protocols.ss7.map.api.dialog.ServingCheckResult;
 import org.restcomm.protocols.ss7.map.api.errors.MAPErrorCode;
 import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessage;
 import org.restcomm.protocols.ss7.map.api.errors.MAPErrorMessageFactory;
@@ -291,6 +292,55 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
         //synchronized (this.dialogs) {
             return this.dialogs.get(dialogId);
         //}
+    }
+
+    /**
+     * Minimal MAP wrapper after TCAP importDialog (CONTINUE takeover).
+     * Restores invoke-id space on the TCAP side only — no MAP invoke timers.
+     */
+    @Override
+    public MAPDialog rehydrateDialogFromTcap(Dialog tcapDialog) throws MAPException {
+        if (tcapDialog == null) {
+            throw new MAPException("tcapDialog is null");
+        }
+        Long localId = tcapDialog.getLocalDialogId();
+        MAPDialog existing = this.getMAPDialog(localId);
+        if (existing != null) {
+            return existing;
+        }
+
+        ApplicationContextName acn = tcapDialog.getApplicationContextName();
+        if (acn == null || acn.getOid() == null) {
+            throw new MAPException("Imported TCAP dialog has no ApplicationContextName; cannot rehydrate MAP");
+        }
+        MAPApplicationContext mapAppCtx = MAPApplicationContext.getInstance(acn.getOid());
+        if (mapAppCtx == null) {
+            throw new MAPException("Unrecognizable ApplicationContextName on imported dialog id=" + localId);
+        }
+
+        MAPServiceBase perfSer = null;
+        for (MAPServiceBase ser : this.mapServices) {
+            ServingCheckData chkRes = ser.isServingService(mapAppCtx);
+            if (chkRes.getResult() == ServingCheckResult.AC_Serving) {
+                perfSer = ser;
+                break;
+            }
+        }
+        if (perfSer == null) {
+            throw new MAPException("No MAP service for ACN on imported dialog id=" + localId);
+        }
+        if (!perfSer.isActivated()) {
+            throw new MAPException("MAP service not activated for imported dialog id=" + localId);
+        }
+
+        MAPDialogImpl mapDialogImpl = ((MAPServiceBaseImpl) perfSer).createNewDialogIncoming(mapAppCtx, tcapDialog);
+        this.addDialog(mapDialogImpl);
+        mapDialogImpl.tcapMessageType = MessageType.Continue;
+        mapDialogImpl.setState(MAPDialogState.ACTIVE);
+        mapDialogImpl.delayedAreaState = MAPDialogImpl.DelayedAreaState.No;
+        loger.info("MAP dialog rehydrated from imported TCAP dialog id=" + localId
+                + " acn=" + mapAppCtx.getApplicationContextName());
+        return mapDialogImpl;
     }
 
     public void start() {
@@ -767,13 +817,22 @@ public class MAPProviderImpl implements MAPProvider, TCListener {
         }
 
         if (mapDialogImpl == null) {
-            loger.error("MAP Dialog not found for Dialog Id " + tcapDialog.getLocalDialogId());
+            // TCAP CONTINUE takeover: dialog was importDialog'd without MAP wrapper.
             try {
-                this.fireTCAbortProvider(tcapDialog, MAPProviderAbortReason.abnormalDialogue, null, false);
+                MAPDialog rehydrated = this.rehydrateDialogFromTcap(tcapDialog);
+                mapDialogImpl = (MAPDialogImpl) rehydrated;
+                loger.info("MAP dialog auto-rehydrated on TC-CONTINUE for Dialog Id "
+                        + tcapDialog.getLocalDialogId());
             } catch (MAPException e) {
-                loger.error("Error while firing TC-U-ABORT. ", e);
+                loger.error("MAP Dialog not found for Dialog Id " + tcapDialog.getLocalDialogId()
+                        + " and rehydrate failed: " + e.getMessage());
+                try {
+                    this.fireTCAbortProvider(tcapDialog, MAPProviderAbortReason.abnormalDialogue, null, false);
+                } catch (MAPException e2) {
+                    loger.error("Error while firing TC-U-ABORT. ", e2);
+                }
+                return;
             }
-            return;
         }
 
         try {
