@@ -28,4 +28,16 @@ public interface PayloadData extends M3UAMessage {
 
     void setCorrelationId(CorrelationId correlationId);
 
+    /**
+     * Local-only preferred ASP name for sticky mid-dialog writes (not an M3UA parameter).
+     *
+     * @return ASP name, or {@code null} to use SLS loadshare
+     */
+    String getPreferredAspName();
+
+    /**
+     * Prefer this ASP when ACTIVE; ignored when null/blank.
+     */
+    void setPreferredAspName(String preferredAspName);
+
 }

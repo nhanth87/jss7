@@ -33,6 +33,8 @@ public abstract class SccpMessageImpl implements SccpMessage {
     // These are MTP3 signaling information that will be set into a MTP3 message when sending to MTP3
     protected int outgoingDpc = -1;
     protected int networkId;
+    /** Local-only sticky M3UA ASP (ingress capture or NI pin); not on SCCP wire. */
+    protected String preferredAspName;
 
     protected SccpMessageImpl(int maxDataLen, int type, int sls, int localSsn) {
         this.isMtpOriginated = false;
@@ -113,6 +115,14 @@ public abstract class SccpMessageImpl implements SccpMessage {
 
     public void setNetworkId(int networkId) {
         this.networkId = networkId;
+    }
+
+    public String getPreferredAspName() {
+        return this.preferredAspName;
+    }
+
+    public void setPreferredAspName(String preferredAspName) {
+        this.preferredAspName = preferredAspName;
     }
 
     public abstract void decode(InputStream in, ParameterFactory factory, SccpProtocolVersion sccpProtocolVersion) throws ParseException;

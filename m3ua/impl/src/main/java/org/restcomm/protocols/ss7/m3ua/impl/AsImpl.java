@@ -615,59 +615,80 @@ public class AsImpl implements As {
             case ACTIVE:
                 boolean aspFound = false;
 
-                // TODO : Algo to select correct ASP
-
-                int aspIndex = (sls & this.aspSlsMask);
-                aspIndex = (aspIndex >> this.aspSlsShiftPlaces);
-
-                AspImpl aspCong = null;
-                for (int i = 0; i < this.appServerProcs.size(); i++) {
-
-                    AspImpl aspTemp = (AspImpl) this.appServerProcs.get(this.slsVsAspTable[aspIndex++]);
-
-                    FSM aspFsm;
-
-                    if (isASPLocalFsm) {
-                        aspFsm = aspTemp.getLocalFSM();
-                    } else {
-                        aspFsm = aspTemp.getPeerFSM();
-                    }
-
-                    if (AspState.getState(aspFsm.getState().getName()) == AspState.ACTIVE) {
-                        if (aspTemp.getAspFactory().getAssociation().getCongestionLevel() > 1) {
-                            aspCong = aspTemp;
-                        } else {
-                            aspTemp.getAspFactory().write(message);
+                // N–N multi-ASP (1 AS, N ASPs): mid-dialog sticky — receive-on-X → return-on-X.
+                // Prefer dialog-bound ASP when ACTIVE (bypass SLS loadshare). Not OVERRIDE /
+                // single-primary: any of N ASPs may own a dialog; new dialogs use ISPN LB upstream.
+                // Mid-dialog failover (default): preferred down → SLS among remaining ACTIVE of N.
+                // Fail-closed opt-in: reject when preferred is down (no ASP flip mid-dialog).
+                String preferredAspName = message.getPreferredAspName();
+                if (preferredAspName != null && !preferredAspName.isEmpty()) {
+                    AspImpl preferred = findAspByName(preferredAspName);
+                    if (preferred != null) {
+                        FSM preferredFsm = isASPLocalFsm ? preferred.getLocalFSM() : preferred.getPeerFSM();
+                        if (preferredFsm != null
+                                && AspState.getState(preferredFsm.getState().getName()) == AspState.ACTIVE) {
+                            // Congested preferred still used (sticky) — do not flip ASP mid-dialog.
+                            writeToAsp(preferred, message);
                             aspFound = true;
-
-                            if (aspTrafficListener != null) {
-                                try {
-                                    aspTrafficListener.onAspMessage(aspTemp.getName(), message.getData().getData());
-                                } catch (Exception e) {
-                                    logger.error(String.format(
-                                            "Error while calling aspTrafficListener=%s onAspMessage method for Asp=%s",
-                                            aspTrafficListener, aspTemp));
-                                }
+                            if (preferred.getAspFactory().getAssociation().getCongestionLevel() > 1
+                                    && logger.isInfoEnabled()) {
+                                logger.info(String.format(
+                                        "Tx : preferred ASP=%s congested but used for sticky N-N dialog (message=%s)",
+                                        preferredAspName, message));
                             }
-
-                            break;
+                        } else if (isPreferredAspFailClosed()) {
+                            logger.error(String.format(
+                                    "Tx : preferred ASP=%s not ACTIVE (fail-closed); dropping message=%s",
+                                    preferredAspName, message));
+                            throw new IOException(String.format(
+                                    "As name=%s preferred ASP=%s is not ACTIVE (fail-closed)", this.name,
+                                    preferredAspName));
+                        } else if (logger.isInfoEnabled()) {
+                            logger.info(String.format(
+                                    "Tx : preferred ASP=%s not ACTIVE; N-N failover via SLS among remaining ACTIVE ASPs (message=%s)",
+                                    preferredAspName, message));
                         }
+                    } else if (logger.isInfoEnabled()) {
+                        logger.info(String.format(
+                                "Tx : preferred ASP=%s not found on AS=%s; N-N SLS among ACTIVE ASPs",
+                                preferredAspName, this.name));
                     }
-                }// for
+                }
 
+                // No preferred ASP (new outbound without pin) or preferred unavailable + failover:
+                // classic SLS across all ACTIVE ASPs of this AS (N–N loadshare, not A-P).
                 if (!aspFound) {
-                    if (aspCong != null) {
-                        aspCong.getAspFactory().write(message);
-                        aspFound = true;
+                    int aspIndex = (sls & this.aspSlsMask);
+                    aspIndex = (aspIndex >> this.aspSlsShiftPlaces);
 
-                        if (aspTrafficListener != null) {
-                            try {
-                                aspTrafficListener.onAspMessage(aspCong.getName(), message.getData().getData());
-                            } catch (Exception e) {
-                                logger.error(String.format(
-                                        "Error while calling aspTrafficListener=%s onAspMessage method for Asp=%s",
-                                        aspTrafficListener, aspCong));
+                    AspImpl aspCong = null;
+                    for (int i = 0; i < this.appServerProcs.size(); i++) {
+
+                        AspImpl aspTemp = (AspImpl) this.appServerProcs.get(this.slsVsAspTable[aspIndex++]);
+
+                        FSM aspFsm;
+
+                        if (isASPLocalFsm) {
+                            aspFsm = aspTemp.getLocalFSM();
+                        } else {
+                            aspFsm = aspTemp.getPeerFSM();
+                        }
+
+                        if (AspState.getState(aspFsm.getState().getName()) == AspState.ACTIVE) {
+                            if (aspTemp.getAspFactory().getAssociation().getCongestionLevel() > 1) {
+                                aspCong = aspTemp;
+                            } else {
+                                writeToAsp(aspTemp, message);
+                                aspFound = true;
+                                break;
                             }
+                        }
+                    }// for
+
+                    if (!aspFound) {
+                        if (aspCong != null) {
+                            writeToAsp(aspCong, message);
+                            aspFound = true;
                         }
                     }
                 }
@@ -687,6 +708,45 @@ public class AsImpl implements As {
                 break;
             default:
                 throw new IOException(String.format("As name=%s is not ACTIVE", this.name));
+        }
+    }
+
+    /**
+     * Mid-dialog sticky ASP policy for <b>N–N</b> (1 AS, N ASPs — not A-P / not OVERRIDE-only).
+     * <ul>
+     *   <li>{@code false} (default): preferred ASP down → SLS among any remaining ACTIVE of N</li>
+     *   <li>{@code true}: fail-closed — reject write; no mid-dialog ASP flip</li>
+     * </ul>
+     * Property: {@code org.restcomm.protocols.ss7.m3ua.preferredAsp.failClosed}
+     */
+    static boolean isPreferredAspFailClosed() {
+        return Boolean.parseBoolean(
+                System.getProperty("org.restcomm.protocols.ss7.m3ua.preferredAsp.failClosed", "false"));
+    }
+
+    private AspImpl findAspByName(String aspName) {
+        if (aspName == null) {
+            return null;
+        }
+        for (Asp asp : this.appServerProcs) {
+            if (aspName.equals(asp.getName())) {
+                return (AspImpl) asp;
+            }
+        }
+        return null;
+    }
+
+    private void writeToAsp(AspImpl aspTemp, PayloadData message) throws IOException {
+        aspTemp.getAspFactory().write(message);
+
+        if (aspTrafficListener != null) {
+            try {
+                aspTrafficListener.onAspMessage(aspTemp.getName(), message.getData().getData());
+            } catch (Exception e) {
+                logger.error(String.format(
+                        "Error while calling aspTrafficListener=%s onAspMessage method for Asp=%s",
+                        aspTrafficListener, aspTemp));
+            }
         }
     }
 

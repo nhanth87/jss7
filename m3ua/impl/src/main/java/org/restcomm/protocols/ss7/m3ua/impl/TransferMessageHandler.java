@@ -53,6 +53,7 @@ public class TransferMessageHandler extends MessageHandler {
                 Mtp3TransferPrimitive mtp3TransferPrimitive = this.mtp3TransferPrimitiveFactory.createMtp3TransferPrimitive(
                         protocolData.getSI(), protocolData.getNI(), protocolData.getMP(), protocolData.getOpc(),
                         protocolData.getDpc(), protocolData.getSLS(), protocolData.getData());
+                mtp3TransferPrimitive.setPreferredAspName(aspImpl.getName());
                 ((AsImpl) aspImpl.getAs()).getM3UAManagement().sendTransferMessageToLocalUser(mtp3TransferPrimitive,
                         payload.getData().getSLS());
             } else {
@@ -86,6 +87,7 @@ public class TransferMessageHandler extends MessageHandler {
                 Mtp3TransferPrimitive mtp3TransferPrimitive = this.mtp3TransferPrimitiveFactory.createMtp3TransferPrimitive(
                         protocolData.getSI(), protocolData.getNI(), protocolData.getMP(), protocolData.getOpc(),
                         protocolData.getDpc(), protocolData.getSLS(), protocolData.getData());
+                mtp3TransferPrimitive.setPreferredAspName(aspImpl.getName());
                 ((AsImpl) aspImpl.getAs()).getM3UAManagement().sendTransferMessageToLocalUser(mtp3TransferPrimitive,
                         payload.getData().getSLS());
             } else {

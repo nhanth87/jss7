@@ -332,12 +332,14 @@ public class SccpRoutingControl implements SccpRoutingCtxInterface {
                     // nonsegmented data
                     Mtp3TransferPrimitive msg = factory.createMtp3TransferPrimitive(Mtp3._SI_SERVICE_SCCP, sap.getNi(), 0,
                             sap.getOpc(), dpc, sls, erd.getSolidData());
+                    msg.setPreferredAspName(message.getPreferredAspName());
                     mup.sendMessage(msg);
                 } else {
                     // segmented data
                     for (byte[] bf : erd.getSegmentedData()) {
                         Mtp3TransferPrimitive msg = factory.createMtp3TransferPrimitive(Mtp3._SI_SERVICE_SCCP, sap.getNi(), 0,
                                 sap.getOpc(), dpc, sls, bf);
+                        msg.setPreferredAspName(message.getPreferredAspName());
                         mup.sendMessage(msg);
                     }
                 }
@@ -405,6 +407,7 @@ public class SccpRoutingControl implements SccpRoutingCtxInterface {
                 Mtp3TransferPrimitiveFactory factory = mup.getMtp3TransferPrimitiveFactory();
                 Mtp3TransferPrimitive msg = factory.createMtp3TransferPrimitive(Mtp3._SI_SERVICE_SCCP, sap.getNi(), 0,
                         sap.getOpc(), dpc, sls, erd.getSolidData());
+                msg.setPreferredAspName(message.getPreferredAspName());
                 mup.sendMessage(msg);
 
 //                if (erd.getSolidData() != null) {
@@ -479,6 +482,7 @@ public class SccpRoutingControl implements SccpRoutingCtxInterface {
                     // nonsegmented data
                     Mtp3TransferPrimitive msg = factory.createMtp3TransferPrimitive(Mtp3._SI_SERVICE_SCCP, sap.getNi(), 0,
                             sap.getOpc(), dpc, 0, erd.getSolidData());
+                    msg.setPreferredAspName(message.getPreferredAspName());
                     mup.sendMessage(msg);
                 } else {
                     // segmented data - not possible for a management message

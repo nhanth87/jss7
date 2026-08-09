@@ -66,4 +66,16 @@ public interface SccpMessage {
 
     void setNetworkId(int networkId);
 
+    /**
+     * Local-only preferred M3UA ASP for sticky dialog routing (not on SCCP wire).
+     *
+     * @return ASP name, or {@code null}
+     */
+    String getPreferredAspName();
+
+    /**
+     * Carry ingress ASP (or NI-pinned ASP) through SCCP for M3UA egress binding.
+     */
+    void setPreferredAspName(String preferredAspName);
+
 }

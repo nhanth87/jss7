@@ -331,4 +331,27 @@ public interface Dialog extends Serializable {
      */
     long getStartTimeDialog();
 
+    /**
+     * Sticky remote MTP OPC captured on TC-BEGIN (DPC for replies). {@code -1} if unset.
+     */
+    int getRemotePc();
+
+    /**
+     * Pin remote PC for outbound SCCP (NI / GTT LB pick, or ingress OPC).
+     */
+    void setRemotePc(int remotePc);
+
+    /**
+     * Sticky M3UA ASP name for mid-dialog PayloadData (N–N: ingress ASP or NI pin).
+     *
+     * @return ASP name, or {@code null} for classic SLS among ACTIVE ASPs of the AS
+     */
+    String getPreferredAspName();
+
+    /**
+     * Bind dialog to an ASP under N–N multi-ASP (receive-on-X → return-on-X).
+     * Subsequent TCAP sends carry this to {@code AsImpl.write}.
+     */
+    void setPreferredAspName(String preferredAspName);
+
 }

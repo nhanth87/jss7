@@ -21,8 +21,21 @@ import org.restcomm.protocols.ss7.m3ua.parameter.RoutingContext;
  */
 public class PayloadDataImpl extends M3UAMessageImpl implements PayloadData {
 
+    /** Not encoded — dialog/NI sticky ASP preference for {@code AsImpl.write}. */
+    private volatile String preferredAspName;
+
     public PayloadDataImpl() {
         super(MessageClass.TRANSFER_MESSAGES, MessageType.PAYLOAD, MessageType.S_PAYLOAD);
+    }
+
+    @Override
+    public String getPreferredAspName() {
+        return preferredAspName;
+    }
+
+    @Override
+    public void setPreferredAspName(String preferredAspName) {
+        this.preferredAspName = preferredAspName;
     }
 
     public NetworkAppearance getNetworkAppearance() {
@@ -90,6 +103,7 @@ public class PayloadDataImpl extends M3UAMessageImpl implements PayloadData {
      */
     public void reset() {
         this.parameters.clear();
+        this.preferredAspName = null;
     }
 
     /**

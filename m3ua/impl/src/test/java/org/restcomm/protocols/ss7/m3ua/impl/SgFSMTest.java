@@ -1268,6 +1268,19 @@ public class SgFSMTest {
             assertTrue(validateMessage(testAssociation2, MessageClass.TRANSFER_MESSAGES, MessageType.PAYLOAD, -1, -1));
         }
 
+        // N–N sticky ASP (1 AS, N ASPs): preferred=testasp1 → all SLS on ASP1
+        // (without preferredAsp, SLS would have split ~128/128 as above).
+        for (int sls = 0; sls < 256; sls++) {
+            Mtp3TransferPrimitive mtp3TransferPrimitive = factory.createMtp3TransferPrimitive(3, 1, 0, 1, 2, sls, new byte[] {
+                    1, 2, 3, 4 });
+            mtp3TransferPrimitive.setPreferredAspName("testasp1");
+            serverM3UAMgmt.sendMessage(mtp3TransferPrimitive);
+        }
+        for (int count = 0; count < 256; count++) {
+            assertTrue(validateMessage(testAssociation1, MessageClass.TRANSFER_MESSAGES, MessageType.PAYLOAD, -1, -1));
+        }
+        assertNull(testAssociation2.txPoll());
+
         // INACTIVATE ASP1.But AS remains ACTIVE in any case
         message = messageFactory.createMessage(MessageClass.ASP_TRAFFIC_MAINTENANCE, MessageType.ASP_INACTIVE);
         ((ASPInactiveImpl) message).setRoutingContext(rc);

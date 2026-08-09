@@ -525,7 +525,7 @@ c.registerRa(ra, ra);
 
 **Last Updated:** 2026-08-04  
 **Team:** `jss7-architect` + `java25-upgrader` + `ra-designer`  
-**Status:** Phase 1–2 **complete**. Phase 3 **main complete** (0 `import javolution` under `src/main`); test XML still uses legacy `javolution.xml.*` API names (~186 files) — migrate to Jackson / test-support shim. Phase 4 = VT/ZGC audit checklist (`docs/vt-zgc-audit.md`). Phase 5 RA = **shipped** as micro-jainslee `vendor-ras/ra-jss7` (sticky P1 + TCAP export/import CONTINUE-miss P2 wire; multi-ASP lab still open). Recent: Java 25 toolchain hardening, JCTools/Agrona cleanup, `MissingDialogResolver`, TCAP export/import.
+**Status:** Phase 1–2 **complete**. Phase 3 **main complete** (0 `import javolution` under `src/main`); test XML still uses legacy `javolution.xml.*` API names (~186 files) — migrate to Jackson / test-support shim. Phase 4 = VT/ZGC audit checklist (`docs/vt-zgc-audit.md`). Phase 5 RA = **shipped** as micro-jainslee `vendor-ras/ra-jss7` (sticky P1 + TCAP export/import CONTINUE-miss P2 wire). **N–N sticky ASP** (dialog `preferredAspName` → `AsImpl.write`) + ISPN NI/GTT peer LB (`Ss7PeerRouteAffinity`) — see [`docs/sticky-asp-nn.md`](docs/sticky-asp-nn.md). Recent: Java 25 toolchain hardening, JCTools/Agrona cleanup, `MissingDialogResolver`, TCAP export/import.
 
 ---
 

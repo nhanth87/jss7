@@ -1189,6 +1189,7 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
 
         PayloadData payload = (PayloadData) messageFactory.createMessage(MessageClass.TRANSFER_MESSAGES, MessageType.PAYLOAD);
         payload.setData(data);
+        payload.setPreferredAspName(mtp3TransferPrimitive.getPreferredAspName());
 
         AsImpl asImpl = this.routeManagement.getAsForRoute(data.getDpc(), data.getOpc(), data.getSI(), data.getSLS());
         if (asImpl == null) {

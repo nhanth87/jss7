@@ -18,6 +18,12 @@ public class Mtp3TransferPrimitive {
 
     private final RoutingLabelFormat pointCodeFormat;
 
+    /**
+     * Local-only (not on MTP3 wire): preferred M3UA ASP name for sticky dialog routing.
+     * Set on ingress from the receiving ASP; honored on egress by {@code AsImpl.write}.
+     */
+    private volatile String preferredAspName;
+
     protected Mtp3TransferPrimitive(int si, int ni, int mp, int opc, int dpc, int sls, byte[] data,
             RoutingLabelFormat pointCodeFormat) {
         this.si = si;
@@ -29,6 +35,20 @@ public class Mtp3TransferPrimitive {
         this.data = data;
 
         this.pointCodeFormat = pointCodeFormat;
+    }
+
+    /**
+     * @return preferred M3UA ASP name, or {@code null} for classic SLS loadshare
+     */
+    public String getPreferredAspName() {
+        return preferredAspName;
+    }
+
+    /**
+     * Bind egress to a named ASP (dialog sticky / NI pin). Not encoded on the wire.
+     */
+    public void setPreferredAspName(String preferredAspName) {
+        this.preferredAspName = preferredAspName;
     }
 
     public int getSi() {

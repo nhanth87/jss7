@@ -20,7 +20,7 @@ import org.restcomm.protocols.ss7.tcap.api.tc.dialog.TRPseudoState;
  */
 public final class TcapDialogSnapshot implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     private final long localOtid;
     private final byte[] remoteOtid;
@@ -35,10 +35,18 @@ public final class TcapDialogSnapshot implements Serializable {
     private final int seqControl;
     private final boolean dpSentInBegin;
     private final boolean[] invokeIdTaken;
+    private final String preferredAspName;
 
     public TcapDialogSnapshot(long localOtid, byte[] remoteOtid, SccpAddress localAddress, SccpAddress remoteAddress,
             TRPseudoState state, long[] applicationContextOid, long idleDeadlineNanos, int networkId, int localSsn,
             int remotePc, int seqControl, boolean dpSentInBegin, boolean[] invokeIdTaken) {
+        this(localOtid, remoteOtid, localAddress, remoteAddress, state, applicationContextOid, idleDeadlineNanos,
+                networkId, localSsn, remotePc, seqControl, dpSentInBegin, invokeIdTaken, null);
+    }
+
+    public TcapDialogSnapshot(long localOtid, byte[] remoteOtid, SccpAddress localAddress, SccpAddress remoteAddress,
+            TRPseudoState state, long[] applicationContextOid, long idleDeadlineNanos, int networkId, int localSsn,
+            int remotePc, int seqControl, boolean dpSentInBegin, boolean[] invokeIdTaken, String preferredAspName) {
         this.localOtid = localOtid;
         this.remoteOtid = remoteOtid == null ? null : Arrays.copyOf(remoteOtid, remoteOtid.length);
         this.localAddress = localAddress;
@@ -53,6 +61,7 @@ public final class TcapDialogSnapshot implements Serializable {
         this.seqControl = seqControl;
         this.dpSentInBegin = dpSentInBegin;
         this.invokeIdTaken = invokeIdTaken == null ? null : Arrays.copyOf(invokeIdTaken, invokeIdTaken.length);
+        this.preferredAspName = preferredAspName;
     }
 
     public long getLocalOtid() {
@@ -108,10 +117,14 @@ public final class TcapDialogSnapshot implements Serializable {
         return invokeIdTaken == null ? null : Arrays.copyOf(invokeIdTaken, invokeIdTaken.length);
     }
 
+    public String getPreferredAspName() {
+        return preferredAspName;
+    }
+
     @Override
     public String toString() {
         return "TcapDialogSnapshot{localOtid=" + localOtid + ", remoteOtid="
                 + (remoteOtid == null ? "null" : Arrays.toString(remoteOtid)) + ", state=" + state + ", networkId="
-                + networkId + "}";
+                + networkId + ", preferredAsp=" + preferredAspName + "}";
     }
 }

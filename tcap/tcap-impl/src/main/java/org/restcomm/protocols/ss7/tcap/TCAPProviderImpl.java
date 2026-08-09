@@ -478,6 +478,12 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 
     public void send(byte[] data, boolean returnMessageOnError, SccpAddress destinationAddress, SccpAddress originatingAddress,
             int seqControl, int networkId, int localSsn, int remotePc) throws IOException {
+        send(data, returnMessageOnError, destinationAddress, originatingAddress, seqControl, networkId, localSsn, remotePc,
+                null);
+    }
+
+    public void send(byte[] data, boolean returnMessageOnError, SccpAddress destinationAddress, SccpAddress originatingAddress,
+            int seqControl, int networkId, int localSsn, int remotePc, String preferredAspName) throws IOException {
         if (this.stack.getPreviewMode())
             return;
 
@@ -485,6 +491,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                 localSsn, returnMessageOnError, null, null);
         msg.setNetworkId(networkId);
         msg.setOutgoingDpc(remotePc);
+        msg.setPreferredAspName(preferredAspName);
         sccpProvider.updateSPCongestion(ssn, getCumulativeCongestionLevel());
         sccpProvider.send(msg);
     }
@@ -1021,6 +1028,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                             int remotePc = sccpDataMessage.getIncomingOpc();
                             dialog = this.getNewDialog(sccpCallingPartyAddress, sccpCalledPartyAddress, sccpDataMessage.getSls(), null);
                             dialog.setRemotePc(remotePc);
+                            dialog.setPreferredAspName(sccpDataMessage.getPreferredAspName());
                             setSsnToDialog(dialog, sccpDataMessage.getCalledPartyAddress().getSubsystemNumber());
                         }
 
@@ -1140,6 +1148,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                     int remotePc = sccpDataMessage.getIncomingOpc();
                     DialogImpl uniDialog = (DialogImpl) this.getNewUnstructuredDialog(sccpCallingPartyAddress, sccpCalledPartyAddress);
                     uniDialog.setRemotePc(remotePc);
+                    uniDialog.setPreferredAspName(sccpDataMessage.getPreferredAspName());
                     setSsnToDialog(uniDialog, sccpDataMessage.getCalledPartyAddress().getSubsystemNumber());
                     uniDialog.processUni(tcapUniMessage, sccpCallingPartyAddress, sccpCalledPartyAddress);
                     break;

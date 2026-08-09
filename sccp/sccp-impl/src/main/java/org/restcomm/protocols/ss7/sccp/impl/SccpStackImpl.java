@@ -1401,6 +1401,11 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
             }
             msg.setNetworkId(networkId);
 
+            String preferredAsp = mtp3Msg.getPreferredAspName();
+            if (preferredAsp != null && !preferredAsp.isEmpty()) {
+                msg.setPreferredAspName(preferredAsp);
+            }
+
             if (logger.isDebugEnabled()) {
                 logger.debug(String.format("Rx : SCCP message from MTP %s", msg));
             }
