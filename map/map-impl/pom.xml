@@ -155,5 +155,44 @@
 				</property>
 			</activation>
 		</profile>
+		<!-- Isolate BerCursor GMLC tests: map-impl test tree has pre-existing API drift.
+		     Property activation disables the activeByDefault `test` profile, so TestNG
+		     must be re-declared here. -->
+		<profile>
+			<id>ber-cursor-gmlc-tests</id>
+			<activation>
+				<property>
+					<name>test</name>
+					<value>BerCursorGmlcDifferentialTest,BerCursorGmlcMalformedTest</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.testng</groupId>
+					<artifactId>testng</artifactId>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<testIncludes>
+								<testInclude>**/BerCursorGmlc*.java</testInclude>
+								<testInclude>**/MAPExtensionContainerTest.java</testInclude>
+							</testIncludes>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<suiteXmlFiles combine.self="override" />
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 </project>

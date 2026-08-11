@@ -5,7 +5,10 @@ import java.io.IOException;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
+import org.mobicents.protocols.asn.BerCursor;
+import org.mobicents.protocols.asn.BerTag;
 import org.mobicents.protocols.asn.Tag;
+import org.restcomm.protocols.ss7.map.MapBerSupport;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.MAPMessageType;
 import org.restcomm.protocols.ss7.map.api.MAPOperationCode;
@@ -88,7 +91,7 @@ public class AnyTimeInterrogationRequestImpl extends MobilityMessageImpl impleme
     public void decodeAll(AsnInputStream ansIS) throws MAPParsingComponentException {
         try {
             int length = ansIS.readLength();
-            this._decode(ansIS, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, ansIS, length, this::_decodeBer, this::_clearFields, this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -106,7 +109,7 @@ public class AnyTimeInterrogationRequestImpl extends MobilityMessageImpl impleme
      */
     public void decodeData(AsnInputStream ansIS, int length) throws MAPParsingComponentException {
         try {
-            this._decode(ansIS, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, ansIS, length, this::_decodeBer, this::_clearFields, this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -116,13 +119,62 @@ public class AnyTimeInterrogationRequestImpl extends MobilityMessageImpl impleme
         }
     }
 
-    private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
-        AsnInputStream ais = asnInputStream.readSequenceStreamData(length);
-
+    private void _clearFields() {
         this.subscriberIdentity = null;
         this.requestedInfo = null;
         this.gsmSCFAddress = null;
         this.extensionContainer = null;
+    }
+
+    private void _decodeBer(byte[] buf, int offset, int length)
+            throws AsnException, IOException, MAPParsingComponentException {
+        _clearFields();
+        BerCursor c = BerCursor.wrapHeap(buf, offset, length);
+        while (c.hasMore()) {
+            c.readTag();
+            if (c.tagClass() != BerTag.CONTEXT)
+                MapBerSupport.unknownTag(_PrimitiveName, c);
+            switch (c.tag()) {
+                case _TAG_SUBSCRIBER_IDENTITY:
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": subscriberIdentity is primitive");
+                    SubscriberIdentityImpl si = new SubscriberIdentityImpl();
+                    MapBerSupport.decodeExplicitChoice(c, si);
+                    this.subscriberIdentity = si;
+                    break;
+                case _TAG_REQUESTED_INFO:
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": requestedInfo is primitive");
+                    RequestedInfoImpl ri = new RequestedInfoImpl();
+                    MapBerSupport.decodeNested(c, ri);
+                    this.requestedInfo = ri;
+                    break;
+                case _TAG_EXTENSION_CONTAINER:
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": extensionContainer is primitive");
+                    MAPExtensionContainerImpl ext = new MAPExtensionContainerImpl();
+                    MapBerSupport.decodeNested(c, ext);
+                    this.extensionContainer = ext;
+                    break;
+                case _TAG_GSM_SCF_ADDRESS:
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": gsmSCFAddress is not primitive");
+                    ISDNAddressStringImpl scf = new ISDNAddressStringImpl();
+                    MapBerSupport.decodeNested(c, scf);
+                    this.gsmSCFAddress = scf;
+                    break;
+                default:
+                    MapBerSupport.unknownTag(_PrimitiveName, c);
+            }
+        }
+        if (this.subscriberIdentity == null || this.requestedInfo == null || this.gsmSCFAddress == null)
+            throw new AsnException(_PrimitiveName + ": missing mandatory field");
+    }
+
+    private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
+        AsnInputStream ais = asnInputStream.readSequenceStreamData(length);
+
+        _clearFields();
 
         while (true) {
             if (ais.available() == 0)

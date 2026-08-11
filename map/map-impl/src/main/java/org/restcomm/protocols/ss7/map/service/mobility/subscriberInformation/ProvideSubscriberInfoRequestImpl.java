@@ -5,7 +5,10 @@ import java.io.IOException;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
+import org.mobicents.protocols.asn.BerCursor;
+import org.mobicents.protocols.asn.BerTag;
 import org.mobicents.protocols.asn.Tag;
+import org.restcomm.protocols.ss7.map.MapBerSupport;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.MAPMessageType;
 import org.restcomm.protocols.ss7.map.api.MAPOperationCode;
@@ -110,7 +113,8 @@ public class ProvideSubscriberInfoRequestImpl extends MobilityMessageImpl implem
     public void decodeAll(AsnInputStream asnInputStream) throws MAPParsingComponentException {
         try {
             int length = asnInputStream.readLength();
-            this._decode(asnInputStream, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, asnInputStream, length, this::_decodeBer, this::_clearFields,
+                    this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -123,7 +127,8 @@ public class ProvideSubscriberInfoRequestImpl extends MobilityMessageImpl implem
     @Override
     public void decodeData(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException {
         try {
-            this._decode(asnInputStream, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, asnInputStream, length, this::_decodeBer, this::_clearFields,
+                    this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -133,12 +138,66 @@ public class ProvideSubscriberInfoRequestImpl extends MobilityMessageImpl implem
         }
     }
 
-    private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
+    private void _clearFields() {
         this.imsi = null;
         this.lmsi = null;
         this.requestedInfo = null;
         this.extensionContainer = null;
         this.callPriority = null;
+    }
+
+    private void _decodeBer(byte[] buf, int offset, int length)
+            throws AsnException, IOException, MAPParsingComponentException {
+        _clearFields();
+        BerCursor c = BerCursor.wrapHeap(buf, offset, length);
+        while (c.hasMore()) {
+            c.readTag();
+            if (c.tagClass() != BerTag.CONTEXT)
+                MapBerSupport.unknownTag(_PrimitiveName, c);
+            switch (c.tag()) {
+                case _TAG_imsi:
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": imsi is not primitive");
+                    IMSIImpl im = new IMSIImpl();
+                    MapBerSupport.decodeNested(c, im);
+                    this.imsi = im;
+                    break;
+                case _TAG_lmsi:
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": lmsi is not primitive");
+                    LMSIImpl lm = new LMSIImpl();
+                    MapBerSupport.decodeNested(c, lm);
+                    this.lmsi = lm;
+                    break;
+                case _TAG_requestedInfo:
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": requestedInfo is primitive");
+                    RequestedInfoImpl ri = new RequestedInfoImpl();
+                    MapBerSupport.decodeNested(c, ri);
+                    this.requestedInfo = ri;
+                    break;
+                case _TAG_extensionContainer:
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": extensionContainer is primitive");
+                    MAPExtensionContainerImpl ext = new MAPExtensionContainerImpl();
+                    MapBerSupport.decodeNested(c, ext);
+                    this.extensionContainer = ext;
+                    break;
+                case _TAG_callPriority:
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": callPriority is not primitive");
+                    this.callPriority = EMLPPPriority.getEMLPPPriority(MapBerSupport.readInt(c));
+                    break;
+                default:
+                    MapBerSupport.unknownTag(_PrimitiveName, c);
+            }
+        }
+        if (this.imsi == null || this.requestedInfo == null)
+            throw new AsnException(_PrimitiveName + ": missing mandatory field");
+    }
+
+    private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
+        _clearFields();
 
         AsnInputStream ais = asnInputStream.readSequenceStreamData(length);
         int num = 0;

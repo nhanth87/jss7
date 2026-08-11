@@ -5,7 +5,10 @@ import java.io.IOException;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
+import org.mobicents.protocols.asn.BerCursor;
+import org.mobicents.protocols.asn.BerTag;
 import org.mobicents.protocols.asn.Tag;
+import org.restcomm.protocols.ss7.map.MapBerSupport;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.MAPMessageType;
 import org.restcomm.protocols.ss7.map.api.MAPOperationCode;
@@ -134,7 +137,8 @@ public class SendRoutingInfoForLCSRequestImpl extends LsmMessageImpl implements 
     public void decodeAll(AsnInputStream asnInputStream) throws MAPParsingComponentException {
         try {
             int length = asnInputStream.readLength();
-            this._decode(asnInputStream, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, asnInputStream, length, this::_decodeBer, this::_clearFields,
+                    this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": ", e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -152,7 +156,8 @@ public class SendRoutingInfoForLCSRequestImpl extends LsmMessageImpl implements 
      */
     public void decodeData(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException {
         try {
-            this._decode(asnInputStream, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, asnInputStream, length, this::_decodeBer, this::_clearFields,
+                    this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": ", e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -162,10 +167,48 @@ public class SendRoutingInfoForLCSRequestImpl extends LsmMessageImpl implements 
         }
     }
 
-    private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
+    private void _clearFields() {
         this.extensionContainer = null;
         this.targetMS = null;
         this.mlcNumber = null;
+    }
+
+    private void _decodeBer(byte[] buf, int offset, int length)
+            throws AsnException, IOException, MAPParsingComponentException {
+        _clearFields();
+        BerCursor c = BerCursor.wrapHeap(buf, offset, length);
+        if (!c.hasMore())
+            throw new AsnException(_PrimitiveName + ": missing mlcNumber");
+        c.readTag();
+        if (c.tagClass() != BerTag.CONTEXT || !c.isPrimitive() || c.tag() != _TAG_MLC_NUMBER)
+            throw new AsnException(_PrimitiveName + ": bad mlcNumber");
+        ISDNAddressStringImpl mlc = new ISDNAddressStringImpl();
+        MapBerSupport.decodeNested(c, mlc);
+        this.mlcNumber = mlc;
+
+        if (!c.hasMore())
+            throw new AsnException(_PrimitiveName + ": missing targetMS");
+        c.readTag();
+        if (c.tagClass() != BerTag.CONTEXT || c.isPrimitive() || c.tag() != _TAG_TARGET_MS)
+            throw new AsnException(_PrimitiveName + ": bad targetMS");
+        SubscriberIdentityImpl ms = new SubscriberIdentityImpl();
+        MapBerSupport.decodeExplicitChoice(c, ms);
+        this.targetMS = ms;
+
+        while (c.hasMore()) {
+            c.readTag();
+            if (c.tagClass() == BerTag.CONTEXT && !c.isPrimitive() && c.tag() == _TAG_EXTENSION_CONTAINER) {
+                MAPExtensionContainerImpl ext = new MAPExtensionContainerImpl();
+                MapBerSupport.decodeNested(c, ext);
+                this.extensionContainer = ext;
+            } else {
+                MapBerSupport.unknownTag(_PrimitiveName, c);
+            }
+        }
+    }
+
+    private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
+        _clearFields();
 
         AsnInputStream ais = asnInputStream.readSequenceStreamData(length);
 

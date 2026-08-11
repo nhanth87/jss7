@@ -95,6 +95,101 @@ public class BerCursorTest {
         }
     }
 
+    @Test
+    public void testRejectsLongLengthOverflow() {
+        assertAsnException(new byte[] {0x04, (byte) 0x84, (byte) 0x80, 0x00, 0x00, 0x00});
+    }
+
+    @Test
+    public void testRejectsValueBeyondContainingInput() {
+        assertAsnException(new byte[] {0x04, 0x02, 0x01});
+    }
+
+    @Test
+    public void testRejectsTruncatedTagAndLength() {
+        assertAsnException(new byte[] {});
+        assertAsnException(new byte[] {0x04});
+        assertAsnException(new byte[] {0x04, (byte) 0x82, 0x01});
+    }
+
+    @Test
+    public void testRejectsMalformedHighTags() {
+        assertAsnException(new byte[] {0x1F, (byte) 0x80, 0x00});
+        assertAsnException(new byte[] {0x1F, 0x1E, 0x00});
+        assertAsnException(new byte[] {0x1F, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+                (byte) 0xFF, 0x7F, 0x00});
+        assertAsnException(new byte[] {0x1F, (byte) 0x81});
+    }
+
+    @Test
+    public void testRejectsIndefinitePrimitive() {
+        assertAsnException(new byte[] {0x04, (byte) 0x80, 0x00, 0x00});
+    }
+
+    @Test
+    public void testRejectsUnterminatedHighTag() {
+        byte[] data = new byte[2 + BerCursor.MAX_HIGH_TAG_OCTETS];
+        data[0] = 0x1F;
+        for (int i = 1; i < data.length; i++)
+            data[i] = (byte) 0x80;
+        assertAsnException(data);
+    }
+
+    @Test
+    public void testRejectsTagCountCap() throws Exception {
+        int n = BerCursor.MAX_TAGS + 1;
+        byte[] data = new byte[n * 3];
+        for (int i = 0; i < n; i++) {
+            data[i * 3] = 0x02;
+            data[i * 3 + 1] = 0x01;
+            data[i * 3 + 2] = 0x01;
+        }
+        BerCursor c = BerCursor.wrapHeap(data, 0, data.length);
+        try {
+            for (int i = 0; i < n; i++) {
+                c.readTag();
+                c.skipValue();
+            }
+            fail("Expected AsnException for tag-count cap");
+        } catch (AsnException expected) {
+            assertTrue(expected.getMessage().contains("tag count"));
+        } finally {
+            c.release();
+        }
+    }
+
+    @Test
+    public void testRejectsNestingCap() throws Exception {
+        int depth = BerCursor.MAX_NESTING + 1;
+        byte[] data = new byte[depth * 2];
+        for (int i = 0; i < depth; i++) {
+            data[i * 2] = 0x30;
+            data[i * 2 + 1] = (byte) ((depth - 1 - i) * 2);
+        }
+        BerCursor c = BerCursor.wrapHeap(data, 0, data.length);
+        try {
+            BerCursor cur = c;
+            for (int i = 0; i < depth; i++) {
+                cur.readTag();
+                cur = cur.openConstructed();
+            }
+            fail("Expected AsnException for nesting cap");
+        } catch (AsnException expected) {
+            assertTrue(expected.getMessage().contains("nesting"));
+        } finally {
+            c.release();
+        }
+    }
+
+    @Test
+    public void testRejectsInvalidHeapRegions() {
+        byte[] data = new byte[4];
+        assertIndexFailure(() -> BerCursor.wrapHeap(data, -1, 1));
+        assertIndexFailure(() -> BerCursor.wrapHeap(data, 0, -1));
+        assertIndexFailure(() -> BerCursor.wrapHeap(data, 3, 2));
+        assertIndexFailure(() -> BerCursor.wrapHeap(data, Integer.MAX_VALUE, 2));
+    }
+
     // ==================================================================
     // NAVIGATION
     // ==================================================================
@@ -274,6 +369,29 @@ public class BerCursorTest {
             assertEquals(value, c.readInt64());
         } finally {
             c.release();
+        }
+    }
+
+    private static void assertAsnException(byte[] data) {
+        BerCursor cursor = BerCursor.wrapHeap(data, 0, data.length);
+        try {
+            try {
+                cursor.readTag();
+                fail("Expected AsnException");
+            } catch (AsnException expected) {
+                // expected
+            }
+        } finally {
+            cursor.release();
+        }
+    }
+
+    private static void assertIndexFailure(Runnable action) {
+        try {
+            action.run();
+            fail("Expected IndexOutOfBoundsException");
+        } catch (IndexOutOfBoundsException expected) {
+            // expected
         }
     }
 }

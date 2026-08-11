@@ -5,7 +5,10 @@ import java.io.IOException;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
+import org.mobicents.protocols.asn.BerCursor;
+import org.mobicents.protocols.asn.BerTag;
 import org.mobicents.protocols.asn.Tag;
+import org.restcomm.protocols.ss7.map.MapBerSupport;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.MAPMessageType;
 import org.restcomm.protocols.ss7.map.api.MAPOperationCode;
@@ -320,7 +323,8 @@ public class ProvideSubscriberLocationResponseImpl extends LsmMessageImpl implem
     public void decodeAll(AsnInputStream asnInputStream) throws MAPParsingComponentException {
         try {
             int length = asnInputStream.readLength();
-            this._decode(asnInputStream, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, asnInputStream, length, this::_decodeBer, this::_clearFields,
+                    this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": ", e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -337,7 +341,7 @@ public class ProvideSubscriberLocationResponseImpl extends LsmMessageImpl implem
      */
     public void decodeData(AsnInputStream ansIS, int length) throws MAPParsingComponentException {
         try {
-            this._decode(ansIS, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, ansIS, length, this::_decodeBer, this::_clearFields, this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": ", e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -347,7 +351,7 @@ public class ProvideSubscriberLocationResponseImpl extends LsmMessageImpl implem
         }
     }
 
-    private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
+    private void _clearFields() {
         this.locationEstimate = null;
         this.geranPositioningData = null;
         this.utranPositioningData = null;
@@ -362,9 +366,137 @@ public class ProvideSubscriberLocationResponseImpl extends LsmMessageImpl implem
         this.moLrShortCircuitIndicator = false;
         this.geranGANSSpositioningData = null;
         this.utranGANSSpositioningData = null;
+        this.targetServingNodeForHandover = null;
         this.utranAdditionalPositioningData = null;
         this.utranBaroPressureMeas = null;
         this.utranCivicAddress = null;
+    }
+
+    private void _decodeBer(byte[] buf, int offset, int length)
+            throws AsnException, IOException, MAPParsingComponentException {
+        _clearFields();
+        BerCursor c = BerCursor.wrapHeap(buf, offset, length);
+        if (!c.hasMore())
+            throw new AsnException(_PrimitiveName + ": missing locationEstimate");
+        c.readTag();
+        if (c.tagClass() != BerTag.UNIVERSAL || !c.isPrimitive() || c.tag() != BerTag.OCTET_STRING)
+            throw new AsnException(_PrimitiveName + ": bad locationEstimate");
+        ExtGeographicalInformationImpl le = new ExtGeographicalInformationImpl();
+        MapBerSupport.decodeNested(c, le);
+        this.locationEstimate = le;
+
+        while (c.hasMore()) {
+            c.readTag();
+            if (c.tagClass() != BerTag.CONTEXT)
+                MapBerSupport.unknownTag(_PrimitiveName, c);
+            switch (c.tag()) {
+                case _TAG_AGE_OF_LOCATION_ESTIMATE -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": ageOfLocationEstimate is not primitive");
+                    this.ageOfLocationEstimate = MapBerSupport.readInt(c);
+                }
+                case _TAG_EXTENSION_CONTAINER -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": extensionContainer is primitive");
+                    MAPExtensionContainerImpl ext = new MAPExtensionContainerImpl();
+                    MapBerSupport.decodeNested(c, ext);
+                    this.extensionContainer = ext;
+                }
+                case _TAG_ADD_LOCATION_ESTIMATE -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": additionalLocationEstimate is not primitive");
+                    AddGeographicalInformationImpl add = new AddGeographicalInformationImpl();
+                    MapBerSupport.decodeNested(c, add);
+                    this.additionalLocationEstimate = add;
+                }
+                case _TAG_DEFERRED_MT_LR_RESPONSE_IND -> {
+                    MapBerSupport.readNull(c);
+                    this.deferredMTLRResponseIndicator = true;
+                }
+                case _TAG_GERAN_POSITIONING_DATA -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": geranPositioningData is not primitive");
+                    PositioningDataInformationImpl gpd = new PositioningDataInformationImpl();
+                    MapBerSupport.decodeNested(c, gpd);
+                    this.geranPositioningData = gpd;
+                }
+                case _TAG_UTRAN_POSITIONING_DATA -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": utranPositioningData is not primitive");
+                    UtranPositioningDataInfoImpl upd = new UtranPositioningDataInfoImpl();
+                    MapBerSupport.decodeNested(c, upd);
+                    this.utranPositioningData = upd;
+                }
+                case _TAG_CELL_ID_OR_SAI ->
+                    this.cellGlobalIdOrServiceAreaIdOrLAI = MapBerSupport.decodeCellIdOrSai(c, _PrimitiveName);
+                case _TAG_SAI_PRESENT -> {
+                    MapBerSupport.readNull(c);
+                    this.saiPresent = true;
+                }
+                case _TAG_ACCURACY_FULFILMENT_INDICATOR -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": accuracyFulfilmentIndicator is not primitive");
+                    this.accuracyFulfilmentIndicator = AccuracyFulfilmentIndicator
+                            .getAccuracyFulfilmentIndicator(MapBerSupport.readInt(c));
+                }
+                case _TAG_VELOCITY_ESTIMATE -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": velocityEstimate is not primitive");
+                    VelocityEstimateImpl ve = new VelocityEstimateImpl();
+                    MapBerSupport.decodeNested(c, ve);
+                    this.velocityEstimate = ve;
+                }
+                case _TAG_MO_LR_SHORT_CIRCUIT_IND -> {
+                    MapBerSupport.readNull(c);
+                    this.moLrShortCircuitIndicator = true;
+                }
+                case _TAG_GERAN_GANSS_POSITIONING_DATA -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": geranGANSSpositioningData is not primitive");
+                    GeranGANSSpositioningDataImpl ggd = new GeranGANSSpositioningDataImpl();
+                    MapBerSupport.decodeNested(c, ggd);
+                    this.geranGANSSpositioningData = ggd;
+                }
+                case _TAG_UTRAN_GANSS_POSITIONING_DATA -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": utranGANSSpositioningData is not primitive");
+                    UtranGANSSpositioningDataImpl ugd = new UtranGANSSpositioningDataImpl();
+                    MapBerSupport.decodeNested(c, ugd);
+                    this.utranGANSSpositioningData = ugd;
+                }
+                case _TAG_TARGET_SERVING_NODE_HANDOVER -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": targetServingNodeForHandover is primitive");
+                    ServingNodeAddressImpl sna = new ServingNodeAddressImpl();
+                    MapBerSupport.decodeExplicitChoice(c, sna);
+                    this.targetServingNodeForHandover = sna;
+                }
+                case _TAG_UTRAN_ADD_POSITIONING_DATA -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": utranAdditionalPositioningData is not primitive");
+                    UtranAdditionalPositioningDataImpl uapd = new UtranAdditionalPositioningDataImpl();
+                    MapBerSupport.decodeNested(c, uapd);
+                    this.utranAdditionalPositioningData = uapd;
+                }
+                case _TAG_UTRAN_BARO_PREASSURE_MEAS -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": utranBaroPressureMeas is not primitive");
+                    this.utranBaroPressureMeas = MapBerSupport.readInt(c);
+                }
+                case _TAG_UTRAN_CIVIC_ADDRESS -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": utranCivicAddress is not primitive");
+                    UtranCivicAddressImpl uca = new UtranCivicAddressImpl();
+                    MapBerSupport.decodeNested(c, uca);
+                    this.utranCivicAddress = uca;
+                }
+                default -> MapBerSupport.unknownTag(_PrimitiveName, c);
+            }
+        }
+    }
+
+    private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
+        _clearFields();
 
         AsnInputStream ais = asnInputStream.readSequenceStreamData(length);
 

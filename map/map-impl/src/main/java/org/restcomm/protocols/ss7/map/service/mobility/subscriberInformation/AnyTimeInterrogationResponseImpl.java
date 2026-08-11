@@ -8,7 +8,10 @@ import java.io.IOException;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
+import org.mobicents.protocols.asn.BerCursor;
+import org.mobicents.protocols.asn.BerTag;
 import org.mobicents.protocols.asn.Tag;
+import org.restcomm.protocols.ss7.map.MapBerSupport;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.MAPMessageType;
 import org.restcomm.protocols.ss7.map.api.MAPOperationCode;
@@ -110,7 +113,8 @@ public class AnyTimeInterrogationResponseImpl extends MobilityMessageImpl implem
     public void decodeAll(AsnInputStream asnInputStream) throws MAPParsingComponentException {
         try {
             int length = asnInputStream.readLength();
-            this._decode(asnInputStream, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, asnInputStream, length, this::_decodeBer, this::_clearFields,
+                    this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -129,7 +133,8 @@ public class AnyTimeInterrogationResponseImpl extends MobilityMessageImpl implem
      */
     public void decodeData(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException {
         try {
-            this._decode(asnInputStream, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, asnInputStream, length, this::_decodeBer, this::_clearFields,
+                    this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": " + e.getMessage(), e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -139,7 +144,37 @@ public class AnyTimeInterrogationResponseImpl extends MobilityMessageImpl implem
         }
     }
 
+    private void _clearFields() {
+        this.subscriberInfo = null;
+        this.extensionContainer = null;
+    }
+
+    private void _decodeBer(byte[] buf, int offset, int length)
+            throws AsnException, IOException, MAPParsingComponentException {
+        _clearFields();
+        BerCursor c = BerCursor.wrapHeap(buf, offset, length);
+        if (!c.hasMore())
+            throw new AsnException(_PrimitiveName + ": missing subscriberInfo");
+        c.readTag();
+        if (c.tagClass() != BerTag.UNIVERSAL || c.isPrimitive() || c.tag() != BerTag.SEQUENCE)
+            throw new AsnException(_PrimitiveName + ": bad subscriberInfo");
+        SubscriberInfoImpl si = new SubscriberInfoImpl();
+        MapBerSupport.decodeNested(c, si);
+        this.subscriberInfo = si;
+        while (c.hasMore()) {
+            c.readTag();
+            if (c.tagClass() == BerTag.UNIVERSAL && !c.isPrimitive() && c.tag() == BerTag.SEQUENCE) {
+                MAPExtensionContainerImpl ext = new MAPExtensionContainerImpl();
+                MapBerSupport.decodeNested(c, ext);
+                this.extensionContainer = ext;
+            } else {
+                MapBerSupport.unknownTag(_PrimitiveName, c);
+            }
+        }
+    }
+
     private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
+        _clearFields();
         AsnInputStream ais = asnInputStream.readSequenceStreamData(length);
 
         // decode subscriberInfo

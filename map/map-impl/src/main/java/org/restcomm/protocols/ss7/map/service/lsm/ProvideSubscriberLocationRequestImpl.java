@@ -5,7 +5,10 @@ import java.io.IOException;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
+import org.mobicents.protocols.asn.BerCursor;
+import org.mobicents.protocols.asn.BerTag;
 import org.mobicents.protocols.asn.Tag;
+import org.restcomm.protocols.ss7.map.MapBerSupport;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.MAPMessageType;
 import org.restcomm.protocols.ss7.map.api.MAPOperationCode;
@@ -364,7 +367,8 @@ public class ProvideSubscriberLocationRequestImpl extends LsmMessageImpl impleme
     public void decodeAll(AsnInputStream asnInputStream) throws MAPParsingComponentException {
         try {
             int length = asnInputStream.readLength();
-            this._decode(asnInputStream, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, asnInputStream, length, this::_decodeBer, this::_clearFields,
+                    this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": ", e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -382,7 +386,8 @@ public class ProvideSubscriberLocationRequestImpl extends LsmMessageImpl impleme
      */
     public void decodeData(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException {
         try {
-            this._decode(asnInputStream, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, asnInputStream, length, this::_decodeBer, this::_clearFields,
+                    this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": ", e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -392,7 +397,7 @@ public class ProvideSubscriberLocationRequestImpl extends LsmMessageImpl impleme
         }
     }
 
-    private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
+    private void _clearFields() {
         this.locationType = null;
         this.mlcNumber = null;
         this.lcsClientID = null;
@@ -414,6 +419,163 @@ public class ProvideSubscriberLocationRequestImpl extends LsmMessageImpl impleme
         this.moLrShortCircuitIndicator = false;
         this.periodicLDRInfo = null;
         this.reportingPLMNList = null;
+    }
+
+    private void _decodeBer(byte[] buf, int offset, int length)
+            throws AsnException, IOException, MAPParsingComponentException {
+        _clearFields();
+        BerCursor c = BerCursor.wrapHeap(buf, offset, length);
+        if (!c.hasMore())
+            throw new AsnException(_PrimitiveName + ": missing locationType");
+        c.readTag();
+        if (c.tagClass() != BerTag.UNIVERSAL || c.isPrimitive() || c.tag() != BerTag.SEQUENCE)
+            throw new AsnException(_PrimitiveName + ": bad locationType");
+        LocationTypeImpl lt = new LocationTypeImpl();
+        MapBerSupport.decodeNested(c, lt);
+        this.locationType = lt;
+
+        if (!c.hasMore())
+            throw new AsnException(_PrimitiveName + ": missing mlcNumber");
+        c.readTag();
+        if (c.tagClass() != BerTag.UNIVERSAL || !c.isPrimitive() || c.tag() != BerTag.OCTET_STRING)
+            throw new AsnException(_PrimitiveName + ": bad mlcNumber");
+        ISDNAddressStringImpl mlc = new ISDNAddressStringImpl();
+        MapBerSupport.decodeNested(c, mlc);
+        this.mlcNumber = mlc;
+
+        while (c.hasMore()) {
+            c.readTag();
+            if (c.tagClass() != BerTag.CONTEXT)
+                MapBerSupport.unknownTag(_PrimitiveName, c);
+            switch (c.tag()) {
+                case _TAG_LCS_CLIENT_ID -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": lcsClientID is primitive");
+                    LCSClientIDImpl cid = new LCSClientIDImpl();
+                    MapBerSupport.decodeNested(c, cid);
+                    this.lcsClientID = cid;
+                }
+                case _TAG_PRIVACY_OVERRIDE -> {
+                    MapBerSupport.readNull(c);
+                    this.privacyOverride = true;
+                }
+                case _TAG_IMSI -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": imsi is not primitive");
+                    IMSIImpl im = new IMSIImpl();
+                    MapBerSupport.decodeNested(c, im);
+                    this.imsi = im;
+                }
+                case _TAG_MSISDN -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": msisdn is not primitive");
+                    ISDNAddressStringImpl ms = new ISDNAddressStringImpl();
+                    MapBerSupport.decodeNested(c, ms);
+                    this.msisdn = ms;
+                }
+                case _TAG_LMSI -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": lmsi is not primitive");
+                    LMSIImpl lm = new LMSIImpl();
+                    MapBerSupport.decodeNested(c, lm);
+                    this.lmsi = lm;
+                }
+                case _TAG_IMEI -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": imei is not primitive");
+                    IMEIImpl ime = new IMEIImpl();
+                    MapBerSupport.decodeNested(c, ime);
+                    this.imei = ime;
+                }
+                case _TAG_LCS_PRIORITY -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": lcsPriority is not primitive");
+                    this.lcsPriority = LCSPriority.getInstance(MapBerSupport.firstOctet(c));
+                }
+                case _TAG_LCS_QOS -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": lcsQoS is primitive");
+                    LCSQoSImpl qos = new LCSQoSImpl();
+                    MapBerSupport.decodeNested(c, qos);
+                    this.lcsQoS = qos;
+                }
+                case _TAG_EXTENSION_CONTAINER -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": extensionContainer is primitive");
+                    MAPExtensionContainerImpl ext = new MAPExtensionContainerImpl();
+                    MapBerSupport.decodeNested(c, ext);
+                    this.extensionContainer = ext;
+                }
+                case _TAG_SUPPORTED_GAD_SHAPES -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": supportedGADShapes is not primitive");
+                    SupportedGADShapesImpl gad = new SupportedGADShapesImpl();
+                    MapBerSupport.decodeNested(c, gad);
+                    this.supportedGADShapes = gad;
+                }
+                case _TAG_LCS_REFERENCE_NUMBER -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": lcsReferenceNumber is not primitive");
+                    this.lcsReferenceNumber = MapBerSupport.firstOctet(c);
+                }
+                case _TAG_LCS_SERVICE_TYPE_ID -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": lcsServiceTypeID is not primitive");
+                    this.lcsServiceTypeID = MapBerSupport.readInt(c);
+                }
+                case _TAG_LCS_CODEWORD -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": lcsCodeword is primitive");
+                    LCSCodewordImpl cw = new LCSCodewordImpl();
+                    MapBerSupport.decodeNested(c, cw);
+                    this.lcsCodeword = cw;
+                }
+                case _TAG_LCS_PRIVACY_CHECK -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": lcsPrivacyCheck is primitive");
+                    LCSPrivacyCheckImpl pc = new LCSPrivacyCheckImpl();
+                    MapBerSupport.decodeNested(c, pc);
+                    this.lcsPrivacyCheck = pc;
+                }
+                case _TAG_AREA_EVENT_INFO -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": areaEventInfo is primitive");
+                    AreaEventInfoImpl aei = new AreaEventInfoImpl();
+                    MapBerSupport.decodeNested(c, aei);
+                    this.areaEventInfo = aei;
+                }
+                case _TAG_H_GMLC_ADDRESS -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": hgmlcAddress is not primitive");
+                    GSNAddressImpl hg = new GSNAddressImpl();
+                    MapBerSupport.decodeNested(c, hg);
+                    this.hgmlcAddress = hg;
+                }
+                case _TAG_MO_LR_SHORT_CIRCUIT_INDICATOR -> {
+                    MapBerSupport.readNull(c);
+                    this.moLrShortCircuitIndicator = true;
+                }
+                case _TAG_PERIODIC_LDR_INFO -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": periodicLDRInfo is primitive");
+                    PeriodicLDRInfoImpl pldr = new PeriodicLDRInfoImpl();
+                    MapBerSupport.decodeNested(c, pldr);
+                    this.periodicLDRInfo = pldr;
+                }
+                case _TAG_REPORTING_PLMN_LIST -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": reportingPLMNList is primitive");
+                    ReportingPLMNListImpl rpl = new ReportingPLMNListImpl();
+                    MapBerSupport.decodeNested(c, rpl);
+                    this.reportingPLMNList = rpl;
+                }
+                default -> MapBerSupport.unknownTag(_PrimitiveName, c);
+            }
+        }
+    }
+
+    private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
+        _clearFields();
 
         AsnInputStream ais = asnInputStream.readSequenceStreamData(length);
 

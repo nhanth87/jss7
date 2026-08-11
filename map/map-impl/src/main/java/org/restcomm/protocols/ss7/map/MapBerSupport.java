@@ -9,10 +9,21 @@ import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.BerCursor;
 import org.mobicents.protocols.asn.BerTag;
 import org.mobicents.protocols.asn.Jss7AsnConfig;
+import org.restcomm.protocols.ss7.map.api.primitives.CellGlobalIdOrServiceAreaIdOrLAI;
+import org.restcomm.protocols.ss7.map.api.service.supplementary.SSCode;
 import org.restcomm.protocols.ss7.map.datacoding.CBSDataCodingSchemeImpl;
-import org.restcomm.protocols.ss7.map.primitives.USSDStringImpl;
+import org.restcomm.protocols.ss7.map.primitives.CellGlobalIdOrServiceAreaIdFixedLengthImpl;
+import org.restcomm.protocols.ss7.map.primitives.CellGlobalIdOrServiceAreaIdOrLAIImpl;
 import org.restcomm.protocols.ss7.map.primitives.ISDNAddressStringImpl;
+import org.restcomm.protocols.ss7.map.primitives.LAIFixedLengthImpl;
+import org.restcomm.protocols.ss7.map.primitives.MAPAsnPrimitive;
+import org.restcomm.protocols.ss7.map.primitives.USSDStringImpl;
 import org.restcomm.protocols.ss7.map.api.MAPParsingComponentException;
+import org.restcomm.protocols.ss7.map.service.supplementary.SSCodeImpl;
+
+import java.util.ArrayList;
+
+import java.io.IOException;
 
 /**
  * Shared support for wiring SMSC/USSD hot-path MAP messages onto {@link org.mobicents.protocols.asn.BerCursor}
@@ -90,6 +101,144 @@ public final class MapBerSupport {
     public static AsnInputStream taggedValueStream(BerCursor c) {
         byte[] v = java.util.Arrays.copyOfRange(c.heapBuffer(), c.valueOffset(), c.valueOffset() + c.valueLength());
         return new AsnInputStream(v, c.tagClass(), c.isPrimitive(), c.tag());
+    }
+
+    @FunctionalInterface
+    public interface TopLevelDecoder {
+        void decode(AsnInputStream input, int length)
+                throws MAPParsingComponentException, IOException, AsnException;
+    }
+
+    @FunctionalInterface
+    public interface BerDecoder {
+        void decode(byte[] buf, int offset, int length)
+                throws AsnException, IOException, MAPParsingComponentException;
+    }
+
+    /**
+     * SRI-SM-style dispatch: try {@link BerDecoder} on the heap snapshot; on any failure
+     * clear fields and run the classic {@link TopLevelDecoder}. The stream is advanced
+     * only after a successful BerCursor decode.
+     */
+    public static void decodeDispatch(String messageName, AsnInputStream input, int length,
+            BerDecoder berDecoder, Runnable clearFields, TopLevelDecoder legacy)
+            throws MAPParsingComponentException, IOException, AsnException {
+        if (useBer(input)) {
+            try {
+                berDecoder.decode(input.getBuffer(), absOffset(input), length);
+                input.advance(length);
+                recordBerOk();
+                return;
+            } catch (Throwable t) {
+                logFallback(messageName, t);
+                if (clearFields != null)
+                    clearFields.run();
+            }
+        }
+        legacy.decode(input, length);
+    }
+
+    /**
+     * Performs bounded BerCursor dispatch for large MAP top-level messages while retaining
+     * the complete classic field decoder. The cursor pass is side-effect free: malformed BER
+     * falls back with the input position and target object untouched. Once validation succeeds,
+     * the classic decoder remains the single source of truth for known optionals and unknown
+     * extension skipping.
+     *
+     * @deprecated use {@link #decodeDispatch} with a real {@code _decodeBer} that understands
+     *             known optionals; this walk-only helper is insufficient for hot-path decode.
+     */
+    @Deprecated
+    public static void decodeTopLevel(String messageName, AsnInputStream input, int length,
+            TopLevelDecoder decoder) throws MAPParsingComponentException, IOException, AsnException {
+        decodeDispatch(messageName, input, length, (buf, off, len) -> {
+            throw new AsnException(messageName + ": decodeTopLevel is walk-only; use decodeDispatch");
+        }, null, decoder);
+    }
+
+    /** Decode a nested MAP primitive from the current TLV value, then skip it. */
+    public static void decodeNested(BerCursor c, MAPAsnPrimitive dest) throws MAPParsingComponentException {
+        dest.decodeData(taggedValueStream(c), c.valueLength());
+        c.skipValue();
+    }
+
+    /**
+     * Decode an explicitly tagged CHOICE: open the constructed wrapper, read the inner
+     * CHOICE tag, then {@code decodeData} the value.
+     */
+    public static void decodeExplicitChoice(BerCursor c, MAPAsnPrimitive dest)
+            throws AsnException, MAPParsingComponentException {
+        if (c.isPrimitive())
+            throw new AsnException("expected constructed explicit CHOICE");
+        BerCursor inner = c.openConstructed();
+        if (!inner.hasMore())
+            throw new AsnException("empty explicit CHOICE");
+        inner.readTag();
+        dest.decodeData(taggedValueStream(inner), inner.valueLength());
+        c.skipValue();
+    }
+
+    public static int readInt(BerCursor c) {
+        return c.readInt32();
+    }
+
+    public static void readNull(BerCursor c) throws AsnException {
+        if (!c.isPrimitive())
+            throw new AsnException("NULL must be primitive");
+        c.skipValue();
+    }
+
+    public static int firstOctet(BerCursor c) throws AsnException {
+        if (c.valueLength() < 1)
+            throw new AsnException("empty OCTET STRING");
+        int v = c.heapBuffer()[c.valueOffset()] & 0xFF;
+        c.skipValue();
+        return v;
+    }
+
+    public static void unknownTag(String name, BerCursor c) throws AsnException {
+        throw new AsnException(name + ": unknown tag class=" + c.tagClass() + " tag=" + c.tag());
+    }
+
+    public static ArrayList<SSCode> decodeSsList(BerCursor c) throws AsnException, MAPParsingComponentException {
+        if (c.isPrimitive())
+            throw new AsnException("ssList is primitive");
+        BerCursor inner = c.openConstructed();
+        ArrayList<SSCode> list = new ArrayList<>();
+        while (inner.hasMore()) {
+            inner.readTag();
+            if (inner.tagClass() != BerTag.UNIVERSAL || !inner.isPrimitive() || inner.tag() != BerTag.OCTET_STRING)
+                throw new AsnException("bad ssList element");
+            SSCodeImpl sc = new SSCodeImpl();
+            sc.decodeData(taggedValueStream(inner), inner.valueLength());
+            inner.skipValue();
+            list.add(sc);
+        }
+        c.skipValue();
+        return list;
+    }
+
+    public static CellGlobalIdOrServiceAreaIdOrLAI decodeCellIdOrSai(BerCursor c, String name)
+            throws AsnException, MAPParsingComponentException {
+        if (c.isPrimitive()) {
+            int len = c.valueLength();
+            if (len == 7) {
+                CellGlobalIdOrServiceAreaIdFixedLengthImpl val = new CellGlobalIdOrServiceAreaIdFixedLengthImpl();
+                val.decodeData(taggedValueStream(c), len);
+                c.skipValue();
+                return new CellGlobalIdOrServiceAreaIdOrLAIImpl(val);
+            }
+            if (len == 5) {
+                LAIFixedLengthImpl val = new LAIFixedLengthImpl();
+                val.decodeData(taggedValueStream(c), len);
+                c.skipValue();
+                return new CellGlobalIdOrServiceAreaIdOrLAIImpl(val);
+            }
+            throw new AsnException(name + ": cellIdOrSai length must be 5 or 7");
+        }
+        CellGlobalIdOrServiceAreaIdOrLAIImpl cgi = new CellGlobalIdOrServiceAreaIdOrLAIImpl();
+        decodeExplicitChoice(c, cgi);
+        return cgi;
     }
 
     /** Result of {@link #decodeUssdArg}: the two mandatory fields shared by all USSD messages. */

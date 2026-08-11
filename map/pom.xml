@@ -19,6 +19,7 @@
 		<module>map-api</module>
 		<module>map-impl</module>
 		<module>load</module>
+		<module>map-ber-jmh</module>
 	</modules>
 
 	<build>

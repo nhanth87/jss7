@@ -5,7 +5,10 @@ import java.io.IOException;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
+import org.mobicents.protocols.asn.BerCursor;
+import org.mobicents.protocols.asn.BerTag;
 import org.mobicents.protocols.asn.Tag;
+import org.restcomm.protocols.ss7.map.MapBerSupport;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.MAPMessageType;
 import org.restcomm.protocols.ss7.map.api.MAPOperationCode;
@@ -193,7 +196,8 @@ public class SubscriberLocationReportResponseImpl extends LsmMessageImpl impleme
     public void decodeAll(AsnInputStream asnInputStream) throws MAPParsingComponentException {
         try {
             int length = asnInputStream.readLength();
-            this._decode(asnInputStream, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, asnInputStream, length, this::_decodeBer, this::_clearFields,
+                    this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": ", e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -211,7 +215,8 @@ public class SubscriberLocationReportResponseImpl extends LsmMessageImpl impleme
      */
     public void decodeData(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException {
         try {
-            this._decode(asnInputStream, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, asnInputStream, length, this::_decodeBer, this::_clearFields,
+                    this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding " + _PrimitiveName + ": ", e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -221,10 +226,79 @@ public class SubscriberLocationReportResponseImpl extends LsmMessageImpl impleme
         }
     }
 
-    private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
+    private void _clearFields() {
         this.naEsrd = null;
         this.naEsrk = null;
         this.extensionContainer = null;
+        this.hGMLCAddress = null;
+        this.molrShortCircuitIndicator = false;
+        this.reportingPLMNList = null;
+        this.lcsReferenceNumber = null;
+    }
+
+    private void _decodeBer(byte[] buf, int offset, int length)
+            throws AsnException, IOException, MAPParsingComponentException {
+        _clearFields();
+        BerCursor c = BerCursor.wrapHeap(buf, offset, length);
+        while (c.hasMore()) {
+            c.readTag();
+            if (c.tagClass() == BerTag.UNIVERSAL) {
+                if (c.tag() == BerTag.SEQUENCE && !c.isPrimitive()) {
+                    MAPExtensionContainerImpl ext = new MAPExtensionContainerImpl();
+                    MapBerSupport.decodeNested(c, ext);
+                    this.extensionContainer = ext;
+                } else {
+                    MapBerSupport.unknownTag(_PrimitiveName, c);
+                }
+                continue;
+            }
+            if (c.tagClass() != BerTag.CONTEXT)
+                MapBerSupport.unknownTag(_PrimitiveName, c);
+            switch (c.tag()) {
+                case _TAG_NA_ESRK -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": naEsrk is not primitive");
+                    ISDNAddressStringImpl esrk = new ISDNAddressStringImpl();
+                    MapBerSupport.decodeNested(c, esrk);
+                    this.naEsrk = esrk;
+                }
+                case _TAG_NA_ESRD -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": naEsrd is not primitive");
+                    ISDNAddressStringImpl esrd = new ISDNAddressStringImpl();
+                    MapBerSupport.decodeNested(c, esrd);
+                    this.naEsrd = esrd;
+                }
+                case _TAG_H_GMLC_ADDRESS -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": hGMLCAddress is not primitive");
+                    GSNAddressImpl hg = new GSNAddressImpl();
+                    MapBerSupport.decodeNested(c, hg);
+                    this.hGMLCAddress = hg;
+                }
+                case _TAG_MO_LR_SHORT_CIC_INDICATOR -> {
+                    MapBerSupport.readNull(c);
+                    this.molrShortCircuitIndicator = true;
+                }
+                case _TAG_REP_PLMN_LIST -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": reportingPLMNList is primitive");
+                    ReportingPLMNListImpl rpl = new ReportingPLMNListImpl();
+                    MapBerSupport.decodeNested(c, rpl);
+                    this.reportingPLMNList = rpl;
+                }
+                case _TAG_LCS_REF_NUMBER -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": lcsReferenceNumber is not primitive");
+                    this.lcsReferenceNumber = MapBerSupport.firstOctet(c);
+                }
+                default -> MapBerSupport.unknownTag(_PrimitiveName, c);
+            }
+        }
+    }
+
+    private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
+        _clearFields();
 
         AsnInputStream ais = asnInputStream.readSequenceStreamData(length);
 

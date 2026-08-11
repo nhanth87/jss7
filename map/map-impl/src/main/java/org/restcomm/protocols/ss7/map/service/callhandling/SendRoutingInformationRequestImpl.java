@@ -5,7 +5,10 @@ import java.io.IOException;
 import org.mobicents.protocols.asn.AsnException;
 import org.mobicents.protocols.asn.AsnInputStream;
 import org.mobicents.protocols.asn.AsnOutputStream;
+import org.mobicents.protocols.asn.BerCursor;
+import org.mobicents.protocols.asn.BerTag;
 import org.mobicents.protocols.asn.Tag;
+import org.restcomm.protocols.ss7.map.MapBerSupport;
 import org.restcomm.protocols.ss7.map.api.MAPException;
 import org.restcomm.protocols.ss7.map.api.MAPMessageType;
 import org.restcomm.protocols.ss7.map.api.MAPOperationCode;
@@ -361,7 +364,8 @@ public class SendRoutingInformationRequestImpl extends CallHandlingMessageImpl i
     public void decodeAll(AsnInputStream asnInputStream) throws MAPParsingComponentException {
         try {
             int length = asnInputStream.readLength();
-            this._decode(asnInputStream, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, asnInputStream, length, this::_decodeBer, this::_clearFields,
+                    this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding SendRoutingInformationRequest: ", e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -374,7 +378,8 @@ public class SendRoutingInformationRequestImpl extends CallHandlingMessageImpl i
     @Override
     public void decodeData(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException {
         try {
-            this._decode(asnInputStream, length);
+            MapBerSupport.decodeDispatch(_PrimitiveName, asnInputStream, length, this::_decodeBer, this::_clearFields,
+                    this::_decode);
         } catch (IOException e) {
             throw new MAPParsingComponentException("IOException when decoding SendRoutingInformationRequest: ", e,
                     MAPParsingComponentExceptionReason.MistypedParameter);
@@ -384,7 +389,7 @@ public class SendRoutingInformationRequestImpl extends CallHandlingMessageImpl i
         }
     }
 
-    private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
+    private void _clearFields() {
         this.msisdn = null;
         this.cugCheckInfo = null;
         this.numberOfForwarding = null;
@@ -415,6 +420,197 @@ public class SendRoutingInformationRequestImpl extends CallHandlingMessageImpl i
         this.suppressMTSS = null;
         this.mtRoamingRetrySupported = false;
         this.callPriority = null;
+    }
+
+    private void _decodeBer(byte[] buf, int offset, int length)
+            throws AsnException, IOException, MAPParsingComponentException {
+        _clearFields();
+        BerCursor c = BerCursor.wrapHeap(buf, offset, length);
+        while (c.hasMore()) {
+            c.readTag();
+            if (c.tagClass() != BerTag.CONTEXT)
+                MapBerSupport.unknownTag(_PrimitiveName, c);
+            switch (c.tag()) {
+                case TAG_msisdn -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": msisdn is not primitive");
+                    ISDNAddressStringImpl m = new ISDNAddressStringImpl();
+                    MapBerSupport.decodeNested(c, m);
+                    this.msisdn = m;
+                }
+                case TAG_cugCheckInfo -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": cugCheckInfo is primitive");
+                    CUGCheckInfoImpl cug = new CUGCheckInfoImpl();
+                    MapBerSupport.decodeNested(c, cug);
+                    this.cugCheckInfo = cug;
+                }
+                case TAG_numberOfForwarding -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": numberOfForwarding is not primitive");
+                    this.numberOfForwarding = MapBerSupport.readInt(c);
+                }
+                case TAG_interrogationType -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": interrogationType is not primitive");
+                    this.interrogationType = InterrogationType.getInterrogationType(MapBerSupport.readInt(c));
+                }
+                case TAG_orInterrogation -> {
+                    MapBerSupport.readNull(c);
+                    this.orInterrogation = true;
+                }
+                case TAG_orCapability -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": orCapability is not primitive");
+                    this.orCapability = MapBerSupport.readInt(c);
+                }
+                case TAG_gmscOrGsmSCFAddress -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": gmscAddress is not primitive");
+                    ISDNAddressStringImpl gmsc = new ISDNAddressStringImpl();
+                    MapBerSupport.decodeNested(c, gmsc);
+                    this.gmscAddress = gmsc;
+                }
+                case TAG_callReferenceNumber -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": callReferenceNumber is not primitive");
+                    CallReferenceNumberImpl crn = new CallReferenceNumberImpl();
+                    MapBerSupport.decodeNested(c, crn);
+                    this.callReferenceNumber = crn;
+                }
+                case TAG_forwardingReason -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": forwardingReason is not primitive");
+                    this.forwardingReason = ForwardingReason.getForwardingReason(MapBerSupport.readInt(c));
+                }
+                case TAG_basicServiceGroup -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": basicServiceGroup is primitive");
+                    ExtBasicServiceCodeImpl bs = new ExtBasicServiceCodeImpl();
+                    MapBerSupport.decodeExplicitChoice(c, bs);
+                    this.basicServiceGroup = bs;
+                }
+                case TAG_networkSignalInfo -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": networkSignalInfo is primitive");
+                    ExternalSignalInfoImpl nsi = new ExternalSignalInfoImpl();
+                    MapBerSupport.decodeNested(c, nsi);
+                    this.networkSignalInfo = nsi;
+                }
+                case TAG_camelInfo -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": camelInfo is primitive");
+                    CamelInfoImpl ci = new CamelInfoImpl();
+                    MapBerSupport.decodeNested(c, ci);
+                    this.camelInfo = ci;
+                }
+                case TAG_suppressionOfAnnouncement -> {
+                    MapBerSupport.readNull(c);
+                    this.suppressionOfAnnouncement = true;
+                }
+                case TAG_extensionContainer -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": extensionContainer is primitive");
+                    MAPExtensionContainerImpl ext = new MAPExtensionContainerImpl();
+                    MapBerSupport.decodeNested(c, ext);
+                    this.extensionContainer = ext;
+                }
+                case TAG_alertingPattern -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": alertingPattern is not primitive");
+                    AlertingPatternImpl ap = new AlertingPatternImpl();
+                    MapBerSupport.decodeNested(c, ap);
+                    this.alertingPattern = ap;
+                }
+                case TAG_ccbsCall -> {
+                    MapBerSupport.readNull(c);
+                    this.ccbsCall = true;
+                }
+                case TAG_supportedCCBSPhase -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": supportedCCBSPhase is not primitive");
+                    this.supportedCCBSPhase = MapBerSupport.readInt(c);
+                }
+                case TAG_additionalSignalInfo -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": additionalSignalInfo is primitive");
+                    ExtExternalSignalInfoImpl asi = new ExtExternalSignalInfoImpl();
+                    MapBerSupport.decodeNested(c, asi);
+                    this.additionalSignalInfo = asi;
+                }
+                case TAG_istSupportIndicator -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": istSupportIndicator is not primitive");
+                    this.istSupportIndicator = ISTSupportIndicator.getInstance(MapBerSupport.readInt(c));
+                }
+                case TAG_prePagingSupported -> {
+                    MapBerSupport.readNull(c);
+                    this.prePagingSupported = true;
+                }
+                case TAG_callDiversionTreatmentIndicator -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": callDiversionTreatmentIndicator is not primitive");
+                    CallDiversionTreatmentIndicatorImpl cdti = new CallDiversionTreatmentIndicatorImpl();
+                    MapBerSupport.decodeNested(c, cdti);
+                    this.callDiversionTreatmentIndicator = cdti;
+                }
+                case TAG_longFTNSupported -> {
+                    MapBerSupport.readNull(c);
+                    this.longFTNSupported = true;
+                }
+                case TAG_suppress_VT_CSI -> {
+                    MapBerSupport.readNull(c);
+                    this.suppressVtCSI = true;
+                }
+                case TAG_suppressIncomingCallBarring -> {
+                    MapBerSupport.readNull(c);
+                    this.suppressIncomingCallBarring = true;
+                }
+                case TAG_gsmSCFInitiatedCall -> {
+                    MapBerSupport.readNull(c);
+                    this.gsmSCFInitiatedCall = true;
+                }
+                case TAG_basicServiceGroup2 -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": basicServiceGroup2 is primitive");
+                    ExtBasicServiceCodeImpl bs2 = new ExtBasicServiceCodeImpl();
+                    MapBerSupport.decodeExplicitChoice(c, bs2);
+                    this.basicServiceGroup2 = bs2;
+                }
+                case TAG_networkSignalInfo2 -> {
+                    if (c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": networkSignalInfo2 is primitive");
+                    ExternalSignalInfoImpl nsi2 = new ExternalSignalInfoImpl();
+                    MapBerSupport.decodeNested(c, nsi2);
+                    this.networkSignalInfo2 = nsi2;
+                }
+                case TAG_suppressMTSS -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": suppressMTSS is not primitive");
+                    SuppressMTSSImpl sm = new SuppressMTSSImpl();
+                    MapBerSupport.decodeNested(c, sm);
+                    this.suppressMTSS = sm;
+                }
+                case TAG_mtRoamingRetrySupported -> {
+                    MapBerSupport.readNull(c);
+                    this.mtRoamingRetrySupported = true;
+                }
+                case TAG_callPriority -> {
+                    if (!c.isPrimitive())
+                        throw new AsnException(_PrimitiveName + ": callPriority is not primitive");
+                    this.callPriority = EMLPPPriority.getEMLPPPriority(MapBerSupport.readInt(c));
+                }
+                default -> MapBerSupport.unknownTag(_PrimitiveName, c);
+            }
+        }
+        if (this.msisdn == null)
+            throw new AsnException(_PrimitiveName + ": missing msisdn");
+        if (this.mapProtocolVersion >= 3 && (this.interrogationType == null || this.gmscAddress == null))
+            throw new AsnException(_PrimitiveName + ": missing V3 mandatory field");
+    }
+
+    private void _decode(AsnInputStream asnInputStream, int length) throws MAPParsingComponentException, IOException, AsnException {
+        _clearFields();
 
         AsnInputStream ais = asnInputStream.readSequenceStreamData(length);
 

@@ -83,12 +83,21 @@ public final class BerCursor {
     private int limit;
     private int pos;
 
+    /** Hard cap on constructed nesting (SEQUENCE-in-SEQUENCE). */
+    public static final int MAX_NESTING = 32;
+    /** Hard cap on TLV count at one cursor level. */
+    public static final int MAX_TAGS = 256;
+    /** High-tag-number encodings longer than this are treated as unterminated. */
+    public static final int MAX_HIGH_TAG_OCTETS = 6;
+
     // ── Cached TLV ───────────────────────────────────────────────────
     private int     tagClass;
     private boolean primitive;
     private int     tag;
     private int     valueOffset;
     private int     valueLength;
+    private int     nesting;
+    private int     tagCount;
 
     // ── Pre-allocated child cursor (eliminates ThreadLocal on inner levels) ──
     private BerCursor child;
@@ -111,11 +120,17 @@ public final class BerCursor {
      * (e.g. a thread-local TCAP decode cursor). Returns {@code this} for chaining.
      */
     public BerCursor resetHeap(byte[] data, int offset, int length) {
+        if (data == null)
+            throw new NullPointerException("data");
+        checkRegion(offset, length, data.length, "heap buffer");
         this.heapBuf = data;
         this.backend = null;
         this.base    = offset;
         this.limit   = offset + length;
         this.pos     = offset;
+        this.nesting = 0;
+        this.tagCount = 0;
+        clearTlv();
         return this;
     }
 
@@ -124,12 +139,32 @@ public final class BerCursor {
      * zero allocation, no ThreadLocal lookup. Returns {@code this} for chaining.
      */
     public BerCursor resetByteBuf(AsnBufferBackend backend, int offset, int length) {
+        if (backend == null)
+            throw new NullPointerException("backend");
+        checkRegion(offset, length, backend.getWriterIndex(), "buffer backend");
         this.heapBuf = null;
         this.backend = backend;
         this.base    = offset;
         this.limit   = offset + length;
         this.pos     = offset;
+        this.nesting = 0;
+        this.tagCount = 0;
+        clearTlv();
         return this;
+    }
+
+    private static void checkRegion(int offset, int length, int capacity, String source) {
+        if (offset < 0 || length < 0 || offset > capacity || length > capacity - offset)
+            throw new IndexOutOfBoundsException("Invalid " + source + " region: offset=" + offset
+                    + ", length=" + length + ", limit=" + capacity);
+    }
+
+    private void clearTlv() {
+        this.tagClass = 0;
+        this.primitive = false;
+        this.tag = 0;
+        this.valueOffset = pos;
+        this.valueLength = 0;
     }
 
     /**
@@ -172,7 +207,9 @@ public final class BerCursor {
     // ==================================================================
 
     @SuppressWarnings("nothing")
-    private int nextByte() {
+    private int nextByte() throws AsnException {
+        if (pos >= limit)
+            throw new AsnException("Unexpected end of BER input at offset " + pos);
         if (heapBuf != null)
             return heapBuf[pos++] & 0xFF;   // ← direct array, JIT inline
         return backend.readByte(pos++) & 0xFF;
@@ -190,28 +227,50 @@ public final class BerCursor {
     // ==================================================================
 
     public void readTag() throws AsnException {
+        if (++tagCount > MAX_TAGS)
+            throw new AsnException("BER tag count exceeds " + MAX_TAGS);
         int b = nextByte();
         tagClass  = (b >> 6) & 0x03;
         primitive = (b & 0x20) == 0;
         tag       = b & 0x1F;
         if (tag == 0x1F) {
             tag = 0;
+            int octets = 0;
             do {
+                if (octets >= MAX_HIGH_TAG_OCTETS)
+                    throw new AsnException("Unterminated BER high-tag-number encoding");
                 b = nextByte();
+                if (octets++ == 0 && (b & 0x7F) == 0)
+                    throw new AsnException("Malformed BER high-tag-number encoding");
+                if (tag > (Integer.MAX_VALUE >>> 7))
+                    throw new AsnException("BER tag number overflow");
                 tag = (tag << 7) | (b & 0x7F);
             } while ((b & 0x80) != 0);
+            if (tag < 0x1F)
+                throw new AsnException("Non-minimal BER high-tag-number encoding");
         }
         b = nextByte();
         if (b <= 0x7F) {
             valueLength = b;
         } else {
             int n = b & 0x7F;
+            if (n == 0) {
+                if (primitive)
+                    throw new AsnException("Indefinite length is illegal for primitive BER values");
+                throw new AsnException("Indefinite constructed BER values are not supported");
+            }
             if (n > 4) throw new AsnException("BER length field too large: " + n + " bytes");
-            valueLength = 0;
+            long decodedLength = 0;
             for (int i = 0; i < n; i++)
-                valueLength = (valueLength << 8) | nextByte();
+                decodedLength = (decodedLength << 8) | nextByte();
+            if (decodedLength > Integer.MAX_VALUE)
+                throw new AsnException("BER value length exceeds supported range: " + decodedLength);
+            valueLength = (int) decodedLength;
         }
         valueOffset = pos;
+        if (valueLength > limit - valueOffset)
+            throw new AsnException("BER value exceeds containing input: length=" + valueLength
+                    + ", remaining=" + (limit - valueOffset));
     }
 
     // ==================================================================
@@ -260,8 +319,9 @@ public final class BerCursor {
      * }</pre>
      */
     public BerSlice sliceFrom(int startPos) {
+        if (startPos < base || startPos > pos)
+            throw new IndexOutOfBoundsException("Invalid BER slice start: " + startPos);
         int len = pos - startPos;
-        if (len < 0) len = 0;
         if (heapBuf != null)
             return new BerSlice(heapBuf, startPos, len);
         return new BerSlice(backend, startPos, len);
@@ -286,7 +346,9 @@ public final class BerCursor {
      * Opens a sub-cursor sharing the same underlying data.
      * Uses pre-allocated child cursor — no ThreadLocal lookup on inner levels.
      */
-    public BerCursor openConstructed() {
+    public BerCursor openConstructed() throws AsnException {
+        if (this.nesting >= MAX_NESTING)
+            throw new AsnException("BER nesting exceeds " + MAX_NESTING);
         BerCursor body = this.child;
         if (body == null) {
             body = new BerCursor();
@@ -297,6 +359,9 @@ public final class BerCursor {
         body.base     = valueOffset;
         body.limit    = valueOffset + valueLength;
         body.pos      = valueOffset;
+        body.nesting  = this.nesting + 1;
+        body.tagCount = 0;
+        body.clearTlv();
         return body;
     }
 
