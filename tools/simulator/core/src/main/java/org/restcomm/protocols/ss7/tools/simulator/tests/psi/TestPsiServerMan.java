@@ -171,6 +171,7 @@ import org.restcomm.protocols.ss7.tcap.asn.comp.InvokeProblemType;
 import org.restcomm.protocols.ss7.tcap.asn.comp.Problem;
 import org.restcomm.protocols.ss7.tools.simulator.Stoppable;
 import org.restcomm.protocols.ss7.tools.simulator.common.AddressNatureType;
+import org.restcomm.protocols.ss7.tools.simulator.common.GmlcLabGeo;
 import org.restcomm.protocols.ss7.tools.simulator.common.TesterBase;
 import org.restcomm.protocols.ss7.tools.simulator.level3.MapMan;
 import org.restcomm.protocols.ss7.tools.simulator.level3.NumberingPlanMapType;
@@ -1016,6 +1017,44 @@ public class TestPsiServerMan extends TesterBase implements TestPsiServerManMBea
                       NumberingPlan.ISDN, vlrAddress);
                 }
               }
+              // Digicom-ET GMLC lab: stamp random Addis Ababa GAD (ATI/PSI/LCS share GmlcLabGeo).
+              if (GmlcLabGeo.enabled()) {
+                GmlcLabGeo.Sample addis = GmlcLabGeo.randomSample(rand);
+                subscriberStateChoice = SubscriberStateChoice.assumedIdle;
+                notReachableReason = null;
+                if (requestedInfo.getSubscriberState()) {
+                  subscriberState = mapProvider.getMAPParameterFactory()
+                      .createSubscriberState(subscriberStateChoice, null);
+                }
+                ageOfLocationInformation = 0;
+                currentLocationRetrieved = true;
+                mcc = addis.mcc();
+                mnc = addis.mnc();
+                lac = addis.lac();
+                cellId = addis.cellId();
+                geographicalLatitude = addis.latitude();
+                geographicalLongitude = addis.longitude();
+                geographicalUncertainty = addis.uncertaintyMeters();
+                geographicalInformation = new GeographicalInformationImpl(
+                    TypeOfShape.EllipsoidPointWithUncertaintyCircle,
+                    geographicalLatitude, geographicalLongitude, geographicalUncertainty);
+                geodeticInformation = null;
+                mscNumber = new ISDNAddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, mscAddress);
+                vlrNumber = mapProvider.getMAPParameterFactory().createISDNAddressString(
+                    AddressNature.international_number, NumberingPlan.ISDN, vlrAddress);
+                try {
+                  cgiOrSai = mapProvider.getMAPParameterFactory()
+                      .createCellGlobalIdOrServiceAreaIdFixedLength(mcc, mnc, lac, cellId);
+                  cellGlobalIdOrServiceAreaIdOrLAI = mapProvider.getMAPParameterFactory()
+                      .createCellGlobalIdOrServiceAreaIdOrLAI(cgiOrSai);
+                } catch (MAPException ex) {
+                  ex.printStackTrace();
+                }
+                logger.info(String.format(
+                    "PSI lab Addis Ababa lat=%.6f lon=%.6f unc=%.1f cgi=%d-%d-%d-%d",
+                    geographicalLatitude, geographicalLongitude, geographicalUncertainty,
+                    mcc, mnc, lac, cellId));
+              }
               boolean epsLocationInfoSupported = requestedInfo.getLocationInformationEPSSupported();
               if (!epsLocationInfoSupported) {
                 locationInformationEPS = null; // set locationInformationEPS to null
@@ -1403,7 +1442,7 @@ public class TestPsiServerMan extends TesterBase implements TestPsiServerManMBea
         sb.append(",\nGeographical Type of Shape=");
         sb.append(subscriberInfo.getLocationInformation().getGeographicalInformation().getTypeOfShape());
       }
-      if (subscriberInfo.getLocationInformation().getGeographicalInformation() != null) {
+      if (subscriberInfo.getLocationInformation().getGeodeticInformation() != null) {
         sb.append(",\nGeodetic Latitude=");
         sb.append(subscriberInfo.getLocationInformation().getGeodeticInformation().getLatitude());
         sb.append(",\nGeodetic Longitude=");

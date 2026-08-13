@@ -59,8 +59,23 @@ public record Ss7Config(
             @JsonProperty("workerThreads") int workerThreads,
             @JsonProperty("maxInStreams")  int maxInStreams,
             @JsonProperty("maxOutStreams") int maxOutStreams,
-            @JsonProperty("links")         List<Link> links
-    ) { }
+            @JsonProperty("links")         List<Link> links,
+            /** {@code FSTACK_DPDK} (default) or {@code NETTY_KERNEL} (JVM-only). */
+            @JsonProperty("backend")       String backend,
+            /** {@code IN_PROCESS} (FFM, same address space) or {@code SIDECAR}. */
+            @JsonProperty("mode")          String mode,
+            /** {@code LOOPBACK} (no NIC) or {@code DPDK}. */
+            @JsonProperty("dataplane")     String dataplane,
+            /** Path to {@code libsctp_fstack.so}; relative paths resolve from cwd. */
+            @JsonProperty("library")       String library,
+            /** When true, FFM loads the library in-process. Implied by {@code mode=IN_PROCESS}. */
+            @JsonProperty("inProcess")     Boolean inProcess
+    ) {
+        /** Topology-only constructor — transport fields stay unset (implicit defaults). */
+        public Sctp(int connectDelay, int workerThreads, int maxInStreams, int maxOutStreams, List<Link> links) {
+            this(connectDelay, workerThreads, maxInStreams, maxOutStreams, links, null, null, null, null, null);
+        }
+    }
 
     /**
      * One SCTP link. {@code local}/{@code peer} are written as {@code "ip:port"}.

@@ -112,6 +112,7 @@ import org.restcomm.protocols.ss7.tcap.asn.ProblemImpl;
 import org.restcomm.protocols.ss7.tcap.asn.comp.InvokeProblemType;
 import org.restcomm.protocols.ss7.tcap.asn.comp.Problem;
 import org.restcomm.protocols.ss7.tools.simulator.Stoppable;
+import org.restcomm.protocols.ss7.tools.simulator.common.GmlcLabGeo;
 import org.restcomm.protocols.ss7.tools.simulator.common.TesterBase;
 import org.restcomm.protocols.ss7.tools.simulator.level3.MapMan;
 import org.restcomm.protocols.ss7.tools.simulator.management.TesterHostImpl;
@@ -735,6 +736,40 @@ public class TestAtiServerMan extends TesterBase implements TestAtiServerManMBea
                                         NumberingPlan.ISDN, vlrAddress);
                                 }
                             }
+                            // Digicom-ET GMLC lab: stamp Addis Ababa GAD (shared with PSI/LCS).
+                            if (GmlcLabGeo.enabled()) {
+                                subscriberStateChoice = SubscriberStateChoice.assumedIdle;
+                                notReachableReason = null;
+                                if (requestedInfo.getSubscriberState()) {
+                                    subscriberState = mapProvider.getMAPParameterFactory()
+                                            .createSubscriberState(subscriberStateChoice, null);
+                                }
+                                ageOfLocationInformation = 0;
+                                currentLocationRetrieved = true;
+                                mcc = GmlcLabGeo.MCC;
+                                mnc = GmlcLabGeo.MNC;
+                                lac = GmlcLabGeo.randomLac(rand);
+                                cellId = GmlcLabGeo.randomCellId(rand);
+                                double[] addis = GmlcLabGeo.randomAddis(rand);
+                                geographicalLatitude = addis[0];
+                                geographicalLongitude = addis[1];
+                                geographicalUncertainty = GmlcLabGeo.randomUncertaintyMeters(rand);
+                                geographicalInformation = new GeographicalInformationImpl(
+                                        TypeOfShape.EllipsoidPointWithUncertaintyCircle,
+                                        geographicalLatitude, geographicalLongitude, geographicalUncertainty);
+                                geodeticInformation = null;
+                                mscNumber = new ISDNAddressStringImpl(AddressNature.international_number, NumberingPlan.ISDN, mscAddress);
+                                vlrNumber = mapProvider.getMAPParameterFactory().createISDNAddressString(
+                                        AddressNature.international_number, NumberingPlan.ISDN, vlrAddress);
+                                cgiOrSai = mapProvider.getMAPParameterFactory()
+                                        .createCellGlobalIdOrServiceAreaIdFixedLength(mcc, mnc, lac, cellId);
+                                cellGlobalIdOrServiceAreaIdOrLAI = mapProvider.getMAPParameterFactory()
+                                        .createCellGlobalIdOrServiceAreaIdOrLAI(cgiOrSai);
+                                logger.info(String.format(
+                                        "ATI lab Addis Ababa lat=%.6f lon=%.6f unc=%.1f cgi=%d-%d-%d-%d",
+                                        geographicalLatitude, geographicalLongitude, geographicalUncertainty,
+                                        mcc, mnc, lac, cellId));
+                            }
                             boolean epsLocationInfoSupported = requestedInfo.getLocationInformationEPSSupported();
                             if (!epsLocationInfoSupported) {
                                 locationInformationEPS = null; // set locationInformationEPS to null
@@ -921,6 +956,37 @@ public class TestAtiServerMan extends TesterBase implements TestAtiServerManMBea
                                 currentLocationRetrieved = false;
                                 geographicalInformation = null;
                                 geodeticInformation = null;
+                            }
+                            // Digicom-ET GMLC lab: stamp Addis Ababa GAD on GPRS LocationInformation too.
+                            if (GmlcLabGeo.enabled()) {
+                                psSubscriberStateChoice = PSSubscriberStateChoice.psAttachedReachableForPaging;
+                                notReachableReason = null;
+                                if (requestedInfo.getSubscriberState()) {
+                                    psSubscriberState = mapProvider.getMAPParameterFactory()
+                                            .createPSSubscriberState(psSubscriberStateChoice, null, pdpContextInfoList);
+                                }
+                                ageOfLocationInformation = 0;
+                                currentLocationRetrieved = true;
+                                mcc = GmlcLabGeo.MCC;
+                                mnc = GmlcLabGeo.MNC;
+                                lac = GmlcLabGeo.randomLac(rand);
+                                cellId = GmlcLabGeo.randomCellId(rand);
+                                double[] addis = GmlcLabGeo.randomAddis(rand);
+                                geographicalLatitude = addis[0];
+                                geographicalLongitude = addis[1];
+                                geographicalUncertainty = GmlcLabGeo.randomUncertaintyMeters(rand);
+                                geographicalInformation = new GeographicalInformationImpl(
+                                        TypeOfShape.EllipsoidPointWithUncertaintyCircle,
+                                        geographicalLatitude, geographicalLongitude, geographicalUncertainty);
+                                geodeticInformation = null;
+                                cgiOrSai = mapProvider.getMAPParameterFactory()
+                                        .createCellGlobalIdOrServiceAreaIdFixedLength(mcc, mnc, lac, cellId);
+                                cellGlobalIdOrServiceAreaIdOrLAI = mapProvider.getMAPParameterFactory()
+                                        .createCellGlobalIdOrServiceAreaIdOrLAI(cgiOrSai);
+                                logger.info(String.format(
+                                        "ATI(GPRS) lab Addis Ababa lat=%.6f lon=%.6f unc=%.1f cgi=%d-%d-%d-%d",
+                                        geographicalLatitude, geographicalLongitude, geographicalUncertainty,
+                                        mcc, mnc, lac, cellId));
                             }
                             locationInformationGPRS = mapProvider.getMAPParameterFactory().createLocationInformationGPRS(cellGlobalIdOrServiceAreaIdOrLAI,
                                     routeingAreaIdentity, geographicalInformation, sgsnNumber, selectedLSAIdentity, extensionContainer, saiPresent, geodeticInformation,

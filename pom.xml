@@ -126,6 +126,16 @@
 				<artifactId>sctp-impl</artifactId>
 				<version>${sctp.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.mobicents.protocols.sctp</groupId>
+				<artifactId>sctp-core</artifactId>
+				<version>${sctp.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mobicents.protocols.sctp</groupId>
+				<artifactId>sctp-backend-fstack</artifactId>
+				<version>${sctp.version}</version>
+			</dependency>
 			<!-- Netty SCTP Transport -->
 			<dependency>
 				<groupId>io.netty</groupId>
@@ -581,6 +591,19 @@
 			     config points <archive><manifestFile> at that never-generated file and fails packaging.
 			     Override the default-jar execution's archive reactor-wide so the jar plugin emits its
 			     own plain manifest. No OSGi bundles are shipped here. -->
+			<!-- maven-bundle-plugin 2.3.4 exposes no <skip> parameter, so neither
+			     -Dmaven-bundle-plugin.skip nor <configuration><skip> can stop it; the restcomm-parent
+			     'bundle-manifest' execution must be unbound from process-classes instead. -->
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>bundle-manifest</id>
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>

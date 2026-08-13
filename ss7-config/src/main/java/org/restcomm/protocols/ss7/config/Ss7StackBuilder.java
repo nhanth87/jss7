@@ -5,6 +5,11 @@ package org.restcomm.protocols.ss7.config;
 
 import org.mobicents.protocols.api.IpChannelType;
 import org.mobicents.protocols.api.Management;
+import org.mobicents.protocols.sctp.fstack.FstackSctpManagementImpl;
+import org.mobicents.protocols.sctp.spi.SctpBackend;
+import org.mobicents.protocols.sctp.spi.SctpDataplane;
+import org.mobicents.protocols.sctp.spi.SctpProvider;
+import org.mobicents.protocols.sctp.spi.SctpTransportMode;
 import org.restcomm.protocols.ss7.cap.CAPStackImpl;
 import org.restcomm.protocols.ss7.cap.api.CAPStack;
 import org.restcomm.protocols.ss7.indicator.NatureOfAddress;
@@ -62,11 +67,6 @@ public final class Ss7StackBuilder {
 
     private static final Logger LOG = LogManager.getLogger(Ss7StackBuilder.class);
 
-    /** Default SCTP provider (mobicents Netty-based impl), resolved reflectively. */
-    private static final String SCTP_IMPL =
-            System.getProperty("ss7.sctp.impl",
-                    "org.mobicents.protocols.sctp.netty.NettySctpManagementImpl");
-
     private final Ss7Config cfg;
 
     private Ss7StackBuilder(Ss7Config cfg) { this.cfg = cfg; }
@@ -117,11 +117,84 @@ public final class Ss7StackBuilder {
         }
     }
 
+    private Management createSctp(String name) throws Exception {
+        stampSctpSystemProperties();
+        String backendRaw = cfg.sctp() != null ? cfg.sctp().backend() : null;
+        if (backendRaw != null && !backendRaw.isBlank()) {
+            SctpBackend backend = SctpBackend.from(backendRaw);
+            if (backend == SctpBackend.NETTY_KERNEL && SctpProvider.isNativeImage()) {
+                throw new IllegalStateException("NETTY_KERNEL SCTP is forbidden in GraalVM native images");
+            }
+            return SctpProvider.create(name, backend);
+        }
+        String impl = System.getProperty("ss7.sctp.impl", "");
+        if (impl != null && !impl.isBlank()) {
+            if (impl.contains("netty") && SctpProvider.isNativeImage()) {
+                throw new IllegalStateException("NETTY_KERNEL SCTP is forbidden in GraalVM native images");
+            }
+            return (Management) Class.forName(impl).getConstructor(String.class).newInstance(name);
+        }
+        return SctpProvider.create(name);
+    }
+
+    /**
+     * JSON {@code sctp.backend/mode/dataplane/library/inProcess} wins over {@code -D}.
+     * Omitted fields leave existing System properties (run.sh / application.properties).
+     */
+    private void stampSctpSystemProperties() {
+        Ss7Config.Sctp s = cfg.sctp();
+        if (s == null) {
+            return;
+        }
+        putJson("sctp.backend", s.backend());
+        putJson("sctp.fstack.mode", s.mode());
+        putJson("sctp.fstack.dataplane", s.dataplane());
+        if (s.library() != null && !s.library().isBlank()) {
+            Path lib = Path.of(s.library());
+            if (!lib.isAbsolute()) {
+                lib = Path.of("").toAbsolutePath().resolve(lib);
+            }
+            putJson("sctp.fstack.library", lib.toString());
+        }
+        Boolean inProcess = s.inProcess();
+        if (inProcess == null && s.mode() != null && !s.mode().isBlank()) {
+            inProcess = "IN_PROCESS".equalsIgnoreCase(s.mode().trim().replace('-', '_'));
+        }
+        if (inProcess != null) {
+            putJson("sctp.fstack.inprocess.enabled", Boolean.toString(inProcess));
+        }
+        LOG.info("[ss7-config] SCTP from JSON backend={} mode={} dataplane={} inprocess={} library={}",
+                System.getProperty("sctp.backend"),
+                System.getProperty("sctp.fstack.mode"),
+                System.getProperty("sctp.fstack.dataplane"),
+                System.getProperty("sctp.fstack.inprocess.enabled"),
+                System.getProperty("sctp.fstack.library"));
+    }
+
+    private static void putJson(String key, String value) {
+        if (value != null && !value.isBlank()) {
+            System.setProperty(key, value.trim());
+        }
+    }
+
+    private void applySctpTransport(Management sctp) {
+        Ss7Config.Sctp s = cfg.sctp();
+        if (s == null || !(sctp instanceof FstackSctpManagementImpl fs)) {
+            return;
+        }
+        if (s.mode() != null && !s.mode().isBlank()) {
+            fs.setMode(SctpTransportMode.from(s.mode()));
+        }
+        if (s.dataplane() != null && !s.dataplane().isBlank()) {
+            fs.setDataplane(SctpDataplane.from(s.dataplane()));
+        }
+    }
+
     // ── SCTP ──────────────────────────────────────────────────
     private Management initSctp() throws Exception {
         Ss7Config.Sctp s = cfg.sctp();
-        Management sctp = (Management) Class.forName(SCTP_IMPL)
-                .getConstructor(String.class).newInstance(cfg.stackName() + "-sctp");
+        Management sctp = createSctp(cfg.stackName() + "-sctp");
+        applySctpTransport(sctp);
         sctp.setWorkerThreads(s.workerThreads());
         sctp.setOptionSctpInitMaxstreams_MaxInStreams(s.maxInStreams());
         sctp.setOptionSctpInitMaxstreams_MaxOutStreams(s.maxOutStreams());

@@ -88,14 +88,33 @@ if [ "$cygwin" = "false" ]; then
     fi
 fi
 
-# Setup the JVM
+# Setup the JVM — Java 25 required (jSS7 j25 / GMLC lab). Avoid mise shims / system java 8.
 if [ "x$JAVA" = "x" ]; then
-    if [ "x$JAVA_HOME" != "x" ]; then
-	JAVA="$JAVA_HOME/bin/java"
+    if [ "x$JAVA_HOME" != "x" ] && [ -x "$JAVA_HOME/bin/java" ]; then
+        JAVA="$JAVA_HOME/bin/java"
     else
-	JAVA="java"
+        JAVA=""
+        for cand in \
+            "$HOME/.local/share/mise/installs/java/zulu-25" \
+            "$HOME/.local/share/mise/installs/java/zulu-25.34.17.0" \
+            "$HOME/.local/share/mise/installs/java/25"
+        do
+            if [ -x "$cand/bin/java" ] && "$cand/bin/java" -version 2>&1 | grep -q 'version "25'; then
+                JAVA_HOME="$cand"
+                JAVA="$cand/bin/java"
+                break
+            fi
+        done
+        if [ "x$JAVA" = "x" ]; then
+            JAVA="java"
+        fi
     fi
 fi
+if ! "$JAVA" -version 2>&1 | grep -q 'version "25'; then
+    die "Java 25 required for jSS7 simulator (got: $("$JAVA" -version 2>&1 | head -1)). Set JAVA_HOME to mise zulu-25; do not use Java 8 GUI shortcuts."
+fi
+export JAVA_HOME="${JAVA_HOME:-$(dirname "$(dirname "$JAVA")")}"
+
 
 # Setup the classpath
 runjar="$SIMULATOR_HOME/bin/run.jar"
@@ -150,6 +169,20 @@ export _JAVA_AWT_WM_NONREPARENTING=1
 # Setup MMS specific properties
 JAVA_OPTS="-Dprogram.name=$PROGNAME $JAVA_OPTS"
 JAVA_OPTS="$JAVA_OPTS -Xms256m -Xmx512m -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000"
+# Default SCTP = sctp-fs / FSTACK_DPDK (same backend as GMLC). NETTY_KERNEL is JVM-only.
+# Override: SCTP_BACKEND=NETTY_KERNEL (or sctp_backend) for kernel SCTP / Wireshark on lo.
+JAVA_OPTS="$JAVA_OPTS -Dsctp.backend=${sctp_backend:-FSTACK_DPDK}"
+if [ "${sctp_backend:-FSTACK_DPDK}" = "NETTY_KERNEL" ]; then
+    JAVA_OPTS="$JAVA_OPTS --add-modules jdk.sctp"
+else
+    JAVA_OPTS="$JAVA_OPTS -Dsctp.fstack.mode=${sctp_fstack_mode:-SIDECAR}"
+    JAVA_OPTS="$JAVA_OPTS -Dsctp.fstack.dataplane=${sctp_fstack_dataplane:-LOOPBACK}"
+    if [ -n "${sctp_fstack_sidecar_socket:-}" ]; then
+        JAVA_OPTS="$JAVA_OPTS -Dsctp.fstack.sidecar.socket=$sctp_fstack_sidecar_socket"
+    fi
+fi
+JAVA_OPTS="$JAVA_OPTS -Dsctp.backend.fallback=false"
+JAVA_OPTS="$JAVA_OPTS --enable-native-access=ALL-UNNAMED"
 # Log4j2 must be configured before Main.<clinit> loads LogManager
 JAVA_OPTS="$JAVA_OPTS -Dlog4j.configurationFile=file:$SIMULATOR_HOME/conf/log4j2.xml"
 # Prefer X11 toolkit path for Swing under Wayland compositors

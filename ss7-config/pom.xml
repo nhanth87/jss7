@@ -94,14 +94,27 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- SCTP transport (versions managed by ss7-parent) -->
+		<!-- SCTP transport — pin versions so an older ss7-parent in m2 cannot emit an invalid POM -->
 		<dependency>
 			<groupId>org.mobicents.protocols.sctp</groupId>
 			<artifactId>sctp-api</artifactId>
+			<version>${sctp.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.protocols.sctp</groupId>
+			<artifactId>sctp-core</artifactId>
+			<version>${sctp.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.protocols.sctp</groupId>
+			<artifactId>sctp-backend-fstack</artifactId>
+			<version>${sctp.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.protocols.sctp</groupId>
 			<artifactId>sctp-impl</artifactId>
+			<version>${sctp.version}</version>
+			<optional>true</optional>
 		</dependency>
 
 		<!-- JSON binding (tree standard: Jackson 2.15.2) -->

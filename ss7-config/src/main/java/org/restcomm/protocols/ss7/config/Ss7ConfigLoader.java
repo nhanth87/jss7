@@ -46,6 +46,9 @@ public final class Ss7ConfigLoader {
     private static final Set<String> NIS           = Set.of("INTERNATIONAL", "SPARE", "NATIONAL", "RESERVED");
     private static final Set<String> ENCODINGS     = Set.of("ODD", "EVEN");
     private static final Set<String> PROTOCOLS     = Set.of("MAP", "CAP", "TCAP", "INAP");
+    private static final Set<String> SCTP_BACKENDS = Set.of("FSTACK_DPDK", "NETTY_KERNEL");
+    private static final Set<String> SCTP_MODES    = Set.of("IN_PROCESS", "SIDECAR");
+    private static final Set<String> SCTP_PLANES   = Set.of("LOOPBACK", "DPDK");
 
     private Ss7ConfigLoader() { }
 
@@ -136,7 +139,12 @@ public final class Ss7ConfigLoader {
                 s.workerThreads() > 0 ? s.workerThreads() : 8,
                 s.maxInStreams() > 0 ? s.maxInStreams() : 256,
                 s.maxOutStreams() > 0 ? s.maxOutStreams() : 256,
-                links);
+                links,
+                blankToNull(s.backend()),
+                blankToNull(s.mode()),
+                blankToNull(s.dataplane()),
+                blankToNull(s.library()),
+                s.inProcess());
     }
 
     private static Ss7Config.M3ua normM3ua(Ss7Config.M3ua m) {
@@ -202,6 +210,10 @@ public final class Ss7ConfigLoader {
 
     // ── validation ────────────────────────────────────────────
     private static Ss7Config validate(Ss7Config c) {
+        requireKnown("sctp.backend", c.sctp().backend(), SCTP_BACKENDS, "FSTACK_DPDK|NETTY_KERNEL");
+        requireKnown("sctp.mode", c.sctp().mode(), SCTP_MODES, "IN_PROCESS|SIDECAR");
+        requireKnown("sctp.dataplane", c.sctp().dataplane(), SCTP_PLANES, "LOOPBACK|DPDK");
+
         // SCTP links
         Set<String> linkNames = new HashSet<>();
         for (Ss7Config.Link l : c.sctp().links()) {
@@ -295,6 +307,18 @@ public final class Ss7ConfigLoader {
 
     private static String orDefault(String v, String def) {
         return (v == null || v.isBlank()) ? def : v;
+    }
+
+    private static String blankToNull(String v) {
+        return (v == null || v.isBlank()) ? null : v.trim();
+    }
+
+    private static void requireKnown(String field, String raw, Set<String> allowed, String vocab) {
+        if (raw == null || raw.isBlank()) {
+            return;
+        }
+        String key = up(raw).replace('-', '_');
+        require(allowed.contains(key), field + " invalid '" + raw + "' (" + vocab + ")");
     }
 
     private static String up(String v) { return v == null ? "" : v.toUpperCase(); }

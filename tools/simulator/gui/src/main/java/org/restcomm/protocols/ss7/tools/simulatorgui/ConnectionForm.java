@@ -57,6 +57,8 @@ public class ConnectionForm extends JFrame {
 
     private static final long serialVersionUID = 1892971654619519775L;
 
+    private static final boolean AUTOSTART_LOCAL = Boolean.getBoolean("simulator.gui.autostartLocal");
+
     private TesterHostFactoryInterface testerHostFactoryInterface;
 
     private JPanel contentPane;
@@ -151,6 +153,18 @@ public class ConnectionForm extends JFrame {
         tbAppName.setBounds(114, 8, 150, 20);
         panel.add(tbAppName);
         tbAppName.setColumns(10);
+
+        if (Boolean.getBoolean("simulator.gui.remoteOnly")) {
+            rbRemote.setSelected(true);
+            rbLocal.setEnabled(false);
+            rbLocal.setToolTipText("Disabled: this GUI must use the shared simulator core over RMI");
+            tbUrl.setEnabled(true);
+            System.out.println("SS7 Simulator GUI remote-only mode: local TesterHost creation disabled");
+        } else if (AUTOSTART_LOCAL) {
+            // Host mode counterpart of -Dsimulator.core.autostart: this GUI owns the stack,
+            // so bring it up without a click. setAppName() runs later in the same EDT task.
+            javax.swing.SwingUtilities.invokeLater(() -> startLocal(tbAppName.getText()));
+        }
     }
 
     public void setAppName(String appName) {
@@ -194,12 +208,28 @@ public class ConnectionForm extends JFrame {
                     t.setRepeats(false);
                     t.start();
                     self.dispose();
+                    if (AUTOSTART_LOCAL) {
+                        startHostOffEdt(host);
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     btStart.setEnabled(true);
                     btStart.setText("Start");
                     JOptionPane.showMessageDialog(self, "Failed to start local host: " + ex.getMessage());
                 }
+            }
+        }.execute();
+    }
+
+    /** SCTP connect/bind must not run on the EDT or the window freezes while the peer is down. */
+    private static void startHostOffEdt(final TesterHostInterface host) {
+        new javax.swing.SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() {
+                System.out.println("SS7 Simulator GUI host mode: starting local MAP stack");
+                host.start();
+                System.out.println("SS7 Simulator GUI host mode: started=" + host.isStarted());
+                return null;
             }
         }.execute();
     }

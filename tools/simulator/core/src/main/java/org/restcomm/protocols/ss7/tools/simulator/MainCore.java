@@ -28,6 +28,7 @@ import org.restcomm.protocols.ss7.tools.simulator.level3.CapManMBean;
 import org.restcomm.protocols.ss7.tools.simulator.level3.CapManStandardMBean;
 import org.restcomm.protocols.ss7.tools.simulator.level3.MapManMBean;
 import org.restcomm.protocols.ss7.tools.simulator.level3.MapManStandardMBean;
+import org.restcomm.protocols.ss7.tools.simulator.common.GmlcLabGeo;
 import org.restcomm.protocols.ss7.tools.simulator.management.TesterHostInterface;
 import org.restcomm.protocols.ss7.tools.simulator.management.TesterHostMBean;
 import org.restcomm.protocols.ss7.tools.simulator.management.TesterHostStandardMBean;
@@ -335,6 +336,19 @@ public class MainCore {
                 mbs.registerMBean(adapter, adapterName);
                 adapter.start();
                 System.out.println("Html connector has been started...");
+            }
+
+            if (System.getProperty("gmlc.sim.addis") != null
+                    || System.getProperty("gmlc.sim.psi.addis") != null) {
+                System.out.println("GMLC lab geo marker=" + GmlcLabGeo.BUILD_MARKER
+                        + " enabled=" + GmlcLabGeo.enabled()
+                        + " classSource=" + GmlcLabGeo.class.getProtectionDomain()
+                                .getCodeSource().getLocation());
+            }
+            if (Boolean.getBoolean("simulator.core.autostart")) {
+                System.out.println("Simulator core autostart: starting TesterHost '" + appName + "'");
+                host.start();
+                System.out.println("Simulator core autostart: started=" + host.isStarted());
             }
 
         } catch (Exception ee) {

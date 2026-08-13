@@ -11,6 +11,12 @@
 	<name>Restcomm jSS7 Simulator :: Simulator core</name>
 
 	<dependencies>
+		<!-- Simulator configuration still uses the legacy javolution XML runtime. -->
+		<dependency>
+			<groupId>javolution</groupId>
+			<artifactId>javolution</artifactId>
+			<version>5.5.1</version>
+		</dependency>
 		<dependency>
 			<groupId>org.jctools</groupId>
 			<artifactId>jctools-core</artifactId>
@@ -83,7 +89,16 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.protocols.sctp</groupId>
+			<artifactId>sctp-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.protocols.sctp</groupId>
+			<artifactId>sctp-backend-fstack</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.protocols.sctp</groupId>
 			<artifactId>sctp-impl</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.restcomm.protocols.ss7.m3ua</groupId>

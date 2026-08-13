@@ -62,6 +62,46 @@ public class Ss7ConfigLoaderTest extends TestCase {
     }
 
     // ── derived defaults ──────────────────────────────────────
+    public void testSctpTransportFromJson() {
+        String json = """
+            {
+              "sctp": {
+                "backend": "FSTACK_DPDK",
+                "mode": "IN_PROCESS",
+                "dataplane": "LOOPBACK",
+                "library": "lib/libsctp_fstack.so",
+                "inProcess": true,
+                "links": [ { "name": "L1", "local": "127.0.0.1:8013", "peer": "127.0.0.1:8014" } ]
+              },
+              "sccp": { "localPoints": [ { "pc": 1, "networkId": 0 } ], "routing": [] },
+              "services": [ { "name": "gmlc", "ssn": 145, "protocol": "map" } ]
+            }
+            """;
+        Ss7Config c = Ss7ConfigLoader.parse(json);
+        assertEquals("FSTACK_DPDK", c.sctp().backend());
+        assertEquals("IN_PROCESS", c.sctp().mode());
+        assertEquals("LOOPBACK", c.sctp().dataplane());
+        assertEquals("lib/libsctp_fstack.so", c.sctp().library());
+        assertEquals(Boolean.TRUE, c.sctp().inProcess());
+    }
+
+    public void testSctpTransportOmittedStaysNull() {
+        Ss7Config c = example();
+        assertNull(c.sctp().backend());
+        assertNull(c.sctp().mode());
+        assertNull(c.sctp().dataplane());
+        assertNull(c.sctp().library());
+        assertNull(c.sctp().inProcess());
+    }
+
+    public void testBadSctpBackend() {
+        expectInvalid("""
+            { "sctp": { "backend": "KERNEL", "links": [ { "name": "L1", "local": "1.1.1.1:1", "peer": "2.2.2.2:2" } ] },
+              "sccp": { "localPoints": [ { "pc": 1, "networkId": 0 } ], "routing": [] },
+              "services": [ { "name": "s", "ssn": 6, "protocol": "map" } ] }
+            """, "sctp.backend");
+    }
+
     public void testDefaultsApplied() {
         String json = """
             {

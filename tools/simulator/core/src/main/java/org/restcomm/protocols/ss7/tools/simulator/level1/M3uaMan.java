@@ -6,7 +6,8 @@ import java.util.List;
 
 import org.mobicents.protocols.api.Association;
 import org.mobicents.protocols.api.IpChannelType;
-import org.mobicents.protocols.sctp.netty.NettySctpManagementImpl;
+import org.mobicents.protocols.api.Management;
+import org.mobicents.protocols.sctp.spi.SctpProvider;
 import org.restcomm.protocols.ss7.m3ua.As;
 import org.restcomm.protocols.ss7.m3ua.Asp;
 import org.restcomm.protocols.ss7.m3ua.AspFactory;
@@ -37,7 +38,7 @@ public class M3uaMan implements M3uaManMBean, Stoppable {
 
     protected final String name;
     private TesterHostImpl testerHost;
-    private NettySctpManagementImpl sctpManagement;
+    private Management sctpManagement;
     private ParameterFactoryImpl factory = new ParameterFactoryImpl();
     private M3UAManagementProxyImpl m3uaMgmt;
     private boolean isSctpConnectionUp = false;
@@ -610,9 +611,8 @@ public class M3uaMan implements M3uaManMBean, Stoppable {
 
         this.stopM3ua();
 
-        // init SCTP stack
-        this.sctpManagement = new NettySctpManagementImpl("SimSCTPServer_" + name);
-        // set 8 threads for delivering messages
+        // init SCTP stack — default FSTACK_DPDK / sctp-fs (same path as GMLC)
+        this.sctpManagement = SctpProvider.create("SimSCTPServer_" + name);
         this.sctpManagement.setPersistDir(persistDir);
         this.sctpManagement.setWorkerThreads(8);
         this.sctpManagement.setSingleThread(false);

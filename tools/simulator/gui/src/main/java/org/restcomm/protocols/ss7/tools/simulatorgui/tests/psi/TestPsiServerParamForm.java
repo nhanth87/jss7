@@ -14,6 +14,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.border.LineBorder;
 import javax.swing.JTextField;
 import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -149,7 +150,7 @@ public class TestPsiServerParamForm extends JDialog {
 
     setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
     setResizable(false);
-    setTitle("MAP LCS test client settings");
+    setTitle("MAP PSI test server settings");
     setBounds(100, 100, 640, bottomOfPage);
     getContentPane().setLayout(null);
 
@@ -170,11 +171,35 @@ public class TestPsiServerParamForm extends JDialog {
     JPanel panelSriDetail = createSection(panel_sri, "SRIforSM request parameters", 23, lineSeparation * 2);
     createLabel(panelSriDetail, "AddressNature, NumberingPlan and NumberingPlanType from General tab", lineSeparation);
 
-    // PSL Request TAB
-    JPanel panel_psi = createTab(tabbedPane, "PSL Request");
+    // PSI Response TAB — these fields must be constructed before reloadData().
+    JPanel panel_psi = createTab(tabbedPane, "PSI Response");
 
-    JPanel panel_psi_1 = createSection(panel_psi, "PSI request parameters", sectionSeparation, lineSeparation * 3);
-    createLabel(panel_psi_1, "PSI params", lineSeparation * 2);
+    JPanel panel_ids = createSection(panel_psi, "Identities", sectionSeparation, lineSeparation * 6);
+    tfImsi = createTextField(panel_ids, "IMSI", lineSeparation);
+    tfImei = createTextField(panel_ids, "IMEI", lineSeparation * 2);
+    tfLmsi = createTextField(panel_ids, "LMSI", lineSeparation * 3);
+    tfNetworkNodeNumber = createTextField(panel_ids, "Network node number", lineSeparation * 4);
+
+    JPanel panel_cgi = createSection(panel_psi, "CGI",
+        2 * sectionSeparation + lineSeparation * 6, lineSeparation * 4);
+    tfMcc = createSmallTextField(panel_cgi, "MCC", 1, lineSeparation);
+    tfMnc = createSmallTextField(panel_cgi, "MNC", 2, lineSeparation);
+    tfLac = createSmallTextField(panel_cgi, "LAC", 1, lineSeparation * 2);
+    tfCellId = createSmallTextField(panel_cgi, "Cell Id", 2, lineSeparation * 2);
+    tfAol = createTextField(panel_cgi, "Age of location", lineSeparation * 3);
+
+    JPanel panel_geo = createSection(panel_psi, "Geographic / geodetic",
+        3 * sectionSeparation + lineSeparation * 10, lineSeparation * 12);
+    tfGeographicLatitude = createTextField(panel_geo, "Geographic latitude", lineSeparation);
+    tfGeographicLongitude = createTextField(panel_geo, "Geographic longitude", lineSeparation * 2);
+    tfGeographicalUncertainty = createTextField(panel_geo, "Geographic uncertainty", lineSeparation * 3);
+    tfGeodeticLatitude = createTextField(panel_geo, "Geodetic latitude", lineSeparation * 4);
+    tfGeodeticLongitude = createTextField(panel_geo, "Geodetic longitude", lineSeparation * 5);
+    tfGeodeticUncetainty = createTextField(panel_geo, "Geodetic uncertainty", lineSeparation * 6);
+    tfGeodeticConfidence = createTextField(panel_geo, "Geodetic confidence", lineSeparation * 7);
+    tfcreeningAndPresentationIndicators = createTextField(panel_geo, "Screening / presentation", lineSeparation * 8);
+    tfIsSaiPresent = createTextField(panel_geo, "SAI present", lineSeparation * 9);
+    tfGCurrentLocationRetrieved = createTextField(panel_geo, "Current location retrieved", lineSeparation * 10);
 
 
     JButton button = new JButton("Load default values for side A");
@@ -252,7 +277,7 @@ public class TestPsiServerParamForm extends JDialog {
     this.tfAol.setText("1");
     this.tfGeographicLatitude.setText("-23.291032");
     this.tfGeographicLongitude.setText("109.977810");
-    this.tfGeodeticUncetainty.setText("50.0");
+    this.tfGeographicalUncertainty.setText("50.0");
     this.tfGeodeticLatitude.setText("-24.010010");
     this.tfGeodeticLongitude.setText("110.00987");
     this.tfGeodeticUncetainty.setText("100.0");
@@ -303,17 +328,28 @@ public class TestPsiServerParamForm extends JDialog {
     this.testPsiServerManMBean.setImei(this.tfImei.getText());
     this.testPsiServerManMBean.setLmsi(this.tfLmsi.getText());
     this.testPsiServerManMBean.setNetworkNodeNumber(this.tfNetworkNodeNumber.getText());
-    this.testPsiServerManMBean.setMcc(Integer.valueOf(this.tfMcc.getText()));
-    this.testPsiServerManMBean.setMnc(Integer.valueOf(this.tfMnc.getText()));
-    this.testPsiServerManMBean.setLac(Integer.valueOf(this.tfLac.getText()));
-    this.testPsiServerManMBean.setCi(Integer.valueOf(this.tfCellId.getText()));
-    this.testPsiServerManMBean.setGeographicalLatitude(Double.valueOf(this.tfGeographicLatitude.getText()));
-    this.testPsiServerManMBean.setGeographicalLongitude(Double.valueOf(this.tfGeographicLongitude.getText()));
-    this.testPsiServerManMBean.setGeographicalUncertainty(Double.valueOf(this.tfGeographicalUncertainty.getText()));
-    this.testPsiServerManMBean.setGeodeticLatitude(Double.valueOf(this.tfGeodeticLatitude.getText()));
-    this.testPsiServerManMBean.setGeodeticLongitude(Double.valueOf(this.tfGeodeticLongitude.getText()));
-    this.testPsiServerManMBean.setGeodeticUncertainty(Double.valueOf(this.tfGeodeticUncetainty.getText()));
-    this.testPsiServerManMBean.setGeodeticConfidence(Integer.valueOf(this.tfGeodeticConfidence.getText()));
+    try {
+      this.testPsiServerManMBean.setMcc(Integer.valueOf(this.tfMcc.getText()));
+      this.testPsiServerManMBean.setMnc(Integer.valueOf(this.tfMnc.getText()));
+      this.testPsiServerManMBean.setLac(Integer.valueOf(this.tfLac.getText()));
+      this.testPsiServerManMBean.setCi(Integer.valueOf(this.tfCellId.getText()));
+      this.testPsiServerManMBean.setAol(Integer.valueOf(this.tfAol.getText()));
+      this.testPsiServerManMBean.setScreeningAndPresentationIndicators(
+          Integer.valueOf(this.tfcreeningAndPresentationIndicators.getText()));
+      this.testPsiServerManMBean.setGeographicalLatitude(Double.valueOf(this.tfGeographicLatitude.getText()));
+      this.testPsiServerManMBean.setGeographicalLongitude(Double.valueOf(this.tfGeographicLongitude.getText()));
+      this.testPsiServerManMBean.setGeographicalUncertainty(Double.valueOf(this.tfGeographicalUncertainty.getText()));
+      this.testPsiServerManMBean.setGeodeticLatitude(Double.valueOf(this.tfGeodeticLatitude.getText()));
+      this.testPsiServerManMBean.setGeodeticLongitude(Double.valueOf(this.tfGeodeticLongitude.getText()));
+      this.testPsiServerManMBean.setGeodeticUncertainty(Double.valueOf(this.tfGeodeticUncetainty.getText()));
+      this.testPsiServerManMBean.setGeodeticConfidence(Integer.valueOf(this.tfGeodeticConfidence.getText()));
+    } catch (NumberFormatException e) {
+      JOptionPane.showMessageDialog(this, "value: " + e + " not valid, must be a number");
+      return false;
+    }
+    this.testPsiServerManMBean.setSaiPresent(Boolean.parseBoolean(this.tfIsSaiPresent.getText()));
+    this.testPsiServerManMBean.setCurrentLocationRetrieved(
+        Boolean.parseBoolean(this.tfGCurrentLocationRetrieved.getText()));
 
     return true;
   }

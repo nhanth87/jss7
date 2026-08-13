@@ -125,6 +125,7 @@ import org.restcomm.protocols.ss7.tcap.asn.comp.InvokeProblemType;
 import org.restcomm.protocols.ss7.tcap.asn.comp.Problem;
 import org.restcomm.protocols.ss7.tools.simulator.Stoppable;
 import org.restcomm.protocols.ss7.tools.simulator.common.AddressNatureType;
+import org.restcomm.protocols.ss7.tools.simulator.common.GmlcLabGeo;
 import org.restcomm.protocols.ss7.tools.simulator.common.TesterBase;
 
 import java.math.BigInteger;
@@ -677,15 +678,65 @@ public class TestLcsServerMan extends TesterBase implements TestLcsServerManMBea
                 provideSubscriberLocationRequest.getPeriodicLDRInfo()
             ), Level.INFO);
 
+        // Digicom-ET GMLC lab: deterministic fast PSL (skip legacy random shape + up-to-35s sleep).
+        if (Boolean.getBoolean("gmlc.sim.psl.simple")
+                || Integer.getInteger("gmlc.sim.psl.maxDelayMs", Integer.MAX_VALUE) <= 100) {
+            try {
+                ExtGeographicalInformation locationEstimate;
+                CellGlobalIdOrServiceAreaIdFixedLength cgi;
+                if (GmlcLabGeo.enabled()) {
+                    double[] addis = GmlcLabGeo.randomAddis(rand);
+                    locationEstimate = mapParameterFactory.createExtGeographicalInformation_EllipsoidPoint(addis[0], addis[1]);
+                    cgi = mapParameterFactory.createCellGlobalIdOrServiceAreaIdFixedLength(
+                            GmlcLabGeo.MCC, GmlcLabGeo.MNC, GmlcLabGeo.randomLac(rand), GmlcLabGeo.randomCellId(rand));
+                    logger.info(String.format("PSL simple lab Addis Ababa lat=%.6f lon=%.6f", addis[0], addis[1]));
+                } else {
+                    locationEstimate =
+                            mapParameterFactory.createExtGeographicalInformation_EllipsoidPoint(-34.901112, -56.164532);
+                    cgi = mapParameterFactory.createCellGlobalIdOrServiceAreaIdFixedLength(748, 1, 109, 10175);
+                }
+                CellGlobalIdOrServiceAreaIdOrLAI cellOrLai =
+                        mapParameterFactory.createCellGlobalIdOrServiceAreaIdOrLAI(cgi);
+                curDialog.addProvideSubscriberLocationResponse(
+                        provideSubscriberLocationRequest.getInvokeId(),
+                        locationEstimate,
+                        null, null, 0, null, null, false,
+                        cellOrLai, true, null, null, false, null, null, null,
+                        null, null, null);
+                curDialog.close(false);
+                this.countMapLcsResp++;
+                this.testerHost.sendNotif(SOURCE_NAME, "Sent: ProvideSubscriberLocationResponse",
+                        createPSLResponse(curDialog.getLocalDialogId(), locationEstimate, lcsReferenceNumber),
+                        Level.INFO);
+            } catch (MAPException | RuntimeException me) {
+                logger.error("Exception on simple ProvideSubscriberLocationResponse " + me.toString(), me);
+            }
+            return;
+        }
+
         byte[] geranPosInfo = {0, 3};
         PositioningDataInformation geranPositioningData = new PositioningDataInformationImpl(geranPosInfo);
         Integer ageOfLocationEstimate = 0;
         AddGeographicalInformation additionalLocationEstimate = null;
         MAPExtensionContainer extensionContainer = null;
         boolean deferredMTLRResponseIndicator = true;
-        byte[] cidOrSaiFixedLength = new BigInteger("34970120704321", 16).toByteArray();
-        CellGlobalIdOrServiceAreaIdFixedLength cellGlobalIdOrServiceAreaIdFixedLength = new CellGlobalIdOrServiceAreaIdFixedLengthImpl(cidOrSaiFixedLength);
-        CellGlobalIdOrServiceAreaIdOrLAI cellGlobalIdOrServiceAreaIdOrLAI = new CellGlobalIdOrServiceAreaIdOrLAIImpl(cellGlobalIdOrServiceAreaIdFixedLength);
+        CellGlobalIdOrServiceAreaIdFixedLength cellGlobalIdOrServiceAreaIdFixedLength;
+        CellGlobalIdOrServiceAreaIdOrLAI cellGlobalIdOrServiceAreaIdOrLAI;
+        try {
+            if (GmlcLabGeo.enabled()) {
+                cellGlobalIdOrServiceAreaIdFixedLength = mapParameterFactory.createCellGlobalIdOrServiceAreaIdFixedLength(
+                        GmlcLabGeo.MCC, GmlcLabGeo.MNC, GmlcLabGeo.randomLac(rand), GmlcLabGeo.randomCellId(rand));
+            } else {
+                byte[] cidOrSaiFixedLength = new BigInteger("34970120704321", 16).toByteArray();
+                cellGlobalIdOrServiceAreaIdFixedLength = new CellGlobalIdOrServiceAreaIdFixedLengthImpl(cidOrSaiFixedLength);
+            }
+            cellGlobalIdOrServiceAreaIdOrLAI = mapParameterFactory.createCellGlobalIdOrServiceAreaIdOrLAI(
+                    cellGlobalIdOrServiceAreaIdFixedLength);
+        } catch (MAPException e) {
+            byte[] cidOrSaiFixedLength = new BigInteger("34970120704321", 16).toByteArray();
+            cellGlobalIdOrServiceAreaIdFixedLength = new CellGlobalIdOrServiceAreaIdFixedLengthImpl(cidOrSaiFixedLength);
+            cellGlobalIdOrServiceAreaIdOrLAI = new CellGlobalIdOrServiceAreaIdOrLAIImpl(cellGlobalIdOrServiceAreaIdFixedLength);
+        }
         if (this.countMapLcsReq % 2 == 0)
             saiPresent = false; // set saiPresent to false if this ATI request is even since test started
         else
@@ -806,6 +857,8 @@ public class TestLcsServerMan extends TesterBase implements TestLcsServerManMBea
                 }
                 break;
         }
+
+        locationEstimate = stampLabAddisLocationEstimate(mapParameterFactory, locationEstimate, rand);
 
         int additionalLocationEstimateRandomOption = rand.nextInt(6) + 1;
         if (typeOfShape == TypeOfShape.Polygon) {
@@ -955,9 +1008,35 @@ public class TestLcsServerMan extends TesterBase implements TestLcsServerManMBea
         }
     }
 
-    private void delayResponse(int delay) {
+    /** Digicom-ET GMLC lab: replace stock Uruguay/random GAD with Addis Ababa ellipsoid point. */
+    private ExtGeographicalInformation stampLabAddisLocationEstimate(
+            MAPParameterFactory mapParameterFactory,
+            ExtGeographicalInformation current,
+            java.util.Random rand) {
+        if (!GmlcLabGeo.enabled()) {
+            return current;
+        }
         try {
-            Thread.sleep(delay);
+            double[] addis = GmlcLabGeo.randomAddis(rand);
+            ExtGeographicalInformation stamped =
+                    mapParameterFactory.createExtGeographicalInformation_EllipsoidPoint(addis[0], addis[1]);
+            logger.info(String.format("LCS lab Addis Ababa lat=%.6f lon=%.6f", addis[0], addis[1]));
+            return stamped;
+        } catch (MAPException e) {
+            logger.warn("Failed to stamp Addis Ababa locationEstimate: " + e.getMessage());
+            return current;
+        }
+    }
+
+    private void delayResponse(int delay) {
+        // Lab default: cap random PSL sleeps (case 10 was 35s on the MAP callback thread).
+        int maxMs = Integer.getInteger("gmlc.sim.psl.maxDelayMs", delay);
+        int sleepMs = Math.max(0, Math.min(delay, maxMs));
+        if (sleepMs <= 0) {
+            return;
+        }
+        try {
+            Thread.sleep(sleepMs);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -1308,6 +1387,8 @@ public class TestLcsServerMan extends TesterBase implements TestLcsServerManMBea
                     break;
             }
 
+            locationEstimate = stampLabAddisLocationEstimate(mapParameterFactory, locationEstimate, rand);
+
             int additionalLocationEstimateRandomOption = rand.nextInt(6) + 1;
             if (typeOfShape == TypeOfShape.Polygon) {
                 additionalTypeOfShape = TypeOfShape.Polygon;
@@ -1641,6 +1722,8 @@ public class TestLcsServerMan extends TesterBase implements TestLcsServerManMBea
                     }
                     break;
             }
+
+            locationEstimate = stampLabAddisLocationEstimate(mapParameterFactory, locationEstimate, rand);
 
             int additionalLocationEstimateRandomOption = rand.nextInt(6) + 1;
             if (typeOfShape == TypeOfShape.Polygon) {

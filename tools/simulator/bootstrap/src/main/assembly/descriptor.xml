@@ -37,6 +37,7 @@
 				<include>org.apache.logging.log4j:log4j-1.2-api</include>
 				<include>urbanophile:java-getopt</include>
 				<include>com.sun.jdmk:jmxtools</include>
+				<include>javolution:javolution</include>
 
 				<!-- Not strictly SS7, But needed by SS7 -->
 				<include>org.jctools:jctools-core</include>
@@ -55,6 +56,8 @@
 				<include>io.netty:netty-codec</include>
 				<include>io.netty:netty-codec-base</include>
 				<include>org.mobicents.protocols.sctp:sctp-api</include>
+				<include>org.mobicents.protocols.sctp:sctp-core</include>
+				<include>org.mobicents.protocols.sctp:sctp-backend-fstack</include>
 				<include>org.mobicents.protocols.sctp:sctp-impl</include>
 				<include>org.mobicents.commons:commons</include>
 				<include>org.mobicents.protocols.stream:stream</include>
