@@ -18,6 +18,7 @@ import org.restcomm.protocols.ss7.sccp.RemoteSignalingPointCode;
 import org.restcomm.protocols.ss7.sccp.RemoteSubSystem;
 import org.restcomm.protocols.ss7.sccp.SccpConnection;
 import org.restcomm.protocols.ss7.sccp.SccpListener;
+import org.restcomm.protocols.ss7.sccp.impl.acl.SccpIncomingAcl;
 import org.restcomm.protocols.ss7.sccp.impl.message.EncodingResultData;
 import org.restcomm.protocols.ss7.sccp.impl.message.MessageFactoryImpl;
 import org.restcomm.protocols.ss7.sccp.impl.message.SccpAddressedMessageImpl;
@@ -130,6 +131,21 @@ public class SccpRoutingControl implements SccpRoutingCtxInterface {
             }
 
             return;
+        }
+
+        // Nextgen STP transit-plane ACL (disabled by default: zero behavior change).
+        // Denials are silently dropped + counted (topology hiding); sampled warn log.
+        SccpIncomingAcl acl = this.sccpStackImpl.getSccpIncomingAcl();
+        if (acl != null && acl.isEnabled()) {
+            SccpIncomingAcl.Decision aclDecision = acl.check(msg.getIncomingOpc(), msg.getCalledPartyAddress());
+            if (aclDecision != SccpIncomingAcl.Decision.ALLOW) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn(String.format(
+                            "Incoming SccpMessage denied by ACL: decision=%s, opc=%d, called=%s",
+                            aclDecision, msg.getIncomingOpc(), msg.getCalledPartyAddress()));
+                }
+                return;
+            }
         }
 
         // if the local SCCP or node is in an overload condition, SCRC shall inform SCMG

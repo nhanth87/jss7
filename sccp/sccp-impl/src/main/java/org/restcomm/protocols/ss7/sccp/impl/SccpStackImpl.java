@@ -32,6 +32,8 @@ import org.restcomm.protocols.ss7.sccp.SccpProtocolVersion;
 import org.restcomm.protocols.ss7.sccp.SccpProvider;
 import org.restcomm.protocols.ss7.sccp.SccpResource;
 import org.restcomm.protocols.ss7.sccp.SccpStack;
+import org.restcomm.protocols.ss7.sccp.impl.acl.IncomingAccessRule;
+import org.restcomm.protocols.ss7.sccp.impl.acl.SccpIncomingAcl;
 import org.restcomm.protocols.ss7.sccp.impl.message.MessageFactoryImpl;
 import org.restcomm.protocols.ss7.sccp.impl.message.SccpAddressedMessageImpl;
 import org.restcomm.protocols.ss7.sccp.impl.message.SccpDataNoticeTemplateMessageImpl;
@@ -206,6 +208,13 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
 
     protected SccpManagement sccpManagement;
     protected SccpRoutingControl sccpRoutingControl;
+
+    /**
+     * Nextgen STP transit-plane inbound ACL (SS7-firewall-lite). Disabled by default —
+     * when disabled the data path pays one volatile read only. Null only before start().
+     */
+    protected SccpIncomingAcl incomingAcl;
+    protected static final String INCOMING_ACL_PERSIST_SUFFIX = "_sccpincomingacl.xml";
 
     protected NonBlockingHashMap<Integer, SccpConnectionImpl> connections = new NonBlockingHashMap<Integer, SccpConnectionImpl>();
 
@@ -889,6 +898,10 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
         this.sccpResource.setPersistDir(this.persistDir);
         this.sccpResource.start();
 
+        // Nextgen STP transit-plane inbound ACL (disabled by default; zero behavior change)
+        this.incomingAcl = new SccpIncomingAcl();
+        this.loadIncomingAcl();
+
         logger.info("Starting routing engine...");
         this.sccpRoutingControl.start();
         logger.info("Starting management ...");
@@ -975,11 +988,82 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
         }
 
         this.store();
+        this.storeIncomingAcl();
 
         // }finally
         // {
         // stateLock.unlock();
         // }
+    }
+
+    /**
+     * Nextgen STP transit-plane inbound ACL. Disabled by default (zero behavior change).
+     * Null only before {@link #start()}.
+     */
+    public SccpIncomingAcl getSccpIncomingAcl() {
+        return incomingAcl;
+    }
+
+    private void loadIncomingAcl() {
+        if (this.incomingAcl == null) {
+            return;
+        }
+        try {
+            String path = this.persistFile.toString().replace(PERSIST_FILE_NAME, "") + this.name
+                    + INCOMING_ACL_PERSIST_SUFFIX;
+            File f = new File(path);
+            if (!f.exists()) {
+                return;
+            }
+            try (FileReader fr = new FileReader(f)) {
+                SccpIncomingAcl.State state = SCCPJacksonXMLHelper.fromXML(fr, SccpIncomingAcl.State.class);
+                if (state != null) {
+                    this.incomingAcl.importState(state);
+                    logger.info(String.format("Loaded incoming ACL from %s: %s", path, this.incomingAcl));
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to load incoming ACL configuration; starting with empty ACL. \n" + e.getMessage(), e);
+        }
+    }
+
+    private void storeIncomingAcl() {
+        if (this.incomingAcl == null) {
+            return;
+        }
+        try {
+            String path = this.persistFile.toString().replace(PERSIST_FILE_NAME, "") + this.name
+                    + INCOMING_ACL_PERSIST_SUFFIX;
+            File f = new File(path);
+            f.createNewFile();
+            try (FileWriter fw = new FileWriter(f)) {
+                SCCPJacksonXMLHelper.toXML(this.incomingAcl.exportState(), fw);
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to persist incoming ACL configuration. \n" + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Decodes only the called party address of an incoming MSU for ACL evaluation on the
+     * transit path (no full message construction). Returns null if unparseable — the ACL
+     * treats null called-party as denied when enabled.
+     */
+    SccpAddress decodeCalledPartyAddressForAcl(Mtp3TransferPrimitive mtp3Msg) {
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(mtp3Msg.getData());
+            DataInputStream in = new DataInputStream(bais);
+            int mt = in.readUnsignedByte();
+            SccpMessageImpl msg = ((MessageFactoryImpl) sccpProvider.getMessageFactory()).createMessage(mt,
+                    mtp3Msg.getOpc(), mtp3Msg.getDpc(), mtp3Msg.getSls(), in, this.sccpProtocolVersion, 0);
+            if (msg instanceof SccpAddressedMessageImpl) {
+                return ((SccpAddressedMessageImpl) msg).getCalledPartyAddress();
+            }
+            return null;
+        } catch (Exception e) {
+            logger.debug("ACL: failed to decode called party address for transit check", e);
+            return null;
+        }
     }
 
     public boolean isStarted() {
@@ -1341,6 +1425,18 @@ public class SccpStackImpl implements SccpStack, Mtp3UserPartListener {
                     }
                     // TODO: ***** SSC should we send SSC message to a peer ?
                     return;
+                }
+                // Nextgen STP transit ACL applies to relayed SCCP traffic (SI == SCCP only;
+                // non-SCCP SI transit is not inspected). Silent drop + counter: topology hiding.
+                if (mtp3Msg.getSi() == Mtp3._SI_SERVICE_SCCP && this.incomingAcl != null && this.incomingAcl.isEnabled()) {
+                    SccpAddress aclCalled = this.decodeCalledPartyAddressForAcl(mtp3Msg);
+                    SccpIncomingAcl.Decision aclDecision = this.incomingAcl.check(opc, aclCalled);
+                    if (aclDecision != SccpIncomingAcl.Decision.ALLOW) {
+                        logger.warn(String.format(
+                                "Transit Mtp3 Message for non-local dpc=%d denied by incoming ACL: decision=%s, opc=%d",
+                                dpc, aclDecision, opc));
+                        return;
+                    }
                 }
                 Mtp3ServiceAccessPoint sap2 = this.router.findMtp3ServiceAccessPoint(dpc, sls);
                 if (sap2 == null) {
