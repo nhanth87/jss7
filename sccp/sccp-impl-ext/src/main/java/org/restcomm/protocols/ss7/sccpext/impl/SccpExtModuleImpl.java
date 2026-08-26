@@ -131,6 +131,7 @@ public class SccpExtModuleImpl implements SccpExtModule {
             logger.warn(String.format(
                     "Received SccpMessage for Translation but no matching Rule found for local routing\nSccpMessage=%s",
                     msg));
+            org.restcomm.protocols.ss7.sccp.impl.SccpTelemetryHook.fireGttUnrouted(msg.getIncomingOpc());
             // Translation failed return error
             ctx.sendSccpError(msg, ReturnCauseValue.NO_TRANSLATION_FOR_ADDRESS, RefusalCauseValue.NO_TRANSLATION_FOR_AN_ADDRESS_OF_SUCH_NATURE);
             return;
@@ -233,6 +234,8 @@ public class SccpExtModuleImpl implements SccpExtModule {
 
         // translate address
         SccpAddress address = rule.translate(calledPartyAddress, translationAddress);
+        org.restcomm.protocols.ss7.sccp.impl.SccpTelemetryHook.fireGttTranslated(
+                msg.getIncomingOpc(), translationAddress.getSignalingPointCode());
 
         if (msg instanceof SccpConnCrMessageImpl && router.spcIsLocal(msg.getIncomingDpc())
                 && !router.spcIsLocal(address.getSignalingPointCode()) && sccpStackImpl.isCanRelay()) {

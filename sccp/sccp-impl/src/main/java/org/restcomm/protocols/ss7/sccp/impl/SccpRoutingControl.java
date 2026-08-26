@@ -139,6 +139,7 @@ public class SccpRoutingControl implements SccpRoutingCtxInterface {
         if (acl != null && acl.isEnabled()) {
             SccpIncomingAcl.Decision aclDecision = acl.check(msg.getIncomingOpc(), msg.getCalledPartyAddress());
             if (aclDecision != SccpIncomingAcl.Decision.ALLOW) {
+                SccpTelemetryHook.fireAclDenied(msg.getIncomingOpc());
                 if (logger.isWarnEnabled()) {
                     logger.warn(String.format(
                             "Incoming SccpMessage denied by ACL: decision=%s, opc=%d, called=%s",
@@ -343,6 +344,8 @@ public class SccpRoutingControl implements SccpRoutingCtxInterface {
                 this.sccpStackImpl.getSccpProtocolVersion());
         switch (erd.getEncodingResult()) {
             case Success:
+                SccpTelemetryHook.fireRelayed(
+                        message.getIncomingOpc() > 0 ? message.getIncomingOpc() : sap.getOpc(), dpc);
                 Mtp3TransferPrimitiveFactory factory = mup.getMtp3TransferPrimitiveFactory();
                 if (erd.getSolidData() != null) {
                     // nonsegmented data

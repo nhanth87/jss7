@@ -229,6 +229,33 @@ public final class Ss7StackBuilder {
                     link.name(), isServer ? "server" : "client",
                     local.host, local.port, channel);
         }
+
+        // Sweep persisted orphans: servers/associations left over from a previous
+        // generation of the config (e.g. a deleted connection) keep binding their
+        // ports forever because SCTP state is persisted to
+        // <stackName>-sctp_sctp.xml and reloaded on every start().
+        java.util.Set<String> keepServers = new java.util.HashSet<>();
+        java.util.Set<String> keepAssocs = new java.util.HashSet<>();
+        for (Ss7Config.Link link : s.links()) {
+            if ("SERVER".equalsIgnoreCase(link.type())) {
+                keepServers.add(link.name() + "-srv");
+            }
+            keepAssocs.add(link.name());
+        }
+        for (org.mobicents.protocols.api.Server sv : sctp.getServers()) {
+            if (!keepServers.contains(sv.getName())) {
+                try { sctp.stopServer(sv.getName()); } catch (Exception ignore) { /* already stopped */ }
+                sctp.removeServer(sv.getName());
+                LOG.info("[ss7-config] SCTP orphan server removed: {}", sv.getName());
+            }
+        }
+        for (String assocName : new java.util.ArrayList<>(sctp.getAssociations().keySet())) {
+            if (!keepAssocs.contains(assocName)) {
+                try { sctp.stopAssociation(assocName); } catch (Exception ignore) { /* already stopped */ }
+                sctp.removeAssociation(assocName);
+                LOG.info("[ss7-config] SCTP orphan association removed: {}", assocName);
+            }
+        }
         return sctp;
     }
 
@@ -376,7 +403,7 @@ public final class Ss7StackBuilder {
             // Routing-address networkId must match the rule — inbound GTT copies
             // address.networkId onto the message (SccpExtModuleImpl), and wiping it
             // to 0 breaks multi-plane stacks (Digicom live=0 / lab=1).
-            SccpAddress primary = toSccpAddress(rule.to(), rule.networkId());
+            SccpAddress primary = translationPrimary(rule);
             int primaryId = addrId++;
             routerExt.addRoutingAddress(primaryId, primary);
 
@@ -393,6 +420,35 @@ public final class Ss7StackBuilder {
                     pattern, mask, primaryId, secondaryId, null, rule.networkId(), null);
         }
         return sccp;
+    }
+
+    /**
+     * Translation-target address for a GTT rule.
+     *
+     * <p>When {@code to} carries a GT, the address is built as-is (GT-routed).
+     * When it carries only {@code pc}/{@code ssn} — the hidden-service transit
+     * shape: deliver on DPC+SSN after consuming the called GT — a synthetic
+     * per-section {@code "-"} GlobalTitle is attached so
+     * {@code RouterExtImpl.addRule} section validation passes while the routing
+     * indicator stays {@link RoutingIndicator#ROUTING_BASED_ON_DPC_AND_SSN}
+     * (mirrors the Nextgen STP GttHarness translation-address construction).</p>
+     */
+    private SccpAddress translationPrimary(Ss7Config.Rule rule) {
+        Ss7Config.Addr to = rule.to();
+        // Ss7ConfigLoader.normAddr() defaults an absent gt to "*"; a bare "*"
+        // alongside pc/ssn means "deliver on DPC+SSN", not a real GT target.
+        String gtDigits = to.gt();
+        boolean hasGt = gtDigits != null && !gtDigits.isBlank() && !"*".equals(gtDigits.trim());
+        if (hasGt || (to.pc() == null && to.ssn() == null)) {
+            return toSccpAddress(to, rule.networkId());
+        }
+        String mask = rule.mask() != null ? rule.mask() : "K";
+        int sections = mask.split("/", -1).length;
+        String dummyDigits = String.join("/", java.util.Collections.nCopies(sections, "-"));
+        GlobalTitle gt = new org.restcomm.protocols.ss7.sccp.impl.parameter.GlobalTitle0010Impl(
+                dummyDigits, 0);
+        return new SccpAddressImpl(RoutingIndicator.ROUTING_BASED_ON_DPC_AND_SSN, gt,
+                to.pc() == null ? 0 : to.pc(), to.ssn() == null ? 0 : to.ssn(), rule.networkId());
     }
 
     // ── TCAP (multi-SSN) ──────────────────────────────────────
