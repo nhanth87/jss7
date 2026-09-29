@@ -154,6 +154,31 @@ public interface TCAPProvider extends Serializable {
     TcapMissingDialogResolver getMissingDialogResolver();
 
     /**
+     * ADR 0007 M7 — optional router for inbound CONTINUE / END / ABORT whose
+     * DTID is not local. Consulted before the missing-dialog resolver.
+     * {@code null} (the default) keeps single-node behaviour.
+     */
+    default void setInboundDialogRouter(TcapInboundDialogRouter router) {
+        throw new UnsupportedOperationException("inbound dialog routing not supported by " + getClass().getName());
+    }
+
+    /**
+     * @return current inbound dialog router, or {@code null}
+     */
+    default TcapInboundDialogRouter getInboundDialogRouter() {
+        return null;
+    }
+
+    /**
+     * ADR 0007 M7 — process a PDU that another node received for a dialog this
+     * node owns. Behaves like a locally received message except that the
+     * inbound dialog router is never consulted, so it cannot be forwarded again.
+     */
+    default void processForeignPdu(TcapForeignPdu pdu) {
+        throw new UnsupportedOperationException("foreign PDU injection not supported by " + getClass().getName());
+    }
+
+    /**
      * Parsing of encoded TCAP message for getting only message type, origination/destination dialogId
      *
      * @param data

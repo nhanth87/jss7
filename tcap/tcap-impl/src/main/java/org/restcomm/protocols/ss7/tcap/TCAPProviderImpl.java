@@ -54,6 +54,8 @@ import org.restcomm.protocols.ss7.tcap.api.MessageType;
 import org.restcomm.protocols.ss7.tcap.api.TCAPException;
 import org.restcomm.protocols.ss7.tcap.api.TCAPProvider;
 import org.restcomm.protocols.ss7.tcap.api.TcapDialogSnapshot;
+import org.restcomm.protocols.ss7.tcap.api.TcapForeignPdu;
+import org.restcomm.protocols.ss7.tcap.api.TcapInboundDialogRouter;
 import org.restcomm.protocols.ss7.tcap.api.TcapMissingDialogResolver;
 import org.restcomm.protocols.ss7.tcap.api.TCListener;
 import org.restcomm.protocols.ss7.tcap.api.tc.dialog.Dialog;
@@ -132,6 +134,7 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
 
     /** Optional CONTINUE miss → import hook (SPIKE failover). */
     private transient volatile TcapMissingDialogResolver missingDialogResolver;
+    private transient volatile TcapInboundDialogRouter inboundDialogRouter;
 
 //    protected transient Map<PrevewDialogDataKey, PreviewDialogData> dialogPreviewList = new ConcurrentHashMap<PrevewDialogDataKey, PrevewDialogData>();
     protected transient NonBlockingHashMap<PreviewDialogDataKey, PreviewDialogData> dialogPreviewList = new NonBlockingHashMap<>();
@@ -441,6 +444,52 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     @Override
     public TcapMissingDialogResolver getMissingDialogResolver() {
         return this.missingDialogResolver;
+    }
+
+    @Override
+    public void setInboundDialogRouter(TcapInboundDialogRouter router) {
+        this.inboundDialogRouter = router;
+    }
+
+    @Override
+    public TcapInboundDialogRouter getInboundDialogRouter() {
+        return this.inboundDialogRouter;
+    }
+
+    @Override
+    public void processForeignPdu(TcapForeignPdu pdu) {
+        if (this.stack.getPreviewMode()) {
+            return;
+        }
+        SccpDataMessage msg = messageFactory.createDataMessageClass1(pdu.calledParty(), pdu.callingParty(), pdu.data(),
+                pdu.sls(), pdu.calledParty().getSubsystemNumber(), false, null, null);
+        msg.setNetworkId(pdu.networkId());
+        msg.setIncomingOpc(pdu.incomingOpc());
+        msg.setPreferredAspName(pdu.preferredAspName());
+        dispatchInbound(msg, true);
+    }
+
+    /**
+     * ADR 0007 M7 — local DTID miss: offer the PDU to the inbound router so the
+     * owning node processes it. Never consulted for a PDU that was itself
+     * forwarded ({@code foreign}), which is what prevents forward loops.
+     *
+     * @return {@code true} when the PDU was handed off and local processing must stop
+     */
+    private boolean routeToOwner(long localOtid, SccpDataMessage msg, boolean foreign) {
+        TcapInboundDialogRouter router = this.inboundDialogRouter;
+        if (router == null || foreign) {
+            return false;
+        }
+        try {
+            return router.routeForeign(localOtid, new TcapForeignPdu(msg.getData(), msg.getCalledPartyAddress(),
+                    msg.getCallingPartyAddress(), msg.getSls(), msg.getNetworkId(), msg.getIncomingOpc(),
+                    msg.getPreferredAspName()));
+        } catch (RuntimeException e) {
+            // A broken router must degrade to single-node handling, never drop the PDU.
+            logger.warn("InboundDialogRouter failed for id=" + localOtid + ": " + e.getMessage(), e);
+            return false;
+        }
     }
 
     /**
@@ -871,21 +920,30 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
     }
 
     public void onMessage(SccpDataMessage sccpDataMessage) {
+        dispatchInbound(sccpDataMessage, false);
+    }
+
+    /**
+     * Local and forwarded (ADR 0007 M7) PDUs share the same keyed mailbox, so a
+     * forwarded CONTINUE keeps its order relative to messages the owner received
+     * itself for the same dialog.
+     */
+    private void dispatchInbound(SccpDataMessage sccpDataMessage, boolean foreign) {
         W2KeyedMailboxDispatcher dispatcher = this.w2IngressDispatcher;
         if (dispatcher != null) {
             String flowKey = w2FlowKey(sccpDataMessage);
             W2Work<Runnable> work = new W2Work<>(flowKey, w2IngressPriority(sccpDataMessage.getData()), Long.MAX_VALUE,
-                    () -> processMessage(sccpDataMessage));
+                    () -> processMessage(sccpDataMessage, foreign));
             if (dispatcher.submit(work)) {
                 return;
             }
             logger.warn("W2 TCAP ingress queue is full; processing message inline to avoid dropping SCCP data: {}",
                     flowKey);
         }
-        processMessage(sccpDataMessage);
+        processMessage(sccpDataMessage, foreign);
     }
 
-    private void processMessage(SccpDataMessage sccpDataMessage) {
+    private void processMessage(SccpDataMessage sccpDataMessage, boolean foreign) {
         try {
             byte[] data = sccpDataMessage.getData();
             SccpAddress sccpCallingPartyAddress = sccpDataMessage.getCalledPartyAddress();
@@ -955,6 +1013,9 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                         setSsnToDialog(dialog, sccpDataMessage.getCalledPartyAddress().getSubsystemNumber());
                     } else {
                         dialog = this.dialogs.get(dialogId);
+                        if (dialog == null && routeToOwner(dialogId, sccpDataMessage, foreign)) {
+                            return;
+                        }
                         if (dialog == null) {
                             dialog = tryImportMissingDialog(dialogId);
                         }
@@ -1079,6 +1140,9 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                         setSsnToDialog(dialog, sccpDataMessage.getCalledPartyAddress().getSubsystemNumber());
                     } else {
                         dialog = this.dialogs.get(dialogId);
+                        if (dialog == null && routeToOwner(dialogId, sccpDataMessage, foreign)) {
+                            return;
+                        }
                     }
                     if (dialog == null) {
                         // ADR 0007 P0 / M3 — the owner JVM died mid-dialog and the peer
@@ -1125,6 +1189,9 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                         setSsnToDialog(dialog, sccpDataMessage.getCalledPartyAddress().getSubsystemNumber());
                     } else {
                         dialog = this.dialogs.get(dialogId);
+                        if (dialog == null && routeToOwner(dialogId, sccpDataMessage, foreign)) {
+                            return;
+                        }
                     }
                     if (dialog == null) {
                         // ADR 0007 P0 / M3 — same leak as TC-END: an ABORT for a
