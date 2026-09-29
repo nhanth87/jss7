@@ -1081,6 +1081,13 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                         dialog = this.dialogs.get(dialogId);
                     }
                     if (dialog == null) {
+                        // ADR 0007 P0 / M3 — the owner JVM died mid-dialog and the peer
+                        // closes it here. Without the resolver hook the imported
+                        // dialog would be unknown and stay in the map until the idle
+                        // timer fired, leaking it for a full idle window.
+                        dialog = tryImportMissingDialog(dialogId);
+                    }
+                    if (dialog == null) {
                         logger.warn("TC-END: No dialog/transaction for id: " + dialogId);
                     } else {
                         logger.debug("Adding NetworkId to dialog in end" + sccpDataMessage.getNetworkId());
@@ -1118,6 +1125,11 @@ public class TCAPProviderImpl implements TCAPProvider, SccpListener {
                         setSsnToDialog(dialog, sccpDataMessage.getCalledPartyAddress().getSubsystemNumber());
                     } else {
                         dialog = this.dialogs.get(dialogId);
+                    }
+                    if (dialog == null) {
+                        // ADR 0007 P0 / M3 — same leak as TC-END: an ABORT for a
+                        // taken-over dialog would otherwise be dropped silently.
+                        dialog = tryImportMissingDialog(dialogId);
                     }
                     if (dialog == null) {
                         logger.warn("TC-ABORT: No dialog/transaction for id: " + dialogId);

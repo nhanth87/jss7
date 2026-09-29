@@ -4,6 +4,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +24,15 @@ import org.restcomm.protocols.ss7.tcap.api.tc.dialog.events.TCNoticeIndication;
 import org.restcomm.protocols.ss7.tcap.api.tc.dialog.events.TCPAbortIndication;
 import org.restcomm.protocols.ss7.tcap.api.tc.dialog.events.TCUniIndication;
 import org.restcomm.protocols.ss7.tcap.api.tc.dialog.events.TCUserAbortIndication;
+import org.restcomm.protocols.ss7.tcap.asn.InvokeImpl;
+import org.restcomm.protocols.ss7.tcap.asn.OperationCodeImpl;
+import org.restcomm.protocols.ss7.tcap.asn.ReturnResultLastImpl;
 import org.restcomm.protocols.ss7.tcap.asn.TcapFactory;
 import org.restcomm.protocols.ss7.tcap.asn.Utils;
+import org.restcomm.protocols.ss7.tcap.api.tc.component.InvokeClass;
+import org.restcomm.protocols.ss7.tcap.api.tc.component.OperationState;
 import org.restcomm.protocols.ss7.tcap.asn.comp.Invoke;
+import org.restcomm.protocols.ss7.tcap.asn.comp.OperationCodeType;
 import org.restcomm.protocols.ss7.tcap.asn.comp.PAbortCauseType;
 import org.restcomm.protocols.ss7.tcap.asn.comp.TCContinueMessage;
 import org.testng.annotations.AfterClass;
@@ -197,9 +204,157 @@ public class TcapDialogExportImportTest extends SccpHarness {
         assertEquals(probeB.pAbortCount.get(), 0);
     }
 
+    /**
+     * ADR 0007 P0 / M1 — the case every earlier test avoided: a dialog with an
+     * <b>outstanding invoke</b>, exported and imported into another provider.
+     *
+     * <p>
+     * The three original tests all used {@code setInvokeTimeout(0)} in
+     * {@code setUp}, so the pending-invoke path was never exercised. Without this
+     * test the take-over silently answers the real peer with
+     * {@code Reject(UnrecognizedInvokeID)}.
+     */
+    @Test(groups = { "functional.flow" })
+    public void exportImportPreservesPendingInvokeAcrossProviders() throws Exception {
+        // A real operation timeout this time — the timer must be re-armed on import.
+        this.stackA.setInvokeTimeout(30000);
+        this.stackB.setInvokeTimeout(30000);
+
+        TCAPProviderImpl providerA = (TCAPProviderImpl) this.stackA.getProvider();
+        TCAPProviderImpl providerB = (TCAPProviderImpl) this.stackB.getProvider();
+        ContinueProbe probeB = new ContinueProbe();
+        providerB.addTCListener(probeB);
+
+        Dialog dialog = providerA.getNewDialog(peer1Address, peer2Address, 5501L);
+        DialogImpl live = (DialogImpl) dialog;
+        byte[] remoteOtid = Utils.encodeTransactionId(5502L, this.stackA.getSwapTcapIdBytes());
+        live.setRemoteTransactionId(remoteOtid);
+        live.setRemotePc(2);
+        live.setState(TRPseudoState.Active);
+
+        // Send a real Invoke (Class 1) and remember its id — this is the operation
+        // the peer will later answer with ReturnResult(Last).
+        InvokeImpl sent = new InvokeImpl(InvokeClass.Class1);
+        sent.setInvokeId(3L);
+        sent.setProvider(providerA);
+        sent.setDialog(live);
+        OperationCodeImpl oc = new OperationCodeImpl();
+        oc.setOperationType(OperationCodeType.Local);
+        oc.setLocalOperationCode(45L); // MAP sendRoutingInfoForSM
+        sent.setOperationCode(oc);
+        sent.setTimeout(30000);
+        live.putPendingInvokeForTest(3L, sent);
+        sent.setState(OperationState.Sent);
+
+        assertEquals(live.getPendingInvokeCount(), 1, "live dialog must report one outstanding operation");
+
+        TcapDialogSnapshot snapshot = providerA.exportDialog(5501L);
+        assertNotNull(snapshot);
+        TcapDialogSnapshot.PendingInvoke[] pendings = snapshot.getPendingInvokes();
+        assertNotNull(pendings, "snapshot must carry the pending invoke (M1)");
+        assertEquals(pendings.length, 1);
+        assertEquals(pendings[0].getInvokeId(), 3);
+        assertEquals(pendings[0].getInvokeClass(), 1);
+        assertEquals(pendings[0].getLocalOperationCode(), Long.valueOf(45L));
+
+        providerA.detachDialogForFailover(5501L);
+        Dialog imported = providerB.importDialog(snapshot);
+        assertNotNull(imported);
+        assertEquals(imported.getPendingInvokeCount(), 1, "imported dialog must restore the outstanding operation");
+
+        // The peer's answer: ReturnResult(Last) for invokeId 3.
+        TCContinueMessage continueMessage = TcapFactory.createTCContinueMessage();
+        continueMessage.setOriginatingTransactionId(remoteOtid);
+        continueMessage.setDestinationTransactionId(Utils.encodeTransactionId(5501L, this.stackB.getSwapTcapIdBytes()));
+
+        continueMessage.setComponent(new org.restcomm.protocols.ss7.tcap.asn.comp.Component[] {
+                returnResultLast(3L) });
+
+        ((DialogImpl) imported).processContinue(continueMessage, peer2Address, peer1Address);
+
+        assertEquals(probeB.pAbortCount.get(), 0, "must not P-Abort");
+        assertEquals(probeB.rejectCount.get(), 0,
+                "must NOT emit Reject(UnrecognizedInvokeID) at the real peer — the invoke was restored");
+        assertEquals(probeB.continueCount.get(), 1, "the ReturnResult(Last) must be delivered upward");
+        assertEquals(imported.getPendingInvokeCount(), 0, "the operation is complete after ReturnResult(Last)");
+    }
+
+    /**
+     * ADR 0007 P0 / M2 — the idle deadline must cross the JVM boundary as wall
+     * clock. Before M2 the snapshot carried {@code System.nanoTime()}, so an
+     * import either got a fresh full window or expired instantly depending on
+     * uptime delta.
+     */
+    @Test(groups = { "functional.flow" })
+    public void snapshotIdleDeadlineIsWallClock() throws Exception {
+        TCAPProviderImpl providerA = (TCAPProviderImpl) this.stackA.getProvider();
+        Dialog dialog = providerA.getNewDialog(peer1Address, peer2Address, 6101L);
+        DialogImpl live = (DialogImpl) dialog;
+        live.setRemoteTransactionId(Utils.encodeTransactionId(6102L, this.stackA.getSwapTcapIdBytes()));
+        live.setState(TRPseudoState.Active);
+
+        TcapDialogSnapshot snapshot = providerA.exportDialog(6101L);
+        assertNotNull(snapshot);
+        long deadline = snapshot.getIdleDeadlineEpochMs();
+        assertTrue(deadline > 0L, "idle deadline must be present as epoch ms");
+        long now = System.currentTimeMillis();
+        // A 60s idle timeout => deadline is now..now+60s in wall clock.
+        assertTrue(deadline >= now, "deadline must not be in the past: " + deadline + " < " + now);
+        assertTrue(deadline <= now + 60000L, "deadline must be within the idle window: " + deadline);
+        // Cross-JVM sanity: nanoTime on a fresh JVM can be near 0 or huge; a wall
+        // clock value is always ~1.7e12. Guard the regression explicitly.
+        assertTrue(deadline > 1_600_000_000_000L, "deadline must look like epoch ms, not a monotonic clock");
+    }
+
+    /**
+     * ADR 0007 P0 / M6 — if an operation genuinely cannot be restored, the dialog
+     * must NOT answer the real peer with a Reject. The component passes through
+     * and the upper layer decides.
+     */
+    @Test(groups = { "functional.flow" })
+    public void unmatchableResponseOnImportedDialogDoesNotRejectPeer() throws Exception {
+        TCAPProviderImpl providerA = (TCAPProviderImpl) this.stackA.getProvider();
+        TCAPProviderImpl providerB = (TCAPProviderImpl) this.stackB.getProvider();
+        ContinueProbe probeB = new ContinueProbe();
+        providerB.addTCListener(probeB);
+
+        Dialog dialog = providerA.getNewDialog(peer1Address, peer2Address, 6201L);
+        DialogImpl live = (DialogImpl) dialog;
+        live.setRemoteTransactionId(Utils.encodeTransactionId(6202L, this.stackA.getSwapTcapIdBytes()));
+        live.setState(TRPseudoState.Active);
+
+        TcapDialogSnapshot snapshot = providerA.exportDialog(6201L);
+        assertNotNull(snapshot);
+        providerA.detachDialogForFailover(6201L);
+
+        Dialog imported = providerB.importDialog(snapshot);
+        assertNotNull(imported);
+        assertEquals(imported.getPendingInvokeCount(), 0);
+
+        // A response for an invoke id this dialog never sent (snapshot carried none).
+        TCContinueMessage continueMessage = TcapFactory.createTCContinueMessage();
+        continueMessage.setOriginatingTransactionId(Utils.encodeTransactionId(6202L, this.stackB.getSwapTcapIdBytes()));
+        continueMessage.setDestinationTransactionId(Utils.encodeTransactionId(6201L, this.stackB.getSwapTcapIdBytes()));
+        continueMessage.setComponent(new org.restcomm.protocols.ss7.tcap.asn.comp.Component[] {
+                returnResultLast(9L) });
+
+        ((DialogImpl) imported).processContinue(continueMessage, peer2Address, peer1Address);
+
+        assertEquals(probeB.rejectCount.get(), 0,
+                "an imported dialog must not Reject the real peer for an operation it never had");
+    }
+
+    /** A minimal ReturnResult(Last) — the response that must not be Rejected. */
+    private static org.restcomm.protocols.ss7.tcap.asn.comp.Component returnResultLast(long invokeId) {
+        ReturnResultLastImpl rrl = new ReturnResultLastImpl();
+        rrl.setInvokeId(invokeId);
+        return rrl;
+    }
+
     private static final class ContinueProbe implements TCListener {
         final AtomicInteger continueCount = new AtomicInteger();
         final AtomicInteger pAbortCount = new AtomicInteger();
+        final AtomicInteger rejectCount = new AtomicInteger();
         final List<PAbortCauseType> pAbortCauses = new ArrayList<>();
 
         @Override
@@ -213,6 +368,14 @@ public class TcapDialogExportImportTest extends SccpHarness {
         @Override
         public void onTCContinue(TCContinueIndication ind) {
             continueCount.incrementAndGet();
+            org.restcomm.protocols.ss7.tcap.asn.comp.Component[] comps = ind.getComponents();
+            if (comps != null) {
+                for (org.restcomm.protocols.ss7.tcap.asn.comp.Component c : comps) {
+                    if (c.getType() == org.restcomm.protocols.ss7.tcap.asn.comp.ComponentType.Reject) {
+                        rejectCount.incrementAndGet();
+                    }
+                }
+            }
         }
 
         @Override

@@ -46,6 +46,8 @@ import org.restcomm.protocols.ss7.tcap.asn.EncodeException;
 import org.restcomm.protocols.ss7.tcap.asn.ErrorCodeImpl;
 import org.restcomm.protocols.ss7.tcap.asn.InvokeImpl;
 import org.restcomm.protocols.ss7.tcap.asn.OperationCodeImpl;
+import org.restcomm.protocols.ss7.tcap.asn.comp.OperationCode;
+import org.restcomm.protocols.ss7.tcap.asn.comp.OperationCodeType;
 import org.restcomm.protocols.ss7.tcap.asn.ProblemImpl;
 import org.restcomm.protocols.ss7.tcap.asn.Result;
 import org.restcomm.protocols.ss7.tcap.asn.ResultSourceDiagnostic;
@@ -125,6 +127,16 @@ public class DialogImpl implements Dialog {
     private Future<?> idleTimerFuture;
     /** Absolute nanoTime when the dialog becomes idle; 0 means idle timer disarmed. */
     private long idleDeadlineNanos;
+    /**
+     * ADR 0007 P0 — this dialog was rebuilt from another JVM's
+     * {@code TcapDialogSnapshot}, not driven locally from the start.
+     * <p>
+     * It changes how an unmatched component is handled: on a locally driven dialog
+     * a missing invoke is a real protocol error and must be Rejected; on an
+     * imported one it is an expected consequence of the snapshot boundary and
+     * must <em>not</em> generate a Reject at the far-end peer.
+     */
+    private boolean importedFromSnapshot;
     /**
      * Sticky idle: extend {@link #idleDeadlineNanos} on activity without cancel+reschedule.
      * Disable with {@code -Dss7.tcap.stickyIdleTimer=false} to restore classic restart churn
@@ -1883,6 +1895,22 @@ public class DialogImpl implements Dialog {
                 index = getIndexFromInvokeId(invokeId);
                 invoke = this.operationsSent[index];
             }
+            // ADR 0007 P0 / M6 — on a dialog imported from a peer JVM, an
+            // unmatched invoke is EXPECTED when the snapshot could not carry the
+            // operation (see TcapDialogSnapshot.PendingInvoke). Emitting
+            // Reject(UnrecognizedInvokeID) here sends the reject to the REAL
+            // far-end peer, corrupting a dialogue that would otherwise have
+            // completed. Log loudly and pass the component through instead; the
+            // upper layer (MAP) can still decide.
+            if (invoke == null && this.importedFromSnapshot && (ci.getType() == ComponentType.ReturnResult
+                    || ci.getType() == ComponentType.ReturnResultLast || ci.getType() == ComponentType.ReturnError)) {
+                logger.warn("Dialog " + this.localTransactionId + ": " + ci.getType()
+                        + " for invokeId=" + invokeId
+                        + " has no local operation (imported dialog) — passing through without a Reject. "
+                        + "The operation state was not carried in the takeover snapshot.");
+                resultingIndications.add(ci);
+                continue;
+            }
 
             switch (ci.getType()) {
 
@@ -2271,8 +2299,9 @@ public class DialogImpl implements Dialog {
     }
 
     /**
-     * SPIKE: build a portable snapshot for CONTINUE takeover. Does not include
-     * live invoke operation objects or scheduled timer tasks.
+     * Portable snapshot for cross-JVM takeover. Carries the outstanding-invoke list
+     * (ADR 0007 P0 / M1) and an absolute wall-clock idle deadline (M2) — not the
+     * live {@code InvokeImpl} objects and not a timer {@code Future}.
      */
     TcapDialogSnapshot exportSnapshot() {
         try {
@@ -2281,9 +2310,140 @@ public class DialogImpl implements Dialog {
             if (this.lastACN != null) {
                 acnOid = this.lastACN.getOid();
             }
+            long now = System.nanoTime();
             return new TcapDialogSnapshot(this.localTransactionId, this.remoteTransactionId, this.localAddress,
-                    this.remoteAddress, this.state, acnOid, this.idleDeadlineNanos, this.networkId, this.localSsn,
-                    this.remotePc, this.seqControl, this.dpSentInBegin, this.invokeIDTable, this.preferredAspName);
+                    this.remoteAddress, this.state, acnOid, nanoToEpochMsLocked(this.idleDeadlineNanos), this.networkId,
+                    this.localSsn, this.remotePc, this.seqControl, this.dpSentInBegin, this.invokeIDTable,
+                    this.preferredAspName, exportPendingInvokesLocked(now));
+        } finally {
+            this.dialogLock.unlock();
+        }
+    }
+
+    /**
+     * Convert a local {@code nanoTime} deadline into wall-clock epoch ms so it
+     * means something in another JVM. Caller must hold {@link #dialogLock}.
+     */
+    private long nanoToEpochMsLocked(long deadlineNanos) {
+        if (deadlineNanos <= 0L) {
+            return 0L;
+        }
+        long deltaMs = TimeUnit.NANOSECONDS.toMillis(deadlineNanos - System.nanoTime());
+        return System.currentTimeMillis() + Math.max(deltaMs, 0L);
+    }
+
+    /**
+     * Snapshot every invoke in {@code operationsSent[]} that is still awaiting a
+     * result. Caller must hold {@link #dialogLock}.
+     */
+    private TcapDialogSnapshot.PendingInvoke[] exportPendingInvokesLocked(long nowNanos) {
+        List<TcapDialogSnapshot.PendingInvoke> out = new ArrayList<>(4);
+        for (InvokeImpl in : this.operationsSent) {
+            if (in == null) {
+                continue;
+            }
+            if (in.getState() != OperationState.Sent) {
+                continue;
+            }
+            Long invokeId = in.getInvokeId();
+            if (invokeId == null) {
+                continue;
+            }
+            OperationCode oc = in.getOperationCode();
+            Long localOp = null;
+            if (oc != null) {
+                try {
+                    localOp = oc.getLocalOperationCode();
+                } catch (Throwable ignore) {
+                    // Global operation codes have no local value; leave null.
+                }
+            }
+            long remainingMs = -1L;
+            long timeout = in.getTimeout();
+            if (timeout > 0) {
+                // Best effort: InvokeImpl does not expose its arm time, so a full
+                // remaining budget is the safe (never premature-timeout) answer.
+                remainingMs = timeout;
+            }
+            out.add(new TcapDialogSnapshot.PendingInvoke(invokeId.intValue(),
+                    in.getInvokeClass().ordinal() + 1, localOp, timeout, remainingMs));
+        }
+        return out.isEmpty() ? null : out.toArray(new TcapDialogSnapshot.PendingInvoke[0]);
+    }
+
+    /**
+     * Rebuild an outstanding invoke in {@code Sent} state from a snapshot entry so
+     * a peer's response is matched instead of rejected (ADR 0007 P0 / M1).
+     * Caller must hold {@link #dialogLock}.
+     */
+    private void restorePendingInvokeLocked(TcapDialogSnapshot.PendingInvoke p) {
+        int index = getIndexFromInvokeId((long) p.getInvokeId());
+        if (index < 0 || index >= this.operationsSent.length) {
+            return;
+        }
+        InvokeClass invokeClass;
+        switch (p.getInvokeClass()) {
+            case 1:
+                invokeClass = InvokeClass.Class1;
+                break;
+            case 2:
+                invokeClass = InvokeClass.Class2;
+                break;
+            case 3:
+                invokeClass = InvokeClass.Class3;
+                break;
+            default:
+                invokeClass = InvokeClass.Class4;
+                break;
+        }
+        InvokeImpl in = new InvokeImpl(invokeClass);
+        in.setInvokeId((long) p.getInvokeId());
+        in.setProvider(this.provider);
+        // setState() early-returns when dialog == null, so bind the dialog FIRST.
+        in.setDialog(this);
+        if (p.getLocalOperationCode() != null) {
+            OperationCodeImpl oc = new OperationCodeImpl();
+            oc.setOperationType(OperationCodeType.Local);
+            oc.setLocalOperationCode(p.getLocalOperationCode());
+            in.setOperationCode(oc);
+        }
+        long timeout = p.getInvokeTimeoutMs();
+        if (timeout <= 0) {
+            timeout = p.getRemainingMillis();
+        }
+        in.setTimeout(timeout);
+        this.operationsSent[index] = in;
+        // Last: arms the operation timer via InvokeImpl.setState(Sent).
+        in.setState(OperationState.Sent);
+    }
+
+    /**
+     * Test seam: install a sent operation at an invoke id, mirroring what
+     * {@link #sendInvokeComponent(InvokeImpl)} does. Package-private so the
+     * export/import test can build a genuinely mid-flight dialog without going
+     * through a live stack.
+     */
+    void putPendingInvokeForTest(Long invokeId, InvokeImpl invoke) {
+        this.operationsSent[getIndexFromInvokeId(invokeId)] = invoke;
+        this.invokeIDTable[getIndexFromInvokeId(invokeId)] = _INVOKEID_TAKEN;
+        this.freeCount--;
+    }
+
+    /**
+     * ADR 0007 P0 / M1 — outstanding operations awaiting a result.
+     * See {@link Dialog#getPendingInvokeCount()}.
+     */
+    @Override
+    public int getPendingInvokeCount() {
+        try {
+            this.dialogLock.lock();
+            int n = 0;
+            for (InvokeImpl in : this.operationsSent) {
+                if (in != null && in.getState() == OperationState.Sent) {
+                    n++;
+                }
+            }
+            return n;
         } finally {
             this.dialogLock.unlock();
         }
@@ -2299,6 +2459,7 @@ public class DialogImpl implements Dialog {
         }
         try {
             this.dialogLock.lock();
+            this.importedFromSnapshot = true;
             this.setRemoteTransactionId(snapshot.getRemoteOtid());
             this.remoteTransactionIdObject = null;
             this.localAddress = snapshot.getLocalAddress();
@@ -2336,11 +2497,33 @@ public class DialogImpl implements Dialog {
                 this.idleTimerFuture.cancel(false);
                 this.idleTimerFuture = null;
             }
-            long deadline = snapshot.getIdleDeadlineNanos();
-            if (deadline > System.nanoTime()) {
-                this.idleDeadlineNanos = deadline;
+            // M2: the snapshot carries an absolute wall-clock deadline. Translate it
+            // into THIS JVM's nanoTime base — reusing the value directly would compare
+            // a foreign monotonic clock against ours and silently grant a fresh full
+            // idle window (or expire instantly, depending on uptime delta).
+            long deadlineEpochMs = snapshot.getIdleDeadlineEpochMs();
+            long remainingMs = deadlineEpochMs - System.currentTimeMillis();
+            if (deadlineEpochMs > 0L && remainingMs > 0L) {
+                this.idleDeadlineNanos = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(remainingMs);
             } else {
                 bumpIdleDeadlineLocked();
+            }
+            // M1: rebuild outstanding invokes so a peer's ReturnResult(Last) /
+            // ReturnError is matched rather than answered with
+            // Reject(UnrecognizedInvokeID) at the real far end.
+            TcapDialogSnapshot.PendingInvoke[] pendings = snapshot.getPendingInvokes();
+            if (pendings != null) {
+                for (TcapDialogSnapshot.PendingInvoke p : pendings) {
+                    if (p == null) {
+                        continue;
+                    }
+                    try {
+                        restorePendingInvokeLocked(p);
+                    } catch (RuntimeException e) {
+                        logger.warn("Failed to restore pending invoke " + p + " for dialog "
+                                + this.localTransactionId + " — its response will be rejected", e);
+                    }
+                }
             }
             scheduleIdleTimerLocked();
         } finally {

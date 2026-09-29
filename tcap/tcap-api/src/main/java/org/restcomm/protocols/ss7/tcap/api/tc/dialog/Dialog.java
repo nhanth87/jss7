@@ -233,6 +233,23 @@ public interface Dialog extends Serializable {
     void resetTimer(Long invokeId) throws TCAPException;
 
     /**
+     * Number of operations this dialog has sent and is still awaiting a result for.
+     *
+     * <p>
+     * Added for cross-JVM dialog takeover (ADR 0007 P0). An incoming
+     * {@code ReturnResult(Last)} / {@code ReturnError} is matched against
+     * {@code operationsSent[]}; when this count is {@code 0} on a dialog that
+     * another JVM believes it owns, the peer is answering a dialogue we cannot
+     * correctly reconstruct. A takeover resolver MUST consult this and refuse
+     * (letting a clean {@code UnrecognizedTxID} P-Abort happen) rather than
+     * import a dialog and then emit {@code Reject(UnrecognizedInvokeID)} at the
+     * real peer.
+     *
+     * @return outstanding invoke count; {@code 0} when idle
+     */
+    int getPendingInvokeCount();
+
+    /**
      * This method can be called on timeout of dialog, inside { @link TCListener#onDialogTimeout(Dialog) } callback. If its
      * called, dialog wont be removed in case application does not perform 'send'.
      */
