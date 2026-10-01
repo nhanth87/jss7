@@ -9,7 +9,7 @@
 
 	<artifactId>ss7-parent</artifactId>
 	<groupId>org.restcomm.protocols.ss7</groupId>
-	<version>9.2.8-j25</version>
+	<version>9.2.9-j25</version>
 
 	<packaging>pom</packaging>
 
@@ -51,7 +51,7 @@
 		<maven.compiler.target>25</maven.compiler.target>
 		<maven.compiler.release>25</maven.compiler.release>
 		<!-- restcomm but not strictly ss7 -->
-		<asn.version>9.2.8-j25</asn.version>
+		<asn.version>9.2.9-j25</asn.version>
 		<stream.version>1.0.0.CR1</stream.version>
 		<sctp.version>2.27.32</sctp.version>
 		<commons.version>1.0.0.CR1</commons.version>
@@ -607,9 +607,35 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<!-- The parent sets <archive><manifestFile> at PLUGIN level, so it reaches every
+				     execution, including the test-jar one (execution id "default"). Overriding it
+				     per-execution is not enough: sccp-impl failed with "Manifest file
+				     .../target/classes/META-INF/MANIFEST.MF does not exist". Override the whole
+				     <archive> once, here, for all executions. -->
+				<configuration>
+					<archive combine.self="override">
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+					</archive>
+				</configuration>
 				<executions>
 					<execution>
 						<id>default-jar</id>
+						<configuration>
+							<archive combine.self="override">
+								<manifest>
+									<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+								</manifest>
+							</archive>
+						</configuration>
+					</execution>
+					<!-- Same inherited <manifestFile> trap, on the test-jar execution: it is
+					     bound in modules that publish test artifacts (sccp-impl was the first),
+					     and it failed packaging with "Manifest file .../MANIFEST.MF does not
+					     exist" because nothing generates that file any more. -->
+					<execution>
+						<id>test-jar</id>
 						<configuration>
 							<archive combine.self="override">
 								<manifest>

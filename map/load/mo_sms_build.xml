@@ -125,28 +125,28 @@
         <mkdir dir="${assemble.dir}" />
         
         <!-- Copy project JAR -->
-        <copy file="${basedir}/target/map-load-9.2.8-j25.jar" tofile="${assemble.dir}/map-load.jar" failonerror="false" />
+        <copy file="${basedir}/target/map-load-9.2.9-j25.jar" tofile="${assemble.dir}/map-load.jar" failonerror="false" />
         
         <!-- Copy jSS7 module JARs from sibling modules -->
-        <copy file="${jss7.root}/map/map-api/target/map-api-9.2.8-j25.jar" tofile="${assemble.dir}/map-api.jar" failonerror="false" />
-        <copy file="${jss7.root}/map/map-impl/target/map-impl-9.2.8-j25.jar" tofile="${assemble.dir}/map-impl.jar" failonerror="false" />
-        <copy file="${jss7.root}/sccp/sccp-api/target/sccp-api-9.2.8-j25.jar" tofile="${assemble.dir}/sccp-api.jar" failonerror="false" />
-        <copy file="${jss7.root}/sccp/sccp-impl/target/sccp-impl-9.2.8-j25.jar" tofile="${assemble.dir}/sccp-impl.jar" failonerror="false" />
-        <copy file="${jss7.root}/sccp/sccp-api-ext/target/sccp-api-ext-9.2.8-j25.jar" tofile="${assemble.dir}/sccp-api-ext.jar" failonerror="false" />
-        <copy file="${jss7.root}/sccp/sccp-impl-ext/target/sccp-impl-ext-9.2.8-j25.jar" tofile="${assemble.dir}/sccp-impl-ext.jar" failonerror="false" />
-        <copy file="${jss7.root}/tcap/tcap-api/target/tcap-api-9.2.8-j25.jar" tofile="${assemble.dir}/tcap-api.jar" failonerror="false" />
-        <copy file="${jss7.root}/tcap/tcap-impl/target/tcap-impl-9.2.8-j25.jar" tofile="${assemble.dir}/tcap-impl.jar" failonerror="false" />
-        <copy file="${jss7.root}/m3ua/api/target/m3ua-api-9.2.8-j25.jar" tofile="${assemble.dir}/m3ua-api.jar" failonerror="false" />
-        <copy file="${jss7.root}/m3ua/impl/target/m3ua-impl-9.2.8-j25.jar" tofile="${assemble.dir}/m3ua-impl.jar" failonerror="false" />
-        <copy file="${jss7.root}/mtp/mtp-api/target/mtp-api-9.2.8-j25.jar" tofile="${assemble.dir}/mtp-api.jar" failonerror="false" />
-        <copy file="${jss7.root}/mtp/mtp-impl/target/mtp-9.2.8-j25.jar" tofile="${assemble.dir}/mtp.jar" failonerror="false" />
-        <copy file="${jss7.root}/isup/isup-api/target/isup-api-9.2.8-j25.jar" tofile="${assemble.dir}/isup-api.jar" failonerror="false" />
-        <copy file="${jss7.root}/isup/isup-impl/target/isup-impl-9.2.8-j25.jar" tofile="${assemble.dir}/isup-impl.jar" failonerror="false" />
-        <copy file="${jss7.root}/ss7-ext/ss7-ext-api/target/ss7-ext-api-9.2.8-j25.jar" tofile="${assemble.dir}/ss7-ext-api.jar" failonerror="false" />
-        <copy file="${jss7.root}/ss7-ext/ss7-ext-impl/target/ss7-ext-impl-9.2.8-j25.jar" tofile="${assemble.dir}/ss7-ext-impl.jar" failonerror="false" />
-        <copy file="${jss7.root}/statistics/api/target/restcomm-statistics-9.2.8-j25.jar" tofile="${assemble.dir}/statistics-api.jar" failonerror="false" />
-        <copy file="${jss7.root}/statistics/impl/target/restcomm-statistics-9.2.8-j25.jar" tofile="${assemble.dir}/statistics-impl.jar" failonerror="false" />
-        <copy file="${jss7.root}/congestion/target/restcomm-congestion-9.2.8-j25.jar" tofile="${assemble.dir}/restcomm-congestion.jar" failonerror="false" />
+        <copy file="${jss7.root}/map/map-api/target/map-api-9.2.9-j25.jar" tofile="${assemble.dir}/map-api.jar" failonerror="false" />
+        <copy file="${jss7.root}/map/map-impl/target/map-impl-9.2.9-j25.jar" tofile="${assemble.dir}/map-impl.jar" failonerror="false" />
+        <copy file="${jss7.root}/sccp/sccp-api/target/sccp-api-9.2.9-j25.jar" tofile="${assemble.dir}/sccp-api.jar" failonerror="false" />
+        <copy file="${jss7.root}/sccp/sccp-impl/target/sccp-impl-9.2.9-j25.jar" tofile="${assemble.dir}/sccp-impl.jar" failonerror="false" />
+        <copy file="${jss7.root}/sccp/sccp-api-ext/target/sccp-api-ext-9.2.9-j25.jar" tofile="${assemble.dir}/sccp-api-ext.jar" failonerror="false" />
+        <copy file="${jss7.root}/sccp/sccp-impl-ext/target/sccp-impl-ext-9.2.9-j25.jar" tofile="${assemble.dir}/sccp-impl-ext.jar" failonerror="false" />
+        <copy file="${jss7.root}/tcap/tcap-api/target/tcap-api-9.2.9-j25.jar" tofile="${assemble.dir}/tcap-api.jar" failonerror="false" />
+        <copy file="${jss7.root}/tcap/tcap-impl/target/tcap-impl-9.2.9-j25.jar" tofile="${assemble.dir}/tcap-impl.jar" failonerror="false" />
+        <copy file="${jss7.root}/m3ua/api/target/m3ua-api-9.2.9-j25.jar" tofile="${assemble.dir}/m3ua-api.jar" failonerror="false" />
+        <copy file="${jss7.root}/m3ua/impl/target/m3ua-impl-9.2.9-j25.jar" tofile="${assemble.dir}/m3ua-impl.jar" failonerror="false" />
+        <copy file="${jss7.root}/mtp/mtp-api/target/mtp-api-9.2.9-j25.jar" tofile="${assemble.dir}/mtp-api.jar" failonerror="false" />
+        <copy file="${jss7.root}/mtp/mtp-impl/target/mtp-9.2.9-j25.jar" tofile="${assemble.dir}/mtp.jar" failonerror="false" />
+        <copy file="${jss7.root}/isup/isup-api/target/isup-api-9.2.9-j25.jar" tofile="${assemble.dir}/isup-api.jar" failonerror="false" />
+        <copy file="${jss7.root}/isup/isup-impl/target/isup-impl-9.2.9-j25.jar" tofile="${assemble.dir}/isup-impl.jar" failonerror="false" />
+        <copy file="${jss7.root}/ss7-ext/ss7-ext-api/target/ss7-ext-api-9.2.9-j25.jar" tofile="${assemble.dir}/ss7-ext-api.jar" failonerror="false" />
+        <copy file="${jss7.root}/ss7-ext/ss7-ext-impl/target/ss7-ext-impl-9.2.9-j25.jar" tofile="${assemble.dir}/ss7-ext-impl.jar" failonerror="false" />
+        <copy file="${jss7.root}/statistics/api/target/restcomm-statistics-9.2.9-j25.jar" tofile="${assemble.dir}/statistics-api.jar" failonerror="false" />
+        <copy file="${jss7.root}/statistics/impl/target/restcomm-statistics-9.2.9-j25.jar" tofile="${assemble.dir}/statistics-impl.jar" failonerror="false" />
+        <copy file="${jss7.root}/congestion/target/restcomm-congestion-9.2.9-j25.jar" tofile="${assemble.dir}/restcomm-congestion.jar" failonerror="false" />
         
         <!-- Copy SCTP module JARs -->
         <copy file="${ethiopia.root}/sctp/sctp-api/target/sctp-api-2.0.13.jar" tofile="${assemble.dir}/sctp-api.jar" failonerror="false" />
@@ -356,4 +356,4 @@
         <delete dir="server" failonerror="false" />
         <delete dir="client" failonerror="false" />
     </target>
-</project>
+</project>

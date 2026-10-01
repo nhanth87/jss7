@@ -46,6 +46,7 @@ public final class Ss7ConfigLoader {
     private static final Set<String> NIS           = Set.of("INTERNATIONAL", "SPARE", "NATIONAL", "RESERVED");
     private static final Set<String> ENCODINGS     = Set.of("ODD", "EVEN");
     private static final Set<String> PROTOCOLS     = Set.of("MAP", "CAP", "TCAP", "INAP");
+    private static final Set<String> ROUTE_RIS     = Set.of("GT", "DPC");
     private static final Set<String> SCTP_BACKENDS = Set.of("FSTACK_DPDK", "NETTY_KERNEL");
     private static final Set<String> SCTP_MODES    = Set.of("IN_PROCESS", "SIDECAR");
     private static final Set<String> SCTP_PLANES   = Set.of("LOOPBACK", "DPDK");
@@ -194,7 +195,8 @@ public final class Ss7ConfigLoader {
         return new Ss7Config.Addr(a.pc(), a.ssn(),
                 orDefault(a.gt(), "*"), orDefault(a.gtType(), "GT0100"),
                 orDefault(a.encoding(), "even"), orDefault(a.plan(), "isdn"),
-                orDefault(a.nature(), "international"));
+                orDefault(a.nature(), "international"),
+                a.ri() == null || a.ri().isBlank() ? null : up(a.ri().trim()));
     }
 
     private static Ss7Config.Tcap normTcap(Ss7Config.Tcap t) {
@@ -300,6 +302,12 @@ public final class Ss7ConfigLoader {
                 + " invalid encoding '" + a.encoding() + "' (odd|even)");
         require(a.pc() != null || a.ssn() != null || (a.gt() != null && !a.gt().isBlank()),
                 where + " is empty (needs at least pc, ssn, or gt)");
+        require(a.ri() == null || ROUTE_RIS.contains(up(a.ri())), where
+                + " invalid ri '" + a.ri() + "' (gt|dpc)");
+        // ri="gt" keeps the translated GT on the wire for the peer's own GTT, so
+        // the internal pc is what selects the MTP3 DPC — it must be present.
+        require(!"GT".equals(up(a.ri())) || a.pc() != null, where
+                + " ri=gt requires a pc (used as the MTP3 DPC)");
     }
 
     // ── small helpers ─────────────────────────────────────────

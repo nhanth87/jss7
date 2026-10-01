@@ -191,6 +191,13 @@ public record Ss7Config(
      * one digit, {@code /} = digit-group separator, {@code -} = ignore. Default
      * {@code "*"} matches any GT. GT format defaults to international/ISDN/even
      * and is only spelled out when it must differ.</p>
+     *
+     * <p>{@code ri} (routing indicator override, translation targets only):
+     * {@code "gt"} forces a GT-routed translation address (the called GT is
+     * carried onward for the peer's own GTT — endpoint shape against a carrier
+     * STP); {@code "dpc"} forces DPC+SSN delivery. Absent keeps the derived
+     * default: real GT digits → GT-routed, bare pc/ssn with the default
+     * {@code gt="*"} → DPC+SSN (hidden-service transit shape).</p>
      */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Addr(
@@ -199,8 +206,9 @@ public record Ss7Config(
             @JsonProperty("gt")       String gt,        // digits or "*"   (default "*")
             @JsonProperty("gtType")   String gtType,    // e.g. GT0100      (default GT0100)
             @JsonProperty("encoding") String encoding,  // odd | even       (default even)
-            @JsonProperty("plan")     String plan,      // isdn | ...        (default isdn)
-            @JsonProperty("nature")   String nature     // international|... (default international)
+            @JsonProperty("plan")     String plan,      // isdn | ...       (default isdn)
+            @JsonProperty("nature")   String nature,    // international|... (default international)
+            @JsonProperty("ri")       String ri         // gt | dpc — translation-target routing override (default: derived)
     ) { }
 
     // ══════════════════════════════════════════════════════════
