@@ -9,7 +9,7 @@
 
 	<artifactId>ss7-parent</artifactId>
 	<groupId>org.restcomm.protocols.ss7</groupId>
-	<version>9.2.9-j25</version>
+	<version>9.2.10-j25</version>
 
 	<packaging>pom</packaging>
 
@@ -51,7 +51,7 @@
 		<maven.compiler.target>25</maven.compiler.target>
 		<maven.compiler.release>25</maven.compiler.release>
 		<!-- restcomm but not strictly ss7 -->
-		<asn.version>9.2.9-j25</asn.version>
+		<asn.version>9.2.10-j25</asn.version>
 		<stream.version>1.0.0.CR1</stream.version>
 		<sctp.version>2.27.32</sctp.version>
 		<commons.version>1.0.0.CR1</commons.version>

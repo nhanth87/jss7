@@ -607,6 +607,37 @@ public class M3UAManagementImpl extends Mtp3UserPartBaseImpl implements M3UAMana
     }
 
     /**
+     * Rebinds an existing AspFactory to a replacement SCTP Association object.
+     * Runtime-only: no {@link #store()} call, because the persisted XML records the
+     * association <em>name</em> and that does not change here.
+     */
+    public void rebindAsp(String aspName, String associationName) throws Exception {
+        AspFactoryImpl aspFactory = this.getAspFactory(aspName);
+        if (aspFactory == null) {
+            throw new Exception(String.format(M3UAOAMMessages.NO_ASP_FOUND, aspName));
+        }
+
+        if (aspFactory.getStatus()) {
+            throw new Exception(String.format("AspFactory=%s is still started. Stop ASP first", aspName));
+        }
+
+        Association association = this.transportManagement.getAssociation(associationName);
+        if (association == null) {
+            throw new Exception(String.format(M3UAOAMMessages.NO_ASSOCIATION_FOUND, associationName));
+        }
+
+        if (association.isStarted()) {
+            throw new Exception(String.format(M3UAOAMMessages.ASSOCIATION_IS_STARTED, associationName));
+        }
+
+        if (association.getAssociationListener() != null) {
+            throw new Exception(String.format(M3UAOAMMessages.ASSOCIATION_IS_ASSOCIATED, associationName));
+        }
+
+        aspFactory.setAssociation(association);
+    }
+
+    /**
      * Associate {@link AspImpl} to {@link AsImpl}
      *
      * @param asName

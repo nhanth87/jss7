@@ -206,6 +206,28 @@ public interface M3UAManagement {
     AspFactory destroyAspFactory(String aspName) throws Exception;
 
     /**
+     * Rebinds an existing {@link AspFactory} to a different SCTP {@link Association}
+     * object, keeping the same association name. The ASP must be stopped first
+     * ({@link #stopAsp(String)}), and the new Association must exist, must not be
+     * started, and must have no listener yet.
+     *
+     * <p>This is a runtime-only operation: unlike {@link #createAspFactory} it never
+     * writes the persist store, because the association name — the only thing the
+     * persisted XML records — does not change. It exists for per-link recovery where
+     * the Association <em>object</em> went stale (socket dead while the name, the ASP
+     * binding and every layer above stay valid): the caller stops the ASP, removes
+     * and re-adds the SCTP Association under the same name, rebinds here, then starts
+     * the SCTP Association again. The ASP handshake restarts on the fresh socket
+     * without touching any other link.
+     *
+     * @param aspName name of the AspFactory to rebind
+     * @param associationName name of the replacement Association (same name as before)
+     * @throws Exception if the AspFactory is unknown or still started, or the
+     *         replacement Association is missing, started, or already bound
+     */
+    void rebindAsp(String aspName, String associationName) throws Exception;
+
+    /**
      * Creates a new {@link Asp} and assigns to {@link As}.
      *
      * @param asName name of As

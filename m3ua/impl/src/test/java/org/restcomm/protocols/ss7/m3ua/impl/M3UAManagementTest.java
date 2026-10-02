@@ -247,6 +247,73 @@ public class M3UAManagementTest {
 
     }
 
+    /**
+     * Per-link recovery: an AspFactory can be rebound to a replacement Association
+     * object under the same name without touching the persist store. Reproduces the
+     * stale-Association failure mode where stop/start on the same object cannot
+     * re-establish the socket.
+     */
+    @Test
+    public void testRebindAsp() throws Exception {
+        Association oldAssoc = this.transportManagement.addAssociation(null, 0, null, 0, "ASPAssocRebind");
+
+        RoutingContext rc = factory.createRoutingContext(new long[] { 1 });
+        NetworkAppearance na = factory.createNetworkAppearance(12l);
+        this.m3uaMgmt.createAs("ASRebind", Functionality.AS, ExchangeType.SE, null, rc, null, 1, na);
+        AspFactoryImpl aspFactory = (AspFactoryImpl) this.m3uaMgmt.createAspFactory("ASPRebind", "ASPAssocRebind", false);
+        this.m3uaMgmt.assignAspToAs("ASRebind", "ASPRebind");
+
+        assertEquals(oldAssoc, aspFactory.getAssociation());
+
+        // snapshot the persist file: rebind must not rewrite it
+        String persistDir = this.m3uaMgmt.getPersistDir();
+        File persistFile = new File(persistDir,
+                this.m3uaMgmt.getName() + "_m3ua1.xml");
+        byte[] before = persistFile.exists()
+                ? java.nio.file.Files.readAllBytes(persistFile.toPath())
+                : null;
+
+        // stale object out, fresh object in under the same name
+        // (what SCTP removeAssociation + addAssociation do in production)
+        Association newAssoc = new TestAssociation("ASPAssocRebind");
+        this.transportManagement.associations.put("ASPAssocRebind", (TestAssociation) newAssoc);
+
+        this.m3uaMgmt.rebindAsp("ASPRebind", "ASPAssocRebind");
+
+        assertEquals(newAssoc, aspFactory.getAssociation());
+        assertEquals(aspFactory, newAssoc.getAssociationListener());
+        // the stale object is detached: it can no longer deliver events to the ASP
+        assertEquals(null, oldAssoc.getAssociationListener());
+
+        byte[] after = persistFile.exists()
+                ? java.nio.file.Files.readAllBytes(persistFile.toPath())
+                : null;
+        assertEquals(before == null ? null : before.length, after == null ? null : after.length);
+        if (before != null) {
+            assertEquals(new String(before, "UTF-8"), new String(after, "UTF-8"));
+        }
+
+        // unknown ASP
+        try {
+            this.m3uaMgmt.rebindAsp("NoSuchAsp", "ASPAssocRebind");
+            throw new AssertionError("expected Exception for unknown ASP");
+        } catch (Exception expected) {
+        }
+
+        // started ASP refuses rebind
+        this.m3uaMgmt.startAsp("ASPRebind");
+        try {
+            this.m3uaMgmt.rebindAsp("ASPRebind", "ASPAssocRebind");
+            throw new AssertionError("expected Exception for started ASP");
+        } catch (Exception expected) {
+        }
+        this.m3uaMgmt.stopAsp("ASPRebind");
+
+        this.m3uaMgmt.unassignAspFromAs("ASRebind", "ASPRebind");
+        this.m3uaMgmt.destroyAs("ASRebind");
+        this.m3uaMgmt.destroyAspFactory("ASPRebind");
+    }
+
     class TestAssociation implements Association {
 
         private int noOfTimeStartCalled = 0;
