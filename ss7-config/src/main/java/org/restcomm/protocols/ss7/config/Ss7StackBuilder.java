@@ -403,14 +403,14 @@ public final class Ss7StackBuilder {
             // Routing-address networkId must match the rule — inbound GTT copies
             // address.networkId onto the message (SccpExtModuleImpl), and wiping it
             // to 0 breaks multi-plane stacks (Digicom live=0 / lab=1).
-            SccpAddress primary = translationPrimary(rule);
+            SccpAddress primary = translationTarget(rule.to(), rule.mask(), rule.networkId());
             int primaryId = addrId++;
             routerExt.addRoutingAddress(primaryId, primary);
 
             int secondaryId = -1;
             if (rule.backup() != null) {
                 secondaryId = addrId++;
-                routerExt.addRoutingAddress(secondaryId, toSccpAddress(rule.backup(), rule.networkId()));
+                routerExt.addRoutingAddress(secondaryId, translationTarget(rule.backup(), rule.mask(), rule.networkId()));
             }
 
             SccpAddress pattern = toSccpAddress(rule.match(), rule.networkId());
@@ -425,30 +425,50 @@ public final class Ss7StackBuilder {
     /**
      * Translation-target address for a GTT rule.
      *
-     * <p>When {@code to} carries a GT, the address is built as-is (GT-routed).
-     * When it carries only {@code pc}/{@code ssn} — the hidden-service transit
-     * shape: deliver on DPC+SSN after consuming the called GT — a synthetic
-     * per-section {@code "-"} GlobalTitle is attached so
-     * {@code RouterExtImpl.addRule} section validation passes while the routing
-     * indicator stays {@link RoutingIndicator#ROUTING_BASED_ON_DPC_AND_SSN}
-     * (mirrors the Nextgen STP GttHarness translation-address construction).</p>
+     * <p>An explicit {@code ri} override (config, per address) wins over the
+     * derived default and only selects the routing shape — every other field
+     * ({@code gt}/{@code pc}/{@code ssn}/GT format) flows from the configured
+     * {@code to} address unchanged:</p>
+     * <ul>
+     *   <li>{@code ri="gt"} — GT-routed translation address: the called party
+     *       leaves as {@link RoutingIndicator#ROUTING_BASED_ON_GLOBAL_TITLE}
+     *       carrying the (mask-translated) GT digits so the peer does its own
+     *       GTT. {@code pc} is kept internally for DPC selection +
+     *       availability checks and dropped on the wire by {@code removeSpc}
+     *       (SccpAddressImpl.encode). With the loader defaults
+     *       ({@code gt="*"}, absent ssn) this is the carrier-STP endpoint
+     *       shape — byte-identical to the USSDGW live Digicom
+     *       routing-address (GT0100 {@code gt="*"}, pc present, ssn=0).</li>
+     *   <li>{@code ri="dpc"} — forces DPC+SSN delivery even when a GT is
+     *       configured.</li>
+     * </ul>
+     *
+     * <p>Derived default (no {@code ri}): when {@code to} carries a real GT
+     * the address is built as-is (GT-routed). When it carries only
+     * {@code pc}/{@code ssn} — the hidden-service transit shape: deliver on
+     * DPC+SSN after consuming the called GT — a synthetic per-section
+     * {@code "-"} GlobalTitle is attached so {@code RouterExtImpl.addRule}
+     * section validation passes while the routing indicator stays
+     * {@link RoutingIndicator#ROUTING_BASED_ON_DPC_AND_SSN} (mirrors the
+     * Nextgen STP GttHarness translation-address construction).</p>
      */
-    private SccpAddress translationPrimary(Ss7Config.Rule rule) {
-        Ss7Config.Addr to = rule.to();
+    private SccpAddress translationTarget(Ss7Config.Addr to, String ruleMask, int networkId) {
+        boolean forceGt = "GT".equalsIgnoreCase(to.ri());
+        boolean forceDpc = "DPC".equalsIgnoreCase(to.ri());
         // Ss7ConfigLoader.normAddr() defaults an absent gt to "*"; a bare "*"
         // alongside pc/ssn means "deliver on DPC+SSN", not a real GT target.
         String gtDigits = to.gt();
         boolean hasGt = gtDigits != null && !gtDigits.isBlank() && !"*".equals(gtDigits.trim());
-        if (hasGt || (to.pc() == null && to.ssn() == null)) {
-            return toSccpAddress(to, rule.networkId());
+        if (!forceDpc && (forceGt || hasGt || (to.pc() == null && to.ssn() == null))) {
+            return toSccpAddress(to, networkId);
         }
-        String mask = rule.mask() != null ? rule.mask() : "K";
+        String mask = ruleMask != null ? ruleMask : "K";
         int sections = mask.split("/", -1).length;
         String dummyDigits = String.join("/", java.util.Collections.nCopies(sections, "-"));
         GlobalTitle gt = new org.restcomm.protocols.ss7.sccp.impl.parameter.GlobalTitle0010Impl(
                 dummyDigits, 0);
         return new SccpAddressImpl(RoutingIndicator.ROUTING_BASED_ON_DPC_AND_SSN, gt,
-                to.pc() == null ? 0 : to.pc(), to.ssn() == null ? 0 : to.ssn(), rule.networkId());
+                to.pc() == null ? 0 : to.pc(), to.ssn() == null ? 0 : to.ssn(), networkId);
     }
 
     // ── TCAP (multi-SSN) ──────────────────────────────────────

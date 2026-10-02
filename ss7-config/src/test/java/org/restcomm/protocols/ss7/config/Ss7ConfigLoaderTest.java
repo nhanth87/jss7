@@ -196,6 +196,37 @@ public class Ss7ConfigLoaderTest extends TestCase {
             """, "no matching localPoint");
     }
 
+    // ── routing-indicator override (ri) ────────────────────────
+    public void testRiGtNormalizedAndPreserved() {
+        Ss7Config c = Ss7ConfigLoader.parse("""
+            { "sccp": { "localPoints": [ { "pc": 1470, "networkId": 0 } ],
+                        "routing": [ { "from": "local", "match": { "gt": "*" },
+                                       "to": { "pc": 1404, "ri": "gt" } } ] },
+              "services": [ { "name": "s", "ssn": 6, "protocol": "map" } ] }
+            """);
+        Ss7Config.Addr to = c.sccp().routing().get(0).to();
+        assertEquals("GT", to.ri());                          // upper-cased, preserved
+        assertEquals(Integer.valueOf(1404), to.pc());
+        assertEquals("*", to.gt());                           // default wildcard
+        assertNull(c.sccp().routing().get(0).match().ri());   // absent stays null
+    }
+
+    public void testRiVocabulary() {
+        expectInvalid("""
+            { "sccp": { "localPoints": [ { "pc": 1, "networkId": 0 } ],
+                        "routing": [ { "match": { "ssn": 6 }, "to": { "pc": 2, "ri": "ssn" } } ] },
+              "services": [ { "name": "s", "ssn": 6, "protocol": "map" } ] }
+            """, "invalid ri");
+    }
+
+    public void testRiGtRequiresPc() {
+        expectInvalid("""
+            { "sccp": { "localPoints": [ { "pc": 1, "networkId": 0 } ],
+                        "routing": [ { "match": { "ssn": 6 }, "to": { "ssn": 6, "ri": "gt" } } ] },
+              "services": [ { "name": "s", "ssn": 6, "protocol": "map" } ] }
+            """, "ri=gt requires a pc");
+    }
+
     public void testBadHostPort() {
         expectInvalid("""
             { "sctp": { "links": [ { "name": "L1", "local": "1.1.1.1", "peer": "2.2.2.2:2" } ] },
