@@ -32,3 +32,9 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# test runs persist management state next to the module; never commit it
+*_tcapmanagement.xml
+*_sccprouter[0-9]*.xml
+*_sccpresource[0-9]*.xml
+dependency-reduced-pom.xml
